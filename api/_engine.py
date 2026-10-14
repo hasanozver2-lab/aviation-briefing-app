@@ -72,28 +72,61 @@ ENV = load_env()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or ENV.get("GEMINI_API_KEY", "")
 
 def get_rss_sources(max_hours=48):
-    """max_hours değerine göre Google News zaman filtreli kaynakları döndürür."""
-    when_tag = "when:2h" if max_hours <= 3 else "when:2d"
+    """Doğrudan yayıncı sitelerinin (Simple Flying, HavaHaber, FlightGlobal, AeroTime vb.) gerçek linkli RSS akışları."""
     return [
+        # 1. Turkey / THY and Turkish aviation
         {
             "category_hint": "Turkey / THY and Turkish aviation",
-            "name": "Google News TR (THY & Türkiye)",
-            "url": f"https://news.google.com/rss/search?q=THY+T%C3%BCrk+Hava+Yollar%C4%B1+Pegasus+AJet+havac%C4%B1l%C4%B1k+{when_tag}&hl=tr&gl=TR&ceid=TR:tr"
+            "name": "HavaHaber",
+            "url": "https://havahaber.com/feed/"
+        },
+        {
+            "category_hint": "Turkey / THY and Turkish aviation",
+            "name": "Tolga Özbek Havacılık",
+            "url": "https://tolgaozbek.com/feed/"
+        },
+        {
+            "category_hint": "Turkey / THY and Turkish aviation",
+            "name": "Yahoo Finance (THY & Pegasus)",
+            "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s=THYAO.IS,PGSUS.IS"
+        },
+        # 2. European and other global airlines
+        {
+            "category_hint": "European and other global airlines",
+            "name": "Simple Flying",
+            "url": "https://simpleflying.com/feed/"
         },
         {
             "category_hint": "European and other global airlines",
-            "name": "Global Airlines (Lufthansa, Airbus, Boeing)",
-            "url": f"https://news.google.com/rss/search?q=airlines+Lufthansa+Airbus+Boeing+Emirates+{when_tag}&hl=en-US&gl=US&ceid=US:en"
+            "name": "FlightGlobal",
+            "url": "https://www.flightglobal.com/rss"
+        },
+        {
+            "category_hint": "European and other global airlines",
+            "name": "AeroTime",
+            "url": "https://www.aerotime.aero/feed"
+        },
+        {
+            "category_hint": "European and other global airlines",
+            "name": "Aviation24",
+            "url": "https://www.aviation24.be/feed/"
+        },
+        # 3. Route news & Fleet
+        {
+            "category_hint": "Route news",
+            "name": "AirDataNews",
+            "url": "https://www.airdatanews.com/feed/"
         },
         {
             "category_hint": "Route news",
-            "name": "Routes & Network Expansion",
-            "url": f"https://news.google.com/rss/search?q=airlines+routes+new+flights+capacity+{when_tag}&hl=en-US&gl=US&ceid=US:en"
+            "name": "Flightradar24",
+            "url": "https://www.flightradar24.com/blog/feed/"
         },
+        # 4. Other areas (Market & Industry)
         {
             "category_hint": "Other areas",
-            "name": "Aviation Regulatory & Industry",
-            "url": f"https://news.google.com/rss/search?q=aviation+IATA+fuel+aircraft+SAF+{when_tag}&hl=en-US&gl=US&ceid=US:en"
+            "name": "Yahoo Finance Aviation",
+            "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s=LHA.DE,AF.PA,IAG.L,AAL,DAL,BA,AIR.PA"
         }
     ]
 
@@ -105,7 +138,7 @@ def clean_html(raw_html):
     return " ".join(clean.split()).strip()
 
 def fetch_rss_items(max_hours=48):
-    """RSS kaynaklarından son max_hours saatlik haberleri çeker ve en yeniden eskiye sıralar."""
+    """Doğrudan yayıncı RSS kaynaklarından son haberleri çeker ve en yeniden eskiye sıralar."""
     articles = []
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(hours=max_hours)
@@ -114,7 +147,10 @@ def fetch_rss_items(max_hours=48):
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
     
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AviationBriefing/1.0"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    }
     sources = get_rss_sources(max_hours)
 
     for source in sources:
