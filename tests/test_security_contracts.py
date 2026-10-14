@@ -111,6 +111,44 @@ def test_official_press_cards_are_extracted_without_navigation_links():
     assert entries[0]["pub_date"] == "01 October 2026"
 
 
+def test_html_source_keeps_article_title_and_source_metadata_separate():
+    payload = b'''<a href="/press-release/2026/item">14 Oct - Singapore Airlines expands its network</a>'''
+    source = {
+        "name": "Singapore Airlines Newsroom",
+        "url": "https://example.com/corporate/newsroom/press-release/",
+        "html_href_contains": "/press-release/",
+    }
+    entries = _engine.extract_html_entries(payload, source)
+    assert entries[0]["title"] == "14 Oct - Singapore Airlines expands its network"
+
+
+def test_major_airline_source_registry_is_present():
+    sources = {source["name"]: source for source in _engine.get_rss_sources()}
+    expected = {
+        "American Airlines Newsroom": "AA",
+        "United Airlines Newsroom": "UA",
+        "Southwest Newsroom": "WN",
+        "Air France Press Releases": "AF",
+        "KLM Newsroom": "KL",
+        "Air Canada News Releases": "AC",
+        "Ryanair Newsroom": "FR",
+        "easyJet Media Centre": "U2",
+        "Qantas Newsroom": "QF",
+        "Singapore Airlines Newsroom": "SQ",
+        "ANA Group Press Releases": "NH",
+        "Japan Airlines Press Releases": "JL",
+        "Cathay Pacific Newsroom": "CX",
+        "Air India Newsroom": "AI",
+        "Etihad Airways News": "EY",
+        "IndiGo Press Releases": "6E",
+        "JetBlue Investor News": "B6",
+        "Copa Holdings News Releases": "CM",
+        "LATAM Investor Releases": "LA",
+        "Alaska Airlines Newsroom": "AS",
+    }
+    assert {name: sources[name]["airline_code"] for name in expected} == expected
+
+
 def test_configured_sources_keep_page_adapter_options(monkeypatch):
     monkeypatch.setenv("AIRLINE_BRIEFING_SOURCES_JSON", json.dumps([{
         "name": "Configured Airline IR",

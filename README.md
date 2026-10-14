@@ -50,7 +50,7 @@ BLOOMBERG_AVIATION_RSS_URL=https://...
 
 Resmi havayolu yatırımcı ilişkileri, newsroom ve sosyal akışları toplu olarak eklemek için `AIRLINE_BRIEFING_SOURCES_JSON` kullanılır. RSS/Atom veya resmi API URL'leriyle kayıt eklenir; sayfa kazıma ve sosyal platformların kullanım şartlarını aşan otomatik scraping yapılmaz.
 
-Şu anda doğrulanmış ve aktif kaynak kayıtlarına Lufthansa Group Newsroom, Delta News Hub, Turkish Airlines Blog, Emirates Newsroom ve Qatar Airways'in resmi Tumblr RSS akışı dahildir. Resmi sayfa RSS yayınlamıyorsa (ör. bazı IR/press-room sayfaları) o sayfa, uygun API veya lisanslı feed bağlanmadan haber üretim hattına alınmaz.
+Yerleşik resmi kaynak seti Lufthansa, Delta, Turkish Airlines, Emirates, Qatar Airways ve Pegasus'a ek olarak American, United, Southwest, Air France, KLM, Air Canada, Ryanair, easyJet, Qantas, Singapore Airlines, ANA, Japan Airlines, Cathay Pacific, Air India, Etihad, IndiGo, JetBlue, Copa, LATAM ve Alaska akışlarını kapsar. RSS/Atom sağlayanlar doğrudan feed olarak; yalnızca newsroom/IR sayfası sağlayanlar tarih zorunlu HTML adaptörüyle okunur. Tarih doğrulanamazsa duyuru akışa alınmaz.
 
 ```json
 [
@@ -70,6 +70,8 @@ Resmi havayolu yatırımcı ilişkileri, newsroom ve sosyal akışları toplu ol
     "airline": "Lufthansa Group",
     "fetch_mode": "html",
     "html_link_class": "press__link",
+    "html_href_contains": "/press-release/",
+    "html_date_context_chars": 1800,
     "date_required": true,
     "resolve_detail_dates": true
   }

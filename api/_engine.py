@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
-SOURCE_POLICY_VERSION = "airline-only-v3"
+SOURCE_POLICY_VERSION = "airline-only-v4"
 SOURCE_TYPES = {
     "mainstream",
     "trade_media",
@@ -155,7 +155,9 @@ def _extract_html_date(value):
     patterns = (
         r"\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b",
         r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b",
+        r"\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}\b",
         r"\b\d{4}-\d{2}-\d{2}\b",
+        r"\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b",
     )
     for pattern in patterns:
         match = re.search(pattern, text, flags=re.IGNORECASE)
@@ -169,6 +171,8 @@ def extract_html_entries(content, source):
     page = content.decode("utf-8", errors="replace") if isinstance(content, bytes) else str(content)
     entries = []
     required_class = source.get("html_link_class", "")
+    href_fragment = source.get("html_href_contains", "")
+    date_context_chars = int(source.get("html_date_context_chars") or 0)
     for match in re.finditer(r"<a\b(?P<attributes>[^>]*)>(?P<body>.*?)</a\s*>", page, flags=re.IGNORECASE | re.DOTALL):
         attributes = match.group("attributes")
         body = match.group("body")
@@ -178,20 +182,29 @@ def extract_html_entries(content, source):
         href = _html_attribute(attributes, "href")
         if not href or href.startswith(("#", "mailto:", "javascript:")):
             continue
+        if href_fragment and href_fragment not in href:
+            continue
         title = _html_attribute(attributes, "title")
         heading_match = re.search(r"<h[1-4]\b[^>]*>(.*?)</h[1-4]\s*>", body, flags=re.IGNORECASE | re.DOTALL)
         heading = _html_text(heading_match.group(1)) if heading_match else ""
-        title = title or heading
+        image_match = re.search(r"<img\b(?P<attributes>[^>]*)>", body, flags=re.IGNORECASE | re.DOTALL)
+        image_alt = _html_attribute(image_match.group("attributes"), "alt") if image_match else ""
+        title = title or heading or image_alt or _html_text(body)
         description = _html_text(body)
         if heading and description.startswith(heading):
             description = description[len(heading):].strip()
         if len(title) < 12:
             continue
+        pub_date = _extract_html_date(body)
+        if not pub_date and date_context_chars:
+            context_start = max(0, match.start() - date_context_chars)
+            context_end = min(len(page), match.end() + date_context_chars)
+            pub_date = _extract_html_date(page[context_start:context_end])
         entries.append({
             "title": title,
             "link": urllib.parse.urljoin(source["url"], href),
             "description": description[:1200],
-            "pub_date": _extract_html_date(body),
+            "pub_date": pub_date,
         })
     return entries[:20]
 
@@ -206,6 +219,7 @@ def fetch_html_detail_date(url, headers, ctx):
             r"(?:Last Modified|Published|Publication Date)\s*:\s*([^<]{3,80})",
             r"property=['\"]article:published_time['\"][^>]+content=['\"]([^'\"]+)",
             r"datePublished\"\s*:\s*\"([^\"]+)\"",
+            r"<time\b[^>]*datetime=['\"]([^'\"]+)['\"]",
         )
         for pattern in patterns:
             match = re.search(pattern, content, flags=re.IGNORECASE)
@@ -253,9 +267,11 @@ def _configured_source_records():
                     continue
                 source_options = {
                     key: record.get(key)
-                    for key in ("fetch_mode", "html_link_class", "endpoint_url")
+                    for key in ("fetch_mode", "html_link_class", "html_href_contains", "endpoint_url")
                     if isinstance(record.get(key), str) and record.get(key)
                 }
+                if isinstance(record.get("html_date_context_chars"), int):
+                    source_options["html_date_context_chars"] = record["html_date_context_chars"]
                 for key in ("date_required", "resolve_detail_dates"):
                     if key in record:
                         source_options[key] = bool(record.get(key))
@@ -314,6 +330,27 @@ def get_rss_sources(max_hours=48):
         _source_record("Emirates Newsroom", "https://www.emirates.com/media-centre/feed/en-us", "European and other global airlines", "airline_newsroom", airline="Emirates", airline_code="EK"),
         _source_record("Qatar Airways Official Tumblr", "https://qatarairways.tumblr.com/rss", "European and other global airlines", "official_social", airline="Qatar Airways", airline_code="QR"),
         _source_record("Pegasus Press Room", "https://www.flypgs.com/en/press-room", "Turkey / THY and Turkish aviation", "airline_newsroom", airline="Pegasus Airlines", airline_code="PC", fetch_mode="html", html_link_class="press__link", date_required=True, resolve_detail_dates=True),
+        # 6. Verified official sources for additional global carriers
+        _source_record("American Airlines Newsroom", "https://news.aa.com/news/", "North American airlines", "airline_newsroom", airline="American Airlines", airline_code="AA", fetch_mode="html", html_href_contains="/news/", html_date_context_chars=1800, date_required=True, resolve_detail_dates=True),
+        _source_record("United Airlines Newsroom", "https://newsroom.united.com/", "North American airlines", "airline_newsroom", airline="United Airlines", airline_code="UA", fetch_mode="html", html_href_contains="/news/", html_date_context_chars=1800, date_required=True, resolve_detail_dates=True),
+        _source_record("Southwest Newsroom", "https://www.swamedia.com/news-and-stories/news-releases", "North American airlines", "airline_newsroom", airline="Southwest Airlines", airline_code="WN", fetch_mode="html", html_href_contains="/news-and-stories/", html_date_context_chars=1800, date_required=True, resolve_detail_dates=True),
+        _source_record("Air France Press Releases", "https://corporate.airfrance.com/en/rss-subscription", "European and other global airlines", "airline_newsroom", airline="Air France", airline_code="AF"),
+        _source_record("KLM Newsroom", "https://nieuws.klm.com/feed/en", "European and other global airlines", "airline_newsroom", airline="KLM", airline_code="KL"),
+        _source_record("Air Canada News Releases", "https://www.aircanada.com/media/?h=1&t=news%20release", "North American airlines", "airline_newsroom", airline="Air Canada", airline_code="AC", fetch_mode="html", html_link_class="text_latestnews_more", html_date_context_chars=2200, date_required=True),
+        _source_record("Ryanair Newsroom", "https://corporate.ryanair.com/media-centre/our-news/?market=ua", "European and other global airlines", "airline_newsroom", airline="Ryanair", airline_code="FR", fetch_mode="html", html_href_contains="/news/", html_date_context_chars=2400, date_required=True),
+        _source_record("easyJet Media Centre", "https://www.easyjet.com/en/news/airline", "European and other global airlines", "airline_newsroom", airline="easyJet", airline_code="U2", fetch_mode="html", html_link_class="stories-card", date_required=True),
+        _source_record("Qantas Newsroom", "https://www.qantasnewsroom.com.au/", "Asia-Pacific airlines", "airline_newsroom", airline="Qantas", airline_code="QF", fetch_mode="html", html_href_contains="qantasnewsroom.com.au", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("Singapore Airlines Newsroom", "https://www.singaporeair.com/en_UK/au/corporate/newsroom/press-release/", "Asia-Pacific airlines", "airline_newsroom", airline="Singapore Airlines", airline_code="SQ", fetch_mode="html", html_href_contains="/corporate/newsroom/press-release/", html_date_context_chars=2200, date_required=True),
+        _source_record("ANA Group Press Releases", "https://www.ana.co.jp/group/en/pr/", "Asia-Pacific airlines", "airline_newsroom", airline="ANA", airline_code="NH", fetch_mode="html", html_href_contains="/group/en/pr/", html_date_context_chars=2200, date_required=True),
+        _source_record("Japan Airlines Press Releases", "https://press.jal.co.jp/en/", "Asia-Pacific airlines", "airline_newsroom", airline="Japan Airlines", airline_code="JL", fetch_mode="html", html_href_contains="/en/", html_date_context_chars=2200, date_required=True),
+        _source_record("Cathay Pacific Newsroom", "https://news.cathaypacific.com/gb", "Asia-Pacific airlines", "airline_newsroom", airline="Cathay Pacific", airline_code="CX", fetch_mode="html", html_href_contains="/gb/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("Air India Newsroom", "https://www.airindia.com/in/en/newsroom/corporate/news-and-announcements.html", "Asia-Pacific airlines", "airline_newsroom", airline="Air India", airline_code="AI", fetch_mode="html", html_href_contains="/in/en/newsroom/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("Etihad Airways News", "https://www.etihad.com/en/news", "Middle East airlines", "airline_newsroom", airline="Etihad Airways", airline_code="EY", fetch_mode="html", html_href_contains="/en/news/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("IndiGo Press Releases", "https://www.goindigo.in/press-releases.html", "Asia-Pacific airlines", "airline_newsroom", airline="IndiGo", airline_code="6E", fetch_mode="html", html_href_contains="/press-releases/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("JetBlue Investor News", "https://ir.jetblue.com/news/", "North American airlines", "airline_ir", airline="JetBlue", airline_code="B6", fetch_mode="html", html_href_contains="/news/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("Copa Holdings News Releases", "https://ir.copaair.com/press-releases", "Latin American airlines", "airline_ir", airline="Copa Airlines", airline_code="CM", fetch_mode="html", html_href_contains="/news-releases/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("LATAM Investor Releases", "https://ir.latam.com/news/press-releases/", "Latin American airlines", "airline_ir", airline="LATAM Airlines", airline_code="LA", fetch_mode="html", html_href_contains="/news/press-releases/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
+        _source_record("Alaska Airlines Newsroom", "https://news.alaskaair.com/press-center/latest-news/category/releases/", "North American airlines", "airline_newsroom", airline="Alaska Airlines", airline_code="AS", fetch_mode="html", html_href_contains="news.alaskaair.com/", html_date_context_chars=2200, date_required=True, resolve_detail_dates=True),
     ]
     sources.extend(_configured_source_records())
     return [source for source in sources if source.get("url")]
@@ -393,6 +430,13 @@ def parse_published_datetime(value):
                 except ValueError:
                     continue
             if parsed is None:
+                for date_format in ("%d %B", "%d %b"):
+                    try:
+                        parsed = datetime.strptime(value.strip(), date_format).replace(year=utc_now().year)
+                        break
+                    except ValueError:
+                        continue
+            if parsed is None:
                 return None
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
@@ -416,10 +460,11 @@ def fetch_rss_items(max_hours=48):
 
     for source in sources:
         try:
+            is_html_source = source.get("fetch_mode") == "html"
             req = urllib.request.Request(source["url"], headers=headers)
-            with urllib.request.urlopen(req, context=ctx, timeout=12) as response:
+            # JS-heavy official pages should fail fast; configured RSS feeds retain the longer window.
+            with urllib.request.urlopen(req, context=ctx, timeout=3 if is_html_source else 12) as response:
                 content = response.read()
-                is_html_source = source.get("fetch_mode") == "html"
                 entries = extract_html_entries(content, source) if is_html_source else parse_feed_entries(content)
                 detail_date_requests = 0
 
@@ -462,7 +507,7 @@ def fetch_rss_items(max_hours=48):
                     
                     # Başlıktaki kaynak ismini ayır
                     source_name = source["name"]
-                    if " - " in title:
+                    if not is_html_source and " - " in title:
                         parts = title.rsplit(" - ", 1)
                         title = parts[0].strip()
                         source_name = parts[1].strip()
