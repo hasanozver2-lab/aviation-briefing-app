@@ -1,5 +1,5 @@
 """
-Vercel Serverless Function Handler
+Vercel Serverless Function Handler (/api/briefing)
 7/24 Bulutta calisan REST API ve Cron tetikleyici.
 """
 
@@ -18,10 +18,8 @@ import engine
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
-        # /api/briefing veya Vercel cron tetikleyici
         mode = query.get("mode", ["daily"])[0]
         force = query.get("refresh", ["false"])[0].lower() in ("true", "1")
 

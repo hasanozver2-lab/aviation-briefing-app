@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aviation Briefing | Executive Intelligence</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#C70A0C">
+  
+  <!-- iOS PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Aviation Briefing">
+  <link rel="apple-touch-icon" href="/static/icon.svg">
+  <link rel="manifest" href="/static/manifest.json">
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --thy-red: #C70A0C;
+      --thy-red-hover: #A5080A;
+      --thy-red-soft: rgba(199, 10, 12, 0.08);
+      --bg-page: #F3F4F6;
+      --bg-card: #FFFFFF;
+      --text-main: #111827;
+      --text-muted: #4B5563;
+      --text-subtle: #6B7280;
+      --border-color: #E5E7EB;
+      --border-accent: rgba(199, 10, 12, 0.25);
+      --card-radius: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed Top App Bar */
+    header.app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: var(--thy-red);
+      color: #FFFFFF;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(199, 10, 12, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      opacity: 0.9;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #FFFFFF;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s ease;
+    }
+
+    .icon-btn:active {
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(0.97);
+    }
+
+    /* Main Container */
+    main.container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Mode Switcher Tabs */
+    .mode-switcher {
+      display: flex;
+      background: #E5E7EB;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .mode-tab.active {
+      background: #FFFFFF;
+      color: var(--thy-red);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Executive Briefing Intro Card */
+    .intro-banner {
+      background: #FFFFFF;
+      border-radius: var(--card-radius);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--thy-red);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .briefing-heading {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .briefing-intro-text {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    .briefing-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--thy-red-soft);
+      color: var(--thy-red);
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--thy-red);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* LAYER 1: Top Summary List */
+    #top-summary {
+      scroll-margin-top: 75px;
+    }
+
+    .summary-card {
+      background: #FFFFFF;
+      border-radius: var(--card-radius);
+      padding: 18px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summary-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .summary-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--thy-red);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .summary-section-group {
+      margin-bottom: 16px;
+    }
+
+    .summary-section-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .summary-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .summary-section-title::before {
+      content: "";
+      width: 3px;
+      height: 12px;
+      background: var(--thy-red);
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .summary-headline-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .summary-item a {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.92rem;
+      line-height: 1.4;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #F9FAFB;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .summary-item a:hover, .summary-item a:active {
+      background: var(--thy-red-soft);
+      border-color: var(--border-accent);
+      color: var(--thy-red);
+    }
+
+    .summary-bullet {
+      color: var(--thy-red);
+      font-size: 1.1rem;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    /* Section Separators */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 32px 0 16px 0;
+    }
+
+    .section-divider-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .section-divider-line {
+      height: 2px;
+      background: #E5E7EB;
+      flex: 1;
+    }
+
+    /* LAYER 2: Detailed Story Blocks */
+    .story-card {
+      background: var(--bg-card);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 80px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .story-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--thy-red);
+      background: var(--thy-red-soft);
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .story-headline {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: var(--text-main);
+      letter-spacing: -0.015em;
+      margin-bottom: 10px;
+    }
+
+    .story-lead {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .story-subheading {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-main);
+      margin: 14px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .analysis-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .analysis-list li {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.45;
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .analysis-list li::before {
+      content: "▪";
+      position: absolute;
+      left: 0;
+      color: var(--thy-red);
+      font-size: 0.95rem;
+    }
+
+    /* Data Points Box */
+    .data-points-box {
+      background: #F9FAFB;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .data-points-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--thy-red);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .data-points-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .data-points-list li {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* THY Impact Assessment Box */
+    .thy-assessment-box {
+      background: var(--thy-red-soft);
+      border-left: 4px solid var(--thy-red);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .thy-assessment-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--thy-red);
+      margin-bottom: 4px;
+    }
+
+    .thy-assessment-text {
+      font-size: 0.88rem;
+      color: #7A0607;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    /* Why It Matters Box */
+    .why-it-matters-box {
+      background: #F3F4F6;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .why-it-matters-label {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Card Footer: Source & Back to Top */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 14px;
+      font-size: 0.82rem;
+    }
+
+    .source-link {
+      color: var(--thy-red);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--thy-red-soft);
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .source-link:active {
+      background: rgba(199, 10, 12, 0.18);
+    }
+
+    .back-to-top-btn {
+      color: var(--thy-red);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .back-to-top-btn:active {
+      background: #E5E7EB;
+    }
+
+    /* iOS Add to Home Screen Banner */
+    .ios-prompt-banner {
+      background: #1F2937;
+      color: #FFFFFF;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.82rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .ios-prompt-text {
+      flex: 1;
+      line-height: 1.35;
+    }
+
+    .ios-prompt-close {
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom) + 20px);
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #111827;
+      color: #FFFFFF;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Loading Spinner */
+    .loading-container {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(199, 10, 12, 0.2);
+      border-top-color: var(--thy-red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Fixed Bar -->
+  <header class="app-bar">
+    <div class="brand-group">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#C70A0C">
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">Aviation Briefing</div>
+        <div class="brand-sub">Executive Intelligence</div>
+      </div>
+    </div>
+    <div class="bar-actions">
+      <button class="icon-btn" id="btn-refresh" title="Yenile">
+        <span>↻</span> Yenile
+      </button>
+      <button class="icon-btn" id="btn-share" title="Bülteni Kopyala / Paylaş">
+        <span>📋</span> Paylaş
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Mode Selector Tabs -->
+    <div class="mode-switcher">
+      <button class="mode-tab active" data-mode="daily">Günlük (Daily / 48h)</button>
+      <button class="mode-tab" data-mode="hourly">Saatlik (Hourly / 1h)</button>
+    </div>
+
+    <!-- iOS "Ana Ekrana Ekle" Bilgilendirmesi -->
+    <div class="ios-prompt-banner" id="ios-prompt" style="display: none;">
+      <div class="ios-prompt-text">
+        📱 <strong>iPhone'a Yükleyin:</strong> Safari'de alttaki <strong>Paylaş (⎋)</strong> butonuna basıp <strong>"Ana Ekrana Ekle"</strong>yi seçerek tam ekran uygulama olarak kullanabilirsiniz.
+      </div>
+      <button class="ios-prompt-close" onclick="dismissIosPrompt()">✕</button>
+    </div>
+
+    <!-- Executive Briefing Heading & Intro Card -->
+    <section class="intro-banner" id="intro-banner">
+      <h1 class="briefing-heading" id="briefing-heading">Aviation Briefing | Loading...</h1>
+      <p class="briefing-intro-text" id="briefing-intro">Below is a summary of the most important verified aviation developments from the last 48 hours.</p>
+      <div class="briefing-meta">
+        <span class="status-badge"><span class="status-dot"></span> Canlı Veri</span>
+        <span id="briefing-time">-</span>
+      </div>
+    </section>
+
+    <!-- LAYER 1: Top Summary List -->
+    <section class="summary-card" id="top-summary">
+      <div class="summary-card-header">
+        <div class="summary-card-title">
+          <span>📑</span> Executive Summary & Contents
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-subtle);">Layer 1</div>
+      </div>
+      <div id="summary-content">
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <p style="font-size: 0.85rem; color: var(--text-subtle);">Haber özetleri yükleniyor...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAYER 2: Detailed Story Blocks -->
+    <section id="detailed-stories">
+      <!-- Dinamik olarak JS ile üretilecek -->
+    </section>
+
+  </main>
+
+  <div id="toast">Bülten panoya kopyalandı!</div>
+
+  <script>
+    let currentMode = "daily";
+    let briefingData = null;
+
+    // Sabit Bölüm Sırası (Prompt kuralı)
+    const SECTION_ORDER = [
+      "Turkey / THY and Turkish aviation",
+      "European and other global airlines",
+      "Route news",
+      "Other areas"
+    ];
+
+    // Sayfa Yüklendiğinde
+    document.addEventListener("DOMContentLoaded", () => {
+      checkIosPrompt();
+      setupTabs();
+      loadBriefing(currentMode);
+
+      document.getElementById("btn-refresh").addEventListener("click", () => {
+        loadBriefing(currentMode, true);
+      });
+
+      document.getElementById("btn-share").addEventListener("click", () => {
+        shareBriefing();
+      });
+    });
+
+    // Sekmeler
+    function setupTabs() {
+      document.querySelectorAll(".mode-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".mode-tab").forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentMode = tab.dataset.mode;
+          loadBriefing(currentMode);
+        });
+      });
+    }
+
+    // iOS Ana Ekrana Ekle Kontrolü
+    function checkIosPrompt() {
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+      const dismissed = localStorage.getItem("ios_prompt_dismissed");
+      if (isIos && !isStandalone && !dismissed) {
+        document.getElementById("ios-prompt").style.display = "flex";
+      }
+    }
+
+    function dismissIosPrompt() {
+      document.getElementById("ios-prompt").style.display = "none";
+      localStorage.setItem("ios_prompt_dismissed", "true");
+    }
+
+    // Brifingi API'dan Yükle
+    async function loadBriefing(mode, forceRefresh = false) {
+      const summaryEl = document.getElementById("summary-content");
+      const storiesEl = document.getElementById("detailed-stories");
+      
+      summaryEl.innerHTML = `
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <p style="font-size: 0.85rem; color: var(--text-subtle);">${forceRefresh ? "Yeni havacılık istihbaratı toplanıp analiz ediliyor..." : "Yükleniyor..."}</p>
+        </div>
+      `;
+      storiesEl.innerHTML = "";
+
+      try {
+        const url = `/api/briefing?mode=${mode}&refresh=${forceRefresh ? 'true' : 'false'}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        const data = await res.json();
+        briefingData = data;
+        renderBriefing(data);
+      } catch (err) {
+        console.error("Yükleme hatası:", err);
+        summaryEl.innerHTML = `
+          <div style="padding: 16px; text-align: center; color: var(--thy-red);">
+            <p><strong>Veri yüklenemedi.</strong></p>
+            <p style="font-size: 0.8rem; color: var(--text-subtle); margin-top: 4px;">${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Brifingi Ekrana Çiz
+    function renderBriefing(data) {
+      document.getElementById("briefing-heading").textContent = data.heading || "Aviation Briefing";
+      document.getElementById("briefing-intro").textContent = data.intro_sentence || "";
+      document.getElementById("briefing-time").textContent = `${data.date_str || ''} • ${data.time_str || ''}`;
+
+      const stories = data.stories || [];
+
+      // Bölümlere göre grupla
+      const grouped = {};
+      SECTION_ORDER.forEach(sec => grouped[sec] = []);
+
+      stories.forEach(story => {
+        const sec = story.section || "Other areas";
+        if (!grouped[sec]) grouped[sec] = [];
+        grouped[sec].push(story);
+      });
+
+      // 1. LAYER 1: Top Summary List
+      let summaryHtml = "";
+      SECTION_ORDER.forEach(secName => {
+        const items = grouped[secName] || [];
+        if (items.length === 0) return;
+
+        summaryHtml += `
+          <div class="summary-section-group">
+            <div class="summary-section-title">${secName}</div>
+            <ul class="summary-headline-list">
+        `;
+
+        items.forEach(item => {
+          summaryHtml += `
+            <li class="summary-item">
+              <a href="#${item.id}">
+                <span class="summary-bullet">›</span>
+                <span>${item.headline}</span>
+              </a>
+            </li>
+          `;
+        });
+
+        summaryHtml += `
+            </ul>
+          </div>
+        `;
+      });
+
+      document.getElementById("summary-content").innerHTML = summaryHtml || "<p style='color: var(--text-subtle); font-size: 0.9rem;'>Bu dönem için kayıtlı haber bulunamadı.</p>";
+
+      // 2. LAYER 2: Detailed Story Blocks
+      let storiesHtml = "";
+      SECTION_ORDER.forEach((secName, secIdx) => {
+        const items = grouped[secName] || [];
+        if (items.length === 0) return;
+
+        storiesHtml += `
+          <div class="section-divider">
+            <h2 class="section-divider-title">${secIdx + 1}. ${secName}</h2>
+            <div class="section-divider-line"></div>
+          </div>
+        `;
+
+        items.forEach(item => {
+          // Analysis Bullets
+          const analysisBullets = (item.detailed_analysis || [])
+            .map(b => `<li>${b}</li>`)
+            .join("");
+
+          // Data Points (Concrete numbers)
+          let dataPointsHtml = "";
+          if (item.data_points && item.data_points.length > 0) {
+            const dataList = item.data_points.map(d => `<li>• ${d}</li>`).join("");
+            dataPointsHtml = `
+              <div class="data-points-box">
+                <div class="data-points-title">📊 Data Points:</div>
+                <ul class="data-points-list">
+                  ${dataList}
+                </ul>
+              </div>
+            `;
+          }
+
+          // THY Impact Assessment
+          let thyImpactHtml = "";
+          if (item.thy_impact_assessment) {
+            thyImpactHtml = `
+              <div class="thy-assessment-box">
+                <div class="thy-assessment-title">✈️ THY Impact Assessment:</div>
+                <div class="thy-assessment-text">${item.thy_impact_assessment}</div>
+              </div>
+            `;
+          }
+
+          // Why It Matters
+          let whyItMattersHtml = "";
+          if (item.why_it_matters) {
+            whyItMattersHtml = `
+              <div class="why-it-matters-box">
+                <span class="why-it-matters-label">Why it matters:</span> ${item.why_it_matters}
+              </div>
+            `;
+          }
+
+          // Original Source Link
+          const sourceObj = item.original_source || {};
+          const sourceTitle = sourceObj.title || "Read full article";
+          const sourceName = sourceObj.source_name ? ` (${sourceObj.source_name})` : "";
+          const sourceUrl = sourceObj.url || "#";
+
+          storiesHtml += `
+            <article class="story-card" id="${item.id}">
+              <div class="story-badge">${item.section}</div>
+              <h3 class="story-headline">${item.headline}</h3>
+              <p class="story-lead">${item.lead || ''}</p>
+
+              <div class="story-subheading">Detailed Analysis:</div>
+              <ul class="analysis-list">
+                ${analysisBullets}
+              </ul>
+
+              ${dataPointsHtml}
+              ${thyImpactHtml}
+              ${whyItMattersHtml}
+
+              <div class="card-footer">
+                <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="source-link">
+                  Original source: [${sourceTitle}]${sourceName} ↗
+                </a>
+                <a href="#top-summary" class="back-to-top-btn">
+                  Back to top summary ↑
+                </a>
+              </div>
+            </article>
+          `;
+        });
+      });
+
+      document.getElementById("detailed-stories").innerHTML = storiesHtml;
+    }
+
+    // Paylaş & Panoya Kopyala
+    function shareBriefing() {
+      if (!briefingData) return;
+
+      let text = `${briefingData.heading}\n`;
+      text += `${briefingData.intro_sentence}\n\n`;
+
+      SECTION_ORDER.forEach(secName => {
+        const items = (briefingData.stories || []).filter(s => s.section === secName);
+        if (items.length === 0) return;
+        text += `\n=== ${secName.toUpperCase()} ===\n`;
+        items.forEach(it => {
+          text += `\n• ${it.headline}\n`;
+          text += `  ${it.lead}\n`;
+          if (it.thy_impact_assessment) {
+            text += `  THY Impact: ${it.thy_impact_assessment}\n`;
+          }
+          if (it.original_source && it.original_source.url) {
+            text += `  Source: ${it.original_source.url}\n`;
+          }
+        });
+      });
+
+      if (navigator.share) {
+        navigator.share({
+          title: briefingData.heading,
+          text: text
+        }).catch(() => copyToClipboard(text));
+      } else {
+        copyToClipboard(text);
+      }
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Bülten metni panoya kopyalandı!");
+      }).catch(err => {
+        showToast("Kopyalanamadı.");
+      });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => {
+        t.classList.remove("show");
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

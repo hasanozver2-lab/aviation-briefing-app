@@ -1,11 +1,8 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/api/briefing", "destination": "/api/index.py" },
-    { "source": "/api/refresh", "destination": "/api/index.py" },
-    { "source": "/api/(.*)", "destination": "/api/index.py" },
-    { "source": "/static/(.*)", "destination": "/static/$1" },
-    { "source": "/", "destination": "/static/index.html" }
+    { "source": "/api/refresh", "destination": "/api/briefing?refresh=true" },
+    { "source": "/static/(.*)", "destination": "/$1" }
   ],
   "crons": [
     {
