@@ -13,6 +13,7 @@ import ssl
 import time
 import urllib.request
 import urllib.parse
+from html import unescape
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -29,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
-SOURCE_POLICY_VERSION = "airline-only-v2"
+SOURCE_POLICY_VERSION = "airline-only-v3"
 SOURCE_TYPES = {
     "mainstream",
     "trade_media",
@@ -140,6 +141,81 @@ def _source_record(name, url, category_hint, source_type="trade_media", **metada
     }
 
 
+def _html_attribute(attributes, name):
+    match = re.search(rf"\b{name}\s*=\s*['\"]([^'\"]+)['\"]", attributes, flags=re.IGNORECASE)
+    return unescape(match.group(1)).strip() if match else ""
+
+
+def _html_text(value):
+    return clean_html(unescape(re.sub(r"<script\b.*?</script\s*>", " ", value, flags=re.IGNORECASE | re.DOTALL)))
+
+
+def _extract_html_date(value):
+    text = _html_text(value)
+    patterns = (
+        r"\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b",
+        r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b",
+        r"\b\d{4}-\d{2}-\d{2}\b",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            return match.group(0)
+    return ""
+
+
+def extract_html_entries(content, source):
+    """Extract explicitly marked press cards from a static official page."""
+    page = content.decode("utf-8", errors="replace") if isinstance(content, bytes) else str(content)
+    entries = []
+    required_class = source.get("html_link_class", "")
+    for match in re.finditer(r"<a\b(?P<attributes>[^>]*)>(?P<body>.*?)</a\s*>", page, flags=re.IGNORECASE | re.DOTALL):
+        attributes = match.group("attributes")
+        body = match.group("body")
+        classes = _html_attribute(attributes, "class")
+        if required_class and required_class not in classes.split():
+            continue
+        href = _html_attribute(attributes, "href")
+        if not href or href.startswith(("#", "mailto:", "javascript:")):
+            continue
+        title = _html_attribute(attributes, "title")
+        heading_match = re.search(r"<h[1-4]\b[^>]*>(.*?)</h[1-4]\s*>", body, flags=re.IGNORECASE | re.DOTALL)
+        heading = _html_text(heading_match.group(1)) if heading_match else ""
+        title = title or heading
+        description = _html_text(body)
+        if heading and description.startswith(heading):
+            description = description[len(heading):].strip()
+        if len(title) < 12:
+            continue
+        entries.append({
+            "title": title,
+            "link": urllib.parse.urljoin(source["url"], href),
+            "description": description[:1200],
+            "pub_date": _extract_html_date(body),
+        })
+    return entries[:20]
+
+
+def fetch_html_detail_date(url, headers, ctx):
+    """Read a detail page's explicit modified/published date when available."""
+    try:
+        request = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(request, context=ctx, timeout=6) as response:
+            content = response.read().decode("utf-8", errors="replace")
+        patterns = (
+            r"(?:Last Modified|Published|Publication Date)\s*:\s*([^<]{3,80})",
+            r"property=['\"]article:published_time['\"][^>]+content=['\"]([^'\"]+)",
+            r"datePublished\"\s*:\s*\"([^\"]+)\"",
+        )
+        for pattern in patterns:
+            match = re.search(pattern, content, flags=re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+    except Exception:
+        return ""
+    return ""
+
+
 def _configured_source_records():
     """Load licensed/API feeds without committing secrets or provider URLs."""
     records = []
@@ -175,6 +251,14 @@ def _configured_source_records():
                 url = record.get("url")
                 if not isinstance(name, str) or not isinstance(url, str) or not url.strip():
                     continue
+                source_options = {
+                    key: record.get(key)
+                    for key in ("fetch_mode", "html_link_class", "endpoint_url")
+                    if isinstance(record.get(key), str) and record.get(key)
+                }
+                for key in ("date_required", "resolve_detail_dates"):
+                    if key in record:
+                        source_options[key] = bool(record.get(key))
                 records.append(_source_record(
                     name,
                     url,
@@ -184,6 +268,7 @@ def _configured_source_records():
                     airline_code=str(record.get("airline_code") or ""),
                     official=True,
                     license_required=bool(record.get("license_required", False)),
+                    **source_options,
                 ))
     return records
 
@@ -228,6 +313,7 @@ def get_rss_sources(max_hours=48):
         _source_record("Turkish Airlines Blog", "https://blog.turkishairlines.com/en/feed/", "Turkey / THY and Turkish aviation", "official_social", airline="Turkish Airlines", airline_code="TK"),
         _source_record("Emirates Newsroom", "https://www.emirates.com/media-centre/feed/en-us", "European and other global airlines", "airline_newsroom", airline="Emirates", airline_code="EK"),
         _source_record("Qatar Airways Official Tumblr", "https://qatarairways.tumblr.com/rss", "European and other global airlines", "official_social", airline="Qatar Airways", airline_code="QR"),
+        _source_record("Pegasus Press Room", "https://www.flypgs.com/en/press-room", "Turkey / THY and Turkish aviation", "airline_newsroom", airline="Pegasus Airlines", airline_code="PC", fetch_mode="html", html_link_class="press__link", date_required=True, resolve_detail_dates=True),
     ]
     sources.extend(_configured_source_records())
     return [source for source in sources if source.get("url")]
@@ -236,7 +322,7 @@ def clean_html(raw_html):
     """HTML etiketlerini temizler."""
     if not raw_html:
         return ""
-    clean = re.sub(r'<.*?>', '', raw_html)
+    clean = re.sub(r'<.*?>', ' ', raw_html)
     return " ".join(clean.split()).strip()
 
 
@@ -299,7 +385,15 @@ def parse_published_datetime(value):
         try:
             parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         except ValueError:
-            return None
+            parsed = None
+            for date_format in ("%d %B %Y", "%B %d, %Y", "%d %b %Y", "%Y-%m-%d"):
+                try:
+                    parsed = datetime.strptime(value.strip(), date_format)
+                    break
+                except ValueError:
+                    continue
+            if parsed is None:
+                return None
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed
@@ -325,15 +419,29 @@ def fetch_rss_items(max_hours=48):
             req = urllib.request.Request(source["url"], headers=headers)
             with urllib.request.urlopen(req, context=ctx, timeout=12) as response:
                 content = response.read()
-                entries = parse_feed_entries(content)
+                is_html_source = source.get("fetch_mode") == "html"
+                entries = extract_html_entries(content, source) if is_html_source else parse_feed_entries(content)
+                detail_date_requests = 0
 
                 for item in entries[:20]:
-                    title, link, description, pub_date = entry_values(item)
+                    if is_html_source:
+                        title = item.get("title", "")
+                        link = item.get("link", "")
+                        description = item.get("description", "")
+                        pub_date = item.get("pub_date", "")
+                    else:
+                        title, link, description, pub_date = entry_values(item)
                     
                     if not title or not link:
                         continue
 
                     if not is_airline_relevant(title, description, source):
+                        continue
+
+                    if not pub_date and source.get("resolve_detail_dates") and detail_date_requests < 10:
+                        pub_date = fetch_html_detail_date(link, headers, ctx)
+                        detail_date_requests += 1
+                    if source.get("date_required") and not pub_date:
                         continue
 
                     canonical_link = canonicalize_url(link)

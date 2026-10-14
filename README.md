@@ -59,16 +59,24 @@ Resmi havayolu yatırımcı ilişkileri, newsroom ve sosyal akışları toplu ol
     "url": "https://example.com/feed-or-api",
     "source_type": "airline_ir",
     "airline": "Pegasus",
-    "airline_code": "PGSUS"
+    "airline_code": "PGSUS",
+    "fetch_mode": "rss",
+    "date_required": true
   },
   {
     "name": "Lufthansa Group Newsroom",
     "url": "https://example.com/feed-or-api",
     "source_type": "airline_newsroom",
-    "airline": "Lufthansa Group"
+    "airline": "Lufthansa Group",
+    "fetch_mode": "html",
+    "html_link_class": "press__link",
+    "date_required": true,
+    "resolve_detail_dates": true
   }
 ]
 ```
+
+Pegasus Press Room için tarih kontrollü HTML adaptörü de aktiftir; yayın tarihi detay sayfasından doğrulanamayan duyurular akışa alınmaz. Bu kural özellikle saatlik radarın eski IR/duyurularla kirlenmesini önler.
 
 IATA dizinindeki tüm üyeler için kaynak URL'leri tek seferde güvenilir biçimde keşfedilemediği için kayıtlar doğrulanmış feed/API URL'leriyle genişletilir. Böylece özel (halka açık olmayan) havayolları ve RSS yayınlamayan siteler için yanlış/uydurma kaynak gösterilmez.
 

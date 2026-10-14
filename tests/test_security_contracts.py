@@ -1,3 +1,5 @@
+import json
+
 from api import _engine
 from api.briefing import handler as briefing_handler
 from api.refresh import handler as refresh_handler
@@ -93,3 +95,33 @@ def test_verified_official_airline_feeds_are_registered():
     assert sources["Lufthansa Group Newsroom"]["source_type"] == "airline_newsroom"
     assert sources["Delta News Hub"]["airline_code"] == "DL"
     assert sources["Emirates Newsroom"]["official"] is True
+
+
+def test_official_press_cards_are_extracted_without_navigation_links():
+    payload = b'''<nav><a href="/menu">Press Room</a></nav>
+    <a class="press__link" href="/release" title="Airline route update">
+      <h3>Airline route update</h3><p>01 October 2026 - New route announced.</p>
+    </a>'''
+    entries = _engine.extract_html_entries(payload, {
+        "url": "https://example.com/en/press-room",
+        "html_link_class": "press__link",
+    })
+    assert len(entries) == 1
+    assert entries[0]["link"] == "https://example.com/release"
+    assert entries[0]["pub_date"] == "01 October 2026"
+
+
+def test_configured_sources_keep_page_adapter_options(monkeypatch):
+    monkeypatch.setenv("AIRLINE_BRIEFING_SOURCES_JSON", json.dumps([{
+        "name": "Configured Airline IR",
+        "url": "https://example.com/ir",
+        "source_type": "airline_ir",
+        "fetch_mode": "html",
+        "html_link_class": "press__link",
+        "date_required": True,
+        "resolve_detail_dates": True,
+    }]))
+    records = _engine._configured_source_records()
+    configured = next(record for record in records if record["name"] == "Configured Airline IR")
+    assert configured["fetch_mode"] == "html"
+    assert configured["date_required"] is True
