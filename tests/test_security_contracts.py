@@ -34,3 +34,23 @@ def test_fallback_contains_only_source_material():
     assert result["status"] == "degraded"
     assert result["stories"][0]["headline"] == "Source title"
     assert result["stories"][0]["original_source"]["url"] == "https://example.com/story"
+
+
+def test_story_ids_are_stable_across_briefing_modes():
+    source = {
+        "title": "Connectivity update",
+        "source_name": "Aviation Source",
+        "url": "https://example.com/connectivity",
+    }
+    briefing = {
+        "stories": [{
+            "headline": "Connectivity update",
+            "section": "Route news",
+            "original_source": source,
+        }]
+    }
+
+    daily = _engine.normalize_generated_briefing(briefing, "daily")
+    hourly = _engine.normalize_generated_briefing(briefing, "hourly")
+
+    assert daily["stories"][0]["id"] == hourly["stories"][0]["id"]

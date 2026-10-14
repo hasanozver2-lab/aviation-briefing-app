@@ -165,6 +165,24 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
+    .mode-tab-label,
+    .mode-tab-meta {
+      display: block;
+    }
+
+    .mode-tab-meta {
+      margin-top: 2px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--text-subtle);
+      letter-spacing: 0.02em;
+    }
+
+    .mode-tab.active .mode-tab-meta {
+      color: var(--thy-red);
+      opacity: 0.8;
+    }
+
     /* Executive Briefing Intro Card */
     .intro-banner {
       background: #FFFFFF;
@@ -217,6 +235,82 @@
       background: var(--thy-red);
       border-radius: 50%;
       display: inline-block;
+    }
+
+    .briefing-context {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+    }
+
+    .briefing-context-title {
+      display: block;
+      color: var(--text-main);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .briefing-context-window {
+      display: block;
+      margin-top: 2px;
+      color: var(--text-subtle);
+    }
+
+    .radar-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: #166534;
+      background: #DCFCE7;
+      border: 1px solid #BBF7D0;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .radar-note[hidden] {
+      display: none;
+    }
+
+    .pulse-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pulse-item {
+      min-width: 0;
+      padding: 10px 11px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #F9FAFB;
+    }
+
+    .pulse-item span {
+      display: block;
+      overflow: hidden;
+      color: var(--text-subtle);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .pulse-item strong {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
     }
 
     /* LAYER 1: Top Summary List */
@@ -351,6 +445,71 @@
       box-shadow: var(--shadow-sm);
       scroll-margin-top: 80px;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .story-card.radar-story {
+      border-left: 4px solid #2878B8;
+    }
+
+    .story-card.is-new {
+      box-shadow: 0 0 0 2px rgba(40, 120, 184, 0.16), var(--shadow-md);
+    }
+
+    .story-card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .story-time {
+      color: var(--text-subtle);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    .story-fresh {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 6px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      color: #0F4C81;
+      background: #E0F2FE;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+
+    .radar-story .story-lead {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+    }
+
+    .empty-state {
+      padding: 24px 18px;
+      border: 1px dashed var(--border-color);
+      border-radius: 12px;
+      background: #F9FAFB;
+      text-align: center;
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .empty-state p {
+      margin-top: 5px;
+      color: var(--text-subtle);
+      font-size: 0.82rem;
     }
 
     .story-badge {
@@ -741,9 +900,15 @@
   <main class="container">
 
     <!-- Mode Selector Tabs -->
-    <div class="mode-switcher">
-      <button class="mode-tab active" data-mode="daily">Günlük (Daily / 48h)</button>
-      <button class="mode-tab" data-mode="hourly">Saatlik (Hourly / 1h)</button>
+    <div class="mode-switcher" role="tablist" aria-label="Briefing görünümü">
+      <button class="mode-tab active" data-mode="daily" role="tab" aria-selected="true">
+        <span class="mode-tab-label">Günlük Brifing</span>
+        <span class="mode-tab-meta">Son 48 saat</span>
+      </button>
+      <button class="mode-tab" data-mode="hourly" role="tab" aria-selected="false">
+        <span class="mode-tab-label">Canlı Radar</span>
+        <span class="mode-tab-meta">Son 60 dakika</span>
+      </button>
     </div>
 
     <!-- iOS "Ana Ekrana Ekle" Bilgilendirmesi -->
@@ -756,11 +921,23 @@
 
     <!-- Executive Briefing Heading & Intro Card -->
     <section class="intro-banner" id="intro-banner">
+      <div class="briefing-context">
+        <div>
+          <span class="briefing-context-title" id="briefing-context-title">Günün özeti</span>
+          <span class="briefing-context-window" id="briefing-context-window">Son 48 saat</span>
+        </div>
+        <span class="radar-note" id="radar-note" hidden>● Yeni akış takipte</span>
+      </div>
       <h1 class="briefing-heading" id="briefing-heading">Aviation Briefing | Loading...</h1>
       <p class="briefing-intro-text" id="briefing-intro">Below is a summary of the most important verified aviation developments from the last 48 hours.</p>
       <div class="briefing-meta">
-        <span class="status-badge"><span class="status-dot"></span> Canlı Veri</span>
+        <span class="status-badge"><span class="status-dot"></span> <span id="status-label">Günlük akış</span></span>
         <span id="briefing-time">-</span>
+      </div>
+      <div class="pulse-grid" aria-label="Briefing özeti">
+        <div class="pulse-item"><span>Toplam haber</span><strong id="pulse-story-count">-</strong></div>
+        <div class="pulse-item"><span>Öncelikli</span><strong id="pulse-critical-count">-</strong></div>
+        <div class="pulse-item"><span>Son güncelleme</span><strong id="pulse-updated-at">-</strong></div>
       </div>
     </section>
 
@@ -768,9 +945,9 @@
     <section class="summary-card" id="top-summary">
       <div class="summary-card-header">
         <div class="summary-card-title">
-          <span>📑</span> Executive Summary & Contents
+          <span>📑</span> <span id="summary-title">Günün önemli gelişmeleri</span>
         </div>
-        <div style="font-size: 0.75rem; color: var(--text-subtle);">Layer 1</div>
+        <div id="summary-scope" style="font-size: 0.75rem; color: var(--text-subtle);">48 SAAT</div>
       </div>
       <div id="summary-content">
         <div class="loading-container">
@@ -828,10 +1005,95 @@
       "Other areas"
     ];
 
+    const MODE_CONFIG = {
+      daily: {
+        contextTitle: "Günün özeti",
+        windowLabel: "Son 48 saat",
+        statusLabel: "Günlük akış",
+        summaryTitle: "Günün önemli gelişmeleri",
+        scopeLabel: "48 SAAT",
+        loadingLabel: "Günlük briefing hazırlanıyor...",
+        emptyTitle: "Bu dönem için doğrulanmış haber bulunamadı.",
+        emptyDetail: "Yeni kaynaklar toplandığında günlük özet burada görünecek."
+      },
+      hourly: {
+        contextTitle: "Canlı gelişme takibi",
+        windowLabel: "Son 60 dakika",
+        statusLabel: "Canlı radar",
+        summaryTitle: "Son saatin gelişmeleri",
+        scopeLabel: "60 DK",
+        loadingLabel: "Canlı radar güncelleniyor...",
+        emptyTitle: "Son 60 dakikada yeni doğrulanmış gelişme yok.",
+        emptyDetail: "Yeni bir gelişme geldiğinde bu akış otomatik olarak güncellenecek."
+      }
+    };
+
+    const previousStoryKeysByMode = new Map();
+
+    function getModeConfig(mode) {
+      return MODE_CONFIG[mode] || MODE_CONFIG.daily;
+    }
+
+    function getStoryKey(story) {
+      const sourceUrl = story && story.original_source && story.original_source.url;
+      return String(story && (story.id || sourceUrl || story.headline) || "story")
+        .trim()
+        .toLowerCase();
+    }
+
+    function deduplicateStories(stories) {
+      const seen = new Set();
+      return stories.filter(story => {
+        const key = getStoryKey(story);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function isCriticalStory(story) {
+      const haystack = [
+        story && story.headline,
+        story && story.lead,
+        story && story.why_it_matters,
+        story && story.strategic_impact
+      ].join(" ").toLowerCase();
+      return /(critical|urgent|emergency|security|safety|accident|divert|closure|strike|warning|alarm|disrupt)/i.test(haystack);
+    }
+
+    function updateModeUi(mode) {
+      const config = getModeConfig(mode);
+      currentMode = mode;
+      document.body.dataset.mode = mode;
+      document.querySelectorAll(".mode-tab").forEach(tab => {
+        const isActive = tab.dataset.mode === mode;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+      });
+      document.getElementById("briefing-context-title").textContent = config.contextTitle;
+      document.getElementById("briefing-context-window").textContent = config.windowLabel;
+      document.getElementById("status-label").textContent = config.statusLabel;
+      document.getElementById("summary-title").textContent = config.summaryTitle;
+      document.getElementById("summary-scope").textContent = config.scopeLabel;
+      document.getElementById("radar-note").hidden = mode !== "hourly";
+      document.getElementById("btn-refresh").title = config.contextTitle + " yenile";
+    }
+
+    function updatePulse(stories, data) {
+      document.getElementById("pulse-story-count").textContent = String(stories.length);
+      document.getElementById("pulse-critical-count").textContent = String(stories.filter(isCriticalStory).length);
+      document.getElementById("pulse-updated-at").textContent = data.time_str || "-";
+    }
+
+    function emptyStateHtml(title, detail) {
+      return '<div class="empty-state"><strong>' + escapeHtml(title) + '</strong><p>' + escapeHtml(detail) + '</p></div>';
+    }
+
     // Sayfa Yüklendiğinde
     document.addEventListener("DOMContentLoaded", () => {
       checkIosPrompt();
       setupTabs();
+      updateModeUi(currentMode);
       loadBriefing(currentMode);
 
       document.getElementById("btn-refresh").addEventListener("click", () => {
@@ -847,9 +1109,8 @@
     function setupTabs() {
       document.querySelectorAll(".mode-tab").forEach(tab => {
         tab.addEventListener("click", () => {
-          document.querySelectorAll(".mode-tab").forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
           currentMode = tab.dataset.mode;
+          updateModeUi(currentMode);
           loadBriefing(currentMode);
         });
       });
@@ -872,13 +1133,16 @@
 
     // Brifingi API'dan Yükle
     async function loadBriefing(mode, forceRefresh = false) {
+      const config = getModeConfig(mode);
       const summaryEl = document.getElementById("summary-content");
       const storiesEl = document.getElementById("detailed-stories");
+
+      updateModeUi(mode);
       
       summaryEl.innerHTML = `
         <div class="loading-container">
           <div class="spinner"></div>
-          <p style="font-size: 0.85rem; color: var(--text-subtle);">${forceRefresh ? "Yeni havacılık istihbaratı toplanıp analiz ediliyor..." : "Yükleniyor..."}</p>
+          <p style="font-size: 0.85rem; color: var(--text-subtle);">${forceRefresh ? "Yeni havacılık istihbaratı toplanıp analiz ediliyor..." : config.loadingLabel}</p>
         </div>
       `;
       storiesEl.innerHTML = "";
@@ -906,11 +1170,20 @@
 
     // Brifingi Ekrana Çiz
     function renderBriefing(data) {
+      const mode = data.mode || currentMode;
+      const config = getModeConfig(mode);
       document.getElementById("briefing-heading").textContent = data.heading || "Aviation Briefing";
       document.getElementById("briefing-intro").textContent = data.intro_sentence || "";
       document.getElementById("briefing-time").textContent = `${data.date_str || ''} • ${data.time_str || ''}`;
 
-      const stories = data.stories || [];
+      const stories = deduplicateStories(Array.isArray(data.stories) ? data.stories : []);
+      const previousStoryKeys = previousStoryKeysByMode.get(mode);
+      const previousKeys = previousStoryKeys || new Set();
+      const newStoryKeys = previousStoryKeys
+        ? new Set(stories.map(getStoryKey).filter(key => !previousKeys.has(key)))
+        : new Set();
+      previousStoryKeysByMode.set(mode, new Set(stories.map(getStoryKey)));
+      updatePulse(stories, data);
 
       // Bölümlere göre grupla
       const grouped = {};
@@ -937,11 +1210,13 @@
         items.forEach(item => {
           const itemId = safeAnchorId(item.id, "story");
           const headline = escapeHtml(item.headline);
+          const itemKey = getStoryKey(item);
+          const freshBadge = newStoryKeys.has(itemKey) ? '<span class="story-fresh">Yeni</span>' : "";
           summaryHtml += `
             <li class="summary-item">
               <a href="#${itemId}">
                 <span class="summary-bullet">›</span>
-                <span>${headline}</span>
+                <span>${headline}${freshBadge}</span>
               </a>
             </li>
           `;
@@ -953,7 +1228,7 @@
         `;
       });
 
-      document.getElementById("summary-content").innerHTML = summaryHtml || "<p style='color: var(--text-subtle); font-size: 0.9rem;'>Bu dönem için kayıtlı haber bulunamadı.</p>";
+      document.getElementById("summary-content").innerHTML = summaryHtml || emptyStateHtml(config.emptyTitle, config.emptyDetail);
 
       // 2. LAYER 2: Detailed Story Blocks
       let storiesHtml = "";
@@ -970,9 +1245,15 @@
 
         items.forEach(item => {
           const itemId = safeAnchorId(item.id, "story");
+          const itemKey = getStoryKey(item);
+          const isNew = newStoryKeys.has(itemKey);
+          const cardClass = "story-card" + (mode === "hourly" ? " radar-story" : "") + (isNew ? " is-new" : "");
           const section = escapeHtml(item.section);
           const headline = escapeHtml(item.headline);
           const lead = escapeHtml(item.lead);
+          const storyTime = escapeHtml(item.published_at || "");
+          const storyTimeMarkup = storyTime ? '<span class="story-time">' + storyTime + '</span>' : "";
+          const freshBadge = isNew ? '<span class="story-fresh">Yeni</span>' : "";
 
           // Analysis Bullets
           const analysisBullets = (item.detailed_analysis || [])
@@ -1056,8 +1337,11 @@
           const articleUrl = safeExternalUrl(sourceObj.url);
 
           storiesHtml += `
-            <article class="story-card" id="${itemId}">
-              <div class="story-badge">${section}</div>
+            <article class="${cardClass}" id="${itemId}">
+              <div class="story-card-topline">
+                <div><span class="story-badge">${section}</span>${freshBadge}</div>
+                ${storyTimeMarkup}
+              </div>
               <h3 class="story-headline">${headline}</h3>
               <p class="story-lead">${lead}</p>
 
@@ -1083,7 +1367,7 @@
         });
       });
 
-      document.getElementById("detailed-stories").innerHTML = storiesHtml;
+      document.getElementById("detailed-stories").innerHTML = storiesHtml || emptyStateHtml(config.emptyTitle, config.emptyDetail);
     }
 
     // iOS PWA Harici Link Açıcı

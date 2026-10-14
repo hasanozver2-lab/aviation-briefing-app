@@ -8,6 +8,7 @@ import os
 import sys
 import re
 import json
+import hashlib
 import ssl
 import time
 import urllib.request
@@ -278,6 +279,7 @@ Each Story Block Structure:
 - `id`: unique slug e.g. "story-1", "story-2"
 - `section`: One of the 4 exact section names above.
 - `headline`: One concise, impactful executive headline.
+- `published_at`: Publication timestamp from the supplied source item.
 - `lead`: 1 short executive lead paragraph.
 - `detailed_analysis`: Array of strings (4-6 bullets for daily, 2-3 for hourly). Include strategy, capacity, demand, revenue, fleet, competition.
 - `data_points`: Array of strings with concrete numerical data (e.g. capacity, frequency, revenue, passengers, ASK, RPK, load factor, delivery count). Leave EMPTY array if no concrete numerical data exists in the story.
@@ -359,6 +361,13 @@ def safe_source_url(value):
     return value.strip()
 
 
+def stable_story_id(source_url, headline, fallback_index):
+    """Keep the same story addressable across daily and hourly briefings."""
+    identity = str(source_url or headline or f"story-{fallback_index}").strip().lower()
+    digest = hashlib.sha1(identity.encode("utf-8")).hexdigest()[:12]
+    return f"story-{digest}"
+
+
 def text_list(value):
     if not isinstance(value, list):
         return []
@@ -393,9 +402,10 @@ def normalize_generated_briefing(briefing, mode):
                 })
 
         stories.append({
-            "id": f"story-{index}",
+            "id": stable_story_id(source.get("url"), raw_story.get("headline"), index),
             "section": section,
             "headline": str(raw_story.get("headline", "Untitled aviation update")),
+            "published_at": str(raw_story.get("published_at", "")),
             "lead": str(raw_story.get("lead", "")),
             "detailed_analysis": text_list(raw_story.get("detailed_analysis")),
             "data_points": text_list(raw_story.get("data_points")),
@@ -448,9 +458,10 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
         if section not in SECTION_ORDER:
             section = "Other areas"
         stories.append({
-            "id": f"story-{index}",
+            "id": stable_story_id(article.get("link"), article.get("title"), index),
             "section": section,
             "headline": str(article.get("title", "Untitled aviation update")),
+            "published_at": str(article.get("pub_date", "")),
             "lead": str(article.get("description", "")),
             "detailed_analysis": [],
             "data_points": [],
