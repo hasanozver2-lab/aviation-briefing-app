@@ -13,6 +13,7 @@ import time
 import urllib.request
 import urllib.parse
 from datetime import datetime, timezone, timedelta
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -70,29 +71,31 @@ def load_env():
 ENV = load_env()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or ENV.get("GEMINI_API_KEY", "")
 
-# RSS Kaynakları
-RSS_SOURCES = [
-    {
-        "category_hint": "Turkey / THY and Turkish aviation",
-        "name": "Google News TR (THY & Türkiye)",
-        "url": "https://news.google.com/rss/search?q=THY+T%C3%BCrk+Hava+Yollar%C4%B1+Pegasus+AJet+havac%C4%B1l%C4%B1k&hl=tr&gl=TR&ceid=TR:tr"
-    },
-    {
-        "category_hint": "European and other global airlines",
-        "name": "Simple Flying Global",
-        "url": "https://news.google.com/rss/search?q=site:simpleflying.com+airlines+Lufthansa+Airbus+Boeing+Emirates&hl=en-US&gl=US&ceid=US:en"
-    },
-    {
-        "category_hint": "Route news",
-        "name": "Aviation Week & FlightGlobal Routes",
-        "url": "https://news.google.com/rss/search?q=airlines+new+routes+flights+expansion+capacity&hl=en-US&gl=US&ceid=US:en"
-    },
-    {
-        "category_hint": "Other areas",
-        "name": "Aviation Regulatory & Industry",
-        "url": "https://news.google.com/rss/search?q=aviation+IATA+ICAO+FAA+EASA+aircraft+deliveries+SAF&hl=en-US&gl=US&ceid=US:en"
-    }
-]
+def get_rss_sources(max_hours=48):
+    """max_hours değerine göre Google News zaman filtreli kaynakları döndürür."""
+    when_tag = "when:2h" if max_hours <= 3 else "when:2d"
+    return [
+        {
+            "category_hint": "Turkey / THY and Turkish aviation",
+            "name": "Google News TR (THY & Türkiye)",
+            "url": f"https://news.google.com/rss/search?q=THY+T%C3%BCrk+Hava+Yollar%C4%B1+Pegasus+AJet+havac%C4%B1l%C4%B1k+{when_tag}&hl=tr&gl=TR&ceid=TR:tr"
+        },
+        {
+            "category_hint": "European and other global airlines",
+            "name": "Global Airlines (Lufthansa, Airbus, Boeing)",
+            "url": f"https://news.google.com/rss/search?q=airlines+Lufthansa+Airbus+Boeing+Emirates+{when_tag}&hl=en-US&gl=US&ceid=US:en"
+        },
+        {
+            "category_hint": "Route news",
+            "name": "Routes & Network Expansion",
+            "url": f"https://news.google.com/rss/search?q=airlines+routes+new+flights+capacity+{when_tag}&hl=en-US&gl=US&ceid=US:en"
+        },
+        {
+            "category_hint": "Other areas",
+            "name": "Aviation Regulatory & Industry",
+            "url": f"https://news.google.com/rss/search?q=aviation+IATA+fuel+aircraft+SAF+{when_tag}&hl=en-US&gl=US&ceid=US:en"
+        }
+    ]
 
 def clean_html(raw_html):
     """HTML etiketlerini temizler."""
@@ -102,7 +105,7 @@ def clean_html(raw_html):
     return " ".join(clean.split()).strip()
 
 def fetch_rss_items(max_hours=48):
-    """RSS kaynaklarından son max_hours saatlik haberleri çeker."""
+    """RSS kaynaklarından son max_hours saatlik haberleri çeker ve en yeniden eskiye sıralar."""
     articles = []
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(hours=max_hours)
@@ -112,8 +115,9 @@ def fetch_rss_items(max_hours=48):
     ctx.verify_mode = ssl.CERT_NONE
     
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AviationBriefing/1.0"}
+    sources = get_rss_sources(max_hours)
 
-    for source in RSS_SOURCES:
+    for source in sources:
         try:
             req = urllib.request.Request(source["url"], headers=headers)
             with urllib.request.urlopen(req, context=ctx, timeout=12) as response:
@@ -124,7 +128,7 @@ def fetch_rss_items(max_hours=48):
                 if channel is None:
                     continue
                 
-                for item in channel.findall("item")[:8]:
+                for item in channel.findall("item")[:10]:
                     title = item.findtext("title", "").strip()
                     link = item.findtext("link", "").strip()
                     description = clean_html(item.findtext("description", ""))
@@ -133,7 +137,20 @@ def fetch_rss_items(max_hours=48):
                     if not title or not link:
                         continue
                     
-                    # Başlıktaki kaynak ismini ayır (örn: "Başlık - Simple Flying")
+                    # Tarih filtreleme
+                    pub_ts = time.time()
+                    pub_str = ""
+                    if pub_date:
+                        try:
+                            dt = parsedate_to_datetime(pub_date)
+                            if dt < cutoff:
+                                continue  # Eski haberi atla
+                            pub_ts = dt.timestamp()
+                            pub_str = dt.strftime("%d %b %H:%M")
+                        except Exception:
+                            pass
+                    
+                    # Başlıktaki kaynak ismini ayır
                     source_name = source["name"]
                     if " - " in title:
                         parts = title.rsplit(" - ", 1)
@@ -146,11 +163,14 @@ def fetch_rss_items(max_hours=48):
                         "description": description,
                         "source": source_name,
                         "category_hint": source["category_hint"],
-                        "pub_date": pub_date
+                        "pub_date": pub_str,
+                        "timestamp": pub_ts
                     })
         except Exception as e:
             print(f"[{source['name']}] RSS çekme hatası: {e}")
             
+    # En taze haberler en üstte
+    articles.sort(key=lambda a: a.get("timestamp", 0), reverse=True)
     return articles
 
 def generate_briefing_with_gemini(articles, mode="daily"):
@@ -159,12 +179,13 @@ def generate_briefing_with_gemini(articles, mode="daily"):
         print("Uyarı: GEMINI_API_KEY bulunamadı, kural tabanlı üretim yapılacak.")
         return fallback_briefing(articles, mode)
 
-    sample_articles = articles[:10]
-    # Sadece başlık, kaynak ve kısa açıklamayı göndererek token ve süre tasarrufu sağla
+    sample_articles = articles[:12]
+    # Sadece başlık, kaynak, yayın saati ve kısa açıklamayı göndererek token ve süre tasarrufu sağla
     compact_articles = [
         {
             "title": a["title"],
             "source": a["source"],
+            "published_at": a.get("pub_date", ""),
             "category_hint": a.get("category_hint", ""),
             "description": a["description"][:200] if a.get("description") else "",
             "link": a["link"]
@@ -174,20 +195,27 @@ def generate_briefing_with_gemini(articles, mode="daily"):
     if not compact_articles:
         return fallback_briefing([], mode)
 
-    prompt_mode_instructions = """
+    today_str = datetime.now().strftime('%d %B %Y')
+
+    prompt_mode_instructions = f"""
 Mode: DAILY (Last 48 Hours)
+- Today is {today_str}.
+- STRONGLY prioritize the freshest breaking news published today and in the last 24-48 hours.
+- Discard any outdated, historical or stale news items.
 - Detailed Analysis: 4 to 6 short, punchy bullet points per story.
 - Include data points, strategic implications, capacity / demand / revenue effects, competition effects, and operational outcomes whenever possible.
 - Explicitly cover the effect on Turkish Airlines (THY) within analysis bullets where relevant.
-""" if mode == "daily" else """
-Mode: HOURLY (Last 1 Hour)
+""" if mode == "daily" else f"""
+Mode: HOURLY (Last 1-2 Hours)
+- Today is {today_str}.
 - Shorter analysis: 2 to 3 short bullets under Detailed Analysis.
-- Include only genuinely new or critical developments.
+- Include only genuinely new, breaking developments from the current hourly window.
 """
 
     system_prompt = f"""
 You are an executive aviation intelligence analyst specialized in Turkish Airlines (THY) and global commercial aviation.
-Your task is to take the provided raw news items and compile a verified executive Aviation Briefing adhering strictly to the user's executive design rules.
+Your task is to take the provided verified news items and compile an up-to-the-minute executive Aviation Briefing adhering strictly to the user's executive design rules.
+Today's date is {today_str}. All analysis must reflect the freshest verified information.
 
 Required Sections (Strict Order):
 1. `Turkey / THY and Turkish aviation`
@@ -393,8 +421,10 @@ def get_briefing(mode="daily", force_refresh=False):
             with open(cache_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 gen_time = datetime.fromisoformat(data.get("generated_at", "2000-01-01T00:00:00"))
-                max_age = timedelta(minutes=30 if mode == "hourly" else 240)
-                if datetime.now() - gen_time < max_age:
+                max_age = timedelta(minutes=10 if mode == "hourly" else 30)
+                # Eski statik test verisi varsa önbelleği atla ve anında taze veri çek
+                has_stale_test = any("Suspend Iran Flights" in s.get("headline", "") for s in data.get("stories", []))
+                if not has_stale_test and (datetime.now() - gen_time < max_age):
                     return data
         except Exception as e:
             print(f"Önbellek okuma hatası ({cache_path.name}): {e}")

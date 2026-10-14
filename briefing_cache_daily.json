@@ -1,52 +1,215 @@
 {
-  "mode": "hourly",
+  "mode": "daily",
   "date_str": "14 October 2026",
-  "time_str": "11:29 UTC",
-  "heading": "Aviation Update | 14 October 2026 11:29",
-  "intro_sentence": "Below is a summary of the most important newly verified or strongly supported aviation developments for the current hourly window.",
+  "time_str": "12:19 UTC",
+  "heading": "Aviation Briefing | 14 October 2026",
+  "intro_sentence": "Below is a summary of the most important verified aviation developments from the last 48 hours.",
   "stories": [
     {
-      "id": "story-1",
+      "id": "thy-ajet-digital-ai",
       "section": "Turkey / THY and Turkish aviation",
-      "headline": "Turkish Airlines, AJet, and Pegasus Suspend All Iran Flights Following New US Sanctions",
-      "lead": "Major Turkish carriers, including Turkish Airlines (THY), its low-cost subsidiary AJet, and Pegasus Airlines, have announced the immediate suspension of all flights to Iran. This decision comes in response to the implementation of new US sanctions targeting the Iranian aviation sector.",
+      "headline": "Turkish Airlines and AJet Showcase Advanced Digital Infrastructure and AI Integration in Lisbon",
+      "lead": "Turkish Technology, a subsidiary of Turkish Airlines, presented the digital infrastructure and AI integration strategies for both THY and its low-cost brand AJet at a recent event in Lisbon, emphasizing innovation in operational efficiency and customer experience.",
       "detailed_analysis": [
-        "The suspension impacts all routes to Iran, directly affecting passenger and cargo operations for the involved airlines.",
-        "The move is a direct compliance measure with US sanctions, highlighting the geopolitical pressures on global aviation.",
-        "Reports indicate approximately 50,000 tickets have been cancelled, leading to significant operational adjustments and potential revenue loss."
+        "THY is leveraging its subsidiary, Turkish Technology, to drive digital transformation across its main brand and AJet.",
+        "Focus on Artificial Intelligence (AI) indicates a strategic move towards predictive analytics, optimized operations, and personalized customer services.",
+        "This investment aims to enhance operational efficiency, reduce costs, and improve the overall passenger journey for both full-service and budget segments.",
+        "The presentation in Lisbon highlights THY's intent to position itself as a technology-forward airline on the international stage.",
+        "Improved digital infrastructure supports scalability for future fleet and network expansion, particularly for AJet's growth ambitions."
       ],
-      "data_points": [
-        "50,000 tickets cancelled"
-      ],
-      "thy_impact_assessment": "Significant negative impact on THY's revenue and route network due to the complete cessation of Iran flights. Operational costs will be incurred for cancellations and re-routing passengers. THY's compliance with international sanctions maintains its global operational integrity but at a direct commercial cost.",
-      "why_it_matters": "This operational change will result in immediate financial losses for Turkish carriers and significantly alter air connectivity between Turkey and Iran.",
+      "data_points": [],
+      "thy_impact_assessment": "Direct positive impact on THY's operational efficiency, cost management, and customer satisfaction. Strengthens THY's brand as an innovator and supports AJet's competitive positioning through advanced technology.",
+      "why_it_matters": "This strategic investment in digital infrastructure and AI will enhance THY's competitive edge and operational resilience, driving long-term financial and operational benefits.",
       "original_source": {
-        "title": "THY, AJet ve Pegasus İran uçuşlarını durdurdu",
-        "source_name": "Bianet",
-        "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOVHliT2RrY2pmSXd0OHk2UVRndDlpNzBvU000aEFJWEFMTUFLblphUFJNcUMzczdxMW00cldleUFtMVhpUXh5WXRXVW9Cc1hvMGFpbFVQemZUODE0dzFUc1RNMU1wS0tFekpoNm9VWmVrd1JLMk15cWZXdUdQZWdkT3l3?oc=5"
+        "title": "THY ve AJet’in Dijital Altyapısı Lizbon’da Anlatıldı! Turkish Technology’den Yapay Zekâ Vurgusu",
+        "source_name": "HavaHaber",
+        "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxObHFTS0pTSFpOX3gyaTJTNGRWbHdQY3Q1MFRKZkszWDJCbExVT2NpaFdfdnZ6Q0M2ZWxzOUtESDJtenVfakpJZGFsRXBqREN5UXVEY3hicldoUWY3V2QxbEV2Z09CbElOTm05RTJiOVZQeVkzZThTenRHN2t6NTk1TDJIY0oxdC1SX3zpb291ZWY1VENva3VCVXNxdncwa09YX1hYYmZWZkxNYi1EdFhEdDFsb0o?oc=5"
       },
       "related_news": []
     },
     {
-      "id": "story-2",
-      "section": "European and other global airlines",
-      "headline": "FAA Mandates Airbus A380 Engine Replacements Following Uncontained Failure Incident",
-      "lead": "The U.S. Federal Aviation Administration (FAA) has issued an Airworthiness Directive (AD) requiring specific engine replacements on certain Airbus A380 aircraft. This directive follows an uncontained engine failure that forced an aborted takeoff, raising significant safety concerns.",
+      "id": "pegasus-cio-festival",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "Pegasus Airlines CIO Discusses Digital Transformation at World Aviation Festival",
+      "lead": "Barış Fındık, CIO of Turkish low-cost carrier Pegasus Airlines, shared insights on the airline's digital strategy and technological advancements at the World Aviation Festival, underscoring the importance of innovation in the competitive aviation landscape.",
       "detailed_analysis": [
-        "The FAA's AD targets specific engine models on the A380 fleet, indicating a focused safety concern rather than a widespread issue across all A380s.",
-        "This action will necessitate operational adjustments and maintenance scheduling for affected airlines, potentially impacting fleet availability.",
-        "The uncontained failure highlights critical safety risks associated with engine integrity, prompting immediate regulatory intervention."
+        "Pegasus Airlines continues to invest heavily in digital transformation to optimize operations and enhance customer experience.",
+        "As a key competitor to THY's AJet, Pegasus's digital advancements directly influence the competitive environment in the Turkish low-cost market.",
+        "Focus on technology helps Pegasus improve efficiency, reduce operational costs, and offer competitive pricing.",
+        "Participation in global forums like the World Aviation Festival indicates Pegasus's commitment to staying at the forefront of industry trends.",
+        "Digital initiatives likely include enhanced online booking, mobile services, and data analytics for demand forecasting."
       ],
       "data_points": [],
-      "thy_impact_assessment": "Weak direct impact on THY as it does not operate the Airbus A380. However, it underscores the importance of stringent engine maintenance and regulatory compliance across the industry, which THY adheres to for its own fleet.",
-      "why_it_matters": "This operational change poses a significant safety risk and financial impact for A380 operators globally due to mandatory maintenance and potential grounding.",
+      "thy_impact_assessment": "Indirect competitive impact. Pegasus's digital advancements put pressure on THY's AJet to match or exceed technological offerings, influencing market share and customer preference in the budget segment.",
+      "why_it_matters": "Pegasus's continued digital innovation intensifies competition within the Turkish aviation market, particularly for THY's low-cost subsidiary AJet, potentially impacting market share and pricing strategies.",
       "original_source": {
-        "title": "FAA Orders Airbus A380 Engine Replacements After Uncontained Failure Forces Aborted Takeoff",
+        "title": "Pegasus CIO’su Barış Fındık World Aviation Festival’de konuştu",
+        "source_name": "Herdem Aviation",
+        "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPcUFRdUQ0U1NKT0Q0TUVWLVQzdjhQdGJscnMzQjNOLVJGeUxyT0NtYUNRc3JCdGs5cTdJX09CeXowLWFDaWN1THhwMG9nd1Q5ZzIyR2U3MXdfQkJDX1laWHFlV01hdWNxWnhic3FmaGZUSmVKdm9XT2F0WjZuLUF3RnUwaTN3c3FuQW9mbFZfOUx0UQ?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "lufthansa-a340-retention",
+      "section": "European and other global airlines",
+      "headline": "Lufthansa Opts to Retain Older Airbus A340s, Signaling Fleet Strategy Shift",
+      "lead": "Lufthansa has decided to keep some of its oldest Airbus A340 aircraft in service, a move that suggests adjustments to its long-haul fleet strategy, potentially driven by demand, delivery delays for new aircraft, or cost considerations.",
+      "detailed_analysis": [
+        "Retention of older A340s indicates a need for sustained long-haul capacity, possibly due to strong demand recovery or unforeseen delays in new aircraft deliveries (e.g., 777X, A350).",
+        "This decision could impact Lufthansa's fleet modernization goals and fuel efficiency targets, as older aircraft typically have higher operating costs.",
+        "The A340s are primarily used for specific long-haul routes, suggesting a strategic need to maintain network breadth or frequency.",
+        "Competitors like THY, which operates a modern and growing wide-body fleet (787s, A350s), benefit from lower operating costs and better passenger experience.",
+        "This could be a temporary measure to bridge a capacity gap until newer, more efficient aircraft become available."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Indirect competitive impact. While THY does not operate A340s, Lufthansa's decision to retain older, less efficient aircraft could slightly diminish its competitive edge on certain long-haul routes where THY operates newer, more fuel-efficient wide-bodies, potentially impacting THY's market share positively.",
+      "why_it_matters": "Lufthansa's fleet strategy adjustment reflects broader industry challenges in managing capacity and fleet modernization, potentially impacting its operational costs and environmental targets.",
+      "original_source": {
+        "title": "Lufthansa To Keep Its Oldest Airbus A340s",
+        "source_name": "Dj's Aviation",
+        "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBjZWFibGh0ZkR2WDVjS3JyVzZQeVYzdENVY3FYU2p5MWx3T2pscXAySGZ0M2RHc2dWRmRwTlNSTlJJSnVRaWxFa1FqX0g4ZUE2TTBrVE9JV2xCWXVMWGdkN3JzRGNqWjZZSUg0RTl2blVDaEZ3?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "royal-air-maroc-starlink",
+      "section": "European and other global airlines",
+      "headline": "Royal Air Maroc to Become Africa's First Airline with Starlink In-Flight Wi-Fi",
+      "lead": "Royal Air Maroc (RAM) is set to be the first African airline to offer Starlink satellite internet connectivity on its flights, a significant upgrade to its passenger experience and a potential differentiator in the competitive African and international markets.",
+      "detailed_analysis": [
+        "RAM's adoption of Starlink represents a leap in in-flight connectivity, offering high-speed, low-latency internet, which is a major passenger amenity.",
+        "This move enhances RAM's brand image as an innovator and improves its competitive standing against other African and European carriers.",
+        "Improved connectivity can drive ancillary revenue opportunities and boost passenger satisfaction, potentially increasing demand.",
+        "The implementation of Starlink could set a new standard for in-flight Wi-Fi in the African market, pressuring competitors to upgrade their offerings.",
+        "This technology investment aligns with a broader trend of airlines seeking to enhance the digital experience onboard."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Weak indirect competitive impact. While THY already offers robust in-flight Wi-Fi, RAM's move with Starlink highlights the evolving expectations for connectivity. THY should monitor Starlink's performance and adoption to assess future competitive pressures and potential upgrades to its own services, particularly on routes competing with RAM.",
+      "why_it_matters": "Royal Air Maroc's adoption of Starlink marks a significant operational and passenger experience upgrade, potentially setting a new benchmark for in-flight connectivity in the African aviation market.",
+      "original_source": {
+        "title": "Royal Air Maroc to Be Africa’s First Airline With Starlink Wi-Fi",
+        "source_name": "mediasat.info",
+        "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNaUVvdHZFM2xPVzBGTEI1OUp3YTFrc1hMVTlBQnkwYnJhQlBBU3hLdHJvM0xYYlJoNGlFWHZEQlJaMlhOMzhVaFItU3J1MTRPcWpGdjkyMGxTVS0wd3ZYb2ZjNmhNT1lvRHBXRGh6MWhuOTZyZ21zU3BfT3ZnSGVhZXpPemsxbmtBYWN5STVQVHA0UHBrWVhUYi1jMmpVOXZTZ3c?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "saudi-flight-cancellations",
+      "section": "Route news",
+      "headline": "Saudi Arabia Experiences Widespread Flight Cancellations Affecting Multiple Airlines",
+      "lead": "Numerous flights to and from Saudi Arabia have been cancelled, impacting several airlines and disrupting travel plans. The specific reasons for the cancellations are not fully detailed but point to significant operational challenges in the region.",
+      "detailed_analysis": [
+        "Widespread cancellations indicate significant operational disruptions, potentially due to airspace restrictions, regulatory changes, or unforeseen events.",
+        "Impacts multiple airlines, suggesting a systemic issue rather than an individual carrier problem.",
+        "Disruptions to Saudi routes affect passenger demand and cargo movements to a key Middle Eastern hub.",
+        "Airlines operating to Saudi Arabia will face revenue losses, rebooking costs, and potential reputational damage.",
+        "The situation requires close monitoring for its duration and broader implications for regional air travel."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Direct operational and revenue impact. THY operates numerous flights to Saudi Arabia (Jeddah, Riyadh, Dammam, Medina). Cancellations will lead to immediate revenue loss, increased operational costs for rebooking and accommodation, and potential disruption to connecting traffic through Istanbul. THY must adapt its schedule and customer service rapidly.",
+      "why_it_matters": "Significant flight cancellations in Saudi Arabia pose a direct operational and financial risk to airlines serving the region, including THY, and disrupt regional travel connectivity.",
+      "original_source": {
+        "title": "Saudi flight cancellations: Latest list of affected airlines and routes",
+        "source_name": "Gulf Business",
+        "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNcVIwZWZ6V09mX19YVWZxZlpYcnFBTDZmaEhpMHNDY0xQNmpjVVhVUnk5cGNYSmthQUtZRlR6cEIwUUZRMUVxQXpRcl9BdG4tOU9sTUVmZ2tBaUhsVjFNV05ELXc1a1c3Q2RPU01MQ2tlU0hnUW5TTXJES0N5SjhnUU4yNnBzTktlVzRPektHQ2lMWkN5dWJZb1NEcTJMOW9xRHp2RUNCdkVOMk1OWHRF?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "japan-demand-flights",
+      "section": "Route news",
+      "headline": "Surging Popularity of Japan Prompts Airlines to Add Flights and Capacity",
+      "lead": "Japan is experiencing a significant surge in tourism popularity, leading multiple international airlines to increase flight frequencies and introduce new routes to various Japanese cities, boosting capacity in response to high demand.",
+      "detailed_analysis": [
+        "Strong demand for travel to Japan indicates a robust recovery in leisure and business travel to the Asia-Pacific region.",
+        "Airlines are responding by increasing capacity, which will intensify competition on routes to Japan.",
+        "Increased flight options will benefit consumers with more choices and potentially lower fares.",
+        "This trend suggests positive revenue opportunities for carriers with strong networks to East Asia.",
+        "The added capacity will help meet the growing tourism and business travel needs, supporting economic recovery in Japan."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Positive indirect impact. THY operates direct flights to major Japanese cities (Tokyo, Osaka). Increased demand for Japan travel presents a strong revenue opportunity for THY, allowing for potential capacity increases or higher load factors on existing routes. THY should monitor competitor capacity additions to maintain its market share.",
+      "why_it_matters": "The significant increase in air travel demand to Japan signals a strong recovery in the Asia-Pacific market, creating substantial revenue opportunities for airlines and intensifying route competition.",
+      "original_source": {
+        "title": "Japan is surging in popularity and airlines are adding flights",
+        "source_name": "Travel Weekly",
+        "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQeWFpbFh5aEI3czhQRUpCVG1hcWx4V3BpS0V5QUdfb2d4NGJna0xFTFVxVzFnVk9tcEJvZnd3MW9JUEx4VWoyZkZ5alBpSE1YRW9JZS1udTZUTlV0NlJiWXEtVXA4TUZvdUM2bWhjSi1fX0JjbWpDRG1odm1zUFZ1bTh4RTBIWVlOeVJBWWRhNWVZT29FemxWcE15YUZzRjZlenRyY1ZjS0djWFU?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "lufthansa-cargo-winter",
+      "section": "Route news",
+      "headline": "Lufthansa Cargo Unveils 2026/2027 Winter Schedule, Boosting Mumbai Connectivity",
+      "lead": "Lufthansa Cargo has released its winter flight schedule for 2026/2027, highlighting enhanced connectivity, particularly with increased services to Mumbai, signaling strategic adjustments to its global cargo network.",
+      "detailed_analysis": [
+        "The new winter schedule reflects Lufthansa Cargo's strategy to optimize its global network for key trade lanes.",
+        "Increased connectivity to Mumbai indicates strong demand for air freight between Europe and India, a growing economic corridor.",
+        "This move enhances Lufthansa Cargo's competitive position in the lucrative Indian market.",
+        "The schedule adjustments aim to maximize cargo capacity utilization and revenue during the peak winter season.",
+        "Improved logistics and faster transit times benefit businesses relying on air freight for supply chains."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Indirect competitive impact on THY Cargo. Lufthansa Cargo's strengthened presence in Mumbai increases competition for air freight services on the Europe-India corridor. THY Cargo, which also has a significant global network, will need to monitor these capacity changes to maintain its market share and pricing competitiveness in this region.",
+      "why_it_matters": "Lufthansa Cargo's enhanced winter schedule, particularly its focus on Mumbai, signifies strategic adjustments in global air freight, impacting competition and logistics efficiency on key trade routes.",
+      "original_source": {
+        "title": "Lufthansa Cargo releases 2026/2027 winter flight schedule and enhances connectivity in Mumbai",
+        "source_name": "American Journal of Transportation",
+        "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPMWhzVDJpTzFTUFg5anZqVjIzczRPTk1kQ255ai1CekFIR3djS2pSWXZUOUlfZkl0NVBXVzNiLVdYYUduRDFLX3BHYVQzYjRMTGFTY1c0cEluZXdFalVVcUdCcGlVMXl3VFFxVV9wWXhiTjJUMlNiNnozRC03TEFERURGaWZjZjdwRTFKZ3J4OTQwWnBPLWlmOV9ZN0ZSQXJPNTJGOERGeUJyUmlWVkk3dmVLT1FTWGRrSHVZ?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "breeze-airways-expansion",
+      "section": "Route news",
+      "headline": "Breeze Airways Announces 22 New Routes and Four Destinations for 2027",
+      "lead": "U.S. low-cost carrier Breeze Airways is significantly expanding its network, announcing 22 new routes and adding four new destinations for 2027, demonstrating aggressive growth in the domestic market.",
+      "detailed_analysis": [
+        "Breeze Airways' rapid expansion indicates strong confidence in the U.S. domestic leisure travel market.",
+        "The addition of 22 new routes and four destinations will intensify competition, particularly in underserved or secondary markets.",
+        "This growth strategy focuses on point-to-point travel, bypassing major hubs and offering competitive fares.",
+        "Increased capacity from Breeze will put pressure on legacy carriers and other LCCs in the regions it serves.",
+        "The airline's model of offering \"Nice,\" \"Nicer,\" and \"Nicest\" bundles aims to attract a broad range of travelers."
+      ],
+      "data_points": [
+        "22 new routes",
+        "4 new destinations"
+      ],
+      "thy_impact_assessment": "Weak indirect impact. Breeze Airways operates exclusively in the U.S. domestic market, which does not directly overlap with THY's international network. However, its aggressive growth reflects the dynamic nature of the global aviation market and the competitive pressures faced by all carriers, including THY's domestic partners or codeshare agreements.",
+      "why_it_matters": "Breeze Airways' aggressive expansion signifies continued growth in the U.S. domestic low-cost market, intensifying competition and offering more travel options for consumers.",
+      "original_source": {
+        "title": "Breeze Adds Four New Destinations, 22 Routes",
+        "source_name": "AirlineGeeks.com",
+        "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPa0VodnRxa05EQzAzcTN2ZERkME9OeG1VbWtFbGhleE41bFhjT3Roa0RvandvZUR5VEdObWlBWjFlZldsVk5VN2tvMXRRdjNBLUR6azRsR3dSalFEZXpXakdlT0VVY1BGMW5pUGJOR24xdDJvUGliR3BuS2lOMW1lam1kV29Uckk?oc=5"
+      },
+      "related_news": [
+        "Breeze Airways announces 11 new nonstop flights to MYR next year"
+      ]
+    },
+    {
+      "id": "ryanair-cancellations",
+      "section": "Route news",
+      "headline": "Ryanair Cancels All Flights to 13 Destinations, Citing Operational Adjustments",
+      "lead": "Ryanair, Europe's largest low-cost carrier, has announced the cancellation of all flights to 13 destinations, effective immediately. This significant reduction in its network is attributed to operational adjustments, potentially impacting capacity and revenue.",
+      "detailed_analysis": [
+        "Cancellation of 13 destinations represents a notable reduction in Ryanair's network, likely impacting capacity and revenue.",
+        "Operational adjustments could stem from various factors, including aircraft delivery delays, staffing shortages, or underperforming routes.",
+        "This move may free up aircraft and crew for redeployment to more profitable routes or to address operational bottlenecks elsewhere.",
+        "Passengers booked on these routes will face disruptions, potentially impacting Ryanair's customer satisfaction and brand image.",
+        "Competitors on affected routes may see an opportunity to absorb displaced demand or increase their own capacity."
+      ],
+      "data_points": [
+        "13 destinations"
+      ],
+      "thy_impact_assessment": "Weak indirect impact. Ryanair's cancellations primarily affect intra-European routes, which do not directly compete with THY's hub-and-spoke international network. However, it highlights the operational challenges faced by even large carriers, and any capacity reduction in Europe could slightly ease competitive pressure on some routes for THY or its subsidiary AJet.",
+      "why_it_matters": "Ryanair's cancellation of 13 destinations signifies significant operational adjustments, impacting its network capacity, revenue, and potentially creating opportunities for competing airlines.",
+      "original_source": {
+        "title": "Ryanair Cancels All Flights To 13 Destinations: See Full List Now",
         "source_name": "Simple Flying",
-        "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQmdKbFBwYTBOSVBQM2lHMVJPdUp6Q1J4ZWxIR0dRRlhES05KTnBDUEdhLWZfUjRjU2NUd1VMVmJ4MU5BQkdsRzFmaU1rX0FTZVRMMDdNV3hZdjlCS2pFdFpWT3VUekR6N2UwdGZCeXRaRTFBQTR1VG5fMDdZNzF0Y3AxZWtDOXVPVkZST245Snd4bDhONkg2b2diZnZHT3dIM01qYmJDMW1vQjVZd0ZB?oc=5"
+        "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE1hU3pOZVk1ZU5BMURXQWVXTFp0SFNBYkJETEs3ZFdVckhBdzRucDNRTV82QzR5WkpSOFNqSnBQSExMZi1Ia0JuRXNnUTBwUzhNclpsNHhjTzN6cUN5c254b1JNX2dENjluZ0g3eTh6UkY0SVFjMzhVZzE3NEs?oc=5"
       },
       "related_news": []
     }
   ],
-  "generated_at": "2026-10-14T11:29:58.081641"
+  "generated_at": "2026-10-14T12:20:47.456394"
 }

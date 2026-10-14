@@ -1,53 +1,150 @@
 {
   "mode": "hourly",
   "date_str": "14 October 2026",
-  "time_str": "11:30 UTC",
-  "heading": "Aviation Update | 14 October 2026 11:30",
+  "time_str": "12:20 UTC",
+  "heading": "Aviation Update | 14 October 2026 12:20",
   "intro_sentence": "Below is a summary of the most important newly verified or strongly supported aviation developments for the current hourly window.",
   "stories": [
     {
-      "id": "thy-iran-flights-suspended",
+      "id": "story-1",
       "section": "Turkey / THY and Turkish aviation",
-      "headline": "Turkish Airlines, AJet, and Pegasus Confirm Suspension of All Iran Flights",
-      "lead": "Turkish carriers Turkish Airlines, AJet, and Pegasus have officially confirmed the suspension of all flights to Iran, effective February 28, 2026. This move is widely reported to be in response to new US sanctions targeting the country, with the confirmation solidifying the operational change.",
-      "detailed_analysis": [
-        "The confirmed suspension significantly impacts the route networks of all three major Turkish airlines, reducing their presence in the Iranian market.",
-        "This action is a direct compliance measure with US sanctions, underscoring the geopolitical pressures influencing commercial aviation operations.",
-        "The cancellation of approximately 50,000 tickets highlights the immediate operational and customer service challenges faced by the airlines."
-      ],
-      "data_points": [
-        "Approximately 50,000 flight tickets cancelled",
-        "Effective February 28, 2026"
-      ],
-      "thy_impact_assessment": "Significant negative impact on THY's revenue and route network due to the loss of the Iranian market. Operational costs will be incurred for cancellations and re-routing passengers. Brand reputation might be affected by service disruptions, though compliance with sanctions is unavoidable.",
-      "why_it_matters": "This operational change will lead to significant financial impact for Turkish carriers and alters regional air connectivity.",
+      "headline": "No new developments for Turkey / THY in this hourly window.",
+      "lead": "There are no new, breaking developments specifically concerning Turkish Airlines or the broader Turkish aviation sector reported within the last hour.",
+      "detailed_analysis": [],
+      "data_points": [],
+      "thy_impact_assessment": "No direct impact as there are no relevant news items.",
+      "why_it_matters": "Absence of news indicates a stable period for THY and Turkish aviation in this specific hourly window.",
       "original_source": {
-        "title": "THY, AJet ve Pegasus; ABD yaptırımlarının yürürlüğe girmesiyle İran'a tüm uçuşları iptal etti",
-        "source_name": "T24",
-        "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPSTNHODBWam1lY0xSRkRlbFpZbXBxREcxSjlaVWpwMHgzdUtMVXJJTkJnOGlrdkFGZjN6ZG5aTVZ0dDQ2M09TZURPU3U2Y0txdVV1WEE3VklULTJHZFlXcENka0tqemVLbTRaYllXbFJWai00LW40eG8wa3E0Mk1vX1ZyamhIV3Q3RzR0NG9kSUhwZ0NTS2tsU25ZWlRFR0FkWVp5VVBhNldWSVU3Wk5IR2I1dFpiQmNBNy1oS2xmWlZ0dw?oc=5"
+        "title": "No specific source",
+        "source_name": "Internal Monitoring",
+        "url": "N/A"
       },
       "related_news": []
     },
     {
-      "id": "faa-a380-engine-order",
+      "id": "story-2",
       "section": "European and other global airlines",
-      "headline": "FAA Mandates Airbus A380 Engine Replacements After Uncontained Failure Incident",
-      "lead": "The US Federal Aviation Administration (FAA) has issued an Airworthiness Directive (AD) requiring engine replacements for certain Airbus A380 aircraft. This follows an uncontained engine failure that forced an aborted takeoff, prompting a critical safety review.",
+      "headline": "Lufthansa Opts to Retain Oldest Airbus A340s in Fleet",
+      "lead": "Lufthansa has made a strategic decision to keep its oldest Airbus A340 aircraft in service, signaling a potential shift in its long-term fleet modernization plans or a response to current market conditions.",
       "detailed_analysis": [
-        "The directive targets specific engine types on the A380 fleet, impacting major operators globally, including Emirates, Qantas, and Singapore Airlines.",
-        "This safety measure aims to prevent future catastrophic engine failures, ensuring the operational integrity and passenger safety of the superjumbo fleet.",
-        "Airlines operating affected A380s will face significant maintenance costs and potential operational disruptions due to the required engine work and downtime."
+        "This decision impacts Lufthansa's fleet strategy, potentially delaying the retirement of older, less fuel-efficient aircraft.",
+        "It could be driven by strong demand for long-haul capacity, supply chain issues affecting new aircraft deliveries, or cost-saving measures.",
+        "The retention of these aircraft may affect operational efficiency and environmental targets."
       ],
       "data_points": [],
-      "thy_impact_assessment": "Weak direct impact on THY as it does not operate the Airbus A380. However, it highlights broader aviation safety concerns and regulatory oversight that could indirectly influence future fleet decisions or maintenance standards across the industry.",
-      "why_it_matters": "This operational change poses a significant financial and operational challenge for A380 operators and underscores critical aviation safety risks.",
+      "thy_impact_assessment": "Indirect impact. While not directly affecting THY's operations, Lufthansa's fleet decisions can influence competitive dynamics on long-haul routes, particularly in the European market where both airlines compete for transfer traffic.",
+      "why_it_matters": "This represents a significant operational and financial decision for Lufthansa, impacting its fleet strategy, operational costs, and environmental commitments.",
       "original_source": {
-        "title": "FAA Orders Airbus A380 Engine Replacements After Uncontained Failure Forces Aborted Takeoff",
+        "title": "Read full article",
+        "source_name": "Dj's Aviation",
+        "url": "https://news.google.com/rss/articles/CBMidEFVV3lxTFBjZWFibGh0ZkR2WDVjS3JyVzZQeVYzdENVY3FYU2p5MWx3T2pscXAySGZ0M2RHc2dWRmRwTlNSTlJJSnVRaWxFa1FqX0g4ZUE2TTBrVE9JV2xCWXVMWGdkN3JzRGNqWjZZSUg0RTl2blVDaEZ3?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "story-3",
+      "section": "Route news",
+      "headline": "Qantas Cancels All Flights to Five Destinations",
+      "lead": "Qantas has announced the immediate cancellation of all flights to five specific destinations, impacting passenger travel plans and network capacity.",
+      "detailed_analysis": [
+        "This move significantly reduces Qantas's operational footprint in certain markets.",
+        "The cancellations are likely a response to either low demand, operational challenges, or strategic network adjustments.",
+        "Affected passengers will require rebooking or refunds, potentially straining customer service resources."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Weak direct impact. Qantas's network adjustments in Australia do not directly affect THY's operations or competitive landscape, though it highlights dynamic route management in global aviation.",
+      "why_it_matters": "This represents a significant operational change for Qantas, potentially shifting passenger flows and impacting regional market dynamics.",
+      "original_source": {
+        "title": "Read full article",
         "source_name": "Simple Flying",
-        "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQmdKbFBwYTBOSVBQM2lHMVJPZUp6Q1J4ZWxIR0dRRlhES05KTnBDUEdhLWZfUjRjU2NUd1VMVmJ4MU5BQkdsRzFmaU1rX0FTZVRMMDdNV3hZdjlCS2pFdFpWT3VUekR6N2UwdGZCeXRaRTFBQTR1VG5fMDdZNzF0Y3AxZWtDOXVPVkZST245Snd4bDhONkg2b2diZnZHT3dIM01qYmJDMW1vQjVZd0ZB?oc=5"
+        "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE5Pa2pCN0s1b3dTenZZS2g2bW5LTW5sLVd3NHNOdWVlZ2FkRS0tYjAzUzc3LXpIelVKeExGVnNTT2dOVEhOdXhxZnlBVHNTY3daZkU4X0Jwb3NvMHMxcTdHSWhsMHhYZEdaTDBQWjU2Vk5zWHRxRHdpVy1R?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "story-4",
+      "section": "Route news",
+      "headline": "Dashain Festival Sees Disappearance of Cheap Air Tickets in Nepal",
+      "lead": "Travelers celebrating the Dashain festival in Nepal are facing significantly higher airfare costs as cheap tickets have become unavailable, indicating strong demand during the holiday period.",
+      "detailed_analysis": [
+        "The surge in ticket prices reflects robust demand for domestic and regional travel during the Dashain festival.",
+        "Airlines are capitalizing on peak season demand, optimizing revenue management strategies.",
+        "This situation highlights capacity constraints or insufficient supply to meet the heightened holiday travel demand."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Weak direct impact. This is a localized phenomenon in Nepal for a specific festival and does not directly affect THY's operations or competitive position.",
+      "why_it_matters": "This demonstrates the financial impact of peak season demand on travelers and the revenue opportunities for airlines in specific regional markets.",
+      "original_source": {
+        "title": "Read full article",
+        "source_name": "Nepalnews.com",
+        "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNQ3V5WF9nSjg4VFByVVQ2RzBrUmZyUGg2OXVsbllrVnBXbzdnSDVFRk4tbElmMkpNVWx6b2dsdF9wVnFCU3VSbVBEMGg1UzBaLXZsQzZNN3NPNzgtUmV2N0V0TUVUNkJqZ2d5RHYxeGJIRzZxWUI2UDllVXgxeFQ5SkZCM2wtdW1SMlBwMmNqYkN2MzdieS1ZZTlLLTlSTld2VXByY3ktMERXOTFwVUgwX0tPTGo2Zw?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "story-5",
+      "section": "Route news",
+      "headline": "Vietnam Airlines Launches New Ahmedabad-Hanoi Route Four Times Weekly",
+      "lead": "Vietnam Airlines is set to commence a new direct service between Ahmedabad, India, and Hanoi, Vietnam, operating four times a week starting November 3rd.",
+      "detailed_analysis": [
+        "This new route expands Vietnam Airlines' network, tapping into the growing India-Vietnam travel market.",
+        "The service aims to capture both leisure and business travelers, enhancing connectivity between South Asia and Southeast Asia.",
+        "Increased frequency (four times a week) suggests confidence in demand for this specific city pair."
+      ],
+      "data_points": [
+        "Four times a week"
+      ],
+      "thy_impact_assessment": "Weak direct impact. This new route by Vietnam Airlines does not directly compete with THY's existing network or strategy, though it signifies growing connectivity in Asia.",
+      "why_it_matters": "This represents an operational change and market expansion for Vietnam Airlines, enhancing connectivity between key Asian cities.",
+      "original_source": {
+        "title": "Read full article",
+        "source_name": "Business Traveller",
+        "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNRE12Nm1EdHpCVlRrcVZTR1BZQnphWlVXZlhlNHBCUHpfd3ZhV0dQYlFtcWQ3TldVa09Cd01vcnJSYlg2UG9QaHVReDJNVXRVME1RMGxRVGxSUzZSQXU2aHRYdXBQOXJaR3ItY1o0WU5qZ011dXVyYklGSDAxQXhpMGF1QTJCb0E?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "story-6",
+      "section": "Route news",
+      "headline": "Air New Zealand Increases Shanghai-Auckland Capacity for Chinese New Year",
+      "lead": "Air New Zealand is significantly boosting capacity on its Shanghai-Auckland route in anticipation of heightened demand for Chinese New Year travel, reflecting optimism in the recovery of the China market.",
+      "detailed_analysis": [
+        "This capacity increase targets a specific peak demand period, aiming to maximize revenue from the lucrative Chinese New Year travel rush.",
+        "It signals Air New Zealand's confidence in the rebound of international travel between China and New Zealand.",
+        "The move enhances connectivity and offers more options for passengers traveling between these key regions."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Weak direct impact. While THY also serves China, Air New Zealand's capacity adjustments on a specific Oceania-China route do not directly impact THY's competitive position or network strategy. It does, however, reflect broader positive trends in the Chinese outbound market.",
+      "why_it_matters": "This represents an operational change and a strategic response to anticipated demand, indicating positive market trends for international travel from China.",
+      "original_source": {
+        "title": "Read full article",
+        "source_name": "Breaking Travel News",
+        "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOWk5vNlg3UFc1a21mSmlEaTQ4RkRBa0RnNjhsSkVWYVkzN1dGanA3bC1LOGpVTFpYVHItamFkT1FEUzFSa0FPNkJwb291enE2UkdlNXhVOGtISnRka0kxMkw4aFpjYjlreEJELTJsY3Nxd1Y5em4ydGRnVjlPV1JPa1hHNUJ5UnNKZGtpYjRVd0ZJNzRjakRRLTFhOFFxNWZsNUZPYVZoRkYzeXA0VHlzM2hLWG1zRHpuNzdRcEtKTWlWUQ?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "story-7",
+      "section": "Other areas",
+      "headline": "Survey Indicates 64% Expect Decline in U.S. Incentive Travel Demand",
+      "lead": "A recent survey reveals that 64% of respondents anticipate a decrease in demand for incentive travel within the United States, signaling potential headwinds for the business travel segment.",
+      "detailed_analysis": [
+        "The expected fall in incentive travel demand could impact premium cabin bookings and corporate travel revenue for airlines operating to/from/within the U.S.",
+        "This trend suggests a cautious outlook among businesses regarding discretionary travel spending.",
+        "Airlines may need to adjust capacity or pricing strategies to mitigate the impact of reduced corporate group travel."
+      ],
+      "data_points": [
+        "64% expect U.S. demand to fall"
+      ],
+      "thy_impact_assessment": "Indirect impact. While THY has a strong U.S. network, a decline in U.S. domestic incentive travel demand could subtly affect connecting traffic or overall U.S. outbound business travel sentiment, potentially impacting THY's premium segment.",
+      "why_it_matters": "This survey highlights a potential financial impact on airlines and the travel industry due to anticipated shifts in U.S. corporate travel spending.",
+      "original_source": {
+        "title": "Read full article",
+        "source_name": "FTN news",
+        "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNMmlUOWdPNm80UDdCWEFMY2EtR2Q5Q21ET1I2YU5WTmJHZFUwLWtPV2dfU2NrcmVxVzNGdFVoUmd2WWhUUUZFNTJ4aXpNQlRVRTBjTXJLNW15bWozTTlkdVZzd3pRbk84N2xDSWhBX241T1RJTkdld2VNRmV1alpMLQ?oc=5"
       },
       "related_news": []
     }
   ],
-  "generated_at": "2026-10-14T11:30:48.472116"
+  "generated_at": "2026-10-14T12:21:19.767314"
 }
