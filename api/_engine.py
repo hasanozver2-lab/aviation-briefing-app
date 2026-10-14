@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
-SOURCE_POLICY_VERSION = "airline-only-v1"
+SOURCE_POLICY_VERSION = "airline-only-v2"
 SOURCE_TYPES = {
     "mainstream",
     "trade_media",
@@ -222,6 +222,12 @@ def get_rss_sources(max_hours=48):
         _source_record("Flightradar24", "https://www.flightradar24.com/blog/feed/", "Route news"),
         # 4. Other areas (Market & Industry)
         _source_record("Yahoo Finance Aviation", "https://feeds.finance.yahoo.com/rss/2.0/headline?s=LHA.DE,AF.PA,IAG.L,AAL,DAL,BA,AIR.PA", "Other areas", "mainstream"),
+        # 5. Verified official airline newsroom / social feeds
+        _source_record("Lufthansa Group Newsroom", "https://newsroom.lufthansagroup.com/feed/en", "European and other global airlines", "airline_newsroom", airline="Lufthansa Group", airline_code="LH"),
+        _source_record("Delta News Hub", "https://news.delta.com/rss.xml", "European and other global airlines", "airline_newsroom", airline="Delta Air Lines", airline_code="DL"),
+        _source_record("Turkish Airlines Blog", "https://blog.turkishairlines.com/en/feed/", "Turkey / THY and Turkish aviation", "official_social", airline="Turkish Airlines", airline_code="TK"),
+        _source_record("Emirates Newsroom", "https://www.emirates.com/media-centre/feed/en-us", "European and other global airlines", "airline_newsroom", airline="Emirates", airline_code="EK"),
+        _source_record("Qatar Airways Official Tumblr", "https://qatarairways.tumblr.com/rss", "European and other global airlines", "official_social", airline="Qatar Airways", airline_code="QR"),
     ]
     sources.extend(_configured_source_records())
     return [source for source in sources if source.get("url")]

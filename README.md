@@ -50,6 +50,8 @@ BLOOMBERG_AVIATION_RSS_URL=https://...
 
 Resmi havayolu yatırımcı ilişkileri, newsroom ve sosyal akışları toplu olarak eklemek için `AIRLINE_BRIEFING_SOURCES_JSON` kullanılır. RSS/Atom veya resmi API URL'leriyle kayıt eklenir; sayfa kazıma ve sosyal platformların kullanım şartlarını aşan otomatik scraping yapılmaz.
 
+Şu anda doğrulanmış ve aktif kaynak kayıtlarına Lufthansa Group Newsroom, Delta News Hub, Turkish Airlines Blog, Emirates Newsroom ve Qatar Airways'in resmi Tumblr RSS akışı dahildir. Resmi sayfa RSS yayınlamıyorsa (ör. bazı IR/press-room sayfaları) o sayfa, uygun API veya lisanslı feed bağlanmadan haber üretim hattına alınmaz.
+
 ```json
 [
   {

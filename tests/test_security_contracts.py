@@ -63,6 +63,10 @@ def test_generic_sources_are_filtered_to_airline_topics():
         "Quarterly results announced",
         source={"official": True, "source_type": "airline_ir"},
     )
+    assert not _engine.is_airline_relevant(
+        "What to eat in Çanakkale",
+        source={"official": True, "source_type": "official_social"},
+    )
 
 
 def test_atom_entries_are_supported():
@@ -82,3 +86,10 @@ def test_atom_entries_are_supported():
     assert link == "https://example.com/fleet"
     assert description == "New aircraft deliveries."
     assert published.endswith("Z")
+
+
+def test_verified_official_airline_feeds_are_registered():
+    sources = {source["name"]: source for source in _engine.get_rss_sources()}
+    assert sources["Lufthansa Group Newsroom"]["source_type"] == "airline_newsroom"
+    assert sources["Delta News Hub"]["airline_code"] == "DL"
+    assert sources["Emirates Newsroom"]["official"] is True
