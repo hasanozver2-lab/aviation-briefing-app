@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="thyRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E30613" />
+      <stop offset="100%" stop-color="#A5080A" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="112" fill="url(#thyRed)"/>
+  
+  <!-- Subtle circular radar lines -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <circle cx="256" cy="256" r="120" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Stylized Aircraft / Wing Symbol -->
+  <path d="M256 110 L280 230 L400 280 L400 310 L280 280 L280 370 L320 400 L320 420 L256 405 L192 420 L192 400 L232 370 L232 280 L112 310 L112 280 L232 230 Z" 
+        fill="#FFFFFF" 
+        filter="drop-shadow(0px 8px 16px rgba(0,0,0,0.3))"/>
+</svg>

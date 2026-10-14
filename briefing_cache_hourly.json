@@ -1,0 +1,53 @@
+{
+  "mode": "hourly",
+  "date_str": "14 October 2026",
+  "time_str": "11:30 UTC",
+  "heading": "Aviation Update | 14 October 2026 11:30",
+  "intro_sentence": "Below is a summary of the most important newly verified or strongly supported aviation developments for the current hourly window.",
+  "stories": [
+    {
+      "id": "thy-iran-flights-suspended",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "Turkish Airlines, AJet, and Pegasus Confirm Suspension of All Iran Flights",
+      "lead": "Turkish carriers Turkish Airlines, AJet, and Pegasus have officially confirmed the suspension of all flights to Iran, effective February 28, 2026. This move is widely reported to be in response to new US sanctions targeting the country, with the confirmation solidifying the operational change.",
+      "detailed_analysis": [
+        "The confirmed suspension significantly impacts the route networks of all three major Turkish airlines, reducing their presence in the Iranian market.",
+        "This action is a direct compliance measure with US sanctions, underscoring the geopolitical pressures influencing commercial aviation operations.",
+        "The cancellation of approximately 50,000 tickets highlights the immediate operational and customer service challenges faced by the airlines."
+      ],
+      "data_points": [
+        "Approximately 50,000 flight tickets cancelled",
+        "Effective February 28, 2026"
+      ],
+      "thy_impact_assessment": "Significant negative impact on THY's revenue and route network due to the loss of the Iranian market. Operational costs will be incurred for cancellations and re-routing passengers. Brand reputation might be affected by service disruptions, though compliance with sanctions is unavoidable.",
+      "why_it_matters": "This operational change will lead to significant financial impact for Turkish carriers and alters regional air connectivity.",
+      "original_source": {
+        "title": "THY, AJet ve Pegasus; ABD yaptırımlarının yürürlüğe girmesiyle İran'a tüm uçuşları iptal etti",
+        "source_name": "T24",
+        "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPSTNHODBWam1lY0xSRkRlbFpZbXBxREcxSjlaVWpwMHgzdUtMVXJJTkJnOGlrdkFGZjN6ZG5aTVZ0dDQ2M09TZURPU3U2Y0txdVV1WEE3VklULTJHZFlXcENka0tqemVLbTRaYllXbFJWai00LW40eG8wa3E0Mk1vX1ZyamhIV3Q3RzR0NG9kSUhwZ0NTS2tsU25ZWlRFR0FkWVp5VVBhNldWSVU3Wk5IR2I1dFpiQmNBNy1oS2xmWlZ0dw?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "faa-a380-engine-order",
+      "section": "European and other global airlines",
+      "headline": "FAA Mandates Airbus A380 Engine Replacements After Uncontained Failure Incident",
+      "lead": "The US Federal Aviation Administration (FAA) has issued an Airworthiness Directive (AD) requiring engine replacements for certain Airbus A380 aircraft. This follows an uncontained engine failure that forced an aborted takeoff, prompting a critical safety review.",
+      "detailed_analysis": [
+        "The directive targets specific engine types on the A380 fleet, impacting major operators globally, including Emirates, Qantas, and Singapore Airlines.",
+        "This safety measure aims to prevent future catastrophic engine failures, ensuring the operational integrity and passenger safety of the superjumbo fleet.",
+        "Airlines operating affected A380s will face significant maintenance costs and potential operational disruptions due to the required engine work and downtime."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Weak direct impact on THY as it does not operate the Airbus A380. However, it highlights broader aviation safety concerns and regulatory oversight that could indirectly influence future fleet decisions or maintenance standards across the industry.",
+      "why_it_matters": "This operational change poses a significant financial and operational challenge for A380 operators and underscores critical aviation safety risks.",
+      "original_source": {
+        "title": "FAA Orders Airbus A380 Engine Replacements After Uncontained Failure Forces Aborted Takeoff",
+        "source_name": "Simple Flying",
+        "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQmdKbFBwYTBOSVBQM2lHMVJPZUp6Q1J4ZWxIR0dRRlhES05KTnBDUEdhLWZfUjRjU2NUd1VMVmJ4MU5BQkdsRzFmaU1rX0FTZVRMMDdNV3hZdjlCS2pFdFpWT3VUekR6N2UwdGZCeXRaRTFBQTR1VG5fMDdZNzF0Y3AxZWtDOXVPVkZST245Snd4bDhONkg2b2diZnZHT3dIM01qYmJDMW1vQjVZd0ZB?oc=5"
+      },
+      "related_news": []
+    }
+  ],
+  "generated_at": "2026-10-14T11:30:48.472116"
+}

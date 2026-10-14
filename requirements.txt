@@ -1,0 +1,2 @@
+# Aviation Briefing App Dependencies
+# Note: Core scraper and parser use Python standard library (urllib, xml, json, ssl)

@@ -1,0 +1,52 @@
+{
+  "mode": "hourly",
+  "date_str": "14 October 2026",
+  "time_str": "11:29 UTC",
+  "heading": "Aviation Update | 14 October 2026 11:29",
+  "intro_sentence": "Below is a summary of the most important newly verified or strongly supported aviation developments for the current hourly window.",
+  "stories": [
+    {
+      "id": "story-1",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "Turkish Airlines, AJet, and Pegasus Suspend All Iran Flights Following New US Sanctions",
+      "lead": "Major Turkish carriers, including Turkish Airlines (THY), its low-cost subsidiary AJet, and Pegasus Airlines, have announced the immediate suspension of all flights to Iran. This decision comes in response to the implementation of new US sanctions targeting the Iranian aviation sector.",
+      "detailed_analysis": [
+        "The suspension impacts all routes to Iran, directly affecting passenger and cargo operations for the involved airlines.",
+        "The move is a direct compliance measure with US sanctions, highlighting the geopolitical pressures on global aviation.",
+        "Reports indicate approximately 50,000 tickets have been cancelled, leading to significant operational adjustments and potential revenue loss."
+      ],
+      "data_points": [
+        "50,000 tickets cancelled"
+      ],
+      "thy_impact_assessment": "Significant negative impact on THY's revenue and route network due to the complete cessation of Iran flights. Operational costs will be incurred for cancellations and re-routing passengers. THY's compliance with international sanctions maintains its global operational integrity but at a direct commercial cost.",
+      "why_it_matters": "This operational change will result in immediate financial losses for Turkish carriers and significantly alter air connectivity between Turkey and Iran.",
+      "original_source": {
+        "title": "THY, AJet ve Pegasus İran uçuşlarını durdurdu",
+        "source_name": "Bianet",
+        "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOVHliT2RrY2pmSXd0OHk2UVRndDlpNzBvU000aEFJWEFMTUFLblphUFJNcUMzczdxMW00cldleUFtMVhpUXh5WXRXVW9Cc1hvMGFpbFVQemZUODE0dzFUc1RNMU1wS0tFekpoNm9VWmVrd1JLMk15cWZXdUdQZWdkT3l3?oc=5"
+      },
+      "related_news": []
+    },
+    {
+      "id": "story-2",
+      "section": "European and other global airlines",
+      "headline": "FAA Mandates Airbus A380 Engine Replacements Following Uncontained Failure Incident",
+      "lead": "The U.S. Federal Aviation Administration (FAA) has issued an Airworthiness Directive (AD) requiring specific engine replacements on certain Airbus A380 aircraft. This directive follows an uncontained engine failure that forced an aborted takeoff, raising significant safety concerns.",
+      "detailed_analysis": [
+        "The FAA's AD targets specific engine models on the A380 fleet, indicating a focused safety concern rather than a widespread issue across all A380s.",
+        "This action will necessitate operational adjustments and maintenance scheduling for affected airlines, potentially impacting fleet availability.",
+        "The uncontained failure highlights critical safety risks associated with engine integrity, prompting immediate regulatory intervention."
+      ],
+      "data_points": [],
+      "thy_impact_assessment": "Weak direct impact on THY as it does not operate the Airbus A380. However, it underscores the importance of stringent engine maintenance and regulatory compliance across the industry, which THY adheres to for its own fleet.",
+      "why_it_matters": "This operational change poses a significant safety risk and financial impact for A380 operators globally due to mandatory maintenance and potential grounding.",
+      "original_source": {
+        "title": "FAA Orders Airbus A380 Engine Replacements After Uncontained Failure Forces Aborted Takeoff",
+        "source_name": "Simple Flying",
+        "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNQmdKbFBwYTBOSVBQM2lHMVJPdUp6Q1J4ZWxIR0dRRlhES05KTnBDUEdhLWZfUjRjU2NUd1VMVmJ4MU5BQkdsRzFmaU1rX0FTZVRMMDdNV3hZdjlCS2pFdFpWT3VUekR6N2UwdGZCeXRaRTFBQTR1VG5fMDdZNzF0Y3AxZWtDOXVPVkZST245Snd4bDhONkg2b2diZnZHT3dIM01qYmJDMW1vQjVZd0ZB?oc=5"
+      },
+      "related_news": []
+    }
+  ],
+  "generated_at": "2026-10-14T11:29:58.081641"
+}
