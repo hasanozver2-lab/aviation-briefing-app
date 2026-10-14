@@ -1334,6 +1334,8 @@
           const sourceObj = item.original_source || {};
           const sourceTitle = escapeHtml(sourceObj.title || "Read full article");
           const sourceName = sourceObj.source_name ? ` (${escapeHtml(sourceObj.source_name)})` : "";
+          const sourceTypeLabels = {mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social"};
+          const sourceTypeLabel = sourceTypeLabels[sourceObj.source_type] || "Verified source";
           const articleUrl = safeExternalUrl(sourceObj.url);
 
           storiesHtml += `
@@ -1356,7 +1358,7 @@
 
               <div class="card-footer">
                 <a href="${articleUrl}" target="_blank" rel="noopener noreferrer" class="source-link">
-                  Original source: [${sourceTitle}]${sourceName} ↗
+                  Original source: [${sourceTitle}]${sourceName} · ${sourceTypeLabel}${sourceObj.official ? " · Official" : ""} ↗
                 </a>
                 <a href="#top-summary" class="back-to-top-btn">
                   Back to top summary ↑

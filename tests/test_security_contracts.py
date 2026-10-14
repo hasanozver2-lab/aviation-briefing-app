@@ -54,3 +54,31 @@ def test_story_ids_are_stable_across_briefing_modes():
     hourly = _engine.normalize_generated_briefing(briefing, "hourly")
 
     assert daily["stories"][0]["id"] == hourly["stories"][0]["id"]
+
+
+def test_generic_sources_are_filtered_to_airline_topics():
+    assert _engine.is_airline_relevant("Airline adds a new route to Istanbul")
+    assert not _engine.is_airline_relevant("Technology company launches a new phone")
+    assert _engine.is_airline_relevant(
+        "Quarterly results announced",
+        source={"official": True, "source_type": "airline_ir"},
+    )
+
+
+def test_atom_entries_are_supported():
+    payload = b'''<?xml version="1.0" encoding="utf-8"?>
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <entry>
+        <title>Airline fleet update</title>
+        <link href="https://example.com/fleet" />
+        <summary>New aircraft deliveries.</summary>
+        <updated>2026-10-14T12:00:00Z</updated>
+      </entry>
+    </feed>'''
+
+    entries = _engine.parse_feed_entries(payload)
+    title, link, description, published = _engine.entry_values(entries[0])
+    assert title == "Airline fleet update"
+    assert link == "https://example.com/fleet"
+    assert description == "New aircraft deliveries."
+    assert published.endswith("Z")

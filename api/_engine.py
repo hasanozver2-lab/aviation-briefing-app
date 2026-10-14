@@ -29,6 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
+SOURCE_POLICY_VERSION = "airline-only-v1"
+SOURCE_TYPES = {
+    "mainstream",
+    "trade_media",
+    "airline_ir",
+    "airline_newsroom",
+    "official_social",
+}
 SECTION_ORDER = [
     "Turkey / THY and Turkish aviation",
     "European and other global airlines",
@@ -81,64 +89,142 @@ def load_env():
 ENV = load_env()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or ENV.get("GEMINI_API_KEY", "")
 
+# Genel medya akışlarında yalnızca havayolu/havacılık bağlamı olan başlıkları
+# kabul ederiz. Resmi havayolu kanalları ise kaynak doğrulaması sayesinde
+# başlıkta "airline" kelimesi geçmese bile (ör. finansal sonuç duyurusu)
+# kabul edilebilir.
+AIRLINE_RELEVANCE_TERMS = (
+    "airline", "airlines", "airways", "carrier", "aviation", "havayolu",
+    "havacılık", "uçuş", "flight", "route", "rota", "fleet", "filo",
+    "aircraft", "uçak", "passenger", "yolcu", "cargo", "kargo", "airport",
+    "havalimanı", "airspace", "hava sahası", "runway", "pist", "slot",
+    "capacity", "kapasite", "traffic", "load factor", "yield", "fare",
+    "revenue", "earnings", "profit", "order", "delivery", "teslimat",
+    "grounded", "maintenance", "bakım", "pilot", "crew", "strike", "grev",
+    "schedule", "tarife", "codeshare", "alliance", "ittifak", "merger",
+    "acquisition", "birleşme", "satın alma", "bankruptcy", "iflas", "faa",
+    "easa", "iata", "icao", "jet fuel", "jet yakıt", "saf", "baggage",
+    "bagaj", "delay", "gecikme", "cancellation", "iptal", "diversion",
+    "safety", "emniyet", "security", "güvenlik", "a320", "a321", "a330",
+    "a350", "a380", "737", "747", "767", "777", "787", "e190", "embraer",
+    "airbus", "boeing",
+)
+
+TOPIC_TERMS = {
+    "airline_operations": ("flight", "uçuş", "schedule", "tarife", "delay", "gecikme", "cancellation", "iptal", "crew", "pilot", "bakım", "maintenance"),
+    "route_network": ("route", "rota", "destination", "uçuş ağı", "hub", "slot", "codeshare", "alliance", "ittifak"),
+    "fleet": ("fleet", "filo", "aircraft", "uçak", "a320", "a321", "a330", "a350", "a380", "737", "747", "767", "777", "787", "e190", "airbus", "boeing", "embraer"),
+    "orders_deliveries": ("order", "sipariş", "delivery", "teslimat", "backlog", "purchase", "satın"),
+    "finance_investor": ("earnings", "revenue", "gelir", "profit", "kâr", "loss", "zarar", "investor", "yatırımcı", "results", "sonuç", "dividend", "temettü"),
+    "regulation_safety": ("faa", "easa", "iata", "icao", "safety", "emniyet", "security", "güvenlik", "regulation", "düzenleme", "incident", "kaza"),
+    "airports_airspace": ("airport", "havalimanı", "airspace", "hava sahası", "runway", "pist", "terminal", "atc", "air traffic"),
+    "fuel_sustainability": ("jet fuel", "jet yakıt", "saf", "sustainable aviation", "sürdürülebilir", "emissions", "karbon"),
+    "labor": ("pilot", "crew", "çalışan", "işçi", "union", "sendika", "strike", "grev", "job", "istihdam"),
+    "partnerships_ma": ("partnership", "ortaklık", "codeshare", "alliance", "merger", "birleşme", "acquisition", "satın alma", "stake", "hisse"),
+}
+
+
+def _env_value(name):
+    """Read a deployment variable, falling back to the shared local .env."""
+    return os.environ.get(name) or ENV.get(name, "")
+
+
+def _source_record(name, url, category_hint, source_type="trade_media", **metadata):
+    return {
+        "category_hint": category_hint,
+        "name": name,
+        "url": url.strip() if isinstance(url, str) else "",
+        "source_type": source_type if source_type in SOURCE_TYPES else "trade_media",
+        "official": source_type in {"airline_ir", "airline_newsroom", "official_social"},
+        **metadata,
+    }
+
+
+def _configured_source_records():
+    """Load licensed/API feeds without committing secrets or provider URLs."""
+    records = []
+    for env_name, display_name, source_type in (
+        ("REUTERS_AVIATION_RSS_URL", "Reuters Aviation", "mainstream"),
+        ("FT_AVIATION_RSS_URL", "Financial Times Aviation", "mainstream"),
+        ("BLOOMBERG_AVIATION_RSS_URL", "Bloomberg Aviation", "mainstream"),
+    ):
+        url = _env_value(env_name)
+        if url:
+            records.append(_source_record(
+                display_name,
+                url,
+                "European and other global airlines",
+                source_type,
+                license_required=True,
+            ))
+
+    # AIRLINE_BRIEFING_SOURCES_JSON; örnek biçim README'de açıklanmıştır.
+    # Böylece yüzlerce resmi feed Vercel env üzerinden kod değişmeden eklenebilir.
+    raw_registry = _env_value("AIRLINE_BRIEFING_SOURCES_JSON")
+    if raw_registry:
+        try:
+            parsed_registry = json.loads(raw_registry)
+        except (TypeError, json.JSONDecodeError) as exc:
+            print(f"AIRLINE_BRIEFING_SOURCES_JSON okunamadı: {exc}")
+            parsed_registry = []
+        if isinstance(parsed_registry, list):
+            for record in parsed_registry:
+                if not isinstance(record, dict):
+                    continue
+                name = record.get("name")
+                url = record.get("url")
+                if not isinstance(name, str) or not isinstance(url, str) or not url.strip():
+                    continue
+                records.append(_source_record(
+                    name,
+                    url,
+                    str(record.get("category_hint") or "European and other global airlines"),
+                    str(record.get("source_type") or "airline_newsroom"),
+                    airline=str(record.get("airline") or ""),
+                    airline_code=str(record.get("airline_code") or ""),
+                    official=True,
+                    license_required=bool(record.get("license_required", False)),
+                ))
+    return records
+
+
+def normalize_article_text(*values):
+    return " ".join(str(value or "") for value in values).casefold()
+
+
+def classify_topics(text):
+    normalized = normalize_article_text(text)
+    return [topic for topic, terms in TOPIC_TERMS.items() if any(term in normalized for term in terms)]
+
+
+def is_airline_relevant(title, description="", source=None):
+    """Reject generic/non-airline stories before they reach the model."""
+    source = source if isinstance(source, dict) else {}
+    normalized = normalize_article_text(title, description)
+    if source.get("official") and source.get("source_type") in {"airline_ir", "airline_newsroom"}:
+        return True
+    return any(term in normalized for term in AIRLINE_RELEVANCE_TERMS)
+
 def get_rss_sources(max_hours=48):
-    """Doğrudan yayıncı sitelerinin (Simple Flying, HavaHaber, FlightGlobal, AeroTime vb.) gerçek linkli RSS akışları."""
-    return [
+    """Return the built-in and deployment-configured airline source registry."""
+    sources = [
         # 1. Turkey / THY and Turkish aviation
-        {
-            "category_hint": "Turkey / THY and Turkish aviation",
-            "name": "HavaHaber",
-            "url": "https://havahaber.com/feed/"
-        },
-        {
-            "category_hint": "Turkey / THY and Turkish aviation",
-            "name": "Tolga Özbek Havacılık",
-            "url": "https://tolgaozbek.com/feed/"
-        },
-        {
-            "category_hint": "Turkey / THY and Turkish aviation",
-            "name": "Yahoo Finance (THY & Pegasus)",
-            "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s=THYAO.IS,PGSUS.IS"
-        },
+        _source_record("HavaHaber", "https://havahaber.com/feed/", "Turkey / THY and Turkish aviation"),
+        _source_record("Tolga Özbek Havacılık", "https://tolgaozbek.com/feed/", "Turkey / THY and Turkish aviation"),
+        _source_record("Yahoo Finance (THY & Pegasus)", "https://feeds.finance.yahoo.com/rss/2.0/headline?s=THYAO.IS,PGSUS.IS", "Turkey / THY and Turkish aviation", "mainstream"),
         # 2. European and other global airlines
-        {
-            "category_hint": "European and other global airlines",
-            "name": "Simple Flying",
-            "url": "https://simpleflying.com/feed/"
-        },
-        {
-            "category_hint": "European and other global airlines",
-            "name": "FlightGlobal",
-            "url": "https://www.flightglobal.com/rss"
-        },
-        {
-            "category_hint": "European and other global airlines",
-            "name": "AeroTime",
-            "url": "https://www.aerotime.aero/feed"
-        },
-        {
-            "category_hint": "European and other global airlines",
-            "name": "Aviation24",
-            "url": "https://www.aviation24.be/feed/"
-        },
+        _source_record("Simple Flying", "https://simpleflying.com/feed/", "European and other global airlines"),
+        _source_record("FlightGlobal", "https://www.flightglobal.com/rss", "European and other global airlines"),
+        _source_record("AeroTime", "https://www.aerotime.aero/feed", "European and other global airlines"),
+        _source_record("Aviation24", "https://www.aviation24.be/feed/", "European and other global airlines"),
         # 3. Route news & Fleet
-        {
-            "category_hint": "Route news",
-            "name": "AirDataNews",
-            "url": "https://www.airdatanews.com/feed/"
-        },
-        {
-            "category_hint": "Route news",
-            "name": "Flightradar24",
-            "url": "https://www.flightradar24.com/blog/feed/"
-        },
+        _source_record("AirDataNews", "https://www.airdatanews.com/feed/", "Route news"),
+        _source_record("Flightradar24", "https://www.flightradar24.com/blog/feed/", "Route news"),
         # 4. Other areas (Market & Industry)
-        {
-            "category_hint": "Other areas",
-            "name": "Yahoo Finance Aviation",
-            "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s=LHA.DE,AF.PA,IAG.L,AAL,DAL,BA,AIR.PA"
-        }
+        _source_record("Yahoo Finance Aviation", "https://feeds.finance.yahoo.com/rss/2.0/headline?s=LHA.DE,AF.PA,IAG.L,AAL,DAL,BA,AIR.PA", "Other areas", "mainstream"),
     ]
+    sources.extend(_configured_source_records())
+    return [source for source in sources if source.get("url")]
 
 def clean_html(raw_html):
     """HTML etiketlerini temizler."""
@@ -147,9 +233,76 @@ def clean_html(raw_html):
     clean = re.sub(r'<.*?>', '', raw_html)
     return " ".join(clean.split()).strip()
 
+
+def _local_name(tag):
+    return tag.rsplit("}", 1)[-1].lower()
+
+
+def _child_text(element, names):
+    wanted = set(names)
+    for child in list(element):
+        if _local_name(child.tag) not in wanted:
+            continue
+        value = "".join(child.itertext()).strip()
+        if value:
+            return value
+    return ""
+
+
+def parse_feed_entries(content):
+    """Parse both RSS 2.0 and Atom without an additional dependency."""
+    root = ET.fromstring(content)
+    root_name = _local_name(root.tag)
+    if root_name == "rss":
+        channel = next((child for child in list(root) if _local_name(child.tag) == "channel"), None)
+        return [child for child in list(channel) if _local_name(child.tag) == "item"] if channel is not None else []
+    if root_name == "feed":
+        return [child for child in list(root) if _local_name(child.tag) == "entry"]
+    return []
+
+
+def entry_values(entry):
+    title = _child_text(entry, {"title"})
+    description = _child_text(entry, {"description", "summary", "content"})
+    link = _child_text(entry, {"link"})
+    if not link:
+        for child in list(entry):
+            if _local_name(child.tag) == "link" and child.attrib.get("href"):
+                link = child.attrib["href"].strip()
+                break
+    pub_date = _child_text(entry, {"pubdate", "published", "updated", "date", "issued"})
+    return title, link, clean_html(description), pub_date
+
+
+def canonicalize_url(value):
+    parsed = urllib.parse.urlsplit(str(value or "").strip())
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return ""
+    query = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
+    query = [(key, val) for key, val in query if not key.lower().startswith("utm_") and key.lower() not in {"fbclid", "gclid"}]
+    normalized_query = urllib.parse.urlencode(query)
+    return urllib.parse.urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/") or "/", normalized_query, ""))
+
+
+def parse_published_datetime(value):
+    if not value:
+        return None
+    try:
+        parsed = parsedate_to_datetime(value)
+    except (TypeError, ValueError, IndexError, OverflowError):
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
 def fetch_rss_items(max_hours=48):
-    """Doğrudan yayıncı RSS kaynaklarından son haberleri çeker ve en yeniden eskiye sıralar."""
+    """Fetch recent airline-relevant entries from RSS/Atom source records."""
     articles = []
+    seen_links = set()
     now = utc_now()
     cutoff = now - timedelta(hours=max_hours)
     
@@ -166,35 +319,32 @@ def fetch_rss_items(max_hours=48):
             req = urllib.request.Request(source["url"], headers=headers)
             with urllib.request.urlopen(req, context=ctx, timeout=12) as response:
                 content = response.read()
-                root = ET.fromstring(content)
-                
-                channel = root.find("channel")
-                if channel is None:
-                    continue
-                
-                for item in channel.findall("item")[:10]:
-                    title = item.findtext("title", "").strip()
-                    link = item.findtext("link", "").strip()
-                    description = clean_html(item.findtext("description", ""))
-                    pub_date = item.findtext("pubDate", "")
+                entries = parse_feed_entries(content)
+
+                for item in entries[:20]:
+                    title, link, description, pub_date = entry_values(item)
                     
                     if not title or not link:
                         continue
+
+                    if not is_airline_relevant(title, description, source):
+                        continue
+
+                    canonical_link = canonicalize_url(link)
+                    if not canonical_link or canonical_link in seen_links:
+                        continue
+                    seen_links.add(canonical_link)
                     
                     # Tarih filtreleme
                     pub_ts = time.time()
                     pub_str = ""
                     if pub_date:
-                        try:
-                            dt = parsedate_to_datetime(pub_date)
-                            if dt.tzinfo is None:
-                                dt = dt.replace(tzinfo=timezone.utc)
+                        dt = parse_published_datetime(pub_date)
+                        if dt:
                             if dt < cutoff:
                                 continue  # Eski haberi atla
                             pub_ts = dt.timestamp()
                             pub_str = dt.strftime("%d %b %H:%M")
-                        except Exception:
-                            pass
                     
                     # Başlıktaki kaynak ismini ayır
                     source_name = source["name"]
@@ -209,6 +359,12 @@ def fetch_rss_items(max_hours=48):
                         "description": description,
                         "source": source_name,
                         "category_hint": source["category_hint"],
+                        "source_type": source.get("source_type", "trade_media"),
+                        "official": bool(source.get("official", False)),
+                        "airline": source.get("airline", ""),
+                        "airline_code": source.get("airline_code", ""),
+                        "license_required": bool(source.get("license_required", False)),
+                        "topics": classify_topics(f"{title} {description}"),
                         "pub_date": pub_str,
                         "timestamp": pub_ts
                     })
@@ -236,6 +392,10 @@ def generate_briefing_with_gemini(articles, mode="daily"):
         {
             "title": a["title"],
             "source": a["source"],
+            "source_type": a.get("source_type", "trade_media"),
+            "official": bool(a.get("official", False)),
+            "airline": a.get("airline", ""),
+            "topics": a.get("topics", []),
             "published_at": a.get("pub_date", ""),
             "category_hint": a.get("category_hint", ""),
             "description": a["description"][:200] if a.get("description") else "",
@@ -268,6 +428,7 @@ Mode: HOURLY (Last 1-2 Hours)
 You are an expert aviation industry analyst creating an essential daily briefing for airline employees and aviation professionals (pilots, cabin managers, dispatchers, network planners, revenue managers, engineers, and aviation specialists).
 Your task is to take the provided verified news items and compile an up-to-the-minute Aviation Intelligence Briefing adhering strictly to institutional analysis standards.
 Today's date is {today_str}. All analysis must reflect the freshest verified information.
+STRICT SCOPE: Include only airline, air transport, airport/airspace, aircraft fleet, route network, airline finance/investor, airline labor, safety/regulation, fuel/sustainability, or airline partnership/M&A developments. Exclude unrelated general business, politics, defense, space, technology, or tourism stories even when they come from a mainstream source. Preserve the supplied official/mainstream source metadata and never invent an original source.
 
 Required Sections (Strict Order):
 1. `Turkey / THY and Turkish aviation`
@@ -343,7 +504,19 @@ Ensure stories are grouped by the 4 required sections in order. Select 6 to 10 o
             data = json.loads(resp.read().decode("utf-8"))
             content = data["candidates"][0]["content"]["parts"][0]["text"]
             briefing = json.loads(content)
-            return normalize_generated_briefing(briefing, mode)
+            article_metadata = {
+                canonicalize_url(article.get("link")): article
+                for article in articles
+                if canonicalize_url(article.get("link"))
+            }
+            normalized = normalize_generated_briefing(briefing, mode, article_metadata)
+            if not normalized["stories"] and articles:
+                return fallback_briefing(
+                    articles,
+                    mode,
+                    "AI output did not reference the approved source items; source headlines are shown instead.",
+                )
+            return normalized
     except Exception as e:
         print(f"Gemini API hatası ({e}); yalnız kaynak özetleri gösterilecek.")
         return fallback_briefing(
@@ -374,7 +547,7 @@ def text_list(value):
     return [item for item in value if isinstance(item, str)]
 
 
-def normalize_generated_briefing(briefing, mode):
+def normalize_generated_briefing(briefing, mode, article_metadata=None):
     """Keep model output within the public JSON contract."""
     if not isinstance(briefing, dict) or not isinstance(briefing.get("stories"), list):
         raise ValueError("Gemini returned an invalid briefing payload")
@@ -401,6 +574,15 @@ def normalize_generated_briefing(briefing, mode):
                     "details": str(raw_exposure.get("details", "")),
                 })
 
+        source_url = safe_source_url(source.get("url"))
+        source_article = (article_metadata or {}).get(canonicalize_url(source_url), {})
+        if article_metadata is not None and (not source_url or not source_article):
+            # Model output must point to an item we actually fetched; this
+            # prevents unrelated/hallucinated stories from entering the feed.
+            continue
+        normalized_source_type = source_article.get("source_type") or source.get("source_type") or "trade_media"
+        if normalized_source_type not in SOURCE_TYPES:
+            normalized_source_type = "trade_media"
         stories.append({
             "id": stable_story_id(source.get("url"), raw_story.get("headline"), index),
             "section": section,
@@ -416,7 +598,12 @@ def normalize_generated_briefing(briefing, mode):
             "original_source": {
                 "title": str(source.get("title", "Read full article")),
                 "source_name": str(source.get("source_name", "")),
-                "url": safe_source_url(source.get("url")),
+                "url": source_url,
+                "source_type": normalized_source_type,
+                "official": bool(source_article.get("official", source.get("official", False))),
+                "airline": str(source_article.get("airline", source.get("airline", ""))),
+                "topics": source_article.get("topics", source.get("topics", [])),
+                "license_required": bool(source_article.get("license_required", source.get("license_required", False))),
             },
             "related_news": text_list(raw_story.get("related_news")),
         })
@@ -436,6 +623,7 @@ def build_briefing_payload(mode, stories, status, warning=""):
     )
     return {
         "mode": mode,
+        "source_policy": SOURCE_POLICY_VERSION,
         "date_str": date_str,
         "time_str": time_str,
         "heading": f"Aviation Briefing | {date_str}" if mode == "daily" else f"Aviation Update | {date_str} {time_str}",
@@ -473,6 +661,11 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
                 "title": str(article.get("title", "Read full article")),
                 "source_name": str(article.get("source", "")),
                 "url": safe_source_url(article.get("link")),
+                "source_type": article.get("source_type", "trade_media"),
+                "official": bool(article.get("official", False)),
+                "airline": str(article.get("airline", "")),
+                "topics": article.get("topics", []),
+                "license_required": bool(article.get("license_required", False)),
             },
             "related_news": [],
         })
@@ -495,6 +688,7 @@ def get_briefing(mode="daily", force_refresh=False):
                 cache_is_valid = (
                     data.get("mode") == mode
                     and data.get("status") in {"ok", "degraded", "unavailable"}
+                    and data.get("source_policy") == SOURCE_POLICY_VERSION
                 )
                 cache_age = utc_now() - gen_time.astimezone(timezone.utc)
                 if cache_is_valid and cache_age < max_age:
