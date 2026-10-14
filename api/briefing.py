@@ -11,9 +11,12 @@ import urllib.parse
 from pathlib import Path
 
 # Engine'i dahil et
-BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(BASE_DIR))
-import engine
+API_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(API_DIR))
+try:
+    import _engine as engine
+except ImportError:
+    from . import _engine as engine
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):

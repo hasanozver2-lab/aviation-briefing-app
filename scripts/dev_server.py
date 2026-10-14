@@ -17,12 +17,13 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-BASE_DIR = Path(__file__).resolve().parent
-STATIC_DIR = BASE_DIR / "static"
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / "public"
 
 # Engine'i içe aktar
-sys.path.insert(0, str(BASE_DIR))
-import engine
+API_DIR = BASE_DIR / "api"
+sys.path.insert(0, str(API_DIR))
+import _engine as engine
 
 def get_local_ip():
     """Yerel ağ IP adresini tespit eder (telefondan bağlanabilmek için)."""
