@@ -793,6 +793,33 @@
     let currentMode = "daily";
     let briefingData = null;
 
+    const HTML_ESCAPE_MAP = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => HTML_ESCAPE_MAP[character]);
+    }
+
+    function safeAnchorId(value, fallback) {
+      const normalized = String(value || fallback).replace(/[^A-Za-z0-9_-]/g, "-");
+      return normalized || fallback;
+    }
+
+    function safeExternalUrl(value) {
+      try {
+        const parsed = new URL(String(value || ""), window.location.origin);
+        if (!["http:", "https:"].includes(parsed.protocol)) return "#";
+        return escapeHtml(parsed.href);
+      } catch {
+        return "#";
+      }
+    }
+
     // Sabit Bölüm Sırası (Prompt kuralı)
     const SECTION_ORDER = [
       "Turkey / THY and Turkish aviation",
@@ -857,8 +884,11 @@
       storiesEl.innerHTML = "";
 
       try {
-        const url = `/api/briefing?mode=${mode}&refresh=${forceRefresh ? 'true' : 'false'}`;
-        const res = await fetch(url);
+        const endpoint = forceRefresh
+          ? `/api/refresh?mode=${encodeURIComponent(mode)}`
+          : `/api/briefing?mode=${encodeURIComponent(mode)}`;
+        const requestOptions = forceRefresh ? { method: "POST" } : {};
+        const res = await fetch(endpoint, requestOptions);
         if (!res.ok) throw new Error("HTTP error " + res.status);
         const data = await res.json();
         briefingData = data;
@@ -868,7 +898,7 @@
         summaryEl.innerHTML = `
           <div style="padding: 16px; text-align: center; color: var(--thy-red);">
             <p><strong>Veri yüklenemedi.</strong></p>
-            <p style="font-size: 0.8rem; color: var(--text-subtle); margin-top: 4px;">${err.message}</p>
+            <p style="font-size: 0.8rem; color: var(--text-subtle); margin-top: 4px;">${escapeHtml(err.message)}</p>
           </div>
         `;
       }
@@ -900,16 +930,18 @@
 
         summaryHtml += `
           <div class="summary-section-group">
-            <div class="summary-section-title">${secName}</div>
+            <div class="summary-section-title">${escapeHtml(secName)}</div>
             <ul class="summary-headline-list">
         `;
 
         items.forEach(item => {
+          const itemId = safeAnchorId(item.id, "story");
+          const headline = escapeHtml(item.headline);
           summaryHtml += `
             <li class="summary-item">
-              <a href="#${item.id}">
+              <a href="#${itemId}">
                 <span class="summary-bullet">›</span>
-                <span>${item.headline}</span>
+                <span>${headline}</span>
               </a>
             </li>
           `;
@@ -931,21 +963,26 @@
 
         storiesHtml += `
           <div class="section-divider">
-            <h2 class="section-divider-title">${secIdx + 1}. ${secName}</h2>
+            <h2 class="section-divider-title">${secIdx + 1}. ${escapeHtml(secName)}</h2>
             <div class="section-divider-line"></div>
           </div>
         `;
 
         items.forEach(item => {
+          const itemId = safeAnchorId(item.id, "story");
+          const section = escapeHtml(item.section);
+          const headline = escapeHtml(item.headline);
+          const lead = escapeHtml(item.lead);
+
           // Analysis Bullets
           const analysisBullets = (item.detailed_analysis || [])
-            .map(b => `<li>${b}</li>`)
+            .map(b => `<li>${escapeHtml(b)}</li>`)
             .join("");
 
           // Data Points (Concrete numbers)
           let dataPointsHtml = "";
           if (item.data_points && item.data_points.length > 0) {
-            const dataList = item.data_points.map(d => `<li>• ${d}</li>`).join("");
+            const dataList = item.data_points.map(d => `<li>• ${escapeHtml(d)}</li>`).join("");
             dataPointsHtml = `
               <div class="data-points-box">
                 <div class="data-points-title">📊 Data Points:</div>
@@ -958,7 +995,7 @@
 
           // Executive Strategic & Market Impact
           let impactHtml = "";
-          const strategicText = item.strategic_impact || item.thy_impact_assessment || "";
+          const strategicText = escapeHtml(item.strategic_impact || item.thy_impact_assessment || "");
           const exposureList = Array.isArray(item.market_exposure) ? item.market_exposure : [];
 
           if (strategicText || exposureList.length > 0) {
@@ -967,7 +1004,11 @@
               exposureMarkup = `
                 <div class="exposure-grid">
                   ${exposureList.map(exp => {
-                    const impactRaw = (exp.impact || "").toLowerCase();
+                    const impactValue = String(exp.impact || "");
+                    const impactRaw = impactValue.toLowerCase();
+                    const carrier = escapeHtml(exp.carrier || "Stakeholder");
+                    const impact = escapeHtml(impactValue || "Neutral");
+                    const details = exp.details ? escapeHtml(exp.details) : "";
                     let badgeClass = "badge-neutral";
                     if (impactRaw.includes("pos") || impactRaw.includes("growth") || impactRaw.includes("opp") || impactRaw.includes("hedged")) {
                       badgeClass = "badge-positive";
@@ -976,9 +1017,9 @@
                     }
                     return `
                       <div class="exposure-item">
-                        <span class="exposure-carrier">${exp.carrier || "Stakeholder"}:</span>
-                        <span class="exposure-badge ${badgeClass}">${exp.impact || "Neutral"}</span>
-                        ${exp.details ? `<span class="exposure-desc">${exp.details}</span>` : ""}
+                        <span class="exposure-carrier">${carrier}:</span>
+                        <span class="exposure-badge ${badgeClass}">${impact}</span>
+                        ${details ? `<span class="exposure-desc">${details}</span>` : ""}
                       </div>
                     `;
                   }).join("")}
@@ -1003,22 +1044,22 @@
           if (item.why_it_matters) {
             whyItMattersHtml = `
               <div class="why-it-matters-box">
-                <span class="why-it-matters-label">Why it matters:</span> ${item.why_it_matters}
+                <span class="why-it-matters-label">Why it matters:</span> ${escapeHtml(item.why_it_matters)}
               </div>
             `;
           }
 
           // Original Source Link (Doğrudan Yayıncı Sayfası)
           const sourceObj = item.original_source || {};
-          const sourceTitle = sourceObj.title || "Read full article";
-          const sourceName = sourceObj.source_name ? ` (${sourceObj.source_name})` : "";
-          const articleUrl = sourceObj.url || "#";
+          const sourceTitle = escapeHtml(sourceObj.title || "Read full article");
+          const sourceName = sourceObj.source_name ? ` (${escapeHtml(sourceObj.source_name)})` : "";
+          const articleUrl = safeExternalUrl(sourceObj.url);
 
           storiesHtml += `
-            <article class="story-card" id="${item.id}">
-              <div class="story-badge">${item.section}</div>
-              <h3 class="story-headline">${item.headline}</h3>
-              <p class="story-lead">${item.lead || ''}</p>
+            <article class="story-card" id="${itemId}">
+              <div class="story-badge">${section}</div>
+              <h3 class="story-headline">${headline}</h3>
+              <p class="story-lead">${lead}</p>
 
               <div class="story-subheading">Detailed Analysis:</div>
               <ul class="analysis-list">
@@ -1030,7 +1071,7 @@
               ${whyItMattersHtml}
 
               <div class="card-footer">
-                <a href="${articleUrl}" target="_blank" rel="noopener noreferrer" class="source-link" onclick="openExternalLink(event, '${articleUrl.replace(/'/g, "\\'")}')">
+                <a href="${articleUrl}" target="_blank" rel="noopener noreferrer" class="source-link">
                   Original source: [${sourceTitle}]${sourceName} ↗
                 </a>
                 <a href="#top-summary" class="back-to-top-btn">

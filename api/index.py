@@ -4,6 +4,7 @@ Serves both the Executive PWA Frontend and the REST API.
 """
 
 from http.server import BaseHTTPRequestHandler
+import hmac
 import json
 import os
 import sys
@@ -21,6 +22,14 @@ try:
 except ImportError:
     from . import _engine as engine
 
+
+def is_refresh_authorized(authorization_header):
+    cron_secret = os.environ.get("CRON_SECRET", "")
+    if not cron_secret:
+        return False
+    expected = f"Bearer {cron_secret}"
+    return hmac.compare_digest(authorization_header, expected)
+
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -28,26 +37,24 @@ class handler(BaseHTTPRequestHandler):
         query = urllib.parse.parse_qs(parsed.query)
 
         # 1. API İstekleri (/api/briefing, /api/refresh)
-        if path.startswith("/api/"):
+        if path in {"/api", "/api/briefing", "/api/refresh"}:
             mode = query.get("mode", ["daily"])[0]
             force = query.get("refresh", ["false"])[0].lower() in ("true", "1") or "refresh" in path
+            if force and not is_refresh_authorized(self.headers.get("Authorization", "")):
+                self.send_json({"error": "Refresh is not authorized"}, status=401)
+                return
             try:
                 data = engine.get_briefing(mode=mode, force_refresh=force)
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json; charset=utf-8")
-                self.send_header("Access-Control-Allow-Origin", "*")
-                self.send_header("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600")
-                self.end_headers()
-                self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+                cache_control = "no-store" if force else "public, s-maxage=600, stale-while-revalidate=1800"
+                self.send_json(data, cache_control=cache_control)
+            except ValueError as e:
+                self.send_json({"error": str(e)}, status=400)
             except Exception as e:
-                self.send_response(500)
-                self.send_header("Content-Type", "application/json; charset=utf-8")
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": str(e)}, ensure_ascii=False).encode("utf-8"))
+                self.send_json({"error": "Briefing generation failed"}, status=500)
             return
 
         # 2. Statik Dosyalar (Manifest, Icon)
-        if "manifest.json" in path:
+        if path.endswith("/manifest.json") or path == "/manifest.json":
             manifest_file = PUBLIC_DIR / "manifest.json"
             if not manifest_file.exists():
                 manifest_file = BASE_DIR / "manifest.json"
@@ -58,7 +65,7 @@ class handler(BaseHTTPRequestHandler):
                 self.wfile.write(manifest_file.read_bytes())
                 return
 
-        if "icon.svg" in path:
+        if path.endswith("/icon.svg") or path == "/icon.svg":
             icon_file = PUBLIC_DIR / "icon.svg"
             if not icon_file.exists():
                 icon_file = BASE_DIR / "icon.svg"
@@ -88,3 +95,12 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.do_GET()
+
+    def send_json(self, data, status=200, cache_control="no-store"):
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", cache_control)
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))

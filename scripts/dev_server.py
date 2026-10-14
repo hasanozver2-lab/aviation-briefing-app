@@ -7,6 +7,8 @@ import os
 import sys
 import json
 import socket
+import ipaddress
+import mimetypes
 import urllib.parse
 from pathlib import Path
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -18,12 +20,44 @@ if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_DIR = BASE_DIR / "public"
+PUBLIC_DIR = BASE_DIR / "public"
 
 # Engine'i içe aktar
 API_DIR = BASE_DIR / "api"
 sys.path.insert(0, str(API_DIR))
 import _engine as engine
+
+
+def resolve_public_file(file_name):
+    """Resolve a URL path only when it remains inside the public directory."""
+    decoded_name = urllib.parse.unquote(file_name)
+    requested_path = Path(decoded_name)
+    if requested_path.is_absolute():
+        return None
+
+    public_root = PUBLIC_DIR.resolve()
+    candidate = (public_root / requested_path).resolve()
+    try:
+        candidate.relative_to(public_root)
+    except ValueError:
+        return None
+    if not candidate.is_file():
+        return None
+    return candidate
+
+
+def is_refresh_authorized(client_ip, authorization_header):
+    """Allow local maintenance or callers holding the refresh secret."""
+    try:
+        if ipaddress.ip_address(client_ip).is_loopback:
+            return True
+    except ValueError:
+        return False
+
+    refresh_secret = os.environ.get("REFRESH_SECRET") or engine.ENV.get("REFRESH_SECRET")
+    if not refresh_secret:
+        return False
+    return authorization_header == f"Bearer {refresh_secret}"
 
 def get_local_ip():
     """Yerel ağ IP adresini tespit eder (telefondan bağlanabilmek için)."""
@@ -40,7 +74,7 @@ def get_local_ip():
 
 class BriefingRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(BASE_DIR), **kwargs)
+        super().__init__(*args, directory=str(PUBLIC_DIR), **kwargs)
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -49,7 +83,7 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
 
         # Kök dizin isteği -> index.html
         if path in ("/", "/index.html"):
-            index_path = STATIC_DIR / "index.html"
+            index_path = PUBLIC_DIR / "index.html"
             if index_path.exists():
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -61,30 +95,26 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         # /static/... dosyaları
         if path.startswith("/static/"):
             file_name = path[len("/static/"):]
-            target = STATIC_DIR / file_name
-            if target.exists() and target.is_file():
+            target = resolve_public_file(file_name)
+            if target:
                 self.send_response(200)
-                if target.suffix == ".html":
-                    self.send_header("Content-Type", "text/html; charset=utf-8")
-                elif target.suffix == ".svg":
-                    self.send_header("Content-Type", "image/svg+xml")
-                elif target.suffix == ".json":
-                    self.send_header("Content-Type", "application/json; charset=utf-8")
-                elif target.suffix == ".css":
-                    self.send_header("Content-Type", "text/css")
-                elif target.suffix == ".js":
-                    self.send_header("Content-Type", "application/javascript")
+                content_type, _ = mimetypes.guess_type(target.name)
+                self.send_header("Content-Type", content_type or "application/octet-stream")
+                self.send_header("X-Content-Type-Options", "nosniff")
                 self.end_headers()
                 self.wfile.write(target.read_bytes())
                 return
+            self.send_error(404, "Not Found")
+            return
 
         # API: Brifing verisini al
         if path == "/api/briefing":
             mode = query.get("mode", ["daily"])[0]
-            force = query.get("refresh", ["false"])[0].lower() in ("true", "1")
             try:
-                data = engine.get_briefing(mode=mode, force_refresh=force)
+                data = engine.get_briefing(mode=mode, force_refresh=False)
                 self.send_json(data)
+            except ValueError as e:
+                self.send_json({"error": str(e)}, status=400)
             except Exception as e:
                 self.send_json({"error": str(e)}, status=500)
             return
@@ -98,7 +128,7 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
             })
             return
 
-        super().do_GET()
+        self.send_error(404, "Not Found")
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -107,9 +137,15 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
 
         if path == "/api/refresh":
             mode = query.get("mode", ["daily"])[0]
+            authorization = self.headers.get("Authorization", "")
+            if not is_refresh_authorized(self.client_address[0], authorization):
+                self.send_json({"error": "Refresh is not authorized"}, status=401)
+                return
             try:
                 data = engine.get_briefing(mode=mode, force_refresh=True)
                 self.send_json(data)
+            except ValueError as e:
+                self.send_json({"error": str(e)}, status=400)
             except Exception as e:
                 self.send_json({"error": str(e)}, status=500)
             return

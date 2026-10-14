@@ -48,5 +48,5 @@ Terminalden veya `start_app.cmd` dosyasına çift tıklayarak başlatabilirsiniz
 
 ```powershell
 cd Q:\DEV\aviation-briefing-app
-q:\DEV\.venv\Scripts\python.exe server.py 8090
+q:\DEV\.venv\Scripts\python.exe scripts\dev_server.py 8090
 ```
