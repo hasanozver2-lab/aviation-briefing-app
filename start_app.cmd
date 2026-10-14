@@ -5,5 +5,5 @@ echo ============================================================
 echo   Aviation Briefing Mobile Server Baslatiliyor...
 echo ============================================================
 cd /d "Q:\DEV\aviation-briefing-app"
-"..\.venv\Scripts\python.exe" server.py 8090
+"..\.venv\Scripts\python.exe" dev_server.py 8090
 pause
