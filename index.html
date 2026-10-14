@@ -457,7 +457,106 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* THY Impact Assessment Box */
+    .enterprise-tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      background: #0F172A;
+      color: #38BDF8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* Executive Strategic & Market Impact Box */
+    .strategic-impact-box {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-left: 4px solid #0F172A;
+      border-radius: 0 10px 10px 0;
+      padding: 13px 15px;
+      margin-bottom: 14px;
+    }
+
+    .strategic-impact-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #0F172A;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .strategic-impact-text {
+      font-size: 0.88rem;
+      color: #1E293B;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* Market Exposure Grid & Chips */
+    .exposure-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #CBD5E1;
+    }
+
+    .exposure-item {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .exposure-carrier {
+      font-weight: 700;
+      color: #0F172A;
+    }
+
+    .exposure-badge {
+      display: inline-block;
+      font-size: 0.70rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 12px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .badge-positive {
+      background: #DCFCE7;
+      color: #166534;
+      border: 1px solid #BBF7D0;
+    }
+
+    .badge-adverse {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+
+    .badge-neutral {
+      background: #F1F5F9;
+      color: #334155;
+      border: 1px solid #CBD5E1;
+    }
+
+    .exposure-desc {
+      color: #475569;
+      font-size: 0.8rem;
+    }
+
+    /* Fallback Legacy THY Box */
     .thy-assessment-box {
       background: var(--thy-red-soft);
       border-left: 4px solid var(--thy-red);
@@ -625,8 +724,8 @@
         </svg>
       </div>
       <div>
-        <div class="brand-title">Aviation Briefing</div>
-        <div class="brand-sub">Executive Intelligence</div>
+        <div class="brand-title">AeroBrief <span class="enterprise-tag">ENTERPRISE</span></div>
+        <div class="brand-sub">Global Aviation Intelligence</div>
       </div>
     </div>
     <div class="bar-actions">
@@ -857,13 +956,44 @@
             `;
           }
 
-          // THY Impact Assessment
-          let thyImpactHtml = "";
-          if (item.thy_impact_assessment) {
-            thyImpactHtml = `
-              <div class="thy-assessment-box">
-                <div class="thy-assessment-title">✈️ THY Impact Assessment:</div>
-                <div class="thy-assessment-text">${item.thy_impact_assessment}</div>
+          // Executive Strategic & Market Impact
+          let impactHtml = "";
+          const strategicText = item.strategic_impact || item.thy_impact_assessment || "";
+          const exposureList = Array.isArray(item.market_exposure) ? item.market_exposure : [];
+
+          if (strategicText || exposureList.length > 0) {
+            let exposureMarkup = "";
+            if (exposureList.length > 0) {
+              exposureMarkup = `
+                <div class="exposure-grid">
+                  ${exposureList.map(exp => {
+                    const impactRaw = (exp.impact || "").toLowerCase();
+                    let badgeClass = "badge-neutral";
+                    if (impactRaw.includes("pos") || impactRaw.includes("growth") || impactRaw.includes("opp") || impactRaw.includes("hedged")) {
+                      badgeClass = "badge-positive";
+                    } else if (impactRaw.includes("neg") || impactRaw.includes("adverse") || impactRaw.includes("risk") || impactRaw.includes("cost") || impactRaw.includes("headwind") || impactRaw.includes("pressure") || impactRaw.includes("disrupt")) {
+                      badgeClass = "badge-adverse";
+                    }
+                    return `
+                      <div class="exposure-item">
+                        <span class="exposure-carrier">${exp.carrier || "Stakeholder"}:</span>
+                        <span class="exposure-badge ${badgeClass}">${exp.impact || "Neutral"}</span>
+                        ${exp.details ? `<span class="exposure-desc">${exp.details}</span>` : ""}
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              `;
+            }
+
+            impactHtml = `
+              <div class="strategic-impact-box">
+                <div class="strategic-impact-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                  Strategic & Market Impact
+                </div>
+                ${strategicText ? `<div class="strategic-impact-text">${strategicText}</div>` : ""}
+                ${exposureMarkup}
               </div>
             `;
           }
@@ -896,7 +1026,7 @@
               </ul>
 
               ${dataPointsHtml}
-              ${thyImpactHtml}
+              ${impactHtml}
               ${whyItMattersHtml}
 
               <div class="card-footer">
@@ -939,8 +1069,9 @@
         items.forEach(it => {
           text += `\n• ${it.headline}\n`;
           text += `  ${it.lead}\n`;
-          if (it.thy_impact_assessment) {
-            text += `  THY Impact: ${it.thy_impact_assessment}\n`;
+          const impactText = it.strategic_impact || it.thy_impact_assessment;
+          if (impactText) {
+            text += `  Strategic Impact: ${impactText}\n`;
           }
           if (it.original_source && it.original_source.url) {
             text += `  Source: ${it.original_source.url}\n`;

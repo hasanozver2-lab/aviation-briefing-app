@@ -249,8 +249,8 @@ Mode: HOURLY (Last 1-2 Hours)
 """
 
     system_prompt = f"""
-You are an executive aviation intelligence analyst specialized in Turkish Airlines (THY) and global commercial aviation.
-Your task is to take the provided verified news items and compile an up-to-the-minute executive Aviation Briefing adhering strictly to the user's executive design rules.
+You are an executive B2B aviation intelligence analyst serving airline C-level executives, fleet planners, commercial directors, and aviation investors.
+Your task is to take the provided verified news items and compile an up-to-the-minute executive Aviation Intelligence Briefing adhering strictly to institutional analysis standards.
 Today's date is {today_str}. All analysis must reflect the freshest verified information.
 
 Required Sections (Strict Order):
@@ -262,14 +262,21 @@ Required Sections (Strict Order):
 Each Story Block Structure:
 - `id`: unique slug e.g. "story-1", "story-2"
 - `section`: One of the 4 exact section names above.
-- `headline`: One concise, impactful line.
-- `lead`: 1 short lead paragraph.
+- `headline`: One concise, impactful executive headline.
+- `lead`: 1 short executive lead paragraph.
 - `detailed_analysis`: Array of strings (4-6 bullets for daily, 2-3 for hourly). Include strategy, capacity, demand, revenue, fleet, competition.
 - `data_points`: Array of strings with concrete numerical data (e.g. capacity, frequency, revenue, passengers, ASK, RPK, load factor, delivery count). Leave EMPTY array if no concrete numerical data exists in the story.
-- `thy_impact_assessment`: Clear assessment from THY's perspective (impact on revenue, cost, competition, route network, fleet, demand, operations, or brand). State honestly if direct impact is weak.
+- `strategic_impact`: High-level executive strategic and commercial assessment (revenue, operational costs, network implications, capacity shifts, or fleet modernization).
+- `market_exposure`: Array of objects detailing affected carriers or key market stakeholders with their impact tag, e.g.:
+  [
+    {{"carrier": "Turkish Airlines (THY)", "impact": "Positive", "details": "Benefits from enhanced hub connectivity and transfer traffic."}},
+    {{"carrier": "European Legacy Carriers", "impact": "Competitive Headwind", "details": "Increased transfer pressure on long-haul routes."}}
+  ]
+- `thy_impact_assessment`: Assessment from Turkish Airlines' (THY) perspective (impact on revenue, cost, competition, route network, fleet, demand, operations, or brand). State honestly if direct impact is weak.
 - `why_it_matters`: Single consequence-focused sentence discussing impact only through market impact, security risk, financial impact, or operational change.
-- `original_source`: {{"title": "Read full article", "source_name": "source name", "url": "direct real url"}}
+- `original_source`: {{"title": "Article Title", "source_name": "publisher name", "url": "direct real url"}}
 - `related_news`: Array of strings (optional, can be empty).
+(Do NOT include any numerical risk score).
 
 {prompt_mode_instructions}
 
@@ -355,6 +362,11 @@ def fallback_briefing(articles, mode="daily"):
                 "Targeted fuel efficiency improvement: 15-20% on new delivery airframes",
                 "Load factor benchmark maintained at ~82.5% across peak international segments"
             ],
+            "strategic_impact": "Accelerates long-term capacity expansion while insulating operating margins against jet fuel price volatility through lower unit seat costs (CASK).",
+            "market_exposure": [
+                {"carrier": "Turkish Airlines (THY)", "impact": "Positive", "details": "Direct CASK reduction and fleet renewal at IST hub."},
+                {"carrier": "Gulf Carriers (Emirates / Qatar)", "impact": "Competitive Headwind", "details": "THY strengthens mid-to-long-haul hub competitiveness."}
+            ],
             "thy_impact_assessment": "Positive direct impact on operating margins and unit costs; strengthens THY's competitive moat against Gulf carriers at IST hub.",
             "why_it_matters": "Accelerates long-term capacity growth while moderating unit fuel expenses amidst jet fuel price volatility.",
             "original_source": {
@@ -378,6 +390,11 @@ def fallback_briefing(articles, mode="daily"):
             "data_points": [
                 "European average seat capacity trimmed by 2.3% for selective Q4 secondary city pairs",
                 "Average delay minutes per flight in European core airspace increased 12% YoY"
+            ],
+            "strategic_impact": "European legacy capacity trimming preserves unit yields but exposes connecting traffic to unconstrained Eastern hubs like Istanbul and Doha.",
+            "market_exposure": [
+                {"carrier": "Lufthansa Group / Air France-KLM", "impact": "Adverse / Cost Pressure", "details": "ATC bottlenecks and fleet maintenance schedule disruptions."},
+                {"carrier": "Turkish Airlines (THY)", "impact": "Positive Opportunity", "details": "Captures transfer passengers avoiding European congested hubs."}
             ],
             "thy_impact_assessment": "Presents an opportunity for THY to capture transit European passenger demand via IST, where hub operations remain unconstrained by Central European ATC bottlenecks.",
             "why_it_matters": "Shifts high-yield transfer passengers towards unconstrained Eastern Mediterranean and Gulf routing hubs.",
@@ -403,6 +420,11 @@ def fallback_briefing(articles, mode="daily"):
                 "New route frequencies: 3 to 4 weekly departures per carrier on announced city pairs",
                 "Premium economy seat share increased by 18% on newly reconfigured long-haul cabins"
             ],
+            "strategic_impact": "Direct routing expansion bypasses traditional sixth-freedom hubs, requiring mega-hub operators to offer superior transfer times and premium amenities.",
+            "market_exposure": [
+                {"carrier": "Asia-Pacific & Transpacific Carriers", "impact": "Positive Growth", "details": "Capturing premium yields on secondary city pairs."},
+                {"carrier": "Turkish Airlines (THY) / Gulf Hubs", "impact": "Competitive Pressure", "details": "Melbourne/Sydney transfer flows face point-to-point alternatives."}
+            ],
             "thy_impact_assessment": "THY's growing Melbourne and Sydney operations face direct competition from expanding Far East non-stop services, underscoring the importance of seamless IST transfers.",
             "why_it_matters": "Direct routing expansion challenges sixth-freedom hub operators to heighten transit lounge and in-flight product standards.",
             "original_source": {
@@ -426,6 +448,11 @@ def fallback_briefing(articles, mode="daily"):
             "data_points": [
                 "Jet fuel price average: ~$98 - $104/bbl across European hubs",
                 "SAF supply remains below 0.5% of total global commercial jet fuel consumption"
+            ],
+            "strategic_impact": "Elevated crack spreads and impending SAF mandates place structural upward pressure on operating costs, rewarding airlines with modern fuel-efficient fleets and active hedging.",
+            "market_exposure": [
+                {"carrier": "Global Airline Industry", "impact": "Cost Pressure", "details": "Fuel volatility increases quarterly operating expenditure."},
+                {"carrier": "Turkish Airlines (THY) / Pegasus", "impact": "Manageable / Hedged", "details": "Active fuel hedging portfolios mitigate short-term crack spread shocks."}
             ],
             "thy_impact_assessment": "Validates THY's disciplined fuel hedging policy (~65% official coverage in 2026), insulating operating margins against unexpected oil price spikes.",
             "why_it_matters": "Directly impacts airline Q4 operating cash flows and sustainability compliance costs under ReFuelEU Aviation.",
