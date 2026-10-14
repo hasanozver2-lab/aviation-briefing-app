@@ -11,10 +11,6 @@
     {
       "path": "/api/briefing?mode=daily&refresh=true",
       "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/briefing?mode=hourly&refresh=true",
-      "schedule": "0 * * * *"
     }
   ]
 }
