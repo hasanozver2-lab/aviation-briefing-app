@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/refresh", "destination": "/api/briefing.py?refresh=true" },
-    { "source": "/api/briefing", "destination": "/api/briefing.py" },
-    { "source": "/static/(.*)", "destination": "/$1" }
-  ],
   "crons": [
     {
       "path": "/api/briefing?mode=daily&refresh=true",
