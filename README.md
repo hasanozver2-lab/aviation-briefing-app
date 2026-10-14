@@ -1,6 +1,6 @@
 # ✈️ Aviation Briefing — Executive Mobile App (iOS PWA)
 
-Bu proje, havacılık sektörü ve **Türk Hava Yolları (THY)** yöneticileri için hazırlanmış; son 48 saatlik (Günlük) ve son 1 saatlik (Saatlik) doğrulanmış havacılık istihbaratını **iPhone ve mobil cihazlardan tek dokunuşla** takip etmenizi sağlayan yerel mobil web uygulamasıdır (PWA).
+Bu proje, havacılık sektörü ve  yöneticileri için hazırlanmış; son 48 saatlik (Günlük) ve son 1 saatlik (Saatlik) doğrulanmış havacılık istihbaratını **iPhone ve mobil cihazlardan tek dokunuşla** takip etmenizi sağlayan yerel mobil web uygulamasıdır (PWA).
 
 ---
 
