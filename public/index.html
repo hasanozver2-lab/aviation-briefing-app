@@ -878,11 +878,19 @@
             `;
           }
 
-          // Original Source Link
+          // Original Source Link & Mobile URL Handler
           const sourceObj = item.original_source || {};
           const sourceTitle = sourceObj.title || "Read full article";
           const sourceName = sourceObj.source_name ? ` (${sourceObj.source_name})` : "";
-          const sourceUrl = sourceObj.url || "#";
+          const rawUrl = sourceObj.url || "";
+          
+          // Google News CBMi linkleri iOS PWA ve mobilde beyaz ekranda takıldığı için
+          // haberi Safari'de doğrudan ve hatasız açan temiz hedef URL oluştur
+          let articleUrl = rawUrl;
+          if (!rawUrl || rawUrl.includes("news.google.com/rss/articles") || rawUrl.includes("news.google.com/articles")) {
+            const query = (sourceObj.title || item.headline || "").trim();
+            articleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+          }
 
           storiesHtml += `
             <article class="story-card" id="${item.id}">
@@ -900,7 +908,7 @@
               ${whyItMattersHtml}
 
               <div class="card-footer">
-                <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="source-link">
+                <a href="${articleUrl}" target="_blank" rel="noopener noreferrer" class="source-link" onclick="openExternalLink(event, '${articleUrl.replace(/'/g, "\\'")}')">
                   Original source: [${sourceTitle}]${sourceName} ↗
                 </a>
                 <a href="#top-summary" class="back-to-top-btn">
@@ -913,6 +921,16 @@
       });
 
       document.getElementById("detailed-stories").innerHTML = storiesHtml;
+    }
+
+    // iOS PWA Harici Link Açıcı
+    function openExternalLink(event, url) {
+      if (!url) return;
+      // iOS PWA içinde Safari'yi yeni pencerede açmaya zorla
+      if (window.navigator && window.navigator.standalone) {
+        event.preventDefault();
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
     }
 
     // Paylaş & Panoya Kopyala
