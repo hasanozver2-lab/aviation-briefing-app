@@ -100,6 +100,29 @@ def validate_date(value):
 
 # --- relevance score --------------------------------------------------------------
 
+def _source_facts(item):
+    """(official, tier) for an article or a story."""
+    source = item.get("original_source") or item
+    return bool(source.get("official")), source.get("tier")
+
+
+def is_finance_commentary(item, commentary):
+    """Stock and price-target commentary, or financial news that is neither official nor from a trusted tier.
+
+    Company results from an airline's own channel or a tier 1-2 outlet are real news and stay.
+    """
+    if not commentary:
+        return False
+    title = item.get("headline") or item.get("title") or ""
+    official, tier = _source_facts(item)
+    trusted = official or (tier is not None and int(tier) <= commentary["trusted_max_tier"])
+    if trusted:
+        return False
+    if text_match.TermSet(commentary["title_patterns"]).any(title):
+        return True
+    return item.get("event_type") in commentary["finance_event_types"]
+
+
 def best_tier(entities):
     """Most prominent (lowest) tier among the matched groups, carriers and airports."""
     tiers = [
@@ -127,6 +150,9 @@ def score_article(article, source_count, config=None):
         "corroboration": min(1.0, max(0, source_count - 1) / (full_at - 1)),
     }
     score = sum(weights[name] * value for name, value in components.items())
+    commentary = config.get("commentary")
+    if is_finance_commentary(article, commentary):
+        score *= commentary["score_multiplier"]
     return round(score, 1), {name: round(value, 3) for name, value in components.items()}
 
 
@@ -193,11 +219,12 @@ def is_military_story(story, selection):
     return not (entities.get("carriers") or entities.get("groups"))
 
 
-def select_stories(stories, selection):
+def select_stories(stories, selection, commentary=None):
     """Stories at or above the score threshold, best first, at most max_per_run; military items are dropped."""
     eligible = [
         story for story in stories
         if float(story.get("relevance_score", 0)) >= selection["min_score"] and not is_military_story(story, selection)
+        and not (selection.get("exclude_commentary") and is_finance_commentary(story, commentary))
     ]
     eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))
     return eligible[: selection["max_per_run"]]

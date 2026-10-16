@@ -205,3 +205,99 @@ def test_civil_aviation_stories_are_kept_even_when_military_words_appear(headlin
 
 def test_v1_does_not_exclude_anything():
     assert len(story_lifecycle.select_stories([military("RAAF F-35A bombers")], V1["selection"])) == 1
+
+
+# --- route_network_change -----------------------------------------------------------------------------------------
+
+@pytest.mark.parametrize("title", [
+    "New Lufthansa Airbus A350-1000 to fly first to Tokyo",
+    "Lufthansa selects Tokyo as first destination for Airbus A350-1000",
+    "Lufthansa picks Tokyo for December launch of first Airbus A350-1000",
+    "ITA Airways to resume Rome-Caracas flights after 12-year absence",
+    "Air Canada Launches Nonstop Flights To New US City",
+    "Qatar Airways adds flights to Manila and deploys A350 on the route",
+    "Emirates and Delta announce a new codeshare agreement",
+    "Airline will suspend its Frankfurt service for the winter",
+])
+def test_route_and_network_changes_are_classified(title):
+    assert market_data.classify_event_type(title)["event_type"] == "route_network_change"
+
+
+@pytest.mark.parametrize("title", [
+    "Emirates brings global travel rehearsal programme to Colombia",     # an accessibility programme, not a route
+    "Emirates turns to Manila for first pilot recruitment drive in the Philippines",   # hiring
+    "Lufthansa tells jets to carry extra fuel as Frankfurt, Zurich face supply crunch",
+])
+def test_news_that_is_not_a_route_change_is_not_classified_as_one(title):
+    result = market_data.classify_event_type(title)
+    assert result is None or result["event_type"] != "route_network_change"
+
+
+def test_route_changes_weigh_as_much_as_fleet_orders():
+    types = market_data.load_taxonomy_config()["event_types"]
+    assert types["route_network_change"]["weight"] == types["fleet_orders"]["weight"] == 0.7
+
+
+def test_the_lufthansa_tokyo_launch_from_the_official_newsroom_outscores_a_community_announcement():
+    tokyo = article("New Lufthansa Airbus A350-1000 to fly first to Tokyo", "Ferry flight to Munich. First scheduled flight on December 3 from Munich to Tokyo/Haneda.", reliability=1.0, official=True)
+    community = article(DELTA_TITLE, DELTA_TEXT, reliability=1.0, official=True)
+    assert tokyo["event_type"] == "route_network_change"
+    assert score(tokyo, 1) > score(community, 3)
+
+
+# --- finance commentary -----------------------------------------------------------------------------------------------------------
+
+COMMENTARY = V2["commentary"]
+
+
+def finance_story(title, tier, official=False, event_type=None, score_value=60.0):
+    return {"story_id": title, "headline": title, "event_type": event_type, "relevance_score": score_value,
+            "original_source": {"tier": tier, "official": official}, "entities": {}}
+
+
+@pytest.mark.parametrize("title", [
+    "Boeing Fell Back Below $200 Ahead of a Strike Deadline. Here's Why I'd Buy the Fear",
+    "Boeing Price Target Slashed To $235 By RBC",
+    "Is American Airlines Stock's Drop A Chance To Buy?",
+    "Morgan Stanley flags Delta Air Lines shift Wall Street misses, sees 64% upside",
+    "Boeing (BA) Outperforms Broader Market: What You Need to Know",
+    "Should you buy Delta shares now?",
+])
+def test_stock_commentary_titles_from_an_untrusted_source_are_commentary(title):
+    assert story_lifecycle.is_finance_commentary(finance_story(title, tier=3), COMMENTARY)
+
+
+@pytest.mark.parametrize("title", [
+    "Boeing Price Target Slashed To $235 By RBC",
+    "Delta shares fall after the company cuts its outlook",
+])
+def test_the_same_headline_from_an_official_or_tier_two_source_is_kept(title):
+    assert not story_lifecycle.is_finance_commentary(finance_story(title, tier=1, official=True), COMMENTARY)
+    assert not story_lifecycle.is_finance_commentary(finance_story(title, tier=2), COMMENTARY)
+
+
+def test_financial_news_without_a_stock_pattern_is_kept_only_from_official_or_tier_two_sources():
+    results = finance_story("Quarterly results beat expectations", tier=3, event_type="airline_financials")
+    assert story_lifecycle.is_finance_commentary(results, COMMENTARY)
+    assert not story_lifecycle.is_finance_commentary(dict(results, original_source={"tier": 3, "official": True}), COMMENTARY)
+    assert not story_lifecycle.is_finance_commentary(dict(results, original_source={"tier": 2, "official": False}), COMMENTARY)
+
+
+def test_non_financial_stories_from_any_source_are_never_commentary():
+    assert not story_lifecycle.is_finance_commentary(finance_story("Airbus A220 order announced", tier=4, event_type="fleet_orders"), COMMENTARY)
+
+
+def test_commentary_is_scored_down_and_kept_out_of_the_list():
+    item = article("Is American Airlines Stock's Drop A Chance To Buy?", "American Airlines stock earnings revenue", reliability=0.7, official=False)
+    item.update(tier=3, event_type="airline_financials", event_weight=0.85)
+    plain = score(item, 1, {**V2, "commentary": None})
+    penalised = score(item, 1)
+    assert penalised == round(plain * COMMENTARY["score_multiplier"], 1) and penalised < plain
+
+    commentary_story = finance_story(item["title"], tier=3, event_type="airline_financials", score_value=90.0)
+    assert story_lifecycle.select_stories([commentary_story], SELECTION, COMMENTARY) == []
+    assert len(story_lifecycle.select_stories([dict(commentary_story, original_source={"tier": 1, "official": True})], SELECTION, COMMENTARY)) == 1
+
+
+def test_v1_has_no_commentary_filter():
+    assert "commentary" not in V1
