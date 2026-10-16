@@ -969,6 +969,7 @@
   <script>
     let currentMode = "daily";
     let briefingData = null;
+    let briefingRequestId = 0;
 
     const HTML_ESCAPE_MAP = {
       "&": "&amp;",
@@ -1132,39 +1133,62 @@
     }
 
     // Brifingi API'dan Yükle
-    async function loadBriefing(mode, forceRefresh = false) {
+    async function loadBriefing(mode, requestLatest = false) {
+      const requestId = ++briefingRequestId;
       const config = getModeConfig(mode);
       const summaryEl = document.getElementById("summary-content");
       const storiesEl = document.getElementById("detailed-stories");
+      const refreshButton = document.getElementById("btn-refresh");
+      const keepsCurrentBriefing = requestLatest && briefingData && briefingData.mode === mode;
 
       updateModeUi(mode);
-      
-      summaryEl.innerHTML = `
-        <div class="loading-container">
-          <div class="spinner"></div>
-          <p style="font-size: 0.85rem; color: var(--text-subtle);">${forceRefresh ? "Yeni havacılık istihbaratı toplanıp analiz ediliyor..." : config.loadingLabel}</p>
-        </div>
-      `;
-      storiesEl.innerHTML = "";
+      if (!keepsCurrentBriefing) {
+        summaryEl.innerHTML = `
+          <div class="loading-container">
+            <div class="spinner"></div>
+            <p style="font-size: 0.85rem; color: var(--text-subtle);">${config.loadingLabel}</p>
+          </div>
+        `;
+        storiesEl.innerHTML = "";
+      }
+      if (requestLatest) {
+        refreshButton.disabled = true;
+        refreshButton.setAttribute("aria-busy", "true");
+      }
 
       try {
-        const endpoint = forceRefresh
-          ? `/api/refresh?mode=${encodeURIComponent(mode)}`
-          : `/api/briefing?mode=${encodeURIComponent(mode)}`;
-        const requestOptions = forceRefresh ? { method: "POST" } : {};
-        const res = await fetch(endpoint, requestOptions);
+        const cacheBuster = requestLatest ? `&view=${Date.now()}` : "";
+        const endpoint = `/api/briefing?mode=${encodeURIComponent(mode)}${cacheBuster}`;
+        const res = await fetch(endpoint, {
+          cache: requestLatest ? "no-store" : "default",
+          headers: { "Accept": "application/json" }
+        });
         if (!res.ok) throw new Error("HTTP error " + res.status);
+        if (!(res.headers.get("content-type") || "").includes("application/json")) {
+          throw new Error("Invalid API response");
+        }
         const data = await res.json();
+        if (requestId !== briefingRequestId) return;
         briefingData = data;
         renderBriefing(data);
       } catch (err) {
+        if (requestId !== briefingRequestId) return;
         console.error("Yükleme hatası:", err);
+        if (keepsCurrentBriefing) {
+          showToast("Güncel briefing yüklenemedi; son briefing gösteriliyor.");
+          return;
+        }
         summaryEl.innerHTML = `
           <div style="padding: 16px; text-align: center; color: var(--thy-red);">
-            <p><strong>Veri yüklenemedi.</strong></p>
-            <p style="font-size: 0.8rem; color: var(--text-subtle); margin-top: 4px;">${escapeHtml(err.message)}</p>
+            <p><strong>Briefing şu an yüklenemedi.</strong></p>
+            <p style="font-size: 0.8rem; color: var(--text-subtle); margin-top: 4px;">Lütfen kısa süre sonra tekrar deneyin.</p>
           </div>
         `;
+      } finally {
+        if (requestLatest && requestId === briefingRequestId) {
+          refreshButton.disabled = false;
+          refreshButton.removeAttribute("aria-busy");
+        }
       }
     }
 

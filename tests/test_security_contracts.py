@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from api import _engine
 from api.briefing import handler as briefing_handler
@@ -163,3 +164,56 @@ def test_configured_sources_keep_page_adapter_options(monkeypatch):
     configured = next(record for record in records if record["name"] == "Configured Airline IR")
     assert configured["fetch_mode"] == "html"
     assert configured["date_required"] is True
+
+
+def test_one_unavailable_source_does_not_block_other_feed_results(monkeypatch):
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback):
+            return False
+
+        def read(self):
+            return b'''<?xml version="1.0" encoding="utf-8"?>
+            <rss><channel><item>
+              <title>Airline adds a new route</title>
+              <link>https://example.com/new-route</link>
+              <description>Network expansion announced.</description>
+            </item></channel></rss>'''
+
+    sources = [
+        {
+            "name": "Unavailable source",
+            "url": "https://example.com/unavailable",
+            "category_hint": "Route news",
+            "source_type": "trade_media",
+        },
+        {
+            "name": "Available source",
+            "url": "https://example.com/feed",
+            "category_hint": "Route news",
+            "source_type": "trade_media",
+        },
+    ]
+
+    def fake_urlopen(request, **_kwargs):
+        if request.full_url.endswith("unavailable"):
+            raise OSError("source unavailable")
+        return FakeResponse()
+
+    monkeypatch.setattr(_engine, "get_rss_sources", lambda _max_hours: sources)
+    monkeypatch.setattr(_engine.urllib.request, "urlopen", fake_urlopen)
+
+    articles = _engine.fetch_rss_items()
+
+    assert [article["source"] for article in articles] == ["Available source"]
+
+
+def test_public_refresh_uses_cached_briefing_endpoint_without_html_errors():
+    project_dir = Path(__file__).resolve().parents[1]
+    for relative_path in ("index.html", "public/index.html", "static/index.html"):
+        page = (project_dir / relative_path).read_text(encoding="utf-8")
+        assert "/api/refresh?mode=" not in page
+        assert "const cacheBuster = requestLatest" in page
+        assert "Invalid API response" in page

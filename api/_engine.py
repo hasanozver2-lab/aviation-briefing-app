@@ -13,6 +13,7 @@ import ssl
 import time
 import urllib.request
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from html import unescape
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
@@ -31,6 +32,11 @@ ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
 SOURCE_POLICY_VERSION = "airline-only-v4"
+RSS_FETCH_TIMEOUT_SECONDS = 10
+HTML_FETCH_TIMEOUT_SECONDS = 3
+HTML_DETAIL_DATE_TIMEOUT_SECONDS = 4
+MAX_HTML_DETAIL_DATE_REQUESTS = 3
+SOURCE_FETCH_WORKERS = 8
 SOURCE_TYPES = {
     "mainstream",
     "trade_media",
@@ -213,7 +219,7 @@ def fetch_html_detail_date(url, headers, ctx):
     """Read a detail page's explicit modified/published date when available."""
     try:
         request = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(request, context=ctx, timeout=6) as response:
+        with urllib.request.urlopen(request, context=ctx, timeout=HTML_DETAIL_DATE_TIMEOUT_SECONDS) as response:
             content = response.read().decode("utf-8", errors="replace")
         patterns = (
             r"(?:Last Modified|Published|Publication Date)\s*:\s*([^<]{3,80})",
@@ -443,96 +449,118 @@ def parse_published_datetime(value):
     return parsed
 
 
+def _fetch_source_articles(source, cutoff, headers):
+    """Fetch one source independently so a slow site cannot block the briefing."""
+    source_name = source.get("name", "Unknown source")
+    is_html_source = source.get("fetch_mode") == "html"
+    timeout = HTML_FETCH_TIMEOUT_SECONDS if is_html_source else RSS_FETCH_TIMEOUT_SECONDS
+
+    try:
+        ctx = ssl.create_default_context()
+        request = urllib.request.Request(source["url"], headers=headers)
+        with urllib.request.urlopen(request, context=ctx, timeout=timeout) as response:
+            content = response.read()
+
+        entries = extract_html_entries(content, source) if is_html_source else parse_feed_entries(content)
+        detail_date_requests = 0
+        articles = []
+        for item in entries[:20]:
+            if is_html_source:
+                title = item.get("title", "")
+                link = item.get("link", "")
+                description = item.get("description", "")
+                pub_date = item.get("pub_date", "")
+            else:
+                title, link, description, pub_date = entry_values(item)
+
+            if not title or not link:
+                continue
+            if not is_airline_relevant(title, description, source):
+                continue
+
+            can_resolve_date = (
+                not pub_date
+                and source.get("resolve_detail_dates")
+                and detail_date_requests < MAX_HTML_DETAIL_DATE_REQUESTS
+            )
+            if can_resolve_date:
+                pub_date = fetch_html_detail_date(link, headers, ctx)
+                detail_date_requests += 1
+            if source.get("date_required") and not pub_date:
+                continue
+
+            pub_ts = time.time()
+            pub_str = ""
+            if pub_date:
+                published_at = parse_published_datetime(pub_date)
+                if published_at:
+                    if published_at < cutoff:
+                        continue
+                    pub_ts = published_at.timestamp()
+                    pub_str = published_at.strftime("%d %b %H:%M")
+
+            article_source_name = source_name
+            if not is_html_source and " - " in title:
+                title, article_source_name = (part.strip() for part in title.rsplit(" - ", 1))
+
+            articles.append({
+                "title": title,
+                "link": link,
+                "description": description,
+                "source": article_source_name,
+                "category_hint": source["category_hint"],
+                "source_type": source.get("source_type", "trade_media"),
+                "official": bool(source.get("official", False)),
+                "airline": source.get("airline", ""),
+                "airline_code": source.get("airline_code", ""),
+                "license_required": bool(source.get("license_required", False)),
+                "topics": classify_topics(f"{title} {description}"),
+                "pub_date": pub_str,
+                "timestamp": pub_ts,
+            })
+        return articles, ""
+    except Exception as exc:
+        return [], type(exc).__name__
+
+
 def fetch_rss_items(max_hours=48):
-    """Fetch recent airline-relevant entries from RSS/Atom source records."""
-    articles = []
-    seen_links = set()
-    now = utc_now()
-    cutoff = now - timedelta(hours=max_hours)
-    
-    ctx = ssl.create_default_context()
-    
+    """Fetch recent airline-relevant entries without serial source delays."""
+    cutoff = utc_now() - timedelta(hours=max_hours)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     }
     sources = get_rss_sources(max_hours)
+    if not sources:
+        return []
 
-    for source in sources:
-        try:
-            is_html_source = source.get("fetch_mode") == "html"
-            req = urllib.request.Request(source["url"], headers=headers)
-            # JS-heavy official pages should fail fast; configured RSS feeds retain the longer window.
-            with urllib.request.urlopen(req, context=ctx, timeout=3 if is_html_source else 12) as response:
-                content = response.read()
-                entries = extract_html_entries(content, source) if is_html_source else parse_feed_entries(content)
-                detail_date_requests = 0
+    articles = []
+    worker_count = min(SOURCE_FETCH_WORKERS, len(sources))
+    with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix="briefing-feed") as executor:
+        futures = {
+            executor.submit(_fetch_source_articles, source, cutoff, headers): source
+            for source in sources
+        }
+        for future in as_completed(futures):
+            source = futures[future]
+            try:
+                source_articles, error_name = future.result()
+            except Exception as exc:
+                source_articles, error_name = [], type(exc).__name__
+            articles.extend(source_articles)
+            if error_name:
+                print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
 
-                for item in entries[:20]:
-                    if is_html_source:
-                        title = item.get("title", "")
-                        link = item.get("link", "")
-                        description = item.get("description", "")
-                        pub_date = item.get("pub_date", "")
-                    else:
-                        title, link, description, pub_date = entry_values(item)
-                    
-                    if not title or not link:
-                        continue
-
-                    if not is_airline_relevant(title, description, source):
-                        continue
-
-                    if not pub_date and source.get("resolve_detail_dates") and detail_date_requests < 10:
-                        pub_date = fetch_html_detail_date(link, headers, ctx)
-                        detail_date_requests += 1
-                    if source.get("date_required") and not pub_date:
-                        continue
-
-                    canonical_link = canonicalize_url(link)
-                    if not canonical_link or canonical_link in seen_links:
-                        continue
-                    seen_links.add(canonical_link)
-                    
-                    # Tarih filtreleme
-                    pub_ts = time.time()
-                    pub_str = ""
-                    if pub_date:
-                        dt = parse_published_datetime(pub_date)
-                        if dt:
-                            if dt < cutoff:
-                                continue  # Eski haberi atla
-                            pub_ts = dt.timestamp()
-                            pub_str = dt.strftime("%d %b %H:%M")
-                    
-                    # Başlıktaki kaynak ismini ayır
-                    source_name = source["name"]
-                    if not is_html_source and " - " in title:
-                        parts = title.rsplit(" - ", 1)
-                        title = parts[0].strip()
-                        source_name = parts[1].strip()
-                        
-                    articles.append({
-                        "title": title,
-                        "link": link,
-                        "description": description,
-                        "source": source_name,
-                        "category_hint": source["category_hint"],
-                        "source_type": source.get("source_type", "trade_media"),
-                        "official": bool(source.get("official", False)),
-                        "airline": source.get("airline", ""),
-                        "airline_code": source.get("airline_code", ""),
-                        "license_required": bool(source.get("license_required", False)),
-                        "topics": classify_topics(f"{title} {description}"),
-                        "pub_date": pub_str,
-                        "timestamp": pub_ts
-                    })
-        except Exception as e:
-            print(f"[{source['name']}] RSS çekme hatası: {e}")
-            
-    # En taze haberler en üstte
-    articles.sort(key=lambda a: a.get("timestamp", 0), reverse=True)
-    return articles
+    articles.sort(key=lambda article: article.get("timestamp", 0), reverse=True)
+    seen_links = set()
+    unique_articles = []
+    for article in articles:
+        canonical_link = canonicalize_url(article["link"])
+        if not canonical_link or canonical_link in seen_links:
+            continue
+        seen_links.add(canonical_link)
+        unique_articles.append(article)
+    return unique_articles
 
 def generate_briefing_with_gemini(articles, mode="daily"):
     """Gemini 2.5 Flash ile haberleri prompt kurallarına göre analiz eder."""
