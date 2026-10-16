@@ -504,6 +504,24 @@ def _taxonomy():
     return _compiled_taxonomy(TAXONOMY_CONFIG_PATH.stat().st_mtime_ns)
 
 
+def is_excluded_from_typing(title):
+    """True for defence items and investment commentary: they must not pick up the guarded types.
+
+    Reads the same lists the selection step uses (config/relevance.json), so the two cannot drift apart.
+    """
+    from . import story_lifecycle  # lazy: story_lifecycle's own imports must not depend on this module
+
+    relevance = story_lifecycle.load_relevance_config()
+    selection = relevance.get("selection", {})
+    prepared = text_match.prepare(title)
+    defence_terms = text_match.TermSet(selection.get("exclude_terms", []))
+    keep_terms = text_match.TermSet(selection.get("keep_terms", []))
+    is_defence = bool(selection.get("exclude_terms")) and defence_terms.any(prepared) and not keep_terms.any(prepared)
+    commentary_patterns = (relevance.get("commentary") or {}).get("title_patterns", [])
+    is_commentary = bool(commentary_patterns) and text_match.TermSet(commentary_patterns).any(prepared)
+    return is_defence or is_commentary
+
+
 def classify_event_type(text, description=""):
     """Primary event type from the title (text) and optional description.
 
@@ -517,8 +535,12 @@ def classify_event_type(text, description=""):
     taxonomy = _taxonomy()
     minimum_body_hits = _min_description_hits()
     combined = text_match.prepare(f"{title.raw} {body.raw}")
+    guarded_types = set(load_taxonomy_config().get("typing_exclusions", {}).get("guarded_types", []))
+    skip_guarded = bool(guarded_types) and is_excluded_from_typing(title.raw)
     ranked_matches = []
     for event_type, rule in taxonomy.items():
+        if skip_guarded and event_type in guarded_types:
+            continue
         title_terms = {term for term, _ in rule["terms"].matches(title)}
         body_terms = {term for term, _ in rule["terms"].matches(body)}
         if not title_terms and len(body_terms) < minimum_body_hits:
