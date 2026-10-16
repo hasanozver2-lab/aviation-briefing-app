@@ -12,9 +12,17 @@
       },
       "event_type_default": 0.2,
       "reliability_default": 0.4,
-      "tier_prominence": {"1": 1.0, "2": 0.7, "3": 0.4, "4": 0.2},
+      "tier_prominence": {
+        "1": 1.0,
+        "2": 0.7,
+        "3": 0.4,
+        "4": 0.2
+      },
       "corroboration_full_at_sources": 3,
-      "selection": {"min_score": 0, "max_per_run": 12}
+      "selection": {
+        "min_score": 0,
+        "max_per_run": 12
+      }
     },
     "v2": {
       "status": "provisional",
@@ -28,9 +36,49 @@
       },
       "event_type_default": 0.1,
       "reliability_default": 0.4,
-      "tier_prominence": {"1": 1.0, "2": 0.7, "3": 0.4, "4": 0.2},
+      "tier_prominence": {
+        "1": 1.0,
+        "2": 0.7,
+        "3": 0.4,
+        "4": 0.2
+      },
       "corroboration_full_at_sources": 3,
-      "selection": {"min_score": 45, "max_per_run": 12}
+      "selection": {
+        "min_score": 45,
+        "max_per_run": 12,
+        "exclude_terms": [
+          "F-35*",
+          "F-16*",
+          "F-22*",
+          "F-15*",
+          "Su-34*",
+          "fighter jet*",
+          "fighter aircraft",
+          "combat aircraft",
+          "warplane*",
+          "bomber*",
+          "missile defen*",
+          "air force",
+          "RAAF",
+          "air battle",
+          "defence ministry",
+          "defense ministry",
+          "savaş uçağ*",
+          "MSB",
+          "silahlı kuvvet*"
+        ],
+        "keep_terms": [
+          "airspace",
+          "airport*",
+          "airline*",
+          "civil aviation",
+          "commercial flight*",
+          "passenger*",
+          "havalimanı*",
+          "havayolu*",
+          "hava sahası*"
+        ]
+      }
     }
   }
 }
