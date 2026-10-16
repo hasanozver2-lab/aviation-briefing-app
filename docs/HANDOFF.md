@@ -38,6 +38,16 @@ Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 - Bölüm: `config/sections.json → rule_order` sırasıyla (event_type → düzenleyici → taşıyıcı/grup bölgesi → havalimanı bölgesi → üretici/tedarik) tetiklenen her kural bölüm üretir; ilki `region_section` (tek birincil), kalanlar `secondary_tags`. Hiçbiri tutmazsa `Other`. Türkiye = Europe, Mısır = Africa, İsrail/Ürdün = Middle East & Gulf.
 - Çıktı JSON'da yeni alanlar: `event_type`, `entities` (groups/carriers/airports/aircraft, her biri `entity_id` ile), `region_section`, `secondary_tags`. Eski `section` (4 bölüm) arayüz için aynen duruyor; arayüz henüz yeni alanları kullanmıyor.
 
+## Yayın hattı (2026-10-16'dan beri: git dalı, Blob değil)
+- Zamanlama: `.github/workflows/briefing-pipeline.yml`, **saatte bir** (`2 * * * *`), tek iş; tek çalıştırma hem `daily` hem `hourly` üretir ve **tek commit** ile `briefing-data` dalına yazar (günde ≤ 24 commit). `main`'e hiçbir zaman commit atılmaz. İzin: yalnızca `contents: write`.
+- Yazma: `scripts/run_pipeline.py` → `api/briefing_store.py` → `api/github_store.py`. Git plumbing (geçici index, `commit-tree`, tek ref push) kullanır; çalışma ağacına dokunmaz. Bir mod başarısız olursa o modun eski brifingi korunur, yalnızca `*-status.json` `stale` yazılır ve iş kırmızı biter.
+- Okuma: `/api/briefing` dosyaları `raw.githubusercontent.com/<repo>/briefing-data/briefings/*.json` adresinden okur (repo herkese açık olmalı; raw önbelleği ≈ 5 dk). Okuma başarısızsa commit'li `briefing_cache_*.json`'a düşer ve `status: "stale"` döner.
+- Depo seçimi: `BRIEFING_STORE=github|blob` (varsayılan `github`). Blob kodu (`api/blob_store.py`) duruyor; `blob` için `BLOB_READ_WRITE_TOKEN` ve `BLOB_PUBLIC_BASE_URL` gerekir. Okuma konumu `BRIEFING_DATA_REPO` / `BRIEFING_DATA_BRANCH` ile değiştirilebilir (Vercel'de `VERCEL_GIT_REPO_OWNER/SLUG` da kullanılır).
+- Vercel: `vercel.json → git.deploymentEnabled["briefing-data"] = false`; veri dalı kendi `vercel.json`'unu da taşır (her commit'te yazılır), böylece push'lar yayın başlatmaz.
+- Secrets: `GEMINI_API_KEY` (zorunlu), `EIA_API_KEY` (**isteğe bağlı**: yoksa Brent/jet yakıtı atlanır, ECB kurları sürer, panelde not görünür ve panel `partial` olur).
+- Yerel deneme: `python scripts/run_pipeline.py --mode all --out-dir <klasör>` (yayınlamaz).
+- Veri dalı büyür (~100 KB × 24/gün). Gerekirse dal periyodik olarak tek commit'e indirilebilir (orphan + force push); şimdilik yapılmadı.
+
 ## Bilinen teknik borç (onaylı, şimdi yapılmayacak)
 1. **Üç kopya `index.html`.** Kök ve `public/` aynı, `static/index.html` eski (1654 satır). Vercel `public/` servis ediyor. Tek kopyaya indirilecek.
 2. **`AGENTS.md` güncel değil.** THY merceği, THY kırmızısı ve `THY Impact Assessment` anlatıyor; kapsam kararı (küresel, THY'ye özel mercek yok) yansıtılmamış.
@@ -55,6 +65,7 @@ Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 - **`index.html` hâlâ `user-scalable=no`** (erişilebilirlik).
 - **Spirit Airlines filosu 0.** Doğrulama kaynağı (Wikipedia) 2026-05-02'de faaliyetin durduğunu yazıyor; tek kaynak, `needs_verification=1` bırakıldı. Gerçekse satır tier 4'e düşmüş olur.
 - **Filo rakamlarının kaynağı Wikipedia (CC BY-SA).** Tier hesabı için yeterli; ancak varlık sayfalarında filo rakamı gösterilecekse kaynak gösterimi (atıf) ve lisans uyumu (CC BY-SA, türev veri paylaşımı koşulu) ayrıca ele alınmalı; `verification_source` sütunu atıf için başlangıç noktası.
+- **ECB isteği ara sıra `HTTPError` veriyor** (2026-10-16 yerel çalıştırmada bir kez; hemen sonra sorunsuz). Actions'ta geçici DB her çalışmada boş olduğundan, tek başarısız istek o saatin kur panelini boş bırakır; basit bir yeniden deneme eklenebilir.
 - **Canlı yayın hattı doğrulanmadı.** 2026-10-16: GitHub'da "Publish aviation briefings" için hiç çalışma kaydı yok ve canlı `/api/briefing` 14 Ekim tarihli commit'li önbelleği döndürüyor (`status`/`market` alanları yok). Secrets, ilk çalışma ve Blob okuma adresi (`BLOB_PUBLIC_BASE_URL`) doğrulanmalı.
 - **Aynı depodan üç Vercel projesi yayın alıyor:** `aviation-briefing-app-drvd` (canlı site), `aviation-briefing-app-5w38` ve `aviation-briefing-app`. Amaçları belirsiz; kullanılmayanlar silinmeden önce sahibine sorulacak.
 - **Seed rakamları kısmen doğrulanmış tahmin.** Doğrulama turu `reports/entity_seed_review.md` üzerinden.
