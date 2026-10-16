@@ -104,6 +104,13 @@ Tamamı deterministik ve kural tabanlı; LLM yalnızca anlatı üretir, etiket/s
 - Arayüz: bu haberler blok ve bölge filtresi dışında, en altta "Yesterday · N" grubunda; yeni haber hapını tetiklemez. Üst sayaç eklenenleri de sayar ("8 stories · 1 breaking").
 - Not: 2026-10-16'dan önce arşiv yok; ilk gerçek tamamlama 17 Ekim'de görülür (tarayıcı denemesi gerçek bugünkü hikâyelerden kurulan bir dün ile yapıldı).
 
+## FX gizleme, tek sayfa, dil kuralı (feature/new-ui)
+- **FX:** `config/market_indicators.json` `market.display_fx: false`. ECB toplama ve DB duruyor; API (üretimde ve okuma anında, eski arşivler dahil) `fx_usd_*` satırlarını ve fx olaylarını döndürmez. Birim "EUR per USD" (değer 1 USD'nin kaç EUR ettiği); eski "EUR/USD" etiketi piyasa kotasyonunun tersini çağrıştırıyordu. Panel boşsa bölüm gizlenir; tek gösterge eksikse "N unavailable".
+- **Tek sayfa + Yesterday:** bkz. önceki bölüm (`daily_min_stories`, `carried_from`).
+- **Dil (`config/language.json`, `api/language.py`):** kaynak dili `config/sources.csv` `language` sütunundan; yalnızca bilinmeyen kaynakta metinden deterministik tespit (Türkçe'ye özgü harf + yaygın sözcük). Hikâye dili: tüm kaynaklar `tr` ise `tr`, karışık/İngilizce ise `en` — kural tek yerde (`story_rule`). Makale ve hikâye `language` taşır; API her okumada hikâye dilini kaynaklardan yeniden hesaplar (sonradan eklenen İngilizce kaynak hikâyeyi İngilizce yapar).
+- **Anlatı dili:** Gemini isteğinde hikâye başına `target_language`; anlatı `narrative_language` ile saklanır. Dili uyuşmayan anlatı (dil alanı olmayan eski anlatılar İngilizce sayılır) yeni hikâyelerden sonra, aynı çalışma başına ≤2 çağrı / 8 hikâye kotasıyla bir kez yeniden üretilir; başarısız olursa eski anlatı görünmeye devam eder. Rapor `rewritten` alanı.
+- **Arayüz:** hikâye metinleri `lang="tr|en"`; kicker/eyebrow gibi arayüz etiketleri `lang="en"` (Türkçe bir kartta "Critical" → "CRİTİCAL" olmasın). Yazı tipleri Google css2 ile latin-ext'i otomatik alır (tarayıcıda ğ ş İ ı ö ü ç doğrulandı).
+
 ## Bilinen teknik borç (onaylı, şimdi yapılmayacak)
 1. ~~Üç kopya `index.html`~~ **Çözüldü:** tek kaynak `public/index.html` (Vercel `public/` servis ediyor; canlıdaki `/` ve `/index.html` içeriği bu dosyayla birebir). `tests/test_ui_contract.py` depoda başka `index.html` kalırsa kırılır. Kalan: `static/` ve kökte yinelenen `manifest.json`/`icon.svg` (hiçbir kod okumuyor, `public/` olanlar kullanılıyor) ile `api/index.py`'deki kökteki `index.html`'e geri düşme yolu.
 2. **`AGENTS.md` güncel değil.** THY merceği, THY kırmızısı ve `THY Impact Assessment` anlatıyor; kapsam kararı (küresel, THY'ye özel mercek yok) yansıtılmamış.
