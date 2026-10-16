@@ -34,13 +34,17 @@ def test_english_and_turkish_reports_of_one_event_become_one_story():
     assert clusters == [[0, 1, 2, 3]]
 
 
-def test_the_same_order_reported_by_five_outlets_is_one_story():
+def test_the_same_order_reported_by_four_outlets_is_one_story():
+    """Real titles and descriptions of the Aviation Capital Group order, English and Turkish."""
     acg = [
-        article("Lessor Aviation Capital Group places record order for 75 Airbus A320neo Family jets", "Aviation24"),
-        article("Airbus secures order for 75 Airbus A320neo family aircraft from ACG", "AeroTime", hours=1),
-        article("Airbus wins order for 75 A320neo Family jets despite years-long delivery backlog", "AirDataNews", hours=1),
+        article("Lessor Aviation Capital Group places record order for 75 Airbus A320neo Family jets", "Aviation24",
+                description="Aviation Capital Group (ACG) has signed a firm order for 75 Airbus A320neo Family aircraft, the largest order in the California-based lessor's nearly 40-year history. The deal brings its cumulative orders for the aircraft family to 190."),
+        article("Airbus secures order for 75 Airbus A320neo family aircraft from ACG", "AeroTime", hours=1,
+                description="Airbus has secured an order for 75 Airbus A320neo family jets from Aviation Capital Group (ACG)"),
+        article("Aviation Capital Group Grows Portfolio with Order for 75 Airbus A320neo Family Aircraft, the Largest Order", "Yahoo Finance", hours=1,
+                description='Aviation Capital Group LLC ("ACG") today announced that it has finalized a new order with Airbus for 75 A320neo Family aircraft.'),
         article("ACG’den Airbus’a 75 uçaklık dev sipariş: Anlaşmanın liste değeri 11,76 milyar dolar", "HavaHaber", hours=3,
-                description="Aviation Capital Group, 75 adet Airbus A320neo ailesi uçak sipariş etti."),
+                description="ABD merkezli uçak kiralama şirketi Aviation Capital Group (ACG), Airbus’a 75 adet A320neo siparişi verdi. Anlaşmanın liste fiyatları üzerinden toplam değeri 11,76 milyar dolara ulaşıyor."),
     ]
     assert len(groups(acg)) == 1 and len(groups(acg)[0]) == 4
 
@@ -105,3 +109,52 @@ def test_one_representative_story_per_cluster_the_most_reliable_source():
 @pytest.mark.parametrize("term", ["podcast", "episode", "weekly", "roundup"])
 def test_roundup_terms_are_configured(term):
     assert term in CONFIG["roundup_terms"]
+
+
+# --- the rules for stories without a shared carrier -------------------------------------------------------------
+
+def test_a_story_with_only_a_broad_aircraft_family_joins_through_shared_signals():
+    """'300+ Engines: Major Airline ... 737 MAX' names no airline; numbers, the engine maker and the engine model link it."""
+    lonely = article("300+ Engines: Major Airline Signs Huge Deal To Power Its Boeing 737 MAX Fleet", "Simple Flying", hours=3,
+                     description="A deal with CFM International includes 100s of LEAP-1B engines and the ability to establish an MRO infrastructure in Turkey.")
+    thy = article("Turkish Airlines and CFM sign MOU for more than 600 LEAP-1B engines", "Yahoo Finance", hours=1,
+                  description="Turkish Airlines signed an MOU with CFM International for more than 600 LEAP-1B engines, including 300 for the 737 MAX.")
+    assert not (clustering.entity_ids(lonely, CONFIG) & clustering.entity_ids(thy, CONFIG)), "the only shared entity is a broad family"
+    assert len(groups([thy, lonely])) == 1
+
+
+def test_a_broad_entity_or_a_single_number_alone_never_merges_two_stories():
+    boeing_a = article("Boeing delivers 50 jets in the quarter", "A", description="Boeing says deliveries rose.")
+    boeing_b = article("Boeing faces a strike deadline at its factories", "B", hours=1, description="Union members vote on the 737 MAX line contract.")
+    assert groups([boeing_a, boeing_b]) == []
+    only_numbers = [article("Carrier announces 300 new hires and 75 trainee pilots", "A"), article("Lessor takes 300 aircraft and 75 engines into its portfolio", "B", hours=1)]
+    assert groups(only_numbers) == []
+
+
+def test_digits_inside_a_model_designator_are_not_a_second_number():
+    left = article("US Navy receives first C-130J for conversion into E-130J command aircraft", "A", description="The C-130J conversion programme.")
+    right = article("England, Greece and Turkey: a strange C-130J story", "B", hours=1, description="C-130B and C-130J transports change hands.")
+    assert groups([left, right]) == []
+
+
+def test_numeric_html_entities_are_not_signals():
+    noisy = article("Japan&#8217;s carrier opens a route", "A", description="The route&#8230; starts soon&#8230; Japan&#8217;s capital")
+    assert not {item for item in clustering.signals(noisy, CONFIG) if item.isdigit()}
+
+
+def test_a_shared_carrier_and_a_shared_aircraft_variant_make_one_story_but_the_carrier_alone_does_not():
+    base = "Lufthansa schedules first A350-1000 passenger flight to Tokyo"
+    variants = [article(base, "A"), article("Lufthansa selects Tokyo as first destination for Airbus A350-1000", "B", hours=1),
+                article("New Lufthansa Airbus A350-1000 to fly first to Tokyo", "C", hours=2)]
+    assert len(groups(variants)) == 1 and len(groups(variants)[0]) == 3
+    other = [article("Lufthansa says goodbye to the A340-600", "A"), article("Lufthansa could transfer eight Airbus A350 jets to TAP after 2030", "B", hours=1)]
+    assert groups(other) == []
+
+
+def test_signals_need_compatible_event_types():
+    a = article("Carrier signs MOU for 600 LEAP-1B engines with CFM", "A")
+    b = article("Strike hits CFM production of 600 LEAP-1B engines", "B", hours=1)
+    a["event_type"], b["event_type"] = "fleet_orders", "operations_disruption"
+    assert groups([a, b]) == []
+    b["event_type"] = None
+    assert len(groups([a, b])) == 1

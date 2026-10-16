@@ -561,13 +561,15 @@ class EntityIndex:
         phrases = _load_json(EXCLUSIONS_PATH)["phrases"] if EXCLUSIONS_PATH.exists() else []
         return cls(data, config, phrases)
 
-    def _rank(self, entities, fields, outside_rivals=None):
+    def _rank(self, entities, fields, outside_rivals=None, blocking_spans=None):
         """Order matches title-first, then by earliest position; drop shadowed matches.
 
         A match is shadowed when it sits inside a longer alias of another entity
         ("Air France" inside "Air France-KLM") or inside an exclusion phrase
         ("Emirates" inside "United Arab Emirates"). outside_rivals holds, per field, spans of
-        another entity kind (a group name such as "Air France-KLM" shadows its brands).
+        another entity kind (a group name such as "Air France-KLM" shadows its brands). blocking_spans
+        holds, per field, spans that swallow a match even when they are exactly as long: an aircraft
+        designator is never a flight number ("A350" must not read as Aegean's code "A3" + "50").
         """
         best = {}
         for field_index, prepared in enumerate(fields):
@@ -583,6 +585,7 @@ class EntityIndex:
                     span for span in spans
                     if not _is_inside(span, exclusion_spans, strictly_longer=False)
                     and not _is_inside(span, rivals, strictly_longer=True)
+                    and not _is_inside(span, (blocking_spans or [[], []])[field_index], strictly_longer=False)
                 ]
                 if surviving and entity_id not in best:
                     best[entity_id] = (field_index, min(start for start, _ in surviving), entity)
@@ -591,6 +594,7 @@ class EntityIndex:
     def find(self, title, description=""):
         fields = [text_match.prepare(title), text_match.prepare(description)]
         group_spans = [[span for entity in self.groups for span in entity.spans(prepared)] for prepared in fields]
+        aircraft_spans = [[span for entity in self.aircraft for span in entity.spans(prepared)] for prepared in fields]
         return {
             "groups": [
                 {"entity_id": g["entity_id"], "slug": g["slug"], "name": g["name"], "region": g["region"], "tier": g["tier"]}
@@ -599,7 +603,7 @@ class EntityIndex:
             "carriers": [
                 {"entity_id": c["entity_id"], "slug": c["slug"], "iata": c["iata"], "name": c["name"],
                  "region": c["region"], "group_entity_id": c["parent_entity_id"], "tier": c["tier"] or c["cargo_tier"]}
-                for c in self._rank(self.carriers, fields, group_spans)
+                for c in self._rank(self.carriers, fields, group_spans, blocking_spans=aircraft_spans)
             ],
             "airports": [
                 {"entity_id": a["entity_id"], "slug": a["slug"], "iata": a["iata"], "name": a["name"],
