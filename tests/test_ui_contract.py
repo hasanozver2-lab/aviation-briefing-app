@@ -49,3 +49,13 @@ def test_the_page_stays_zoomable_and_calls_no_third_party_scripts(path):
     hosts = set(re.findall(r"https?://([^/\"' )]+)", html))
     assert hosts <= ALLOWED_EXTERNAL_HOSTS | {"www.w3.org"}, hosts
     assert "<script src" not in html
+
+
+@pytest.mark.parametrize("path", COPIES)
+def test_the_page_updates_itself_when_a_new_version_is_deployed(path):
+    """A home-screen app resumes with old page code; it must notice a new deployment and reload."""
+    html = page(path)
+    assert "function checkForNewVersion" in html and "location.reload()" in html
+    assert 'cache: "no-store"' in html
+    assert "!state.articleId) location.reload()" in html, "never reload under a reader with a story open"
+    assert html.count("checkForNewVersion()") >= 3          # on load, on returning to the app, after closing a story
