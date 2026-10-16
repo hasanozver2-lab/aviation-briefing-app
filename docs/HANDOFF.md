@@ -84,6 +84,13 @@ Tamamı deterministik ve kural tabanlı; LLM yalnızca anlatı üretir, etiket/s
 - **Okuma zamanı filtresi:** `story_lifecycle.drop_excluded` API yanıtında güncel savunma/yatırım yorumu filtrelerini uygular; arşiv dosyasına dokunmaz (liste gevşetilirse haber geri gelir). Yanıtta `excluded_count`; `hidden_low_count` bunları saymaz.
 - `scripts/dev_server.py` `log_message` int argümanda TypeError veriyordu (ERR_EMPTY_RESPONSE); düzeltildi.
 
+## Piyasa verisi: EIA yerine FRED (feature/fred-market-data)
+- Yakıt serileri: EIA anahtarı varsa EIA birincil (`RBRTE`, `EER_EPJK_PF4_RGC_DPG`), yoksa ya da EIA hata verirse FRED (`DCOILBRENTEU` Brent, `DJFUELUSGULF` ABD Körfezi jet yakıtı, $/galon; kıyas için ×42 ile $/bbl). Kaynak etiketi: FRED için "FRED (EIA)". Seri kimlikleri `config/market_indicators.json`da.
+- FRED anahtarı sırası: `FRED_API_KEY` (ortam/GitHub secret) → yoksa ya da çağrı başarısızsa anahtarsız `fredgraph.csv`. İki yol da başarısızsa pipeline kırılmaz: panel `partial`, `missing_data_note` dolu, `errors` içinde sağlayıcı adı. Hata iletilerine istek adresi (anahtar) yazılmaz, yalnızca istisna türü.
+- EIA anahtarı yoksa atlama kaydedilir: `panel.skipped == ["EIA"]`; FRED yedek olarak yakıtı sağladığında `status` `ok`, `panel.fuel_provider == "fred"`.
+- Her göstergede `as_of` gerçek gözlem tarihi, `carried_forward` (gözlem bugünden eski), `age_days` kaç gün eski. FRED'de gözlem 1–2 gün gecikmeli gelir (2026-10-16'da son değer 10-14). Eşikler değişmedi (jet yakıtı haftalık %5, crack spread 1,5σ).
+- `FRED_API_KEY` GitHub secret olarak tanımlı (stdin ile aktarıldı); iş akışı yalnızca `secrets.FRED_API_KEY` ile başvurur.
+
 ## Bilinen teknik borç (onaylı, şimdi yapılmayacak)
 1. ~~Üç kopya `index.html`~~ **Çözüldü:** tek kaynak `public/index.html` (Vercel `public/` servis ediyor; canlıdaki `/` ve `/index.html` içeriği bu dosyayla birebir). `tests/test_ui_contract.py` depoda başka `index.html` kalırsa kırılır. Kalan: `static/` ve kökte yinelenen `manifest.json`/`icon.svg` (hiçbir kod okumuyor, `public/` olanlar kullanılıyor) ile `api/index.py`'deki kökteki `index.html`'e geri düşme yolu.
 2. **`AGENTS.md` güncel değil.** THY merceği, THY kırmızısı ve `THY Impact Assessment` anlatıyor; kapsam kararı (küresel, THY'ye özel mercek yok) yansıtılmamış.

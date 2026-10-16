@@ -188,16 +188,17 @@ def test_readable_store_wins_over_the_committed_cache(tmp_path, monkeypatch):
     assert result["status"] == "ok" and result["stories"] == [{"id": "live"}]
 
 
-# --- optional EIA key -----------------------------------------------------------------
+# --- optional EIA key (FRED fallback is covered in test_fred_market.py) -----------------------------------------------------------------
 
 def test_missing_eia_key_skips_fuel_but_ecb_rates_continue(tmp_path, monkeypatch):
     monkeypatch.setattr(market_data, "fetch_eia_series", lambda *a, **k: (_ for _ in ()).throw(AssertionError("EIA must not be called")))
     today = date(2026, 10, 15)
+    monkeypatch.setattr(market_data, "fetch_fred_series", lambda *a, **k: (_ for _ in ()).throw(OSError("FRED unreachable")))
     monkeypatch.setattr(market_data, "fetch_ecb_fx_series", lambda start, end: {"fx_usd_try": [(today - timedelta(days=1), 40.0), (today, 41.0)]})
 
     panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", eia_api_key="", end_date=today)
 
-    assert panel["skipped"] == ["EIA"] and panel["errors"] == []
+    assert panel["skipped"] == ["EIA"] and panel["errors"] == ["FRED: OSError"]
     assert panel["status"] == "partial"
     assert "EIA" in panel["missing_data_note"]
     assert [item["series_id"] for item in panel["items"]] == ["fx_usd_try"]

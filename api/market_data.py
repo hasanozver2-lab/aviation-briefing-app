@@ -26,10 +26,14 @@ TAXONOMY_CONFIG_PATH = BASE_DIR / "config" / "event_taxonomy.json"
 MIGRATION_PATH = BASE_DIR / "migrations" / "002_market_data.sql"
 DEFAULT_DATABASE_PATH = BASE_DIR / "data" / "pipeline.sqlite3"
 EIA_SPOT_ENDPOINT = "https://api.eia.gov/v2/petroleum/pri/spt/data/"
+FRED_OBSERVATIONS_ENDPOINT = "https://api.stlouisfed.org/fred/series/observations"
+FRED_GRAPH_CSV_ENDPOINT = "https://fred.stlouisfed.org/graph/fredgraph.csv"
+FUEL_SERIES = ("brent_spot", "us_gulf_coast_jet_fuel")
+GALLONS_PER_BARREL = 42
 ECB_EXR_ENDPOINT = "https://data-api.ecb.europa.eu/service/data/EXR"
 IATA_FUEL_MONITOR_URL = "https://www.iata.org/en/publications/economics/fuel-monitor/"
 FX_CURRENCIES = ("EUR", "GBP", "JPY", "CNY", "INR", "TRY", "BRL")
-MISSING_EIA_NOTE = "Brent ve ABD Körfez Kıyısı jet yakıtı göstergeleri bu yayında yok: EIA anahtarı tanımlı değil."
+MISSING_FUEL_NOTE = "Brent ve ABD Körfez Kıyısı jet yakıtı göstergeleri bu yayında yok: EIA anahtarı tanımlı değil ve FRED'e ulaşılamadı."
 FUEL_CONTEXT_TERMS = text_match.TermSet(["jet fuel", "yakıt*", "brent", "oil", "petrol*"], allow_plural=True)
 
 
@@ -107,6 +111,56 @@ def fetch_eia_series(series_id, api_key, start_date, end_date):
     return sorted(observations)
 
 
+def _parse_fred_value(raw):
+    """FRED marks missing days with '.'; those are skipped rather than stored."""
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def fetch_fred_series_with_key(series_id, api_key, start_date, end_date):
+    query = urllib.parse.urlencode({
+        "series_id": series_id, "api_key": api_key, "file_type": "json",
+        "observation_start": start_date.isoformat(), "observation_end": end_date.isoformat(),
+    })
+    payload = _json_request(f"{FRED_OBSERVATIONS_ENDPOINT}?{query}")
+    rows = [(row.get("date"), _parse_fred_value(row.get("value"))) for row in payload.get("observations", [])]
+    return _fred_rows(rows)
+
+
+def fetch_fred_series_keyless(series_id, start_date, end_date):
+    query = urllib.parse.urlencode({"id": series_id, "cosd": start_date.isoformat(), "coed": end_date.isoformat()})
+    reader = csv.reader(io.StringIO(_text_request(f"{FRED_GRAPH_CSV_ENDPOINT}?{query}")))
+    next(reader, None)  # header
+    return _fred_rows([(row[0], _parse_fred_value(row[1])) for row in reader if len(row) >= 2])
+
+
+def _fred_rows(rows):
+    observations = []
+    for raw_date, value in rows:
+        if value is None:
+            continue
+        try:
+            observations.append((date.fromisoformat(str(raw_date)), value))
+        except ValueError:
+            continue
+    return sorted(observations)
+
+
+def fetch_fred_series(series_id, api_key, start_date, end_date):
+    """FRED observations: the keyed API when a key is set, the keyless CSV otherwise or when the keyed call fails.
+
+    Exceptions are never formatted with the request URL, so the key cannot reach a log through here.
+    """
+    if str(api_key or "").strip():
+        try:
+            return fetch_fred_series_with_key(series_id, api_key, start_date, end_date)
+        except Exception:
+            pass
+    return fetch_fred_series_keyless(series_id, start_date, end_date)
+
+
 def ecb_fx_url(start_date, end_date):
     currencies = "+".join(("USD",) + FX_CURRENCIES[1:])
     key = f"D.{currencies}.EUR.SP00.A"
@@ -157,20 +211,30 @@ def fetch_ecb_fx_series(start_date, end_date):
     return {series_id: sorted(values) for series_id, values in crosses.items()}
 
 
-def market_series_definitions():
+def _fuel_source(series_config, provider):
+    return provider_label(provider) if provider else series_config["source"]
+
+
+def provider_label(provider):
+    return load_market_config()["providers"][provider]
+
+
+def market_series_definitions(provider_by_series=None):
+    """provider_by_series ("eia" | "fred" per fuel series) sets the source label of what was actually fetched."""
     config = load_market_config()
     configured_series = config["series"]
+    provider_by_series = provider_by_series or {}
     definitions = {
         "brent_spot": {
             "name": configured_series["brent_spot"]["name"],
             "unit": configured_series["brent_spot"]["unit"],
-            "source": configured_series["brent_spot"]["source"],
+            "source": _fuel_source(configured_series["brent_spot"], provider_by_series.get("brent_spot")),
             "frequency": "daily",
         },
         "us_gulf_coast_jet_fuel": {
             "name": configured_series["us_gulf_coast_jet_fuel"]["name"],
             "unit": configured_series["us_gulf_coast_jet_fuel"]["unit"],
-            "source": configured_series["us_gulf_coast_jet_fuel"]["source"],
+            "source": _fuel_source(configured_series["us_gulf_coast_jet_fuel"], provider_by_series.get("us_gulf_coast_jet_fuel")),
             "frequency": "daily",
         },
     }
@@ -184,9 +248,9 @@ def market_series_definitions():
     return definitions
 
 
-def upsert_observations(path, observations_by_series, fetched_at=None):
+def upsert_observations(path, observations_by_series, fetched_at=None, provider_by_series=None):
     target = migrate_market_database(path)
-    definitions = market_series_definitions()
+    definitions = market_series_definitions(provider_by_series)
     fetched_timestamp = (fetched_at or utc_now()).isoformat()
     with sqlite3.connect(target) as connection:
         for series_id, definition in definitions.items():
@@ -265,7 +329,7 @@ def calculate_series_indicators(observations):
     }
 
 
-def calculate_crack_spread(brent_observations, jet_fuel_observations):
+def calculate_crack_spread(brent_observations, jet_fuel_observations, source_label="EIA"):
     spread_rows = calculate_crack_spread_rows(brent_observations, jet_fuel_observations)
     indicators = calculate_series_indicators(spread_rows)
     if not indicators:
@@ -283,7 +347,7 @@ def calculate_crack_spread(brent_observations, jet_fuel_observations):
     indicators.update({
         "name": "ABD Körfez Kıyısı jet yakıtı - Brent marjı",
         "unit": "USD/varil",
-        "source": "EIA; jet yakıtı USD/galon değeri 42 ile USD/varile çevrilmiştir.",
+        "source": f"{source_label}; jet yakıtı USD/galon değeri {GALLONS_PER_BARREL} ile USD/varile çevrilmiştir.",
         "mean_90_days": mean_90_days,
         "standard_deviation_90_days": standard_deviation_90_days,
         "deviation_from_mean_standard_deviations": deviation,
@@ -365,7 +429,7 @@ def _event_comment(event_type, api_key):
     return deterministic_market_comment(event_type)
 
 
-def list_threshold_breaches(path):
+def list_threshold_breaches(path, fuel_source="EIA"):
     """Evaluate every stored observation date so historical threshold days are auditable."""
     target = database_path(path)
     thresholds = load_market_config()["thresholds"]
@@ -380,7 +444,7 @@ def list_threshold_breaches(path):
                 "event_type": "fuel_energy",
                 "as_of": observed_on.isoformat(),
                 "headline": "ABD Körfez Kıyısı jet yakıtında haftalık eşik aşımı",
-                "source": "EIA",
+                "source": fuel_source,
                 "payload": {
                     "series_id": "us_gulf_coast_jet_fuel",
                     "value": value,
@@ -409,7 +473,7 @@ def list_threshold_breaches(path):
                 "event_type": "fuel_energy",
                 "as_of": observed_on.isoformat(),
                 "headline": "ABD Körfez Kıyısı jet yakıtı - Brent marjında 90 günlük eşik aşımı",
-                "source": "EIA",
+                "source": fuel_source,
                 "payload": {
                     "series_id": "jet_fuel_brent_crack_spread",
                     "value": value,
@@ -445,13 +509,13 @@ def list_threshold_breaches(path):
 def calculate_crack_spread_rows(brent_observations, jet_fuel_observations):
     brent_by_date = dict(brent_observations)
     return [
-        (observed_on, jet_value * 42 - brent_by_date[observed_on])
+        (observed_on, jet_value * GALLONS_PER_BARREL - brent_by_date[observed_on])
         for observed_on, jet_value in jet_fuel_observations
         if observed_on in brent_by_date
     ]
 
 
-def write_threshold_events(path, indicators, api_key=""):
+def write_threshold_events(path, indicators, api_key="", fuel_source="EIA"):
     """Persist deterministic threshold events; only most-recent events receive a short comment."""
     target = migrate_market_database(path)
     latest_dates = {
@@ -461,7 +525,7 @@ def write_threshold_events(path, indicators, api_key=""):
     }
     published_events = []
     with sqlite3.connect(target) as connection:
-        for breach in list_threshold_breaches(target):
+        for breach in list_threshold_breaches(target, fuel_source):
             event_id = _upsert_event(
                 connection,
                 breach["event_type"],
@@ -601,8 +665,9 @@ def record_article_events(path, articles):
     return recorded_articles
 
 
-def build_market_panel(path):
-    definitions = market_series_definitions()
+def build_market_panel(path, provider_by_series=None):
+    definitions = market_series_definitions(provider_by_series)
+    jet_provider = (provider_by_series or {}).get("us_gulf_coast_jet_fuel")
     indicators = {
         series_id: calculate_series_indicators(load_observations(path, series_id))
         for series_id in definitions
@@ -610,6 +675,7 @@ def build_market_panel(path):
     crack_spread = calculate_crack_spread(
         load_observations(path, "brent_spot"),
         load_observations(path, "us_gulf_coast_jet_fuel"),
+        source_label=_fuel_source({"source": "EIA"}, jet_provider) if jet_provider else "EIA",
     )
     if crack_spread:
         indicators["jet_fuel_brent_crack_spread"] = crack_spread
@@ -619,12 +685,16 @@ def build_market_panel(path):
             continue
         definition = definitions.get(series_id, {})
         item = dict(indicator)
+        observed_on = date.fromisoformat(indicator["as_of"])
+        age_days = (utc_now().date() - observed_on).days
         item.update({
             "series_id": series_id,
             "name": definition.get("name", indicator.get("name", series_id)),
             "unit": definition.get("unit", indicator.get("unit", "")),
             "source": definition.get("source", indicator.get("source", "")),
-            "carried_forward": date.fromisoformat(indicator["as_of"]) < utc_now().date(),
+            # as_of is the real observation date (FRED/EIA publish with a lag); age_days says how stale that is today.
+            "carried_forward": age_days > 0,
+            "age_days": max(age_days, 0),
         })
         items.append(item)
     return {
@@ -639,8 +709,17 @@ def build_market_panel(path):
     }, indicators
 
 
-def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=None, gemini_api_key=""):
-    """Fetch, persist, calculate, and emit deterministic market signals for a pipeline run."""
+def _fetch_fuel_series(fetch, series_key, config, today, start):
+    """{series_id: observations} for both fuel series from one provider (all or nothing)."""
+    return {series_id: fetch(config[series_id][series_key], start, today) for series_id in FUEL_SERIES}
+
+
+def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=None, gemini_api_key="", fred_api_key=""):
+    """Fetch, persist, calculate, and emit deterministic market signals for a pipeline run.
+
+    Fuel series: EIA when EIA_API_KEY is set, with FRED as the fallback; FRED alone otherwise. A missing
+    EIA key is recorded in panel["skipped"], never silently dropped. No provider failure stops the run.
+    """
     target = migrate_market_database(path)
     today = end_date or utc_now().date()
     start = start_date or (today - timedelta(days=400))
@@ -648,29 +727,37 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
     observations = {}
     errors = []
     skipped = []
-    if not str(eia_api_key or "").strip():
-        # Without an EIA key the pipeline still runs: fuel indicators are skipped, ECB rates continue.
-        skipped.append("EIA")
-    else:
+    fuel_provider = None
+    if str(eia_api_key or "").strip():
         try:
-            observations["brent_spot"] = fetch_eia_series(config["brent_spot"]["eia_series"], eia_api_key, start, today)
-            observations["us_gulf_coast_jet_fuel"] = fetch_eia_series(
-                config["us_gulf_coast_jet_fuel"]["eia_series"], eia_api_key, start, today
-            )
+            observations.update(_fetch_fuel_series(lambda series, s, e: fetch_eia_series(series, eia_api_key, s, e), "eia_series", config, today, start))
+            fuel_provider = "eia"
         except Exception as exc:
             errors.append(f"EIA: {type(exc).__name__}")
+    else:
+        skipped.append("EIA")
+    if fuel_provider is None:
+        try:
+            observations.update(_fetch_fuel_series(lambda series, s, e: fetch_fred_series(series, fred_api_key, s, e), "fred_series", config, today, start))
+            fuel_provider = "fred"
+        except Exception as exc:
+            errors.append(f"FRED: {type(exc).__name__}")
     try:
         observations.update(fetch_ecb_fx_series(start, today))
     except Exception as exc:
         errors.append(f"ECB: {type(exc).__name__}")
+    provider_by_series = {series_id: fuel_provider for series_id in FUEL_SERIES} if fuel_provider else {}
     if observations:
-        upsert_observations(target, observations)
-    panel, indicators = build_market_panel(target)
+        upsert_observations(target, observations, provider_by_series=provider_by_series)
+    panel, indicators = build_market_panel(target, provider_by_series)
     panel["errors"] = errors
     panel["skipped"] = skipped
-    if skipped:
-        panel["missing_data_note"] = MISSING_EIA_NOTE
-    if (errors or skipped) and panel["status"] == "ok":
+    panel["fuel_provider"] = fuel_provider
+    if not fuel_provider:
+        panel["missing_data_note"] = MISSING_FUEL_NOTE
+    has_gap = bool(errors) or not fuel_provider
+    if has_gap and panel["status"] == "ok":
         panel["status"] = "partial"
-    panel["events"] = write_threshold_events(target, indicators, gemini_api_key) if indicators else []
+    fuel_source = provider_label(fuel_provider) if fuel_provider else "EIA"
+    panel["events"] = write_threshold_events(target, indicators, gemini_api_key, fuel_source) if indicators else []
     return panel
