@@ -79,7 +79,7 @@ def main():
     parser.add_argument("--report", type=Path, default=PROJECT_DIR / "reports" / "source_registry_audit.md")
     args = parser.parse_args()
 
-    database = source_registry.migrate_sources(_engine.get_builtin_source_records(), args.database)
+    database = source_registry.sync_sources_from_csv(target_path=args.database)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(render_report(database), encoding="utf-8")
     print(f"Registry migrated: {database}")
