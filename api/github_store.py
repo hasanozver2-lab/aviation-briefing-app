@@ -81,6 +81,23 @@ def _serialize(payload):
     return json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
+def read_branch_json(pathname, repo_dir=None, remote=DEFAULT_REMOTE, branch=None):
+    """Read one JSON file from the remote data branch via git (None when branch or file is missing)."""
+    branch = branch or data_branch()
+    repo_dir = str(repo_dir or Path(__file__).resolve().parent.parent)
+    tracking_ref = f"refs/remotes/{remote}/{branch}"
+    fetched = _git(["fetch", "--quiet", remote, f"+refs/heads/{branch}:{tracking_ref}"], repo_dir, check=False)
+    if fetched.returncode != 0:
+        return None
+    shown = _git(["show", f"{tracking_ref}:{_safe_path(pathname)}"], repo_dir, check=False)
+    if shown.returncode != 0:
+        return None
+    try:
+        return json.loads(shown.stdout.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+
+
 def publish_files(files, message, repo_dir=None, remote=DEFAULT_REMOTE, branch=None):
     """Commit {pathname: json_payload} to the data branch in a single commit and push it.
 

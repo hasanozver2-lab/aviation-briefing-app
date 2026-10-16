@@ -1,0 +1,15 @@
+{
+  "_doc": "Relevance score v1: a deterministic 0-100 weighted sum, no LLM. Each component is 0-1 and comes from data (taxonomy weight, source reliability, entity tier, official flag, number of distinct publishers).",
+  "version": "v1",
+  "weights": {
+    "event_type": 35,
+    "source_reliability": 20,
+    "entity_prominence": 25,
+    "official_source": 10,
+    "corroboration": 10
+  },
+  "event_type_default": 0.2,
+  "reliability_default": 0.4,
+  "tier_prominence": {"1": 1.0, "2": 0.7, "3": 0.4, "4": 0.2},
+  "corroboration_full_at_sources": 3
+}

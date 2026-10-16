@@ -1,0 +1,11 @@
+{
+  "_doc": "All durations are hours, all scores are on the 0-100 relevance scale (config/relevance.json). Badges are recomputed from stored timestamps every time the API answers, so they expire on their own.",
+  "timezone": "Europe/Istanbul",
+  "fallback_utc_offset_hours": 3,
+  "max_publication_age_hours": 24,
+  "new": {"max_age_hours": 6},
+  "updated": {"max_age_hours": 6, "min_score_change": 8},
+  "breaking": {"max_age_hours": 3, "critical_score": 60},
+  "hourly_view_window_hours": 2,
+  "title_match_threshold": 0.6
+}

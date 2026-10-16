@@ -84,7 +84,7 @@ def test_api_answers_without_any_local_cache_file(tmp_path, monkeypatch, mode):
 def test_api_serves_the_blob_snapshot_when_no_cache_file_exists(tmp_path, monkeypatch):
     monkeypatch.setattr(_engine, "CACHE_FILE_DAILY", tmp_path / "missing_daily.json")
     snapshot = {"mode": "daily", "status": "ok", "generated_at": "2026-10-16T08:00:00+00:00", "stories": [{"id": "s"}]}
-    monkeypatch.setattr(briefing_store, "read_json", lambda path: snapshot if path.endswith("daily.json") else {})
+    monkeypatch.setattr(briefing_store, "read_json", lambda path: snapshot if path.endswith("latest.json") else {})
 
     result = _engine.get_ready_briefing("daily")
 

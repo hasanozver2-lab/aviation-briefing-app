@@ -25,11 +25,15 @@ try:
     from . import briefing_store
     from . import market_data
     from . import entities
+    from . import story_lifecycle
+    from .urls import canonicalize_url
 except ImportError:
     import source_registry
     import briefing_store
     import market_data
     import entities
+    import story_lifecycle
+    from urls import canonicalize_url
 
 # Windows cp1254 encoding fix
 if hasattr(sys.stdout, 'reconfigure'):
@@ -443,16 +447,6 @@ def entry_values(entry, include_description=True):
     return title, link, clean_html(description) if include_description else "", pub_date
 
 
-def canonicalize_url(value):
-    parsed = urllib.parse.urlsplit(str(value or "").strip())
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-        return ""
-    query = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
-    query = [(key, val) for key, val in query if not key.lower().startswith("utm_") and key.lower() not in {"fbclid", "gclid"}]
-    normalized_query = urllib.parse.urlencode(query)
-    return urllib.parse.urlunsplit((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/") or "/", normalized_query, ""))
-
-
 def parse_published_datetime(value):
     if not value:
         return None
@@ -783,10 +777,8 @@ def safe_source_url(value):
 
 
 def stable_story_id(source_url, headline, fallback_index):
-    """Keep the same story addressable across daily and hourly briefings."""
-    identity = str(source_url or headline or f"story-{fallback_index}").strip().lower()
-    digest = hashlib.sha1(identity.encode("utf-8")).hexdigest()[:12]
-    return f"story-{digest}"
+    """Keep the same story addressable across runs, modes and days (hash of the canonical source URL)."""
+    return story_lifecycle.stable_story_id(source_url, headline or f"story-{fallback_index}")
 
 
 def text_list(value):
@@ -958,6 +950,7 @@ def run_pipeline(mode="daily", market_database=None):
     entities.annotate_articles(articles, entity_index)
     print(f"{len(articles)} haber maddesi toplandı. Analiz ediliyor...")
     briefing = generate_briefing_with_gemini(articles, mode=mode)
+    story_lifecycle.enrich_stories(briefing["stories"], articles)
     if mode == "daily":
         source_registry.record_source_statistics(articles, briefing)
     briefing["market"] = market_panel
@@ -977,33 +970,58 @@ def _read_local_briefing_cache(mode):
     return data if data.get("mode") == mode else None
 
 
-def get_ready_briefing(mode="daily"):
-    """Read a completed briefing; this function never collects feeds or calls an LLM."""
+class BriefingNotFound(LookupError):
+    """No archive file exists for the requested day."""
+
+
+def get_ready_briefing(mode="daily", date=None):
+    """Read a completed briefing; this function never collects feeds or calls an LLM.
+
+    date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
+    LookupError when no archive exists for it. Badges and ordering are recomputed on every read.
+    """
     mode = validate_mode(mode)
-    snapshot = briefing_store.read_json(briefing_store.briefing_path(mode))
-    pipeline_status = briefing_store.read_json(briefing_store.pipeline_status_path(mode)) or {}
+    if date is not None:
+        story_lifecycle.validate_date(date)
+    now = story_lifecycle.utc_now()
+    config = story_lifecycle.load_badges_config()
+    today = story_lifecycle.day_key(now, config)
+    snapshot_path = briefing_store.latest_path() if date is None else briefing_store.day_path(date)
+    snapshot = briefing_store.read_json(snapshot_path)
+    pipeline_status = briefing_store.read_json(briefing_store.status_path()) or {}
     store_unreadable = not isinstance(snapshot, dict)
+    if store_unreadable and date is not None:
+        raise BriefingNotFound(f"no briefing archive for {date}")
     if store_unreadable:
         snapshot = _read_local_briefing_cache(mode)
     if not isinstance(snapshot, dict):
         return build_briefing_payload(mode, [], status="unavailable", warning="No completed pipeline snapshot is available yet.")
 
     snapshot["last_pipeline_run_at"] = snapshot.get("last_pipeline_run_at") or snapshot.get("generated_at", "")
+    is_archive = bool(snapshot.get("date"))
+    if is_archive:
+        snapshot = story_lifecycle.present_stories(snapshot, now, config)
+        if mode == "hourly" and snapshot["date"] == today:
+            snapshot = story_lifecycle.hourly_view(snapshot, now, config)
+        snapshot["mode"] = mode
     if store_unreadable:
         snapshot["status"] = "stale"
         snapshot["warning"] = "The live briefing data could not be read; the last committed snapshot is shown."
-    elif pipeline_status.get("status") == "stale":
+    elif date is None and is_archive and snapshot["date"] != today:
+        snapshot["status"] = "stale"
+        snapshot["warning"] = "No briefing has been published for today yet; the latest archived day is shown."
+    elif date is None and pipeline_status.get("status") == "stale":
         snapshot["status"] = "stale"
         snapshot["warning"] = "The latest pipeline attempt failed; the last successful briefing is shown."
         snapshot["last_pipeline_attempt_at"] = pipeline_status.get("last_attempt_at", "")
     return snapshot
 
 
-def get_briefing(mode="daily", force_refresh=False):
+def get_briefing(mode="daily", force_refresh=False, date=None):
     """Compatibility wrapper: only an explicit local maintenance call may generate data."""
     if force_refresh:
         return run_pipeline(mode)
-    return get_ready_briefing(mode)
+    return get_ready_briefing(mode, date=date)
 
 if __name__ == "__main__":
     print("Aviation Briefing Engine test ediliyor...")

@@ -40,13 +40,26 @@ Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 
 ## Yayın hattı (2026-10-16'dan beri: git dalı, Blob değil)
 - Zamanlama: `.github/workflows/briefing-pipeline.yml`, **saatte bir** (`2 * * * *`), tek iş; tek çalıştırma hem `daily` hem `hourly` üretir ve **tek commit** ile `briefing-data` dalına yazar (günde ≤ 24 commit). `main`'e hiçbir zaman commit atılmaz. İzin: yalnızca `contents: write`.
-- Yazma: `scripts/run_pipeline.py` → `api/briefing_store.py` → `api/github_store.py`. Git plumbing (geçici index, `commit-tree`, tek ref push) kullanır; çalışma ağacına dokunmaz. Bir mod başarısız olursa o modun eski brifingi korunur, yalnızca `*-status.json` `stale` yazılır ve iş kırmızı biter.
-- Okuma: `/api/briefing` dosyaları `raw.githubusercontent.com/<repo>/briefing-data/briefings/*.json` adresinden okur (repo herkese açık olmalı; raw önbelleği ≈ 5 dk). Okuma başarısızsa commit'li `briefing_cache_*.json`'a düşer ve `status: "stale"` döner.
+- Yazma: `scripts/run_pipeline.py` → `api/briefing_store.py` → `api/github_store.py`. Git plumbing (geçici index, `commit-tree`, tek ref push) kullanır; çalışma ağacına dokunmaz. Dosyalar: `briefings/YYYY-MM-DD.json` (Europe/Istanbul günü), `briefings/latest.json` (= bugünün dosyasının kopyası), `briefings/status.json`. Eski `daily.json`/`hourly.json`/`*-status.json` artık yazılmaz.
+- Okuma: `/api/briefing` `latest.json`'ı (veya `?date=YYYY-MM-DD` ile o günün dosyasını) `raw.githubusercontent.com/<repo>/briefing-data/briefings/` altından okur (repo herkese açık olmalı; raw önbelleği ≈ 5 dk). Okuma başarısızsa commit'li `briefing_cache_*.json`'a düşer ve `status: "stale"` döner. Geçersiz tarih 400, arşivi olmayan gün 404.
 - Depo seçimi: `BRIEFING_STORE=github|blob` (varsayılan `github`). Blob kodu (`api/blob_store.py`) duruyor; `blob` için `BLOB_READ_WRITE_TOKEN` ve `BLOB_PUBLIC_BASE_URL` gerekir. Okuma konumu `BRIEFING_DATA_REPO` / `BRIEFING_DATA_BRANCH` ile değiştirilebilir (Vercel'de `VERCEL_GIT_REPO_OWNER/SLUG` da kullanılır).
 - Vercel: `vercel.json → git.deploymentEnabled["briefing-data"] = false`; veri dalı kendi `vercel.json`'unu da taşır (her commit'te yazılır), böylece push'lar yayın başlatmaz.
 - Secrets: `GEMINI_API_KEY` (zorunlu), `EIA_API_KEY` (**isteğe bağlı**: yoksa Brent/jet yakıtı atlanır, ECB kurları sürer, panelde not görünür ve panel `partial` olur).
 - Yerel deneme: `python scripts/run_pipeline.py --mode all --out-dir <klasör>` (yayınlamaz).
 - Veri dalı büyür (~100 KB × 24/gün). Gerekirse dal periyodik olarak tek commit'e indirilebilir (orphan + force push); şimdilik yapılmadı.
+
+## Haber yaşam döngüsü, arşiv ve etiketler (`api/story_lifecycle.py`)
+Tamamı deterministik ve kural tabanlı; LLM yalnızca anlatı üretir, etiket/skor/sıralama üretmez.
+- **Kimlik:** `story_id` = kanonik kaynak URL'sinin (utm/fbclid, sondaki `/`, fragment atılmış) SHA-1'inin ilk 12 hanesi (`story-<12 hane>`). Aynı haber her çalışmada ve günde aynı kimliği alır.
+- **Zaman damgaları:** `first_seen_at` (bir kez yazılır, asla değişmez; dün görülen haber bugün yeniden gelirse dünkü değeri taşır), `last_updated_at` (yalnızca *önemli* değişimde ilerler), `published_at_iso` (makalenin yayın zamanı).
+- **Eşleştirme:** aynı `story_id`, ortak kaynak URL'si veya başlık benzerliği ≥ `title_match_threshold` (0,6) → aynı haber. Aynı olayı anlatan farklı yayıncılar tek haberde `sources[]` altında toplanır.
+- **Önemli değişim ("updated"):** skor `updated.min_score_change` kadar değişti veya yeni kaynak eklendi. Bu durumda içerik yenilenir; değilse haber **olduğu gibi** bırakılır (LLM metni her saat değişse de dosya değişmez).
+- **Skor (`config/relevance.json`, v1):** 0–100 ağırlıklı toplam: event_type ağırlığı 35, kaynak güvenilirliği 20, varlık öne çıkışı (eşleşen grup/taşıyıcı/havalimanının en iyi tier'ı) 25, resmî kaynak 10, yayıncı sayısı 10. Bileşenler `score_components` alanında.
+- **Etiketler (`config/badges.json`):** `new` (first_seen ≤ 6 s), `updated` (last_updated > first_seen ve ≤ 6 s), `breaking` (first_seen ≤ 3 s ve skor ≥ `critical_score` 60). `new`/`breaking` için ayrıca yayın zamanı ≤ `max_publication_age_hours` (24) olmalı; eski haber ilk kez görülünce "yeni" sayılmaz. **Etiketler API her yanıtladığında saklı zaman damgalarından yeniden hesaplanır**, bu yüzden süre dolunca pipeline çalışmasa da kalkar. Dosyadaki `badges` yalnızca yazım anının bilgisidir.
+- **Sıralama:** breaking önce, sonra skor, sonra en yeni; her API yanıtında yeniden uygulanır.
+- **Arşiv:** saatlik çalışma bugünün dosyasına birleştirir; **hiçbir haber silinmez**, geçmiş günler değişmez. Gün Europe/Istanbul gece yarısında döner (sistemde tz veritabanı yoksa sabit +03:00).
+- **Commit yok kuralı:** içerik parmak izi (çalışma saatleri, rozetler, sıralama, piyasa yorumları hariç) değişmediyse gün dosyası ve `latest.json` yazılmaz; `status.json` yalnızca durum/hata değişince yazılır. Hiçbir şey değişmediyse commit atılmaz.
+- **API:** `mode=daily` (varsayılan) bugünün tüm haberleri; `mode=hourly` bugünün son `hourly_view_window_hours` (2) saatte görülen/güncellenen haberleri; `date=YYYY-MM-DD` o günün arşivi. Her haberde `badges`.
 
 ## Bilinen teknik borç (onaylı, şimdi yapılmayacak)
 1. **Üç kopya `index.html`.** Kök ve `public/` aynı, `static/index.html` eski (1654 satır). Vercel `public/` servis ediyor. Tek kopyaya indirilecek.
@@ -68,4 +81,7 @@ Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 - **ECB isteği ara sıra `HTTPError` veriyor** (2026-10-16 yerel çalıştırmada bir kez; hemen sonra sorunsuz). Actions'ta geçici DB her çalışmada boş olduğundan, tek başarısız istek o saatin kur panelini boş bırakır; basit bir yeniden deneme eklenebilir.
 - **Canlı yayın hattı doğrulanmadı.** 2026-10-16: GitHub'da "Publish aviation briefings" için hiç çalışma kaydı yok ve canlı `/api/briefing` 14 Ekim tarihli commit'li önbelleği döndürüyor (`status`/`market` alanları yok). Secrets, ilk çalışma ve Blob okuma adresi (`BLOB_PUBLIC_BASE_URL`) doğrulanmalı.
 - **Aynı depodan üç Vercel projesi yayın alıyor:** `aviation-briefing-app-drvd` (canlı site), `aviation-briefing-app-5w38` ve `aviation-briefing-app`. Amaçları belirsiz; kullanılmayanlar silinmeden önce sahibine sorulacak.
+- **Gemini 429 riski.** 2026-10-16'da, günde birkaç denemeden sonra anahtar `HTTP 429` vermeye başladı (80 sn beklemek düzeltmedi). Saatlik çalışma günde 48 Gemini çağrısı yapar (daily + hourly); kota buna yetmezse iş her saat `stale` ile kırmızı biter. Çözüm seçenekleri: iki modu tek çağrıda birleştirmek, yalnızca yeni makale varsa çağırmak, ücretli kota.
+- **Skor v1 kalibrasyonu gerekiyor.** Gerçek 40 makalede tek haber `breaking` eşiğini (60) geçti ve o haber resmî havayolu bülteninde bir topluluk yardımı duyurusuydu (resmî kaynak + tier 1 taşıyıcı). Ağırlıklar/eşik `config/relevance.json` ve `config/badges.json` içinde; Adım 2'de event_type ağırlığı artırılabilir veya `breaking` için event_type zorunlu kılınabilir.
+- **Veri dalında eski dosyalar duruyor:** `briefings/daily.json`, `hourly.json`, `*-status.json` artık güncellenmiyor; okunmuyor, silinebilir.
 - **Seed rakamları kısmen doğrulanmış tahmin.** Doğrulama turu `reports/entity_seed_review.md` üzerinden.
