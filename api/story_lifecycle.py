@@ -244,6 +244,34 @@ def find_match(story, candidates, threshold):
     return best if best_similarity >= threshold else None
 
 
+def _is_same_story(story, candidate, threshold):
+    if candidate.get("story_id") == story.get("story_id") or _story_urls(story) & _story_urls(candidate):
+        return True
+    return any(
+        source_registry.title_similarity(title, other) >= threshold
+        for title in _story_titles(story) for other in _story_titles(candidate)
+    )
+
+
+def _consolidate(stored, story, threshold):
+    """The stored story an incoming one belongs to. Several stored stories that turn out to be the same
+    event (they were archived before they could be clustered) are folded into the oldest one: its
+    first_seen_at and narrative stay, no source is lost, only the duplicate entries disappear."""
+    matches = [candidate for candidate in stored if _is_same_story(story, candidate, threshold)]
+    if not matches:
+        return None
+    primary = min(matches, key=lambda item: (item.get("first_seen_at", ""), item.get("story_id", "")))
+    for other in matches:
+        if other is primary:
+            continue
+        known = _story_urls(primary)
+        primary["sources"] = primary.get("sources", []) + [entry for entry in other.get("sources", []) if canonicalize_url(entry.get("url")) not in known]
+        stored.remove(other)
+    if len(matches) > 1:
+        primary["source_count"] = len({entry["name"] for entry in primary["sources"] if entry.get("name")}) or 1
+    return primary
+
+
 def _dedupe_incoming(stories, threshold):
     """Within one run the same story may arrive from both modes; keep one and union its sources."""
     kept = []
@@ -302,7 +330,7 @@ def build_day(existing_day, previous_day, briefings, now, config=None):
     stored = [copy.deepcopy(story) for story in (existing_day or {}).get("stories", []) if story.get("story_id")]
     previous = [story for story in (previous_day or {}).get("stories", []) if story.get("story_id")]
     for story in _dedupe_incoming([s for briefing in ordered for s in briefing.get("stories", [])], threshold):
-        target = find_match(story, stored, threshold)
+        target = _consolidate(stored, story, threshold)
         if target is None:
             carried = find_match(story, previous, threshold)
             if carried is not None:
