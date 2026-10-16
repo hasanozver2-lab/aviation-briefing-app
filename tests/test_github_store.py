@@ -94,6 +94,18 @@ def test_publish_rejects_paths_that_escape_the_store(remote_and_work):
         github_store.publish_files({"../evil.json": {}}, "x", repo_dir=work)
 
 
+def test_files_can_be_removed_from_the_data_branch_in_the_same_commit(remote_and_work):
+    origin, work = remote_and_work
+    github_store.publish_files({"briefings/daily.json": {"old": True}, "briefings/latest.json": {"v": 1}}, "first", repo_dir=work)
+
+    github_store.publish_files({"briefings/latest.json": {"v": 2}}, "cleanup", repo_dir=work, remove=["briefings/daily.json", "briefings/never-existed.json"])
+
+    names = git(origin, "ls-tree", "-r", "--name-only", "briefing-data").splitlines()
+    assert sorted(names) == ["briefings/latest.json", "vercel.json"]
+    assert read_branch_file(origin, "briefings/latest.json") == {"v": 2}
+    assert git(origin, "rev-list", "--count", "briefing-data") == "2"      # history keeps the old files
+
+
 # --- reading ------------------------------------------------------------------------
 
 def test_default_read_url_points_at_the_data_branch(monkeypatch):

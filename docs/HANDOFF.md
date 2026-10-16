@@ -64,6 +64,12 @@ Tamamı deterministik ve kural tabanlı; LLM yalnızca anlatı üretir, etiket/s
 - **Commit yok kuralı:** içerik parmak izi (çalışma saatleri, rozetler, sıralama, piyasa yorumları hariç) değişmediyse gün dosyası ve `latest.json` yazılmaz; `status.json` yalnızca durum/hata değişince yazılır. Hiçbir şey değişmediyse commit atılmaz.
 - **API:** `mode=daily` (varsayılan) bugünün tüm haberleri; `mode=hourly` bugünün son `hourly_view_window_hours` (2) saatte görülen/güncellenen haberleri; `date=YYYY-MM-DD` o günün arşivi. Her haberde `badges`.
 
+### Kümeleme, kapılar ve kapsam dışı haberler
+- **Aynı olay tek haber (`api/clustering.py`, `config/clustering.json`):** iki makale, başlıkları neredeyse aynıysa (Jaccard ≥ 0,6) **veya** ortak bir varlık (taşıyıcı/grup/havalimanı/uçak) ve varlığın kendi adı olmayan en az 2 ortak başlık sözcüğü (en az biri rakam içeren ya da ≥ 5 harfli) paylaşıyorsa, 36 saat içinde aynı haberdir. Böylece İngilizce ve Türkçe haberler birleşir (THY–CFM 5 makale → 1 haber, 4 yayıncı). Podcast/özet başlıkları entity kuralına giremez (farklı haberleri zincirleme birleştirirdi). Kümelerin temsilcisi en güvenilir kaynaktır.
+- **Finans kapısı:** `airline_financials` yalnızca kaynak güvenilirliği ≥ 0,8 ise `breaking` olabilir (`config/badges.json → breaking.type_requirements`); finans sitelerindeki hisse yorumları (0,7) olamaz.
+- **Askerî havacılık:** `selection.exclude_terms` (F-35, F-16, Su-34, bombardıman, füze savunması, air force, RAAF, savaş uçağı…) başlıkta geçer **ve** haberde hiçbir havayolu/grup yoksa **ve** `keep_terms` (airspace, airport, airline, passenger…) geçmiyorsa haber seçilmez. Yalnızca v2'de; v1 etkilenmez.
+- **Arayüz:** filtre çipleri `region_section`'a göre; sağdaki etiketler yalnızca sunucudan (`Breaking`, `New`, `Updated`). Eski anahtar kelime tabanlı "Priority" kaldırıldı; lead haber ilk `breaking` haber veya sıralamadaki ilk haber.
+
 ## Bilinen teknik borç (onaylı, şimdi yapılmayacak)
 1. **Üç kopya `index.html`.** Kök ve `public/` aynı, `static/index.html` eski (1654 satır). Vercel `public/` servis ediyor. Tek kopyaya indirilecek.
 2. **`AGENTS.md` güncel değil.** THY merceği, THY kırmızısı ve `THY Impact Assessment` anlatıyor; kapsam kararı (küresel, THY'ye özel mercek yok) yansıtılmamış.
@@ -85,8 +91,7 @@ Tamamı deterministik ve kural tabanlı; LLM yalnızca anlatı üretir, etiket/s
 - **Canlı yayın hattı doğrulanmadı.** 2026-10-16: GitHub'da "Publish aviation briefings" için hiç çalışma kaydı yok ve canlı `/api/briefing` 14 Ekim tarihli commit'li önbelleği döndürüyor (`status`/`market` alanları yok). Secrets, ilk çalışma ve Blob okuma adresi (`BLOB_PUBLIC_BASE_URL`) doğrulanmalı.
 - **Aynı depodan üç Vercel projesi yayın alıyor:** `aviation-briefing-app-drvd` (canlı site), `aviation-briefing-app-5w38` ve `aviation-briefing-app`. Amaçları belirsiz; kullanılmayanlar silinmeden önce sahibine sorulacak.
 - **Veri dalında eski dosyalar duruyor:** `briefings/daily.json`, `hourly.json`, `*-status.json` artık güncellenmiyor; okunmuyor, silinebilir.
-- **Aynı olay çok haber olarak görünüyor.** Başlık benzerliği (Jaccard ≥ 0,6) diller arası veya yeniden yazılmış başlıkları birleştirmiyor (THY–CFM 4, ACG siparişi 5, Lufthansa A350-1000 5 ayrı haber); yayıncı sayısı bu yüzden hep 1 ve `corroboration` bileşeni çalışmıyor. Ortak varlık + event_type + sayı ile kümeleme önerilir. Ayrıntı: `reports/relevance_calibration_v2.md`.
-- **Finans yorumu ve askerî havacılık üst sırada.** Yahoo "stock" yazıları `airline_financials`/`breaking` olabiliyor; F-35/F-16/füze haberleri `geopolitics_airspace` olarak 42–49 puan alıyor. Kural önerileri kalibrasyon raporunda.
-- **Eski veri dalı dosyaları:** `briefings/daily.json`, `hourly.json`, `*-status.json` canlı doğrulama bitene kadar duruyor; sonra silinmesi için sahibine sorulacak.
 - **Eski tek çağrılı yol:** `_engine.run_pipeline(mode)` / `generate_briefing_with_gemini` yalnızca yerel bakım için duruyor, zamanlanmış hat `collect_run` + `narrative` kullanıyor; kaldırılabilir.
+- **Yatırım yorumları hâlâ seçilebiliyor.** Yahoo "stock" yazıları `breaking` olamıyor ama skoru ≥ 45 ise listeye girebiliyor (örn. "Boeing ... Strike Deadline. Here's Why I'd Buy"). Kaynak türüne göre bir hisse yorumu filtresi eklenebilir.
+- **Gereksiz iki Vercel projesi:** `aviation-briefing-app-5w38` ve `aviation-briefing-app` aynı depoyu yayınlıyor; amaçları belirsiz, silinmedi (sahibi karar verecek; Vercel erişimi yok).
 - **Seed rakamları kısmen doğrulanmış tahmin.** Doğrulama turu `reports/entity_seed_review.md` üzerinden.

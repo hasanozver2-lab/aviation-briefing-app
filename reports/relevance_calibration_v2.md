@@ -60,3 +60,13 @@ Weights v2: event_type 45, source_reliability 15, entity_prominence 20, official
 4. **Official newsroom items sit just below the threshold** (rows 16-17, 43.5 with selection min_score 45): "New Lufthansa A350-1000 to fly first to Tokyo" is a genuine network story with no taxonomy event type.
 5. **The Delta community story** is rank 20 at 41.2 (was 56.8 under v1): `community_csr` classification (it was a one-term match on "personal guidance" in a foundation blurb) plus the official-source bonus cut from 10 to 4. It would reach 46.5 if a second outlet carried it, because corroboration is worth 5.3 points per extra publisher.
 6. `selection.min_score` (45) and every weight are provisional values for you to adjust in `config/relevance.json` (v2).
+
+
+## Update after the review (same real articles)
+
+Clustering across languages, the finance gate and the military exclusion were applied; **weights and thresholds are unchanged and still provisional**.
+
+- 109 articles became 98 stories (was 109): THY–CFM is one story with 4 publishers (score 78, top of the list), the 75-jet ACG order is one story with 5 publishers (58).
+- 9 stories pass `min_score` 45. Six military/defence items were dropped.
+- The Yahoo "Is American Airlines Stock's Drop A Chance To Buy?" piece (68.8) is no longer `breaking`; it still ranks second because it scores on event type and carrier tier.
+- Still open: stock commentary can pass the score threshold; official newsroom items without an event type (Lufthansa A350-1000 to Tokyo) stay just below it.

@@ -98,10 +98,11 @@ def read_branch_json(pathname, repo_dir=None, remote=DEFAULT_REMOTE, branch=None
         return None
 
 
-def publish_files(files, message, repo_dir=None, remote=DEFAULT_REMOTE, branch=None):
+def publish_files(files, message, repo_dir=None, remote=DEFAULT_REMOTE, branch=None, remove=()):
     """Commit {pathname: json_payload} to the data branch in a single commit and push it.
 
-    Existing files that are not replaced stay in the tree. Returns the new commit id, or ""
+    Existing files that are not replaced stay in the tree; paths in `remove` are deleted from it.
+    Returns the new commit id, or ""
     when nothing changed. Only refs/heads/<branch> is pushed; main is never written.
     """
     branch = branch or data_branch()
@@ -121,6 +122,8 @@ def publish_files(files, message, repo_dir=None, remote=DEFAULT_REMOTE, branch=N
         env = {**base_env, "GIT_INDEX_FILE": str(Path(scratch) / "index")}
         if parent:
             _git(["read-tree", parent], repo_dir, env=env)
+        for path in remove:
+            _git(["update-index", "--force-remove", _safe_path(path)], repo_dir, env=env)
         entries = {**{_safe_path(path): _serialize(payload) for path, payload in files.items()},
                    VERCEL_CONFIG_PATH: _serialize(VERCEL_CONFIG)}
         for path, data in entries.items():
