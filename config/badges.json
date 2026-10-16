@@ -28,5 +28,7 @@
   },
   "hourly_view_window_hours": 2,
   "title_match_threshold": 0.6,
-  "_breaking_requirements": "airline_financials is breaking only from a source with reliability >= 0.8 (airline IR/newsrooms, tier 1-2 trade media); finance-site stock commentary (0.7) is not."
+  "_breaking_requirements": "airline_financials is breaking only from a source with reliability >= 0.8 (airline IR/newsrooms, tier 1-2 trade media); finance-site stock commentary (0.7) is not.",
+  "daily_min_stories": 8,
+  "_daily_min_stories": "When today's daily view lists fewer stories than this, the best-scoring listed stories of the previous day fill it up (marked carried_from: yesterday, never badged)."
 }

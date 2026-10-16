@@ -38,11 +38,7 @@
     .mast-actions button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; padding: 6px 0; }
         .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
     .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
-    .tabs { display: flex; gap: 22px; }
-    .tab { padding: 6px 0 9px; font: 500 14px/1 var(--sans); color: var(--faint); border-bottom: 2px solid transparent; }
-    .tab span { color: var(--faint); font-weight: 400; }
-    .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
-    .mast-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
+        .mast-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
     .mast-meta #updated { font-size: 11px; color: var(--faint); }
     .stale { margin: 10px var(--pad) 0; padding: 10px 12px; background: var(--paper-2); font: 400 12.5px/1.4 var(--sans); color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
     .stale[hidden] { display: none; }
@@ -163,10 +159,6 @@
       </div>
       <div class="title">The Aviation Briefing</div>
       <div class="mast-row">
-        <div class="tabs" role="tablist" aria-label="Briefing view">
-          <button class="tab" role="tab" id="tab-daily" data-mode="daily" aria-selected="true" aria-controls="content">Daily <span>· today</span></button>
-          <button class="tab" role="tab" id="tab-hourly" data-mode="hourly" aria-selected="false" aria-controls="content">Live <span>· last 2h</span></button>
-        </div>
         <div class="mast-meta"><span id="counts"></span><span id="updated"></span></div>
       </div>
     </header>
@@ -185,7 +177,7 @@
       <div class="mkt-table" id="mkt-table" hidden></div>
     </section>
 
-    <main id="content" role="tabpanel" aria-labelledby="tab-daily"><div class="state">Loading the briefing…</div></main>
+    <main id="content"><div class="state">Loading the briefing…</div></main>
   </div>
 
   <button id="new-pill" type="button" hidden></button>
@@ -209,10 +201,10 @@
     const SECTION_ORDER = ["Europe", "Middle East & Gulf", "Asia-Pacific", "Americas", "Africa", "Manufacturers & Supply Chain", "Regulation & Airspace", "Other"];
     const LEVEL_LABELS = { critical: "Critical", important: "Important", watch: "Watch" };
     const TOP_LEVELS = ["critical", "important"];
-    const MODE = {
-      daily: { empty: "No verified developments yet today.", loading: "Loading today's briefing…" },
-      hourly: { empty: "No new verified developments in the last 2 hours.", loading: "Updating Live…" }
-    };
+    const EMPTY_TEXT = "No verified developments yet today.";
+    const LOADING_TEXT = "Loading today's briefing…";
+    const BRIEFING_URL = "/api/briefing";
+    const YESTERDAY = "yesterday";
     const POLL_INTERVAL_MS = 5 * 60 * 1000;
     const MIN_POLL_GAP_MS = 60 * 1000;
     const SCROLL_TOP_THRESHOLD = 120;
@@ -226,7 +218,7 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { mode: "daily", filter: "All", data: null, stories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
+    const state = { filter: "All", data: null, stories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
     const initialHash = location.hash ? decodeURIComponent(location.hash.slice(1)) : "";
 
@@ -258,6 +250,7 @@
     function isBreaking(story) { return badgeSet(story).has("breaking"); }
     function isTopLevel(story) { return TOP_LEVELS.includes(story.level); }
     function isPending(story) { return story.narrative_status === "pending"; }
+    function isYesterday(story) { return story.carried_from === YESTERDAY; }
     function sourcesOf(story) { return Array.isArray(story.sources) ? story.sources : []; }
     function sourceCount(story) { return Math.max(Number(story.source_count) || 0, sourcesOf(story).length); }
     function tagsHtml(story, withRegion) {
@@ -282,13 +275,13 @@
     function fmtChange(v) { const n = Number(v); if (!Number.isFinite(n)) return ""; return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(1) + "%"; }
     function showToast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2500); }
 
-    async function loadBriefing(mode, requestLatest = false) {
+    async function loadBriefing(requestLatest = false) {
       const requestId = ++briefingRequestId;
-      const keepsCurrent = requestLatest && state.data && state.data.mode === mode;
-      if (!keepsCurrent) $("content").innerHTML = `<div class="state">${MODE[mode].loading}</div>`;
+      const keepsCurrent = requestLatest && state.data;
+      if (!keepsCurrent) $("content").innerHTML = `<div class="state">${LOADING_TEXT}</div>`;
       try {
-        const cacheBuster = requestLatest ? `&view=${Date.now()}` : "";
-        const res = await fetch(`/api/briefing?mode=${encodeURIComponent(mode)}${cacheBuster}`, {
+        const cacheBuster = requestLatest ? `?view=${Date.now()}` : "";
+        const res = await fetch(`${BRIEFING_URL}${cacheBuster}`, {
           cache: requestLatest ? "no-store" : "default",
           headers: { "Accept": "application/json" }
         });
@@ -296,7 +289,7 @@
         if (!(res.headers.get("content-type") || "").includes("application/json")) throw new Error("Invalid API response");
         const data = await res.json();
         if (requestId !== briefingRequestId) return;
-        render(data, mode);
+        render(data);
       } catch (err) {
         if (requestId !== briefingRequestId) return;
         console.error("Briefing load failed:", err);
@@ -305,8 +298,8 @@
       }
     }
 
-    function render(data, mode) {
-      state.data = Object.assign({ mode }, data);
+    function render(data) {
+      state.data = data;
       state.pending = null;
       $("new-pill").hidden = true;
       const stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
@@ -349,8 +342,11 @@
     }
 
     function renderList() {
-      const { stories, filter, mode } = state;
-      if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${MODE[mode].empty}</div><div class="end">— End of briefing —</div>`; return; }
+      const { filter } = state;
+      // Yesterday's stories (added by the API when today is thin) are shown last and take no part in the block or the region filter.
+      const stories = state.stories.filter(s => !isYesterday(s));
+      const yesterday = state.stories.filter(isYesterday);
+      if (!stories.length && !yesterday.length) { state.order = []; $("content").innerHTML = `<div class="state">${EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
       const counts = {};
       stories.forEach(s => { const k = sectionOf(s); counts[k] = (counts[k] || 0) + 1; });
       const sectionNames = Object.keys(counts).sort((a, b) => sectionRank(a) - sectionRank(b));
@@ -363,7 +359,8 @@
       const lead = block[0] || null;
       const blockRest = block.slice(1);
       const groups = (showBlock ? sectionNames : [filter]).map(name => ({ name, items: stories.filter(s => sectionOf(s) === name) })).filter(g => g.items.length);
-      state.order = [].concat(...groups.map(g => g.items));
+      const carried = showBlock ? yesterday : [];
+      state.order = [].concat(...groups.map(g => g.items), carried);
 
       let n = 0;
       const compactRow = (s) => {
@@ -395,7 +392,7 @@
         </button>`;
       };
 
-      let html = "";
+      let html = stories.length ? "" : `<div class="state">${EMPTY_TEXT}</div>`;
       if (block.length) html += `<section class="group"><div class="group-head eyebrow">Critical &amp; Important · ${block.length}</div></section>`;
       if (lead) {
         const count = sourceCount(lead);
@@ -407,13 +404,14 @@
         </article>`;
       }
       if (blockRest.length) html += `<section class="group">${blockRest.map(compactRow).join("")}</section>`;
-      html += `<nav class="filters" aria-label="Filter by region"><div class="filters-inner">
+      if (stories.length) html += `<nav class="filters" aria-label="Filter by region"><div class="filters-inner">
         ${[["All", stories.length]].concat(sectionNames.map(name => [name, counts[name]])).map(([name, c]) =>
           `<button class="chip" type="button" data-filter="${escapeHtml(name)}" aria-pressed="${name === filter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
       </div></nav>`;
       groups.forEach(g => {
         html += `<section class="group"><div class="group-head eyebrow">${escapeHtml(g.name)}</div>${g.items.map(s => row(s, false)).join("")}</section>`;
       });
+      if (carried.length) html += `<section class="group"><div class="group-head eyebrow">Yesterday · ${carried.length}</div>${carried.map(s => row(s, false)).join("")}</section>`;
       html += `<div class="end">— End of briefing —</div>`;
       $("content").innerHTML = html;
     }
@@ -517,7 +515,7 @@
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
       $("art-body").innerHTML = `
-        <div class="kicker">${tagsHtml(s, true)}</div>
+        <div class="kicker">${tagsHtml(s, true)}${isYesterday(s) ? "<span>Yesterday</span>" : ""}</div>
         <h1 tabindex="-1">${escapeHtml(s.headline)}</h1>
         <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
         ${isPending(s) ? `<p class="art-pending">Analysis pending — the written analysis appears after the next update.</p>` : ""}
@@ -565,15 +563,6 @@
       else copy();
     }
 
-    function setMode(mode) {
-      state.mode = mode; state.filter = "All";
-      document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.mode === mode)));
-      $("content").setAttribute("aria-labelledby", "tab-" + mode);
-      if (state.articleId) closeArticle();
-      window.scrollTo(0, 0);
-      loadBriefing(mode);
-    }
-
     // A home-screen app is frozen when it goes to the background and resumes with the OLD page code, so a
     // new deployment never reaches it. The page therefore compares its own source with the server's when it
     // returns to the foreground and every few minutes, and reloads itself when they differ.
@@ -606,12 +595,11 @@
       if (document.hidden || state.polling || !state.data) return;
       state.polling = true;
       state.lastPoll = Date.now();
-      const polledMode = state.mode;
       try {
-        const res = await fetch(`/api/briefing?mode=${polledMode}`, { cache: "default", headers: { "Accept": "application/json" } });
+        const res = await fetch(BRIEFING_URL, { cache: "default", headers: { "Accept": "application/json" } });
         if (!res.ok || !(res.headers.get("content-type") || "").includes("application/json")) return;
         const data = await res.json();
-        if (polledMode === state.mode) applyPolled(data);
+        applyPolled(data);
       } catch (err) {
         console.error("Background refresh failed:", err);
       } finally {
@@ -620,21 +608,20 @@
     }
     function applyPolled(data) {
       const known = new Set(state.stories.map(storyKey));
-      const arrived = dedupe(Array.isArray(data.stories) ? data.stories : []).filter(s => !known.has(storyKey(s)));
+      const arrived = dedupe(Array.isArray(data.stories) ? data.stories : []).filter(s => !isYesterday(s) && !known.has(storyKey(s)));
       const atTop = window.scrollY < SCROLL_TOP_THRESHOLD && !state.articleId;
       const label = `${arrived.length} new ${arrived.length === 1 ? "story" : "stories"}`;
-      if (!arrived.length) { if (atTop) render(data, state.mode); return; }
-      if (atTop) { render(data, state.mode); showToast(`${label} added`); return; }
+      if (!arrived.length) { if (atTop) render(data); return; }
+      if (atTop) { render(data); showToast(`${label} added`); return; }
       state.pending = data;
       $("new-pill").textContent = `↑ ${label}`;
       $("new-pill").hidden = false;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { if (t.dataset.mode !== state.mode) setMode(t.dataset.mode); }));
       $("new-pill").addEventListener("click", () => {
         if (state.articleId) closeArticle();
-        if (state.pending) render(state.pending, state.mode);
+        if (state.pending) render(state.pending);
         window.scrollTo(0, 0);
       });
       setInterval(backgroundRefresh, POLL_INTERVAL_MS);
@@ -691,7 +678,7 @@
       if (isIos && !standalone && !safeStorage.get("ios_prompt_dismissed")) $("ios-prompt").hidden = false;
       $("ios-close").addEventListener("click", () => { $("ios-prompt").hidden = true; safeStorage.set("ios_prompt_dismissed", "true"); });
 
-      loadBriefing(state.mode);
+      loadBriefing();
     });
   </script>
 </body>

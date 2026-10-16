@@ -63,13 +63,17 @@ def test_the_page_reads_only_fields_the_api_really_returns():
     assert "freshness" not in html, "the API has no freshness field; the age comes from last_pipeline_run_at"
 
 
-def test_tabs_are_labelled_with_what_they_cover():
+def test_there_is_one_page_without_tabs_or_modes():
     html = page()
-    assert 'data-mode="daily"' in html and 'data-mode="hourly"' in html
-    assert "Daily <span>· today</span>" in html and "Live <span>· last 2h</span>" in html
-    assert "Live radar" not in html and "48h" not in html and "60 min" not in html
-    # the 2 hours are the server's hourly_view_window_hours; keep the label honest if the config changes
-    assert story_lifecycle.load_badges_config()["hourly_view_window_hours"] == 2
+    for removed in ('role="tab"', "data-mode", "Live", "setMode", "hourly", "state.mode", "?mode=", "48h", "60 min"):
+        assert removed not in html, f"{removed} belongs to the removed Daily/Live tabs"
+    assert 'BRIEFING_URL = "/api/briefing"' in html, "the page asks for the default (daily, today) view and sends no mode"
+
+
+def test_yesterdays_stories_come_from_the_api_and_sit_at_the_bottom_unbadged():
+    html = page()
+    assert 'carried_from === YESTERDAY' in html and "Yesterday ·" in html
+    assert "!isYesterday(s) && !known.has" in html, "carried-over stories never raise the new-stories pill"
 
 
 def test_labels_and_levels_come_from_the_server():

@@ -1021,7 +1021,8 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
 
     date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
     LookupError when no archive exists for it. Badges, score bands and ordering are recomputed on every
-    read; the archive-only low band is returned only with include_low.
+    read; the archive-only low band is returned only with include_low. A thin daily view for today is topped up with
+    the previous day's best stories (carried_from: yesterday, no badges).
     """
     mode = validate_mode(mode)
     if date is not None:
@@ -1050,6 +1051,9 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         if not include_low:
             snapshot["stories"] = [story for story in everything if story_lifecycle.is_listed(story)]
         snapshot["hidden_low_count"] = len(everything) - len(snapshot["stories"])
+        if mode == "daily" and date is None and snapshot["date"] == today:
+            previous_day = briefing_store.read_json(briefing_store.day_path(story_lifecycle.previous_day_key(today)))
+            story_lifecycle.backfill_from_previous_day(snapshot, previous_day if isinstance(previous_day, dict) else None, now, config)
         if mode == "hourly" and snapshot["date"] == today:
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode
