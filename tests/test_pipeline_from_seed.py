@@ -43,7 +43,7 @@ def isolated_pipeline(tmp_path, monkeypatch):
 def test_pipeline_builds_registry_and_entities_from_the_seed_alone(isolated_pipeline):
     registry_db, market_db = isolated_pipeline
 
-    briefing = _engine.run_pipeline("daily", market_database=market_db)
+    collected = _engine.collect_run(market_database=market_db)
 
     with sqlite3.connect(registry_db) as connection:
         assert connection.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 39
@@ -53,18 +53,20 @@ def test_pipeline_builds_registry_and_entities_from_the_seed_alone(isolated_pipe
         assert connection.execute("SELECT COUNT(*) FROM airports").fetchone()[0] > 100
         assert connection.execute("SELECT COUNT(*) FROM groups").fetchone()[0] >= 10
 
-    stories = {story["original_source"]["url"]: story for story in briefing["stories"]}
+    stories = {story["original_source"]["url"]: story for story in collected["stories"]}
     thy = stories["https://example.com/thy-cfm"]
     assert [carrier["slug"] for carrier in thy["entities"]["carriers"]] == ["turkish-airlines"]
     assert thy["entities"]["carriers"][0]["entity_id"].startswith("carrier:")
     assert (thy["region_section"], thy["secondary_tags"]) == ("Europe", ["Manufacturers & Supply Chain"])
-    assert stories["https://example.com/faa-delta"]["region_section"] == "Regulation & Airspace"
+    assert thy["event_type"] == "fleet_orders" and thy["narrative_status"] == "pending"
+    assert collected["candidates"] == 2          # the FAA/Delta item is a candidate but scores below the selection threshold
+    assert "https://example.com/faa-delta" not in stories
 
 
 def test_pipeline_is_idempotent_when_the_databases_already_exist(isolated_pipeline):
     _, market_db = isolated_pipeline
-    _engine.run_pipeline("daily", market_database=market_db)
-    _engine.run_pipeline("daily", market_database=market_db)
+    _engine.collect_run(market_database=market_db)
+    _engine.collect_run(market_database=market_db)
     with sqlite3.connect(market_db) as connection:
         assert connection.execute("SELECT COUNT(*) FROM carriers WHERE slug = 'turkish-airlines'").fetchone()[0] == 1
 

@@ -20,11 +20,11 @@ CONFIG = story_lifecycle.load_badges_config()
 
 
 def story(url="https://example.com/thy-cfm", headline="THY signs engine deal", score=40.0, publishers=("Wire A",),
-          published=NOW - HOUR, title=None):
+          published=NOW - HOUR, title=None, event_type="geopolitics_airspace"):
     sources = [{"name": name, "url": f"{url}?via={index}" if index else url, "title": title or headline} for index, name in enumerate(publishers)]
     story_id = story_lifecycle.stable_story_id(url, headline)
     return {
-        "id": story_id, "story_id": story_id, "section": "Route news", "headline": headline,
+        "id": story_id, "story_id": story_id, "section": "Route news", "headline": headline, "event_type": event_type,
         "original_source": {"title": title or headline, "source_name": publishers[0], "url": url},
         "relevance_score": score, "sources": sources, "source_count": len(set(publishers)),
         "published_at_iso": story_lifecycle.to_iso(published), "detailed_analysis": ["first analysis"],
@@ -114,7 +114,8 @@ def test_score_change_at_the_threshold_marks_the_story_updated():
     assert item["last_updated_at"] == story_lifecycle.to_iso(later)
     assert item["relevance_score"] == 40.0 + minimum and item["previous_score"] == 40.0
     assert item["update_reasons"] == ["score_change"]
-    assert item["headline"] == "THY engine deal, new details"           # a material update refreshes the content
+    assert item["headline"] == "THY signs engine deal"                  # the narrative is kept ...
+    assert item["narrative_status"] == "pending"                         # ... until a new one replaces it
     assert "updated" in story_lifecycle.compute_badges(item, later, CONFIG)
 
 
@@ -195,8 +196,8 @@ def test_a_story_that_was_new_yesterday_is_not_new_again_after_the_window():
 
 # --- badges expire on their own --------------------------------------------------------------
 
-def stored(score=70.0, first_seen=NOW, last_updated=None, published=None):
-    return {"story_id": "s", "first_seen_at": story_lifecycle.to_iso(first_seen),
+def stored(score=70.0, first_seen=NOW, last_updated=None, published=None, event_type="geopolitics_airspace"):
+    return {"story_id": "s", "event_type": event_type, "first_seen_at": story_lifecycle.to_iso(first_seen),
             "last_updated_at": story_lifecycle.to_iso(last_updated or first_seen), "relevance_score": score,
             "published_at_iso": story_lifecycle.to_iso(published or first_seen - HOUR)}
 
@@ -234,7 +235,7 @@ def test_old_news_seen_for_the_first_time_is_not_new_or_breaking():
 
 
 def test_durations_and_thresholds_come_from_the_config():
-    tight = {**CONFIG, "new": {"max_age_hours": 1}, "breaking": {"max_age_hours": 0.5, "critical_score": 95}}
+    tight = {**CONFIG, "new": {"max_age_hours": 1}, "breaking": {**CONFIG["breaking"], "max_age_hours": 0.5, "critical_score": 95}}
     item = stored(score=70.0)
     assert story_lifecycle.compute_badges(item, NOW + timedelta(minutes=30), tight) == ["new"]
     assert story_lifecycle.compute_badges(item, NOW + timedelta(minutes=61), tight) == []
@@ -256,14 +257,15 @@ def test_ordering_puts_breaking_first_then_score_then_newest():
 def test_relevance_score_is_a_deterministic_weighted_sum_of_data():
     article = {"event_weight": 0.9, "reliability_weight": 1.0, "official": True,
                "entities": {"carriers": [{"tier": 1}], "groups": [], "airports": []}}
-    score, components = story_lifecycle.score_article(article, source_count=3)
+    v1 = story_lifecycle.load_relevance_config("v1")
+    score, components = story_lifecycle.score_article(article, source_count=3, config=v1)
     assert components == {"event_type": 0.9, "source_reliability": 1.0, "entity_prominence": 1.0, "official_source": 1.0, "corroboration": 1.0}
     assert score == 100 * 0.9 * 0.35 + 20 + 25 + 10 + 10 == pytest.approx(96.5)
-    assert story_lifecycle.score_article(article, source_count=3) == (score, components)
+    assert story_lifecycle.score_article(article, source_count=3, config=v1) == (score, components)
 
 
 def test_relevance_score_degrades_without_signals():
-    score, components = story_lifecycle.score_article({}, source_count=1)
+    score, components = story_lifecycle.score_article({}, source_count=1, config=story_lifecycle.load_relevance_config("v1"))
     assert components["entity_prominence"] == 0 and components["corroboration"] == 0 and components["official_source"] == 0
     assert score == pytest.approx(0.2 * 35 + 0.4 * 20)
 
@@ -394,55 +396,81 @@ def test_http_endpoint_serves_today_by_default_and_a_day_by_date(api_server, mon
     assert fetch(api_server, "date=not-a-date")[0] == 400
 
 
-# --- the pipeline script --------------------------------------------------------------------------
+# --- the pipeline script ----------------------------------------------------------------------------
 
-def stub_modes(monkeypatch, per_mode):
-    """per_mode: {mode: briefing | Exception}"""
-    def fake(mode):
-        outcome = per_mode[mode]
+def collected(*stories, articles=100):
+    return {"stories": [copy.deepcopy(item) for item in stories], "articles": articles, "candidates": len(stories),
+            "market": {"status": "ok", "items": [], "events": []}}
+
+
+def stub_collect(monkeypatch, outcome):
+    def fake():
         if isinstance(outcome, Exception):
             raise outcome
         return copy.deepcopy(outcome)
-    monkeypatch.setattr(_engine, "run_pipeline", fake)
+    monkeypatch.setattr(_engine, "collect_run", fake)
+
+
+def narrate_all(stories, api_key, description_limit, now=None):
+    """A stand-in LLM step: every pending story gets a narrative."""
+    pending = [item for item in stories if item.get("narrative_status") != "done"]
+    for item in pending:
+        item.update({"narrative_status": "done", "lead": "generated lead", "narrative_generated_at": "x"})
+    return {"calls": 1 if pending else 0, "narrated": len(pending), "pending": 0, "error": ""}
+
+
+def llm_down(stories, api_key, description_limit, now=None):
+    pending = [item for item in stories if item.get("narrative_status") != "done"]
+    return {"calls": 1 if pending else 0, "narrated": 0, "pending": len(pending), "error": "HTTP 429 after 4 attempts"}
+
+
+def go(tmp_path, now, narrate=narrate_all):
+    return run_pipeline.run(out_dir=tmp_path, now=now, api_key="test-key", narrate=narrate)
 
 
 def read_out(out_dir, pathname):
     return json.loads((out_dir / pathname).read_text(encoding="utf-8"))
 
 
-def test_first_run_writes_the_day_file_latest_and_status(tmp_path, monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(mode="hourly")})
+def candidate(**kwargs):
+    item = story(**kwargs)
+    item["narrative_status"] = "pending"
+    return item
 
-    assert run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW) == 0
+
+def test_first_run_writes_the_day_file_latest_and_status(tmp_path, monkeypatch):
+    stub_collect(monkeypatch, collected(candidate()))
+
+    assert go(tmp_path, NOW) == 0
 
     day = read_out(tmp_path, "briefings/2026-10-16.json")
     assert read_out(tmp_path, "briefings/latest.json") == day
     assert read_out(tmp_path, "briefings/status.json")["status"] == "ok"
-    assert len(day["stories"]) == 1
+    assert len(day["stories"]) == 1 and day["stories"][0]["narrative_status"] == "done"
 
 
 def test_a_run_without_changes_commits_nothing(tmp_path, monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(mode="hourly")})
-    run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW)
+    stub_collect(monkeypatch, collected(candidate()))
+    go(tmp_path, NOW)
     published = []
     monkeypatch.setattr(briefing_store, "publish", lambda files, message, repo_dir=None: published.append(files) or "ok")
     monkeypatch.setattr(briefing_store, "read_for_update", lambda pathname, repo_dir=None: read_out(tmp_path, pathname) if (tmp_path / pathname).exists() else None)
 
-    assert run_pipeline.run(("daily", "hourly"), now=NOW + HOUR) == 0     # same story, same score, an hour later
+    assert run_pipeline.run(now=NOW + HOUR, api_key="k", narrate=narrate_all) == 0     # same story, same score, an hour later
 
     assert published == []
 
 
 def test_a_new_story_is_published_to_the_day_file_and_latest_in_one_commit(tmp_path, monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(mode="hourly")})
-    run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW)
+    stub_collect(monkeypatch, collected(candidate()))
+    go(tmp_path, NOW)
     published = []
     monkeypatch.setattr(briefing_store, "publish", lambda files, message, repo_dir=None: published.append(files) or "ok")
     monkeypatch.setattr(briefing_store, "read_for_update", lambda pathname, repo_dir=None: read_out(tmp_path, pathname) if (tmp_path / pathname).exists() else None)
-    extra = story(url="https://example.com/b", headline="Airbus A220 order", title="Airbus A220 order")
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(extra, mode="hourly")})
+    extra = candidate(url="https://example.com/b", headline="Airbus A220 order", title="Airbus A220 order")
+    stub_collect(monkeypatch, collected(candidate(), extra))
 
-    run_pipeline.run(("daily", "hourly"), now=NOW + HOUR)
+    run_pipeline.run(now=NOW + HOUR, api_key="k", narrate=narrate_all)
 
     assert len(published) == 1
     assert sorted(published[0]) == ["briefings/2026-10-16.json", "briefings/latest.json"]
@@ -451,50 +479,88 @@ def test_a_new_story_is_published_to_the_day_file_and_latest_in_one_commit(tmp_p
 
 
 def test_past_days_are_never_rewritten(tmp_path, monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(mode="hourly")})
-    run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW)
+    stub_collect(monkeypatch, collected(candidate()))
+    go(tmp_path, NOW)
     before = (tmp_path / "briefings/2026-10-16.json").read_bytes()
 
     next_morning = datetime(2026, 10, 17, 6, 0, tzinfo=UTC)
-    fresh = story(url="https://example.com/n", headline="Next day story", title="Next day story", published=next_morning - HOUR)
-    stub_modes(monkeypatch, {"daily": briefing(fresh), "hourly": briefing(mode="hourly")})
-    run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=next_morning)
+    fresh = candidate(url="https://example.com/n", headline="Next day story", title="Next day story", published=next_morning - HOUR)
+    stub_collect(monkeypatch, collected(fresh))
+    go(tmp_path, next_morning)
 
     assert (tmp_path / "briefings/2026-10-16.json").read_bytes() == before
     assert read_out(tmp_path, "briefings/latest.json")["date"] == "2026-10-17"
     assert read_out(tmp_path, "briefings/2026-10-17.json")["stories"][0]["headline"] == "Next day story"
 
 
-def test_a_failed_mode_is_recorded_stale_and_the_other_mode_still_archives(tmp_path, monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": RuntimeError("gemini unavailable")})
+# --- the LLM failing is not a pipeline failure ---------------------------------------------------------
 
-    assert run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW) == 1
+def test_llm_failure_still_publishes_scores_badges_and_the_archive(tmp_path, monkeypatch):
+    stub_collect(monkeypatch, collected(candidate(score=75.0)))
 
+    assert go(tmp_path, NOW, narrate=llm_down) == 0                  # the job does not go red
+
+    day = read_out(tmp_path, "briefings/2026-10-16.json")
+    item = day["stories"][0]
+    assert item["narrative_status"] == "pending"
+    assert item["relevance_score"] == 75.0 and item["first_seen_at"]
+    assert "breaking" in story_lifecycle.compute_badges(item, NOW, CONFIG)
     status = read_out(tmp_path, "briefings/status.json")
-    assert status["status"] == "stale" and "gemini unavailable" in status["errors"]["hourly"]
-    assert len(read_out(tmp_path, "briefings/2026-10-16.json")["stories"]) == 1
+    assert status["status"] == "ok" and status["narrative_pending"] == 1 and "429" in status["narrative_error"]
 
 
-def test_when_every_mode_fails_the_archive_is_left_alone(tmp_path, monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(mode="hourly")})
-    run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW)
+def test_pending_narratives_are_retried_on_the_next_run(tmp_path, monkeypatch):
+    stub_collect(monkeypatch, collected(candidate()))
+    go(tmp_path, NOW, narrate=llm_down)
+    assert read_out(tmp_path, "briefings/2026-10-16.json")["stories"][0]["narrative_status"] == "pending"
+
+    go(tmp_path, NOW + HOUR, narrate=narrate_all)                    # same story, the LLM is back
+
+    item = read_out(tmp_path, "briefings/2026-10-16.json")["stories"][0]
+    assert item["narrative_status"] == "done"
+    assert item["first_seen_at"] == story_lifecycle.to_iso(NOW)       # nothing else about the story moved
+    assert read_out(tmp_path, "briefings/status.json")["narrative_pending"] == 0
+
+
+def test_a_story_with_a_finished_narrative_is_not_sent_to_the_llm_again(tmp_path, monkeypatch):
+    stub_collect(monkeypatch, collected(candidate()))
+    go(tmp_path, NOW)
+    seen = []
+
+    def spy(stories, api_key, description_limit, now=None):
+        seen.append([item["story_id"] for item in stories if item.get("narrative_status") != "done"])
+        return {"calls": 0, "narrated": 0, "pending": 0, "error": ""}
+
+    go(tmp_path, NOW + HOUR, narrate=spy)
+    assert seen == [[]]
+
+
+# --- real failures --------------------------------------------------------------------------------------
+
+def test_a_collection_failure_writes_stale_fails_the_run_and_leaves_the_archive_alone(tmp_path, monkeypatch):
+    stub_collect(monkeypatch, collected(candidate()))
+    go(tmp_path, NOW)
     archive = (tmp_path / "briefings/2026-10-16.json").read_bytes()
 
-    stub_modes(monkeypatch, {"daily": RuntimeError("down"), "hourly": RuntimeError("down")})
-    assert run_pipeline.run(("daily", "hourly"), out_dir=tmp_path, now=NOW + HOUR) == 1
+    stub_collect(monkeypatch, RuntimeError("No articles could be collected from any source"))
+    assert go(tmp_path, NOW + HOUR) == 1
 
     assert (tmp_path / "briefings/2026-10-16.json").read_bytes() == archive
-    assert read_out(tmp_path, "briefings/status.json")["status"] == "stale"
+    status = read_out(tmp_path, "briefings/status.json")
+    assert status["status"] == "stale" and "No articles" in status["errors"]["collect"]
 
 
 def test_a_publish_failure_fails_the_run(monkeypatch):
-    stub_modes(monkeypatch, {"daily": briefing(story()), "hourly": briefing(mode="hourly")})
+    stub_collect(monkeypatch, collected(candidate()))
     monkeypatch.setattr(briefing_store, "read_for_update", lambda pathname, repo_dir=None: None)
     monkeypatch.setattr(briefing_store, "publish", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("push rejected")))
-    assert run_pipeline.run(("daily", "hourly"), now=NOW) == 1
+    assert run_pipeline.run(now=NOW, api_key="k", narrate=narrate_all) == 1
 
 
 def test_status_alone_does_not_cause_a_commit_when_unchanged():
-    existing = {"status": "ok", "errors": {}, "last_attempt_at": "2026-10-16T08:00:00+00:00"}
-    assert not run_pipeline.status_changed(existing, run_pipeline.status_payload({}, NOW))
-    assert run_pipeline.status_changed(existing, run_pipeline.status_payload({"hourly": "boom"}, NOW))
+    report = {"calls": 1, "narrated": 0, "pending": 2, "error": "HTTP 429 after 4 attempts"}
+    existing = run_pipeline.status_payload("", report, NOW)
+    later_report = {"calls": 2, "narrated": 0, "pending": 2, "error": "HTTP 503 after 4 attempts"}
+    assert not run_pipeline.status_changed(existing, run_pipeline.status_payload("", later_report, NOW + HOUR))
+    assert run_pipeline.status_changed(existing, run_pipeline.status_payload("boom", report, NOW))
+    assert run_pipeline.status_changed(existing, run_pipeline.status_payload("", {**report, "pending": 0}, NOW))

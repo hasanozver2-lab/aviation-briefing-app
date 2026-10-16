@@ -880,6 +880,44 @@ def build_briefing_payload(mode, stories, status, warning=""):
     }
 
 
+def build_candidate_story(article, index=1):
+    """A story made only of source data; its narrative stays "pending" until the LLM step fills it."""
+    section = article.get("category_hint")
+    if section not in SECTION_ORDER:
+        section = "Other areas"
+    return {
+        "id": stable_story_id(article.get("link"), article.get("title"), index),
+        "section": section,
+        "headline": str(article.get("title", "Untitled aviation update")),
+        "published_at": str(article.get("pub_date", "")),
+        "lead": str(article.get("description", ""))[:400],
+        "source_description": str(article.get("description", "")),
+        "detailed_analysis": [],
+        "data_points": [],
+        "strategic_impact": "",
+        "market_exposure": [],
+        **deterministic_fields(article),
+        "thy_impact_assessment": "",
+        "why_it_matters": "",
+        "original_source": {
+            "title": str(article.get("title", "Read full article")),
+            "source_name": str(article.get("source", "")),
+            "url": safe_source_url(article.get("link")),
+            "source_type": article.get("source_type", "trade_media"),
+            "official": bool(article.get("official", False)),
+            "airline": str(article.get("airline", "")),
+            "topics": article.get("topics", []),
+            "license_required": bool(article.get("license_required", False)),
+            "license_status": str(article.get("license_status", "public")),
+            "region": str(article.get("region", "Global")),
+            "tier": article.get("tier"),
+            "reliability_weight": article.get("reliability_weight"),
+        },
+        "related_news": [],
+        "narrative_status": "pending",
+    }
+
+
 def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailable."):
     """Return only real source material when AI analysis cannot be produced."""
     mode = validate_mode(mode)
@@ -887,40 +925,41 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
     for index, article in enumerate(articles[:10], start=1):
         if not isinstance(article, dict):
             continue
-        section = article.get("category_hint")
-        if section not in SECTION_ORDER:
-            section = "Other areas"
-        stories.append({
-            "id": stable_story_id(article.get("link"), article.get("title"), index),
-            "section": section,
-            "headline": str(article.get("title", "Untitled aviation update")),
-            "published_at": str(article.get("pub_date", "")),
-            "lead": str(article.get("description", "")),
-            "detailed_analysis": [],
-            "data_points": [],
-            "strategic_impact": "",
-            "market_exposure": [],
-            **deterministic_fields(article),
-            "thy_impact_assessment": "",
-            "why_it_matters": "",
-            "original_source": {
-                "title": str(article.get("title", "Read full article")),
-                "source_name": str(article.get("source", "")),
-                "url": safe_source_url(article.get("link")),
-                "source_type": article.get("source_type", "trade_media"),
-                "official": bool(article.get("official", False)),
-                "airline": str(article.get("airline", "")),
-                "topics": article.get("topics", []),
-                "license_required": bool(article.get("license_required", False)),
-                "license_status": str(article.get("license_status", "public")),
-                "region": str(article.get("region", "Global")),
-                "tier": article.get("tier"),
-                "reliability_weight": article.get("reliability_weight"),
-            },
-            "related_news": [],
-        })
+        story = build_candidate_story(article, index)
+        for key in ("source_description", "narrative_status"):
+            story.pop(key, None)
+        story["lead"] = str(article.get("description", ""))
+        stories.append(story)
     status = "degraded" if stories else "unavailable"
     return build_briefing_payload(mode, stories, status=status, warning=warning)
+
+
+def collect_run(market_database=None):
+    """One collection pass shared by every mode: sources, market panel, entities, scores, selection.
+
+    Raises only when data collection itself failed. No LLM is involved; the LLM step comes later and
+    may fail without affecting anything returned here.
+    """
+    local_market_database = market_data.database_path(market_database)
+    # The CSV files in config/ are the source of truth; SQLite is rebuilt from them on every run.
+    source_registry.sync_sources_from_csv()
+    entity_index = entities.EntityIndex.from_csv()
+    entities.sync_entities(local_market_database)
+    # Commentary on market events stays template-based: it keeps the run's LLM budget for story narratives.
+    market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="")
+    articles = fetch_rss_items(max_hours=48)
+    if not articles:
+        raise RuntimeError("No articles could be collected from any source")
+    market_data.record_article_events(local_market_database, articles)
+    entities.annotate_articles(articles, entity_index)
+
+    candidates = [build_candidate_story(article, index) for index, article in enumerate(story_lifecycle.cluster_representatives(articles), start=1)]
+    story_lifecycle.enrich_stories(candidates, articles)
+    selected = story_lifecycle.select_stories(candidates, story_lifecycle.load_relevance_config()["selection"])
+    source_registry.record_source_statistics(articles, {"stories": selected})
+    print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold")
+    return {"stories": selected, "market": market_panel, "articles": len(articles), "candidates": len(candidates)}
+
 
 def _write_local_briefing_cache(briefing, mode):
     cache_path = CACHE_FILE_HOURLY if mode == "hourly" else CACHE_FILE_DAILY

@@ -28,14 +28,24 @@ BADGE_NEW, BADGE_UPDATED, BADGE_BREAKING = "new", "updated", "breaking"
 VOLATILE_DAY_KEYS = {"generated_at", "time_str", "last_pipeline_run_at", "last_pipeline_attempt_at", "heading", "warning", "market", "badges"}
 VOLATILE_STORY_KEYS = {"badges"}
 HEAD_KEYS_TO_DROP = {"stories"}
+# The LLM-written part of a story. It is kept when a story is refreshed, and regenerated only after
+# a material update (narrative_status goes back to "pending" until then).
+NARRATIVE_FIELDS = (
+    "headline", "lead", "detailed_analysis", "data_points", "strategic_impact", "market_exposure",
+    "why_it_matters", "thy_impact_assessment", "related_news", "narrative_generated_at",
+)
+NARRATIVE_PENDING = "pending"
 
 
 def load_badges_config():
     return json.loads(BADGES_CONFIG_PATH.read_text(encoding="utf-8"))
 
 
-def load_relevance_config():
-    return json.loads(RELEVANCE_CONFIG_PATH.read_text(encoding="utf-8"))
+def load_relevance_config(version=None):
+    """The scoring config of one version (default: active_version); old versions stay loadable."""
+    raw = json.loads(RELEVANCE_CONFIG_PATH.read_text(encoding="utf-8"))
+    name = version or raw["active_version"]
+    return {**raw["versions"][name], "version": name}
 
 
 # --- time ---------------------------------------------------------------------
@@ -160,6 +170,22 @@ def enrich_stories(stories, articles, relevance_config=None):
     return stories
 
 
+def cluster_representatives(articles):
+    """One article per group of near-identical titles: the most reliable source, earliest among equals."""
+    representatives = []
+    for indexes in source_registry.cluster_articles_for_stats(articles):
+        members = [articles[index] for index in indexes]
+        representatives.append(max(members, key=lambda a: (a.get("reliability_weight") or 0, bool(a.get("official")), -a.get("timestamp", 0))))
+    return representatives
+
+
+def select_stories(stories, selection):
+    """Stories at or above the score threshold, best first, at most max_per_run."""
+    eligible = [story for story in stories if float(story.get("relevance_score", 0)) >= selection["min_score"]]
+    eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))
+    return eligible[: selection["max_per_run"]]
+
+
 def stable_story_id(source_url, headline=""):
     """A hash of the canonical source URL, so the same story keeps its id across runs and days."""
     identity = canonicalize_url(source_url) or str(headline or "").strip().lower()
@@ -225,6 +251,10 @@ def _apply_incoming(target, story, now_iso, config):
         return False   # an unchanged story is left exactly as stored
     reasons = (["score_change"] if score_changed else []) + (["new_source"] if new_sources else [])
     refreshed = copy.deepcopy(story)
+    for key in NARRATIVE_FIELDS:
+        if key in target:
+            refreshed[key] = target[key]     # keep the old narrative until a new one replaces it
+    refreshed["narrative_status"] = NARRATIVE_PENDING
     merged_sources = target.get("sources", []) + new_sources
     refreshed.update({
         "story_id": target["story_id"], "id": target["story_id"],
@@ -287,7 +317,9 @@ def compute_badges(story, now, config=None):
     fresh_publication = published is None or hours(published) <= config["max_publication_age_hours"]
     age = hours(first_seen)
     badges = []
-    if fresh_publication and 0 <= age <= config["breaking"]["max_age_hours"] and float(story.get("relevance_score", 0)) >= config["breaking"]["critical_score"]:
+    breaking = config["breaking"]
+    allowed_type = story.get("event_type") in breaking["allowed_event_types"]
+    if allowed_type and fresh_publication and 0 <= age <= breaking["max_age_hours"] and float(story.get("relevance_score", 0)) >= breaking["critical_score"]:
         badges.append(BADGE_BREAKING)
     if fresh_publication and 0 <= age <= config["new"]["max_age_hours"]:
         badges.append(BADGE_NEW)
