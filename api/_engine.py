@@ -1042,6 +1042,8 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
     snapshot["last_pipeline_run_at"] = snapshot.get("last_pipeline_run_at") or snapshot.get("generated_at", "")
     is_archive = bool(snapshot.get("date"))
     if is_archive:
+        # Current exclusion lists apply at read time; nothing is removed from the archive file itself.
+        snapshot["excluded_count"] = story_lifecycle.drop_excluded(snapshot)
         snapshot = story_lifecycle.present_stories(snapshot, now, config)
         everything = snapshot["stories"]
         if not include_low:

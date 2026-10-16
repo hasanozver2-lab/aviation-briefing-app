@@ -165,8 +165,10 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
 
     def log_message(self, format, *args):
         # Konsolu temiz tutmak için sadece API isteklerini yaz
-        if "api" in args[0]:
-            sys.stdout.write(f"[{engine.datetime.now().strftime('%H:%M:%S')}] {args[0]}\n")
+        # args[0] is the request line for access logs but an int status code for log_error, hence the str().
+        message = str(args[0]) if args else ""
+        if "api" in message:
+            sys.stdout.write(f"[{engine.datetime.now().strftime('%H:%M:%S')}] {message}\n")
             sys.stdout.flush()
 
 def run_server(port=8090):

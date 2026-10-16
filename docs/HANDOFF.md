@@ -78,8 +78,14 @@ Tamamı deterministik ve kural tabanlı; LLM yalnızca anlatı üretir, etiket/s
 - **Düzeltmeler:** `clean_html` artık `html.unescape` yapıyor (açıklamalardaki `&#8217;` sahte sayı sinyali üretiyordu). Taşıyıcı kodu çakışması: Aegean "A3"+"50" her A350/A320 haberine uyuyordu; uçak kodu aralığı artık taşıyıcı eşleşmesini engelliyor.
 - **Tipsiz haberler:** `reports/unclassified_sample.md` (sayı, oran, 40 rastgele örnek, yeni tip önerileri). Öneriler eklenmedi; karar kullanıcıda.
 
+## Taksonomi v2, okuma zamanı filtresi (feature/taxonomy-v2-readtime-filters, geçici)
+- **Yeni/genişleyen türler** (`config/event_taxonomy.json`, hepsi geçici): `airport_infrastructure` 0,5, `partnerships_mna` 0,65, `regulation_policy` 0,6, `sustainability_saf` 0,45, `workforce_hr` 0,3; `fleet_orders` teslimat/emeklilik/kabin yenileme; `community_csr` erişilebilirlik. "SAF" terimi `fuel_energy`den `sustainability_saf`e taşındı (0,9 ağırlıkla yeni türü her zaman geçerdi). Önce/sonra: `reports/taxonomy_v2_before_after.md`.
+- **Dışlama tür eşleştirmesinden önce:** `typing_exclusions.guarded_types` — başlığı savunma (`selection.exclude_terms`, `keep_terms` yoksa) veya yatırım yorumu (`commentary.title_patterns`) listesine uyan haber bu türleri alamaz. Listeler `relevance.json`da tek yerde durur (`market_data.is_excluded_from_typing`).
+- **Okuma zamanı filtresi:** `story_lifecycle.drop_excluded` API yanıtında güncel savunma/yatırım yorumu filtrelerini uygular; arşiv dosyasına dokunmaz (liste gevşetilirse haber geri gelir). Yanıtta `excluded_count`; `hidden_low_count` bunları saymaz.
+- `scripts/dev_server.py` `log_message` int argümanda TypeError veriyordu (ERR_EMPTY_RESPONSE); düzeltildi.
+
 ## Bilinen teknik borç (onaylı, şimdi yapılmayacak)
-1. **Üç kopya `index.html`.** Kök ve `public/` aynı, `static/index.html` eski (1654 satır). Vercel `public/` servis ediyor. Tek kopyaya indirilecek.
+1. ~~Üç kopya `index.html`~~ **Çözüldü:** tek kaynak `public/index.html` (Vercel `public/` servis ediyor; canlıdaki `/` ve `/index.html` içeriği bu dosyayla birebir). `tests/test_ui_contract.py` depoda başka `index.html` kalırsa kırılır. Kalan: `static/` ve kökte yinelenen `manifest.json`/`icon.svg` (hiçbir kod okumuyor, `public/` olanlar kullanılıyor) ile `api/index.py`'deki kökteki `index.html`'e geri düşme yolu.
 2. **`AGENTS.md` güncel değil.** THY merceği, THY kırmızısı ve `THY Impact Assessment` anlatıyor; kapsam kararı (küresel, THY'ye özel mercek yok) yansıtılmamış.
 3. **Tarih ayrıştırma yıl sorunu.** `_engine.parse_published_datetime` yılsız biçimlerde ("%d %B", "%d %b") yılı şimdiki yıl alır; yıl dönümünde geçmiş haber ileri tarihli olabilir.
 

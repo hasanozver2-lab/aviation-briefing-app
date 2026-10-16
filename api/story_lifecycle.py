@@ -219,6 +219,26 @@ def is_military_story(story, selection):
     return not (entities.get("carriers") or entities.get("groups"))
 
 
+def is_excluded(story, relevance):
+    """Defence items and investment commentary under the CURRENT lists in config/relevance.json."""
+    return is_military_story(story, relevance["selection"]) or bool(
+        relevance["selection"].get("exclude_commentary") and is_finance_commentary(story, relevance.get("commentary"))
+    )
+
+
+def drop_excluded(day, relevance=None):
+    """Read-time filter: remove stories the current exclusion lists reject. Returns how many were dropped.
+
+    The archive file is never rewritten here; a story that was archived under older (or no) exclusion rules
+    simply stops being served, and comes back if the lists are loosened.
+    """
+    relevance = relevance or load_relevance_config()
+    kept = [story for story in day.get("stories", []) if not is_excluded(story, relevance)]
+    dropped = len(day.get("stories", [])) - len(kept)
+    day["stories"] = kept
+    return dropped
+
+
 def select_stories(stories, selection, commentary=None):
     """Stories to archive: the listed ones (score >= min_score, at most max_per_run) and the archive-only low band
     (archive_min_score <= score < min_score, at most max_low_per_run). Military items and finance commentary are dropped."""
