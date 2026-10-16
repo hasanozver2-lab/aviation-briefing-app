@@ -73,9 +73,6 @@ def load_description_limit():
     return limit
 
 
-DESCRIPTION_MAX_CHARS = load_description_limit()
-
-
 def validate_mode(mode):
     """Only accept modes backed by an isolated cache and prompt contract."""
     if mode not in VALID_MODES:
@@ -609,7 +606,8 @@ def fetch_rss_items(max_hours=48):
 
 def build_compact_articles(articles, description_limit=None):
     """Only title, source, time, a bounded description and deterministic labels go to the model."""
-    limit = description_limit or DESCRIPTION_MAX_CHARS
+    # Read at use time so the read-only API never depends on pipeline.json at import.
+    limit = description_limit or load_description_limit()
     return [
         {
             "title": a["title"],

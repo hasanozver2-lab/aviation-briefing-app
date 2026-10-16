@@ -6,7 +6,7 @@ from api import _engine, entities
 # --- model payload and published JSON -----------------------------------------
 
 def test_description_limit_comes_from_config_and_defaults_to_800():
-    assert _engine.DESCRIPTION_MAX_CHARS == 800
+    assert _engine.load_description_limit() == 800
     article = {"title": "T", "source": "S", "link": "https://example.com/a", "description": "x" * 1000}
     assert len(_engine.build_compact_articles([article])[0]["description"]) == 800
     assert len(_engine.build_compact_articles([article], description_limit=200)[0]["description"]) == 200
@@ -45,3 +45,13 @@ def test_fallback_story_without_labels_has_explicit_empty_defaults():
     assert story["entities"] == entities.empty_entities()
     assert story["region_section"] == ""
     assert story["secondary_tags"] == []
+
+
+def test_read_only_api_path_does_not_need_pipeline_config(tmp_path, monkeypatch):
+    from api import blob_store
+    monkeypatch.setattr(_engine, "PIPELINE_CONFIG_PATH", tmp_path / "missing.json")
+    monkeypatch.setattr(_engine, "CACHE_FILE_DAILY", tmp_path / "missing_daily.json")
+    monkeypatch.setattr(blob_store, "get_public_json", lambda path: None)
+    assert _engine.get_ready_briefing("daily")["status"] == "unavailable"
+    with pytest.raises(FileNotFoundError):
+        _engine.build_compact_articles([{"title": "T", "source": "S", "link": "https://example.com/a", "description": "x"}])
