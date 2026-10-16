@@ -1,0 +1,23 @@
+{
+  "series": {
+    "brent_spot": {
+      "eia_series": "RBRTE",
+      "name": "Brent spot fiyatı",
+      "unit": "USD/varil",
+      "source": "U.S. Energy Information Administration"
+    },
+    "us_gulf_coast_jet_fuel": {
+      "eia_series": "EER_EPJK_PF4_RGC_DPG",
+      "name": "ABD Körfez Kıyısı jet yakıtı",
+      "unit": "USD/galon",
+      "source": "U.S. Energy Information Administration"
+    }
+  },
+  "thresholds": {
+    "jet_fuel_weekly_change_pct": 5.0,
+    "crack_spread_standard_deviations": 1.5,
+    "fx_daily_change_pct": 2.0
+  },
+  "lookbacks_days": [1, 7, 30, 90, 365],
+  "iatanote": "IATA Jet Fuel Price Monitor yalnızca kaynak bağlantısı olarak gösterilir; Platts verisi çekilmez, saklanmaz veya yeniden yayınlanmaz."
+}

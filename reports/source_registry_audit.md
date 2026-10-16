@@ -84,4 +84,4 @@ Recorded collection days: 1
 | Flightradar24 | 2 | 2 | 2 |
 | Lufthansa Group Newsroom | 2 | 2 | 2 |
 
-First-to-report is a conservative title-similarity metric across material collected by this app; it is not a claim about the entire market.
+First-to-report is a clustering-preliminary measurement based on conservative title similarity across material collected by this app; it is not a claim about the entire market and is not used in scoring.

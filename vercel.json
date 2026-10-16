@@ -1,9 +1,3 @@
 {
-  "version": 2,
-  "crons": [
-    {
-      "path": "/api/briefing?mode=daily&refresh=true",
-      "schedule": "0 4 * * *"
-    }
-  ]
+  "version": 2
 }

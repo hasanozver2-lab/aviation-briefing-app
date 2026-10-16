@@ -4,9 +4,7 @@ Serves both the Executive PWA Frontend and the REST API.
 """
 
 from http.server import BaseHTTPRequestHandler
-import hmac
 import json
-import os
 import sys
 import urllib.parse
 from pathlib import Path
@@ -23,30 +21,21 @@ except ImportError:
     from . import _engine as engine
 
 
-def is_refresh_authorized(authorization_header):
-    cron_secret = os.environ.get("CRON_SECRET", "")
-    if not cron_secret:
-        return False
-    expected = f"Bearer {cron_secret}"
-    return hmac.compare_digest(authorization_header, expected)
-
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
-        # 1. API İstekleri (/api/briefing, /api/refresh)
+        # 1. API İstekleri. Data is produced by GitHub Actions, never by Vercel.
         if path in {"/api", "/api/briefing", "/api/refresh"}:
             mode = query.get("mode", ["daily"])[0]
-            force = query.get("refresh", ["false"])[0].lower() in ("true", "1") or "refresh" in path
-            if force and not is_refresh_authorized(self.headers.get("Authorization", "")):
-                self.send_json({"error": "Refresh is not authorized"}, status=401)
+            if query.get("refresh", ["false"])[0].lower() in ("true", "1") or "refresh" in path:
+                self.send_json({"error": "Briefing refreshes run in GitHub Actions."}, status=405)
                 return
             try:
-                data = engine.get_briefing(mode=mode, force_refresh=force)
-                cache_control = "no-store" if force else "public, s-maxage=600, stale-while-revalidate=1800"
-                self.send_json(data, cache_control=cache_control)
+                data = engine.get_ready_briefing(mode=mode)
+                self.send_json(data, cache_control="public, s-maxage=60, stale-while-revalidate=300")
             except ValueError as e:
                 self.send_json({"error": str(e)}, status=400)
             except Exception as e:

@@ -1,8 +1,12 @@
 import json
 import sqlite3
+import urllib.parse
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from api import _engine
+from api import blob_store
+from api import market_data
 from api import source_registry
 from api.briefing import handler as briefing_handler
 from api.refresh import handler as refresh_handler
@@ -237,10 +241,143 @@ def test_source_registry_migrates_current_sources_with_configured_tier_weights(t
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'source_stats'"
         ).fetchone()
 
-    assert count == 36
+    assert count == 39
     assert lufthansa == (1, 1.0, "public")
     assert flightglobal == (2, 0.8)
     assert source_stats_exists is not None
+
+
+def test_paid_publishers_are_registered_but_never_active(tmp_path):
+    database = tmp_path / "source_registry.sqlite3"
+    source_registry.migrate_sources(_engine.get_builtin_source_records(), database)
+    with sqlite3.connect(database) as connection:
+        rows = connection.execute(
+            "SELECT name, tier, license_status, active FROM sources WHERE name IN (?, ?, ?) ORDER BY name",
+            ("Bloomberg Aviation", "Financial Times Aviation", "Reuters Aviation"),
+        ).fetchall()
+
+    assert rows == [
+        ("Bloomberg Aviation", 3, "paid", 0),
+        ("Financial Times Aviation", 3, "paid", 0),
+        ("Reuters Aviation", 3, "paid", 0),
+    ]
+    assert not {source["name"] for source in _engine.get_rss_sources()} & {row[0] for row in rows}
+
+
+def test_configured_paid_publishers_cannot_be_enabled(monkeypatch):
+    monkeypatch.setenv("REUTERS_AVIATION_RSS_URL", "https://example.com/reuters.xml")
+    configured = _engine._configured_source_records()
+    reuters = next(source for source in configured if source["name"] == "Reuters Aviation")
+
+    assert reuters["active"] is False
+    assert reuters["license_required"] is True
+    assert reuters["tier"] == 3
+
+
+def test_eia_brent_uses_rbrte_and_never_wti():
+    config = market_data.load_market_config()
+    assert config["series"]["brent_spot"]["eia_series"] == "RBRTE"
+    url = market_data.eia_series_url("RBRTE", "test-key", date(2026, 9, 1), date(2026, 10, 1))
+    query = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+    assert query["facets[series][]"] == ["RBRTE"]
+    assert "RWTC" not in url
+
+
+def test_market_panel_calculates_us_gulf_coast_jet_fuel_and_weekend_carry_forward(tmp_path):
+    database = tmp_path / "market.sqlite3"
+    start = date(2026, 8, 1)
+    brent = [(date.fromordinal(start.toordinal() + index), 70 + index * 0.1) for index in range(45)]
+    jet_fuel = [(date.fromordinal(start.toordinal() + index), 2 + index * 0.01) for index in range(45)]
+    market_data.upsert_observations(database, {"brent_spot": brent, "us_gulf_coast_jet_fuel": jet_fuel})
+
+    panel, indicators = market_data.build_market_panel(database)
+    items = {item["series_id"]: item for item in panel["items"]}
+
+    assert items["brent_spot"]["name"] == "Brent spot fiyatı"
+    assert items["us_gulf_coast_jet_fuel"]["name"] == "ABD Körfez Kıyısı jet yakıtı"
+    assert items["us_gulf_coast_jet_fuel"]["unit"] == "USD/galon"
+    assert len(items["brent_spot"]["sparkline"]) == 30
+    assert items["brent_spot"]["carried_forward"] is True
+    assert indicators["jet_fuel_brent_crack_spread"]["value"] == jet_fuel[-1][1] * 42 - brent[-1][1]
+
+
+def test_market_thresholds_list_historical_jet_fuel_breach(tmp_path):
+    database = tmp_path / "market.sqlite3"
+    start = date(2026, 7, 1)
+    brent = [(date.fromordinal(start.toordinal() + index), 70.0) for index in range(100)]
+    jet_fuel = [(date.fromordinal(start.toordinal() + index), 2.0) for index in range(99)]
+    jet_fuel.append((date.fromordinal(start.toordinal() + 99), 2.2))
+    market_data.upsert_observations(database, {
+        "brent_spot": brent,
+        "us_gulf_coast_jet_fuel": jet_fuel,
+    })
+
+    breaches = market_data.list_threshold_breaches(database)
+
+    assert {
+        "event_type": "fuel_energy",
+        "as_of": "2026-10-08",
+        "headline": "ABD Körfez Kıyısı jet yakıtında haftalık eşik aşımı",
+    }.items() <= breaches[-1].items()
+    assert round(breaches[-1]["payload"]["weekly_pct"], 6) == 10.0
+
+
+def test_ecb_weekend_value_keeps_its_last_valid_business_date(tmp_path, monkeypatch):
+    database = tmp_path / "market.sqlite3"
+    last_business_day = date(2026, 10, 9)
+    market_data.upsert_observations(database, {
+        "fx_usd_eur": [(last_business_day, 0.86)],
+    })
+    monkeypatch.setattr(
+        market_data,
+        "utc_now",
+        lambda: datetime(2026, 10, 11, tzinfo=timezone.utc),
+    )
+
+    panel, _ = market_data.build_market_panel(database)
+    eur = next(item for item in panel["items"] if item["series_id"] == "fx_usd_eur")
+
+    assert eur["as_of"] == "2026-10-09"
+    assert eur["carried_forward"] is True
+
+
+def test_geopolitics_requires_aviation_context():
+    assert market_data.classify_event_type("Regional conflict drives diplomatic talks") is None
+    classification = market_data.classify_event_type("Conflict prompts airline airspace closure and flight diversions")
+    assert classification == {"event_type": "geopolitics_airspace", "event_weight": 0.95}
+
+
+def test_article_event_links_same_day_fuel_signal(tmp_path):
+    database = market_data.migrate_market_database(tmp_path / "market.sqlite3")
+    occurred_on = "2026-10-16"
+    with sqlite3.connect(database) as connection:
+        fuel_event_id = market_data._upsert_event(
+            connection, "fuel_energy", occurred_on, "Jet fuel signal", "EIA", {"value": 1}
+        )
+    article = {
+        "title": "Airline shares fall as jet fuel costs rise",
+        "description": "",
+        "source": "Example",
+        "link": "https://example.com/market",
+        "timestamp": datetime(2026, 10, 16, tzinfo=timezone.utc).timestamp(),
+    }
+    market_data.record_article_events(database, [article])
+
+    assert article["event_type"] == "capital_markets"
+    assert article["related_market_event_id"] == fuel_event_id
+
+
+def test_ready_briefing_reads_snapshot_and_marks_failed_pipeline_stale(monkeypatch):
+    snapshot = {"mode": "daily", "status": "ok", "generated_at": "2026-10-16T08:00:00+00:00", "stories": []}
+    stale_status = {"mode": "daily", "status": "stale", "last_attempt_at": "2026-10-16T09:00:00+00:00"}
+
+    monkeypatch.setattr(blob_store, "get_public_json", lambda path: snapshot if path.endswith("daily.json") else stale_status)
+    monkeypatch.setattr(_engine, "fetch_rss_items", lambda *_args: (_ for _ in ()).throw(AssertionError("API must not collect")))
+
+    result = _engine.get_ready_briefing("daily")
+
+    assert result["status"] == "stale"
+    assert result["last_pipeline_run_at"] == snapshot["generated_at"]
 
 
 def test_paid_feed_keeps_body_out_of_article_processing(monkeypatch):

@@ -1,0 +1,56 @@
+name: Publish aviation briefings
+
+on:
+  schedule:
+    - cron: "2 * * * *"
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Briefing mode to publish"
+        required: true
+        default: "all"
+        type: choice
+        options: [all, daily, hourly]
+
+permissions:
+  contents: read
+
+jobs:
+  daily:
+    if: >-
+      (github.event_name == 'schedule' && github.event.schedule == '2 * * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'daily' || inputs.mode == 'all'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Publish daily briefing
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_PUBLIC_BASE_URL: ${{ secrets.BLOB_PUBLIC_BASE_URL }}
+          MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
+        run: python scripts/run_pipeline.py --mode daily
+
+  hourly:
+    if: >-
+      (github.event_name == 'schedule' && github.event.schedule == '*/15 * * * *') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'hourly' || inputs.mode == 'all'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Publish hourly briefing
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_PUBLIC_BASE_URL: ${{ secrets.BLOB_PUBLIC_BASE_URL }}
+          MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
+        run: python scripts/run_pipeline.py --mode hourly

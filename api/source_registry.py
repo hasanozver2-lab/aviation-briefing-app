@@ -157,7 +157,7 @@ def load_active_sources(source_records, target_path=None):
     """Apply active flags and governance metadata when the packaged registry exists."""
     target = database_path(target_path)
     if not target.is_file():
-        return source_records
+        return [source for source in source_records if source.get("active", True)]
 
     try:
         with sqlite3.connect(f"file:{target.as_posix()}?mode=ro", uri=True) as connection:
@@ -171,6 +171,8 @@ def load_active_sources(source_records, target_path=None):
     registered = {(row["name"], row["url"]): row for row in rows}
     active_sources = []
     for source in source_records:
+        if not source.get("active", True):
+            continue
         row = registered.get((source.get("name"), source.get("url")))
         if row is None:
             active_sources.append(source)

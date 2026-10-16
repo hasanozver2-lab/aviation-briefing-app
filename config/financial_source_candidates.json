@@ -1,0 +1,103 @@
+{
+  "candidates": [
+    {
+      "name": "SEC EDGAR — Delta Air Lines submissions",
+      "url": "https://data.sec.gov/submissions/CIK0000027904.json",
+      "feed_type": "json_api",
+      "region": "North America",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "8-K, 10-Q and 10-K metadata only",
+      "usage_terms": "Public SEC API; identify the automated client with User-Agent and remain at or below SEC fair-access limits."
+    },
+    {
+      "name": "SEC EDGAR — United Airlines Holdings submissions",
+      "url": "https://data.sec.gov/submissions/CIK0000100517.json",
+      "feed_type": "json_api",
+      "region": "North America",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "8-K, 10-Q and 10-K metadata only",
+      "usage_terms": "Public SEC API; identify the automated client with User-Agent and remain at or below SEC fair-access limits."
+    },
+    {
+      "name": "SEC EDGAR — Boeing submissions",
+      "url": "https://data.sec.gov/submissions/CIK0000012927.json",
+      "feed_type": "json_api",
+      "region": "North America",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "8-K, 10-Q and 10-K metadata only",
+      "usage_terms": "Public SEC API; identify the automated client with User-Agent and remain at or below SEC fair-access limits."
+    },
+    {
+      "name": "Delta Air Lines Investor Relations",
+      "url": "https://ir.delta.com/resources/default.aspx",
+      "feed_type": "structured_html",
+      "region": "North America",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "Earnings releases, presentations and SEC filing links",
+      "usage_terms": "Public investor page found; a dedicated machine-readable RSS/API and reuse permission were not confirmed."
+    },
+    {
+      "name": "United Airlines Investor Relations",
+      "url": "https://ir.united.com/financial-information/quarterly-results",
+      "feed_type": "structured_html",
+      "region": "North America",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "Quarterly earnings releases, investor updates and filing links",
+      "usage_terms": "Public investor page found; a dedicated machine-readable RSS/API and reuse permission were not confirmed."
+    },
+    {
+      "name": "Southwest Airlines Investor Relations",
+      "url": "https://investors.southwest.com/financial-results",
+      "feed_type": "structured_html",
+      "region": "North America",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "Earnings releases and 10-Q/10-K links",
+      "usage_terms": "Public investor page found; a dedicated machine-readable RSS/API and reuse permission were not confirmed."
+    },
+    {
+      "name": "Lufthansa Group Financial News",
+      "url": "https://newsroom.lufthansagroup.com/en/",
+      "feed_type": "rss_or_structured_html",
+      "region": "Europe",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "Financial news and ad-hoc releases",
+      "usage_terms": "The public newsroom exposes an RSS area and financial-news navigation; a financial-only endpoint and reuse conditions were not confirmed."
+    },
+    {
+      "name": "Air France-KLM Regulated Information",
+      "url": "https://www.airfranceklm.com/en/investor-relations/publications-and-regulated-information",
+      "feed_type": "structured_html",
+      "region": "Europe",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "Financial press releases and regulated filings",
+      "usage_terms": "Public regulated-information page found; a dedicated machine-readable RSS/API and reuse permission were not confirmed."
+    },
+    {
+      "name": "KAP — Turkish Airlines disclosures",
+      "url": "https://kap.org.tr/tr/sirket-bildirimleri/1107-turk-hava-yollari-a-o",
+      "feed_type": "structured_html",
+      "region": "Turkey",
+      "tier": 1,
+      "active": false,
+      "adapter_required": true,
+      "scope": "THYAO material disclosures and financial reporting",
+      "usage_terms": "Public disclosure page found; no documented public RSS/API or automated-reuse permission was confirmed in this review."
+    }
+  ]
+}

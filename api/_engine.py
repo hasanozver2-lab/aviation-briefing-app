@@ -22,8 +22,12 @@ import xml.etree.ElementTree as ET
 
 try:
     from . import source_registry
+    from . import blob_store
+    from . import market_data
 except ImportError:
     import source_registry
+    import blob_store
+    import market_data
 
 # Windows cp1254 encoding fix
 if hasattr(sys.stdout, 'reconfigure'):
@@ -36,7 +40,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
-SOURCE_POLICY_VERSION = "airline-only-v5"
+SOURCE_POLICY_VERSION = "airline-only-v6"
 RSS_FETCH_TIMEOUT_SECONDS = 10
 HTML_FETCH_TIMEOUT_SECONDS = 3
 HTML_DETAIL_DATE_TIMEOUT_SECONDS = 4
@@ -257,6 +261,9 @@ def _configured_source_records():
                 "European and other global airlines",
                 source_type,
                 license_required=True,
+                active=False,
+                region="Global",
+                tier=3,
             ))
 
     # AIRLINE_BRIEFING_SOURCES_JSON; örnek biçim README'de açıklanmıştır.
@@ -334,6 +341,11 @@ def get_builtin_source_records(max_hours=48):
         _source_record("Flightradar24", "https://www.flightradar24.com/blog/feed/", "Route news"),
         # 4. Other areas (Market & Industry)
         _source_record("Yahoo Finance Aviation", "https://feeds.finance.yahoo.com/rss/2.0/headline?s=LHA.DE,AF.PA,IAG.L,AAL,DAL,BA,AIR.PA", "Other areas", "mainstream"),
+        # Licensed publishers stay visible in governance, but are deliberately
+        # inactive until a separate commercial licence authorizes ingestion.
+        _source_record("Reuters Aviation", "https://www.reuters.com/", "Other areas", "mainstream", license_required=True, active=False, region="Global", tier=3),
+        _source_record("Financial Times Aviation", "https://www.ft.com/companies/airlines", "Other areas", "mainstream", license_required=True, active=False, region="Global", tier=3),
+        _source_record("Bloomberg Aviation", "https://www.bloomberg.com/industries/transportation", "Other areas", "mainstream", license_required=True, active=False, region="Global", tier=3),
         # 5. Verified official airline newsroom / social feeds
         _source_record("Lufthansa Group Newsroom", "https://newsroom.lufthansagroup.com/feed/en", "European and other global airlines", "airline_newsroom", airline="Lufthansa Group", airline_code="LH"),
         _source_record("Delta News Hub", "https://news.delta.com/rss.xml", "European and other global airlines", "airline_newsroom", airline="Delta Air Lines", airline_code="DL"),
@@ -885,48 +897,75 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
     status = "degraded" if stories else "unavailable"
     return build_briefing_payload(mode, stories, status=status, warning=warning)
 
-def get_briefing(mode="daily", force_refresh=False):
-    """Önbellekteki brifingi döndürür veya yenisini üretir."""
-    mode = validate_mode(mode)
+def _write_local_briefing_cache(briefing, mode):
     cache_path = CACHE_FILE_HOURLY if mode == "hourly" else CACHE_FILE_DAILY
-    
-    if not force_refresh and cache_path.exists():
-        try:
-            with open(cache_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                gen_time = datetime.fromisoformat(data.get("generated_at", "2000-01-01T00:00:00"))
-                if gen_time.tzinfo is None:
-                    gen_time = gen_time.astimezone()
-                max_age = timedelta(minutes=10 if mode == "hourly" else 30)
-                cache_is_valid = (
-                    data.get("mode") == mode
-                    and data.get("status") in {"ok", "degraded", "unavailable"}
-                    and data.get("source_policy") == SOURCE_POLICY_VERSION
-                )
-                cache_age = utc_now() - gen_time.astimezone(timezone.utc)
-                if cache_is_valid and cache_age < max_age:
-                    return data
-        except Exception as e:
-            print(f"Önbellek okuma hatası ({cache_path.name}): {e}")
+    try:
+        with open(cache_path, "w", encoding="utf-8") as cache_file:
+            json.dump(briefing, cache_file, ensure_ascii=False, indent=2)
+    except OSError as exc:
+        print(f"Önbellek yazma hatası: {exc}")
 
+
+def run_pipeline(mode="daily", market_database=None):
+    """Run collection and analysis only in the scheduled worker or local maintenance flow."""
+    mode = validate_mode(mode)
     print(f"Havacılık haberleri toplanıyor (Mod: {mode})...")
+    local_market_database = market_data.database_path(market_database)
+    market_panel = market_data.refresh_market_data(
+        local_market_database,
+        eia_api_key=_env_value("EIA_API_KEY"),
+        gemini_api_key=GEMINI_API_KEY,
+    )
     articles = fetch_rss_items(max_hours=48 if mode == "daily" else 2)
+    market_data.record_article_events(local_market_database, articles)
     print(f"{len(articles)} haber maddesi toplandı. Analiz ediliyor...")
     briefing = generate_briefing_with_gemini(articles, mode=mode)
     if mode == "daily":
         source_registry.record_source_statistics(articles, briefing)
-    
-    try:
-        with open(cache_path, "w", encoding="utf-8") as f:
-            json.dump(briefing, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"Önbellek yazma hatası: {e}")
-        
+    briefing["market"] = market_panel
+    briefing["last_pipeline_run_at"] = utc_now().isoformat()
+    _write_local_briefing_cache(briefing, mode)
     return briefing
+
+
+def _read_local_briefing_cache(mode):
+    cache_path = CACHE_FILE_HOURLY if mode == "hourly" else CACHE_FILE_DAILY
+    if not cache_path.exists():
+        return None
+    try:
+        data = json.loads(cache_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if data.get("mode") == mode else None
+
+
+def get_ready_briefing(mode="daily"):
+    """Read a completed briefing; this function never collects feeds or calls an LLM."""
+    mode = validate_mode(mode)
+    snapshot = blob_store.get_public_json(blob_store.briefing_path(mode))
+    pipeline_status = blob_store.get_public_json(blob_store.pipeline_status_path(mode)) or {}
+    if not isinstance(snapshot, dict):
+        snapshot = _read_local_briefing_cache(mode)
+    if not isinstance(snapshot, dict):
+        return build_briefing_payload(mode, [], status="unavailable", warning="No completed pipeline snapshot is available yet.")
+
+    snapshot["last_pipeline_run_at"] = snapshot.get("last_pipeline_run_at") or snapshot.get("generated_at", "")
+    if pipeline_status.get("status") == "stale":
+        snapshot["status"] = "stale"
+        snapshot["warning"] = "The latest pipeline attempt failed; the last successful briefing is shown."
+        snapshot["last_pipeline_attempt_at"] = pipeline_status.get("last_attempt_at", "")
+    return snapshot
+
+
+def get_briefing(mode="daily", force_refresh=False):
+    """Compatibility wrapper: only an explicit local maintenance call may generate data."""
+    if force_refresh:
+        return run_pipeline(mode)
+    return get_ready_briefing(mode)
 
 if __name__ == "__main__":
     print("Aviation Briefing Engine test ediliyor...")
-    res = get_briefing(mode="daily", force_refresh=True)
+    res = run_pipeline(mode="daily")
     print(f"Başarılı! {len(res['stories'])} haber oluşturuldu.")
     print("Başlık:", res["heading"])
     for s in res["stories"]:

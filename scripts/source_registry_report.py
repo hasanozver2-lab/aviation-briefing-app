@@ -68,7 +68,7 @@ def render_report(database):
             )
         report.extend([
             "",
-            "First-to-report is a conservative title-similarity metric across material collected by this app; it is not a claim about the entire market.",
+            "First-to-report is a clustering-preliminary measurement based on conservative title similarity across material collected by this app; it is not a claim about the entire market and is not used in scoring.",
         ])
     return "\n".join(report) + "\n"
 
