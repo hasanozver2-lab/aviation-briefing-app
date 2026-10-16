@@ -59,3 +59,10 @@ def test_the_page_updates_itself_when_a_new_version_is_deployed(path):
     assert 'cache: "no-store"' in html
     assert "!state.articleId) location.reload()" in html, "never reload under a reader with a story open"
     assert html.count("checkForNewVersion()") >= 3          # on load, on returning to the app, after closing a story
+
+
+@pytest.mark.parametrize("path", COPIES)
+def test_there_is_no_manual_refresh_button(path):
+    html = page(path)
+    assert "btn-refresh" not in html and ">Refresh<" not in html
+    assert 'id="btn-share"' in html          # the Share button stays
