@@ -66,3 +66,11 @@ def test_there_is_no_manual_refresh_button(path):
     html = page(path)
     assert "btn-refresh" not in html and ">Refresh<" not in html
     assert 'id="btn-share"' in html          # the Share button stays
+
+
+@pytest.mark.parametrize("path", COPIES)
+def test_regions_and_server_labels_replace_the_old_keyword_logic(path):
+    html = page(path)
+    assert "story.region_section || story.section" in html, "filter chips follow the region, not the source's old section"
+    assert "isPriority" not in html and "Priority" not in html, "only the server's Breaking label is used"
+    assert "function isBreaking" in html
