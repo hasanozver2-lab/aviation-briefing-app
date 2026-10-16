@@ -3,7 +3,7 @@ name: Publish aviation briefings
 on:
   schedule:
     - cron: "2 * * * *"
-    - cron: "*/15 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -18,6 +18,10 @@ permissions:
 
 jobs:
   daily:
+    # One run per mode at a time; a newer queued run replaces an older queued one, a running one finishes.
+    concurrency:
+      group: aerobrief-daily
+      cancel-in-progress: false
     if: >-
       (github.event_name == 'schedule' && github.event.schedule == '2 * * * *') ||
       (github.event_name == 'workflow_dispatch' && (inputs.mode == 'daily' || inputs.mode == 'all'))
@@ -37,8 +41,11 @@ jobs:
         run: python scripts/run_pipeline.py --mode daily
 
   hourly:
+    concurrency:
+      group: aerobrief-hourly
+      cancel-in-progress: false
     if: >-
-      (github.event_name == 'schedule' && github.event.schedule == '*/15 * * * *') ||
+      (github.event_name == 'schedule' && github.event.schedule == '*/30 * * * *') ||
       (github.event_name == 'workflow_dispatch' && (inputs.mode == 'hourly' || inputs.mode == 'all'))
     runs-on: ubuntu-latest
     steps:
