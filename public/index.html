@@ -359,11 +359,11 @@
       // grouped by region. A region filter shows only that region's group, at every level. The reading order (prev/next)
       // is the region order, so each story appears once in it even though the block repeats the top ones.
       const showBlock = filter === "All";
-      const block = [];
-      const lead = showBlock ? (stories.find(isBreaking) || stories[0]) : null;
-      const blockRest = [];
-      const groups = (showBlock ? sectionNames : [filter]).map(name => ({ name, items: stories.filter(s => s !== lead && sectionOf(s) === name) })).filter(g => g.items.length);
-      state.order = [].concat(lead ? [lead] : [], ...groups.map(g => g.items));
+      const block = showBlock ? stories.filter(isTopLevel) : [];
+      const lead = block[0] || null;
+      const blockRest = block.slice(1);
+      const groups = (showBlock ? sectionNames : [filter]).map(name => ({ name, items: stories.filter(s => sectionOf(s) === name) })).filter(g => g.items.length);
+      state.order = [].concat(...groups.map(g => g.items));
 
       let n = 0;
       const compactRow = (s) => {

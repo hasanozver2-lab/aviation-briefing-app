@@ -88,6 +88,12 @@ def test_regions_follow_the_server_and_the_old_turkey_section_is_gone():
     assert "story.region_section ||" in html and "story.section" not in html
 
 
+def test_the_top_block_and_the_region_groups():
+    html = page()
+    assert "Critical &amp; Important" in html and "function isTopLevel" in html
+    assert 'TOP_LEVELS = ["critical", "important"]' in html
+
+
 def test_clustered_stories_show_their_sources_and_pending_ones_a_plain_note():
     html = page()
     assert "${count} sources" in html and "sourcesOf(s)" in html and 'class="sources"' in html
