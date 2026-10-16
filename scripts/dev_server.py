@@ -111,7 +111,7 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         if path == "/api/briefing":
             mode = query.get("mode", ["daily"])[0]
             try:
-                data = engine.get_briefing(mode=mode, force_refresh=False, date=query.get("date", [None])[0])
+                data = engine.get_briefing(mode=mode, force_refresh=False, date=query.get("date", [None])[0], include_low=engine.wants_low(query))
                 self.send_json(data)
             except engine.BriefingNotFound as e:
                 self.send_json({"error": str(e)}, status=404)

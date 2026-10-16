@@ -34,7 +34,7 @@ class handler(BaseHTTPRequestHandler):
                 self.send_json({"error": "Briefing refreshes run in GitHub Actions."}, status=405)
                 return
             try:
-                data = engine.get_ready_briefing(mode=mode, date=query.get("date", [None])[0])
+                data = engine.get_ready_briefing(mode=mode, date=query.get("date", [None])[0], include_low=engine.wants_low(query))
                 self.send_json(data, cache_control="public, s-maxage=60, stale-while-revalidate=300")
             except engine.BriefingNotFound as e:
                 self.send_json({"error": str(e)}, status=404)

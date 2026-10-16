@@ -404,7 +404,8 @@ def clean_html(raw_html):
     if not raw_html:
         return ""
     clean = re.sub(r'<.*?>', ' ', raw_html)
-    return " ".join(clean.split()).strip()
+    # Feeds escape punctuation as numeric entities (&#8217;); left raw they show up in the text and as fake numbers.
+    return " ".join(unescape(clean).split()).strip()
 
 
 def _local_name(tag):
@@ -1014,11 +1015,12 @@ class BriefingNotFound(LookupError):
     """No archive file exists for the requested day."""
 
 
-def get_ready_briefing(mode="daily", date=None):
+def get_ready_briefing(mode="daily", date=None, include_low=False):
     """Read a completed briefing; this function never collects feeds or calls an LLM.
 
     date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
-    LookupError when no archive exists for it. Badges and ordering are recomputed on every read.
+    LookupError when no archive exists for it. Badges, score bands and ordering are recomputed on every
+    read; the archive-only low band is returned only with include_low.
     """
     mode = validate_mode(mode)
     if date is not None:
@@ -1041,6 +1043,10 @@ def get_ready_briefing(mode="daily", date=None):
     is_archive = bool(snapshot.get("date"))
     if is_archive:
         snapshot = story_lifecycle.present_stories(snapshot, now, config)
+        everything = snapshot["stories"]
+        if not include_low:
+            snapshot["stories"] = [story for story in everything if story_lifecycle.is_listed(story)]
+        snapshot["hidden_low_count"] = len(everything) - len(snapshot["stories"])
         if mode == "hourly" and snapshot["date"] == today:
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode
@@ -1057,11 +1063,16 @@ def get_ready_briefing(mode="daily", date=None):
     return snapshot
 
 
-def get_briefing(mode="daily", force_refresh=False, date=None):
+def get_briefing(mode="daily", force_refresh=False, date=None, include_low=False):
     """Compatibility wrapper: only an explicit local maintenance call may generate data."""
     if force_refresh:
         return run_pipeline(mode)
-    return get_ready_briefing(mode, date=date)
+    return get_ready_briefing(mode, date=date, include_low=include_low)
+
+
+def wants_low(query):
+    """?include_low=1 (or true) asks for the archive-only low band as well."""
+    return str((query.get("include_low") or [""])[0]).lower() in {"1", "true", "yes"}
 
 if __name__ == "__main__":
     print("Aviation Briefing Engine test ediliyor...")
