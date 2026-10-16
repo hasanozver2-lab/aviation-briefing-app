@@ -1,0 +1,164 @@
+entity_id,slug,parent_entity_id,iata,icao,name,aliases,region,alliance,operator_type,tier,cargo_tier,metric_approx,fleet_widebody,fleet_narrowbody,fleet_regional,capacity_purchase,needs_verification,tier_override,override_reason,verification_source,verified_at
+carrier:000001,lufthansa,group:000001,LH,DLH,Lufthansa,Deutsche Lufthansa|Lufthansa German Airlines,Europe,Star Alliance,passenger,1,,405,100,205,0,0,0,,,,
+carrier:000002,swiss,group:000001,LX,SWR,SWISS International Air Lines,Swiss International Air Lines|Swiss Airlines|=SWISS,Europe,Star Alliance,passenger,2,,116,26,64,0,0,1,,,,
+carrier:000003,austrian-airlines,group:000001,OS,AUA,Austrian Airlines,Austrian,Europe,Star Alliance,passenger,3,,71.5,12,40,15,0,0,,,"https://en.wikipedia.org/wiki/Austrian_Airlines (wikipedia, as of May 2026; rows sum to 67)",2026-10-16
+carrier:000004,brussels-airlines,group:000001,SN,BEL,Brussels Airlines,,Europe,Star Alliance,passenger,3,,59,11,37,0,0,0,,,"https://en.wikipedia.org/wiki/Brussels_Airlines (wikipedia, as of 30 Jun 2026; 48 in service)",2026-10-16
+carrier:000005,eurowings,group:000001,EW,EWG,Eurowings,,Europe,,passenger,3,,95,0,95,0,0,1,,,"unverified 2026-10-16: Wikipedia table garbled, narrowbody count unreliable (about 90, Eurowings Europe separate)",
+carrier:000006,discover-airlines,group:000001,4Y,OCN,Discover Airlines,Discover,Europe,,passenger,4,,36,8,20,0,0,0,,,,
+carrier:000007,air-dolomiti,group:000001,EN,DLA,Air Dolomiti,,Europe,Star Alliance,passenger,4,,6,0,0,12,0,1,,,,
+carrier:000008,lufthansa-cargo,group:000001,,GEC,Lufthansa Cargo,LH Cargo,Europe,,cargo,,4,26,13,0,0,0,0,,,,
+carrier:000009,british-airways,group:000002,BA,BAW,British Airways,,Europe,oneworld,passenger,1,,390,125,140,0,0,0,,,,
+carrier:000010,iberia,group:000002,IB,IBE,Iberia,,Europe,oneworld,passenger,2,,126,34,58,0,0,0,,,,
+carrier:000011,vueling,group:000002,VY,VLG,Vueling,,Europe,,passenger,2,,125,0,125,0,0,0,,,,
+carrier:000012,aer-lingus,group:000002,EI,EIN,Aer Lingus,,Europe,,passenger,3,,68,14,40,0,0,0,,,,
+carrier:000013,level,group:000002,,,LEVEL,=LEVEL|LEVEL Europe,Europe,,passenger,4,,8,0,8,0,0,1,,,,
+carrier:000014,air-france,group:000003,AF,AFR,Air France,Air France Airlines,Europe,SkyTeam,passenger,1,,309,92,125,0,0,0,,,,
+carrier:000015,air-france-hop,group:000003,A5,,Air France HOP,,Europe,SkyTeam,passenger,4,,15,0,0,30,0,1,,,,
+carrier:000016,klm,group:000003,KL,KLM,KLM,KLM Royal Dutch Airlines,Europe,SkyTeam,passenger,2,,131,42,47,0,0,0,,,,
+carrier:000017,klm-cityhopper,group:000003,WA,CND,KLM Cityhopper,,Europe,SkyTeam,passenger,4,,28.5,0,0,57,0,0,,,,
+carrier:000018,transavia,group:000003,HV,TRA,Transavia,Transavia Airlines,Europe,,passenger,3,,52,0,52,0,0,0,,,"https://en.wikipedia.org/wiki/Transavia (wikipedia, as of Oct 2026; Netherlands AOC only)",2026-10-16
+carrier:000019,transavia-france,group:000003,TO,TVF,Transavia France,,Europe,,passenger,4,,42,0,42,0,0,1,,,,
+carrier:000020,martinair,group:000003,MP,MPH,Martinair,Martinair Cargo,Europe,,cargo,,4,6,3,0,0,0,1,,,,
+carrier:000021,turkish-airlines,group:000004,TK,THY,Turkish Airlines,THY|Türk Hava Yolları|Turk Hava Yollari|Turkish Airlines Inc,Europe,Star Alliance,passenger,1,,505,130,245,0,0,0,,,,
+carrier:000022,turkish-cargo,group:000004,,,Turkish Cargo,Turkish Airlines Cargo|THY Kargo,Europe,,cargo,,3,56,28,0,0,0,1,,,,
+carrier:000023,ajet,group:000004,VF,AJA,AJet,,Europe,,passenger,3,,85,0,85,0,0,1,,,"unverified 2026-10-16: sources conflict: 85-89 (news, infobox) vs 126 (table); lease scope unclear",
+carrier:000024,aeroflot,group:000005,SU,AFL,Aeroflot,Aeroflot Russian Airlines,Europe,SkyTeam,passenger,1,,240,45,150,0,0,1,,,,
+carrier:000025,rossiya-airlines,group:000005,FV,SDM,Rossiya Airlines,Rossiya,Europe,,passenger,4,,40,0,40,0,0,1,,,,
+carrier:000026,pobeda,group:000005,DP,PBD,Pobeda,Pobeda Airlines,Europe,,passenger,4,,42,0,42,0,0,1,,,,
+carrier:000027,pegasus,,PC,PGT,Pegasus Airlines,Pegasus|Pegasus Hava Yolları|Pegasus Hava Yollari,Europe,,passenger,2,,131,0,131,0,0,0,,,"https://en.wikipedia.org/wiki/Pegasus_Airlines (wikipedia infobox, as of Jun 2026; type table of Aug 2025 shows 129)",2026-10-16
+carrier:000028,sunexpress,,XQ,SXS,SunExpress,Sun Express,Europe,,passenger,3,,65,0,65,0,0,0,,,,
+carrier:000029,ryanair,,FR,RYR,Ryanair,Ryanair Group|Ryanair Holdings|Ryanair DAC,Europe,,passenger,1,,620,0,620,0,0,0,,,,
+carrier:000030,easyjet,,U2,EZY,easyJet,easy Jet,Europe,,passenger,1,,340,0,340,0,0,0,,,,
+carrier:000031,wizz-air,,W6,WZZ,Wizz Air,Wizz|Wizzair,Europe,,passenger,1,,215,0,215,0,0,1,,,unverified 2026-10-16: found 118 but page also cites 250+ aircraft; count looks partial,
+carrier:000032,jet2,,LS,EXS,Jet2,Jet2.com,Europe,,passenger,2,,126,0,126,0,0,0,,,"https://en.wikipedia.org/wiki/Jet2.com (wikipedia, as of Oct 2025; passenger 737-800/A321 only, 7 freighter-type 737-300 excluded, infobox says 120)",2026-10-16
+carrier:000033,norwegian,,DY,NAX,Norwegian Air Shuttle,Norwegian Air|Norwegian Airlines,Europe,,passenger,3,,85,0,85,0,0,0,,,,
+carrier:000034,sas,,SK,SAS,Scandinavian Airlines,SAS Scandinavian Airlines|=SAS,Europe,SkyTeam,passenger,2,,129.5,14,94,15,0,0,,,"https://en.wikipedia.org/wiki/Scandinavian_Airlines (wikipedia, as of Sep 2025; mainline 74 + SAS Connect 34 A320neo + SAS Link 15 E195, wet-leases excluded)",2026-10-16
+carrier:000035,finnair,,AY,FIN,Finnair,,Europe,oneworld,passenger,3,,89,24,29,24,0,0,,,"https://en.wikipedia.org/wiki/Finnair (wikipedia, as of Jul 2026; regional = Norra ATR72 12 + E190 12 flying for Finnair)",2026-10-16
+carrier:000036,tap-air-portugal,,TP,TAP,TAP Air Portugal,TAP,Europe,Star Alliance,passenger,2,,119,22,75,0,0,0,,,"https://en.wikipedia.org/wiki/TAP_Air_Portugal (wikipedia, as of May 2026; Portugalia/TAP Express not included)",2026-10-16
+carrier:000037,ita-airways,,AZ,ITY,ITA Airways,ITA,Europe,SkyTeam,passenger,2,,119,22,75,0,0,0,,,,
+carrier:000038,lot-polish-airlines,,LO,LOT,LOT Polish Airlines,LOT,Europe,Star Alliance,passenger,3,,65.5,14,20,35,0,0,,,,
+carrier:000039,aegean-airlines,,A3,AEE,Aegean Airlines,Aegean,Europe,Star Alliance,passenger,3,,70,0,70,0,0,0,,,,
+carrier:000040,condor,,DE,CFG,Condor,Condor Flugdienst,Europe,,passenger,3,,69,12,45,0,0,0,,,,
+carrier:000041,tui-airways,,BY,TOM,TUI Airways,TUI fly|TUI Airways UK,Europe,,passenger,3,,68,14,40,0,0,0,,,,
+carrier:000042,air-europa,,UX,AEA,Air Europa,,Europe,SkyTeam,passenger,3,,76,29,18,0,0,0,,,"https://en.wikipedia.org/wiki/Air_Europa (wikipedia, as of Nov 2025)",2026-10-16
+carrier:000043,volotea,,V7,VOE,Volotea,,Europe,,passenger,4,,41,0,41,0,0,0,,,"https://www.aviationoutlook.com/p/volotea-strategic-analysis-outlook-report (other, as of Jun 2026; wikipedia infobox says 45)",2026-10-16
+carrier:000044,airbaltic,,BT,BTI,airBaltic,Air Baltic,Europe,,passenger,3,,55,0,55,0,0,0,,,"https://en.wikipedia.org/wiki/AirBaltic (wikipedia, as of Sep 2026; fleet planned to fall to ~36 by end 2026 after Chapter 11 filing)",2026-10-16
+carrier:000045,icelandair,,FI,ICE,Icelandair,,Europe,,passenger,4,,34,0,30,8,0,0,,,,
+carrier:000046,s7-airlines,,S7,SBI,S7 Airlines,Siberia Airlines,Europe,oneworld,passenger,3,,95.5,0,87,17,0,0,,,"https://en.wikipedia.org/wiki/S7_Airlines (wikipedia, as of Aug 2025; many aircraft parked)",2026-10-16
+carrier:000047,qantas,group:000006,QF,QFA,Qantas,Qantas Airways,Asia-Pacific,oneworld,passenger,2,,168,44,80,0,0,0,,,,
+carrier:000048,qantaslink,group:000006,,QLK,QantasLink,,Asia-Pacific,oneworld,passenger,4,,40,0,0,80,0,1,,,,
+carrier:000049,jetstar,group:000006,JQ,JST,Jetstar,Jetstar Airways,Asia-Pacific,,passenger,2,,111,11,89,0,0,0,,,"https://en.wikipedia.org/wiki/Jetstar_Airways (wikipedia, as of May 2026; Australia AOC only)",2026-10-16
+carrier:000050,air-china,group:000007,CA,CCA,Air China,,Asia-Pacific,Star Alliance,passenger,1,,530,95,340,0,0,1,,,,
+carrier:000051,shenzhen-airlines,group:000007,ZH,CSZ,Shenzhen Airlines,,Asia-Pacific,Star Alliance,passenger,1,,212,7,198,0,0,0,,,"https://en.wikipedia.org/wiki/Shenzhen_Airlines (wikipedia, as of Jun 2026; table total 205)",2026-10-16
+carrier:000052,air-china-cargo,group:000007,,CAO,Air China Cargo,,Asia-Pacific,,cargo,,4,30,15,0,0,0,1,,,,
+carrier:000053,china-eastern,group:000008,MU,CES,China Eastern Airlines,China Eastern,Asia-Pacific,SkyTeam,passenger,1,,830,90,650,0,0,1,,,,
+carrier:000054,china-cargo-airlines,group:000008,CK,CKK,China Cargo Airlines,,Asia-Pacific,SkyTeam,cargo,,4,20,10,0,0,0,1,,,,
+carrier:000055,china-southern,group:000009,CZ,CSN,China Southern Airlines,China Southern,Asia-Pacific,,passenger,1,,780,75,630,0,0,1,,,,
+carrier:000056,xiamen-airlines,group:000009,MF,CXA,Xiamen Airlines,XiamenAir,Asia-Pacific,SkyTeam,passenger,2,,189,12,165,0,0,0,,,"https://en.wikipedia.org/wiki/Xiamen_Airlines (wikipedia, as of Jul 2026; per-type rows 177 vs stated 172, ambiguous)",2026-10-16
+carrier:000057,hainan-airlines,,HU,CHH,Hainan Airlines,Hainan Airlines Holding,Asia-Pacific,,passenger,1,,360,45,270,0,0,1,,,,
+carrier:000058,sichuan-airlines,,3U,CSC,Sichuan Airlines,,Asia-Pacific,,passenger,1,,224,20,184,0,0,0,,,"https://en.wikipedia.org/wiki/Sichuan_Airlines (wikipedia, as of Oct 2025; passenger fleet only)",2026-10-16
+carrier:000059,spring-airlines,,9C,CQH,Spring Airlines,,Asia-Pacific,,passenger,2,,120,0,120,0,0,1,,,,
+carrier:000060,juneyao-airlines,,HO,DKH,Juneyao Airlines,Juneyao Air,Asia-Pacific,,passenger,2,,116,8,100,0,0,1,,,,
+carrier:000061,ana,group:000010,NH,ANA,All Nippon Airways,ANA,Asia-Pacific,Star Alliance,passenger,1,,290,95,100,0,0,0,,,,
+carrier:000062,peach-aviation,group:000010,MM,APJ,Peach Aviation,Peach,Asia-Pacific,,passenger,4,,38,0,38,0,0,0,,,,
+carrier:000063,ana-wings,group:000010,EH,AKX,ANA Wings,,Asia-Pacific,Star Alliance,passenger,4,,10,0,0,20,0,1,,,,
+carrier:000064,japan-airlines,group:000011,JL,JAL,Japan Airlines,JAL,Asia-Pacific,oneworld,passenger,1,,298,118,62,0,0,0,,,"https://en.wikipedia.org/wiki/Japan_Airlines_fleet (wikipedia, as of Mar 2026; mainline only, widebody +/-1)",2026-10-16
+carrier:000065,zipair,group:000011,ZG,TZP,ZIPAIR Tokyo,Zipair,Asia-Pacific,,passenger,4,,14,7,0,0,0,0,,,,
+carrier:000066,j-air,group:000011,XM,JAR,J-Air,,Asia-Pacific,oneworld,passenger,4,,9,0,0,18,0,1,,,,
+carrier:000067,singapore-airlines,group:000012,SQ,SIA,Singapore Airlines,=SIA,Asia-Pacific,Star Alliance,mixed,1,,240,110,20,0,0,0,,,,
+carrier:000068,scoot,group:000012,TR,TGW,Scoot,,Asia-Pacific,,passenger,3,,60,11,38,0,0,0,,,,
+carrier:000069,cathay-pacific,group:000013,CX,CPA,Cathay Pacific,Cathay,Asia-Pacific,oneworld,mixed,1,,305,130,45,0,0,0,,,,
+carrier:000070,hk-express,group:000013,UO,HKE,HK Express,Hong Kong Express,Asia-Pacific,,passenger,4,,38,0,38,0,0,1,,,,
+carrier:000071,korean-air,group:000014,KE,KAL,Korean Air,,Asia-Pacific,SkyTeam,mixed,1,,320,125,70,0,0,0,,,,
+carrier:000072,asiana-airlines,group:000014,OZ,AAR,Asiana Airlines,Asiana,Asia-Pacific,Star Alliance,mixed,2,,110,43,24,0,0,0,,,"https://en.wikipedia.org/wiki/Asiana_Airlines (wikipedia, as of Jul 2026; full integration into Korean Air due end 2026)",2026-10-16
+carrier:000073,jin-air,group:000014,LJ,JNA,Jin Air,,Asia-Pacific,,passenger,4,,32,4,24,0,0,1,,,,
+carrier:000074,eva-air,,BR,EVA,EVA Air,EVA,Asia-Pacific,Star Alliance,passenger,2,,145,55,35,0,0,0,,,,
+carrier:000075,china-airlines,,CI,CAL,China Airlines,,Asia-Pacific,SkyTeam,mixed,2,,155,65,25,0,0,0,,,,
+carrier:000076,thai-airways,,TG,THA,Thai Airways,Thai Airways International,Asia-Pacific,Star Alliance,passenger,2,,139,59,21,0,0,0,,,"https://en.wikipedia.org/wiki/Thai_Airways_International_fleet (wikipedia, as of Feb 2026; likely higher now)",2026-10-16
+carrier:000077,malaysia-airlines,,MH,MAS,Malaysia Airlines,=MAS,Asia-Pacific,oneworld,passenger,2,,124,33,58,0,0,0,,,"https://www.ch-aviation.com/news/168576-malaysia-airlines-to-decide-on-a350-replacement-by-2026 (tracker, 2026; per search summary)",2026-10-16
+carrier:000078,airasia,group:000015,AK,AXM,AirAsia,Malaysia AirAsia|Air Asia,Asia-Pacific,,passenger,2,,108,0,108,0,0,0,,,"https://en.wikipedia.org/wiki/AirAsia (wikipedia, as of Jul 2026; AK only, 3 freighters excluded)",2026-10-16
+carrier:000079,thai-airasia,group:000015,FD,AIQ,Thai AirAsia,,Asia-Pacific,,passenger,3,,60,0,60,0,0,1,,,,
+carrier:000080,indonesia-airasia,group:000015,QZ,AWQ,Indonesia AirAsia,,Asia-Pacific,,passenger,4,,25,0,25,0,0,1,,,,
+carrier:000081,philippines-airasia,group:000015,Z2,APG,Philippines AirAsia,,Asia-Pacific,,passenger,4,,20,0,20,0,0,1,,,,
+carrier:000082,airasia-x,group:000015,D7,XAX,AirAsia X,Air Asia X,Asia-Pacific,,passenger,4,,21,8,5,0,0,1,,,,
+carrier:000083,vietnam-airlines,,VN,HVN,Vietnam Airlines,,Asia-Pacific,SkyTeam,passenger,2,,119,22,75,0,0,0,,,,
+carrier:000084,vietjet,,VJ,VJC,VietJet Air,Vietjet,Asia-Pacific,,passenger,2,,115,8,99,0,0,0,,,"https://vietnamnet.vn/en/vietnam-s-aircraft-fleet-hits-record-258-as-airlines-expand-2558666.html (CAAV data, as of 2026-09-22; Vietnam-registered only)",2026-10-16
+carrier:000085,garuda-indonesia,,GA,GIA,Garuda Indonesia,Garuda,Asia-Pacific,SkyTeam,passenger,3,,61,8,45,0,0,1,,,,
+carrier:000086,lion-air,,JT,LNI,Lion Air,,Asia-Pacific,,passenger,2,,104,12,80,0,0,0,,,"https://en.wikipedia.org/wiki/Lion_Air (wikipedia, as of Feb 2026; per-type rows sum 92 vs stated 99, unexplained gap)",2026-10-16
+carrier:000087,philippine-airlines,,PR,PAL,Philippine Airlines,=PAL,Asia-Pacific,,passenger,3,,70,15,40,0,0,1,,,,
+carrier:000088,cebu-pacific,,5J,CEB,Cebu Pacific,Cebu Air,Asia-Pacific,,passenger,3,,96,14,68,0,0,0,,,"https://en.wikipedia.org/wiki/Cebu_Pacific (wikipedia, as of Oct 2026; turboprops sit under Cebgo, not counted)",2026-10-16
+carrier:000089,virgin-australia,,VA,VOZ,Virgin Australia,,Asia-Pacific,,passenger,3,,85,0,80,10,0,0,,,,
+carrier:000090,air-new-zealand,,NZ,ANZ,Air New Zealand,,Asia-Pacific,Star Alliance,passenger,2,,112,24,37,54,0,0,,,"https://en.wikipedia.org/wiki/Air_New_Zealand (wikipedia, as of Sep 2025; regional = Air NZ Link ATR72 31 + Q300 23)",2026-10-16
+carrier:000091,indigo,,6E,IGO,IndiGo,InterGlobe Aviation,Asia-Pacific,,passenger,1,,402.5,0,380,45,0,0,,,,
+carrier:000092,air-india,group:000016,AI,AIC,Air India,,Asia-Pacific,Star Alliance,passenger,1,,247,60,127,0,0,0,,,"https://en.wikipedia.org/wiki/Air_India_fleet (wikipedia, as of Oct 2025; includes ex-Vistara, narrowbody derived as total 187 minus widebody)",2026-10-16
+carrier:000093,air-india-express,group:000016,IX,AXB,Air India Express,,Asia-Pacific,,passenger,2,,105,0,105,0,0,0,,,"https://en.wikipedia.org/wiki/Air_India_Express (wikipedia, as of Aug 2026)",2026-10-16
+carrier:000094,spicejet,,SG,SEJ,SpiceJet,,Asia-Pacific,,passenger,4,,39,0,27,24,0,0,,,"https://en.wikipedia.org/wiki/SpiceJet (wikipedia, as of Jul 2026; 3 freighter 737-700 excluded)",2026-10-16
+carrier:000095,akasa-air,,QP,AKJ,Akasa Air,,Asia-Pacific,,passenger,4,,28,0,28,0,0,0,,,,
+carrier:000096,pakistan-international-airlines,,PK,PIA,Pakistan International Airlines,=PIA,Asia-Pacific,,passenger,4,,35,5,25,0,0,1,,,,
+carrier:000097,srilankan-airlines,,UL,ALK,SriLankan Airlines,Sri Lankan Airlines,Asia-Pacific,oneworld,passenger,4,,31,8,15,0,0,1,,,,
+carrier:000098,air-astana,,KC,KZR,Air Astana,,Asia-Pacific,,passenger,4,,38,3,32,0,0,0,,,"https://en.wikipedia.org/wiki/Air_Astana (wikipedia, as of Jul 2026; FlyArystan excluded)",2026-10-16
+carrier:000099,emirates,,EK,UAE,Emirates,Emirates Airline|Emirates Airlines|Emirates SkyCargo,Middle East & Gulf,,mixed,1,,510,255,0,0,0,0,,,,
+carrier:000100,qatar-airways,,QR,QTR,Qatar Airways,Qatar Airways Cargo,Middle East & Gulf,oneworld,mixed,1,,385,150,85,0,0,0,,,,
+carrier:000101,etihad-airways,,EY,ETD,Etihad Airways,Etihad,Middle East & Gulf,,mixed,2,,168,68,32,0,0,0,,,,
+carrier:000102,flydubai,,FZ,FDB,flydubai,fly dubai,Middle East & Gulf,,passenger,3,,85,0,85,0,0,0,,,,
+carrier:000103,air-arabia,,G9,ABY,Air Arabia,,Middle East & Gulf,,passenger,3,,85,0,85,0,0,0,,,,
+carrier:000104,saudia,group:000017,SV,SVA,Saudia,Saudi Arabian Airlines,Middle East & Gulf,SkyTeam,passenger,1,,242,89,64,0,0,0,,,"https://en.wikipedia.org/wiki/Saudia (wikipedia, as of Sep 2025; passenger fleet, flyadeal and freighters excluded)",2026-10-16
+carrier:000105,flyadeal,group:000017,F3,FAD,flyadeal,,Middle East & Gulf,,passenger,4,,40,0,40,0,0,0,,,,
+carrier:000106,flynas,,XY,KNE,flynas,,Middle East & Gulf,,passenger,3,,63,4,55,0,0,0,,,,
+carrier:000107,riyadh-air,,,,Riyadh Air,,Middle East & Gulf,,passenger,4,,0,0,0,0,0,1,,,,
+carrier:000108,gulf-air,,GF,GFA,Gulf Air,,Middle East & Gulf,,passenger,3,,57,10,37,0,0,0,,,"https://en.wikipedia.org/wiki/Gulf_Air (wikipedia, as of Jan 2026)",2026-10-16
+carrier:000109,oman-air,,WY,OMA,Oman Air,,Middle East & Gulf,,passenger,4,,37,9,19,0,0,0,,,"https://en.wikipedia.org/wiki/Oman_Air (wikipedia, as of Nov 2025; per-type rows sum 28 vs stated 33; tier 4 either way)",2026-10-16
+carrier:000110,kuwait-airways,,KU,KAC,Kuwait Airways,,Middle East & Gulf,,passenger,4,,38,12,14,0,0,0,,,,
+carrier:000111,royal-jordanian,,RJ,RJA,Royal Jordanian,,Middle East & Gulf,oneworld,passenger,4,,27,3,18,6,0,0,,,,
+carrier:000112,middle-east-airlines,,ME,MEA,Middle East Airlines,=MEA,Middle East & Gulf,SkyTeam,passenger,4,,24,4,16,0,0,0,,,,
+carrier:000113,el-al,,LY,ELY,El Al,El Al Israel Airlines,Middle East & Gulf,,passenger,3,,60,15,30,0,0,0,,,,
+carrier:000114,american-airlines,,AA,AAL,American Airlines,American Airlines Group,Americas,oneworld,passenger,1,,1069,107,855,0,0,0,,,,
+carrier:000115,delta-air-lines,,DL,DAL,Delta Air Lines,Delta,Americas,SkyTeam,passenger,1,,1155,165,825,0,0,0,,,,
+carrier:000116,united-airlines,,UA,UAL,United Airlines,United Air Lines|United Airlines Holdings,Americas,Star Alliance,passenger,1,,1210,210,790,0,0,0,,,,
+carrier:000117,southwest-airlines,,WN,SWA,Southwest Airlines,Southwest,Americas,,passenger,1,,800,0,800,0,0,0,,,,
+carrier:000118,jetblue,,B6,JBU,JetBlue,JetBlue Airways,Americas,,passenger,1,,262.5,0,235,55,0,0,,,,
+carrier:000119,alaska-airlines,group:000018,AS,ASA,Alaska Airlines,,Americas,oneworld,passenger,1,,259,5,249,0,0,0,,,"https://news.alaskaair.com/fleet/ (airline, as of Jul 2026; mainline passenger only, 5 freighters and Hawaiian/Horizon types excluded)",2026-10-16
+carrier:000120,hawaiian-airlines,group:000018,HA,HAL,Hawaiian Airlines,,Americas,,passenger,3,,85,24,37,0,0,0,,,"https://en.wikipedia.org/wiki/Hawaiian_Airlines (wikipedia, as of Mar 2026; passenger only, 10 A330P2F freighters excluded)",2026-10-16
+carrier:000121,horizon-air,group:000018,QX,QXE,Horizon Air,,Americas,oneworld,passenger,4,,30,0,0,60,1,1,,,,
+carrier:000122,spirit-airlines,,NK,NKS,Spirit Airlines,,Americas,,passenger,4,,0,0,0,0,0,1,,,"https://en.wikipedia.org/wiki/Spirit_Airlines (wikipedia, as of 2026-05-02; page states operations ceased and liquidation began; last fleet ~131 A320-family)",2026-10-16
+carrier:000123,frontier-airlines,,F9,FFT,Frontier Airlines,,Americas,,passenger,2,,160,0,160,0,0,0,,,,
+carrier:000124,allegiant-air,,G4,AAY,Allegiant Air,Allegiant,Americas,,passenger,2,,120,0,120,0,0,0,,,,
+carrier:000125,sun-country-airlines,,SY,SCX,Sun Country Airlines,Sun Country,Americas,,mixed,4,,45,0,45,0,0,1,,,unverified 2026-10-16: found 66 incl. 20 cargo 737BCF but per-type split low confidence; Allegiant acquisition announced 2026-01-11,
+carrier:000126,skywest-airlines,,OO,SKW,SkyWest Airlines,SkyWest,Americas,,passenger,2,,240,0,0,480,1,1,,,,
+carrier:000127,republic-airways,,YX,RPA,Republic Airways,Republic Airline,Americas,,passenger,2,,155.5,0,0,311,1,0,,,"https://www.barchart.com/story/news/555273/republic-airways-holdings-inc-announces-q4-and-full-year-2025-financial-results (airline results, as of 2025-12-31; after Mesa merger)",2026-10-16
+carrier:000128,air-canada,,AC,ACA,Air Canada,Air Canada Rouge,Americas,Star Alliance,passenger,1,,285,75,135,0,0,0,,,,
+carrier:000129,jazz-aviation,,QK,JZA,Jazz Aviation,,Americas,Star Alliance,passenger,3,,52,0,0,104,1,0,,,"https://en.wikipedia.org/wiki/Jazz_Aviation (wikipedia, as of 2026-03-24; Transport Canada register)",2026-10-16
+carrier:000130,westjet,,WS,WJA,WestJet,WestJet Encore,Americas,,passenger,2,,186.5,7,155,35,0,0,,,"https://en.wikipedia.org/wiki/WestJet (wikipedia, as of 2026-09-10; regional = Encore Q400 in service)",2026-10-16
+carrier:000131,porter-airlines,,PD,POE,Porter Airlines,Porter,Americas,,passenger,4,,35,0,0,70,0,1,,,,
+carrier:000132,flair-airlines,,F8,FLE,Flair Airlines,,Americas,,passenger,4,,20,0,20,0,0,0,,,,
+carrier:000133,aeromexico,,AM,AMX,Aeroméxico,Aeromexico,Americas,SkyTeam,passenger,2,,144,22,100,0,0,0,,,,
+carrier:000134,volaris,,Y4,VOI,Volaris,,Americas,,passenger,2,,140,0,140,0,0,0,,,,
+carrier:000135,viva-aerobus,,VB,VIV,Viva Aerobus,VivaAerobus,Americas,,passenger,3,,80,0,80,0,0,0,,,,
+carrier:000136,latam-airlines,,LA,LAN,LATAM Airlines,LATAM,Americas,oneworld,passenger,1,,305,45,215,0,0,0,,,,
+carrier:000137,avianca,group:000019,AV,AVA,Avianca,,Americas,Star Alliance,passenger,2,,144,12,120,0,0,0,,,,
+carrier:000138,gol,group:000019,G3,GLO,GOL Linhas Aéreas,GOL|Gol Airlines,Americas,,passenger,2,,130,0,130,0,0,0,,,,
+carrier:000139,azul,,AD,AZU,Azul,Azul Brazilian Airlines,Americas,,passenger,2,,141.5,12,75,85,0,0,,,,
+carrier:000140,copa-airlines,,CM,CMP,Copa Airlines,Copa,Americas,Star Alliance,passenger,2,,105,0,105,0,0,0,,,"https://en.wikipedia.org/wiki/Copa_Airlines (wikipedia, as of Jun 2025; passenger 737s, cargo 737-800BCF excluded)",2026-10-16
+carrier:000141,sky-airline,,H2,SKU,Sky Airline,,Americas,,passenger,4,,25,0,25,0,0,1,,,,
+carrier:000142,jetsmart,,JA,JAT,JetSMART,JetSmart,Americas,,passenger,4,,35,0,35,0,0,1,,,,
+carrier:000143,aerolineas-argentinas,,AR,ARG,Aerolíneas Argentinas,Aerolineas Argentinas,Americas,SkyTeam,passenger,3,,82,6,70,0,0,0,,,,
+carrier:000144,fedex-express,,FX,FDX,FedEx Express,FedEx|Federal Express,Americas,,cargo,,1,840,330,120,240,0,1,,,,
+carrier:000145,ups-airlines,,5X,UPS,UPS Airlines,UPS,Americas,,cargo,,1,435,180,75,0,0,1,,,,
+carrier:000146,atlas-air,,5Y,GTI,Atlas Air,,Americas,,cargo,,1,220,110,0,0,0,1,,,,
+carrier:000147,cargolux,,CV,CLX,Cargolux,,Europe,,cargo,,3,60,30,0,0,0,1,,,,
+carrier:000148,sf-airlines,,O3,CSS,SF Airlines,,Asia-Pacific,,cargo,,3,90,15,60,0,0,1,,,,
+carrier:000149,ethiopian-airlines,,ET,ETH,Ethiopian Airlines,Ethiopian,Africa,Star Alliance,mixed,1,,236,83,55,30,0,0,,,"https://en.wikipedia.org/wiki/Ethiopian_Airlines_fleet (wikipedia, as of Nov 2025; widebody incl. 12 777F + 4 767F, narrowbody incl. 4 737-800SF; passenger-only would also be tier 1)",2026-10-16
+carrier:000150,egyptair,,MS,MSR,EgyptAir,Egypt Air,Africa,Star Alliance,mixed,3,,94,23,48,0,0,0,,,"https://en.wikipedia.org/wiki/EgyptAir (wikipedia, as of Jul 2026; passenger only)",2026-10-16
+carrier:000151,royal-air-maroc,,AT,RAM,Royal Air Maroc,,Africa,oneworld,passenger,3,,62.5,10,40,5,0,1,,,,
+carrier:000152,south-african-airways,,SA,SAA,South African Airways,SAA,Africa,Star Alliance,passenger,4,,18,5,8,0,0,1,,,,
+carrier:000153,kenya-airways,,KQ,KQA,Kenya Airways,,Africa,SkyTeam,passenger,4,,38,9,15,10,0,1,,,,
+carrier:000154,air-algerie,,AH,DAH,Air Algérie,Air Algerie,Africa,,passenger,3,,59,10,35,8,0,1,,,,
+carrier:000155,rwandair,,WB,RWD,RwandAir,,Africa,,passenger,4,,10,0,10,0,0,1,,,,
+carrier:000156,airlink,,4Z,LNK,Airlink,,Africa,,passenger,4,,25,0,0,50,0,1,,,,
+carrier:000157,flysafair,,FA,SFR,FlySafair,,Africa,,passenger,4,,20,0,20,0,0,1,,,,
+carrier:000158,air-peace,,P4,APK,Air Peace,,Africa,,passenger,4,,28,2,20,8,0,1,,,,
+carrier:000159,tunisair,,TU,TAR,Tunisair,,Africa,Star Alliance,passenger,4,,20,0,20,0,0,1,,,,
+carrier:000160,air-mauritius,,MK,MAU,Air Mauritius,,Africa,,passenger,4,,12.5,5,0,5,0,1,,,,
+carrier:000161,envoy-air,,MQ,ENY,Envoy Air,Envoy,Americas,oneworld,passenger,3,,75,0,0,150,1,0,,,,
+carrier:000162,psa-airlines,,OH,JIA,PSA Airlines,=PSA,Americas,oneworld,passenger,3,,65,0,0,130,1,0,,,,
+carrier:000163,endeavor-air,,9E,EDV,Endeavor Air,Endeavor,Americas,SkyTeam,passenger,3,,70,0,0,140,1,0,,,,

@@ -1,5 +1,6 @@
 """SQLite-backed governance and measurement for briefing sources."""
 
+import csv
 import json
 import os
 import re
@@ -13,6 +14,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CONFIG_PATH = BASE_DIR / "config" / "source_registry.json"
 MIGRATION_PATH = BASE_DIR / "migrations" / "001_source_registry.sql"
 DEFAULT_DATABASE_PATH = BASE_DIR / "data" / "source_registry.sqlite3"
+SOURCES_CSV_PATH = BASE_DIR / "config" / "sources.csv"
+SOURCES_CSV_COLUMNS = (
+    "name", "url", "feed_url", "feed_type", "region", "tier",
+    "license_status", "language", "active", "notes",
+)
 
 TIER_BY_SOURCE_TYPE = {
     "airline_ir": 1,
@@ -118,39 +124,106 @@ def source_to_registry_record(source, config=None):
     }
 
 
-def migrate_sources(source_records, target_path=None):
-    """Apply the schema and idempotently upsert the currently configured sources."""
-    target = database_path(target_path)
+UPSERT_SOURCE_SQL = """
+    INSERT INTO sources (
+        name, url, feed_url, feed_type, region, tier, reliability_weight,
+        license_status, language, active, added_at, notes
+    ) VALUES (
+        :name, :url, :feed_url, :feed_type, :region, :tier, :reliability_weight,
+        :license_status, :language, :active, :added_at, :notes
+    )
+    ON CONFLICT(name, url) DO UPDATE SET
+        feed_url = excluded.feed_url,
+        feed_type = excluded.feed_type,
+        region = excluded.region,
+        tier = excluded.tier,
+        reliability_weight = excluded.reliability_weight,
+        license_status = excluded.license_status,
+        language = excluded.language,
+        active = excluded.active,
+        notes = excluded.notes
+"""
+
+
+def _write_source_records(records, target):
     target.parent.mkdir(parents=True, exist_ok=True)
-    config = load_registry_config()
     with sqlite3.connect(target) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(MIGRATION_PATH.read_text(encoding="utf-8"))
+        for record in records:
+            connection.execute(UPSERT_SOURCE_SQL, record)
+    return target
+
+
+def migrate_sources(source_records, target_path=None):
+    """Apply the schema and idempotently upsert the currently configured sources."""
+    config = load_registry_config()
+    records = [source_to_registry_record(source, config) for source in source_records]
+    return _write_source_records(records, database_path(target_path))
+
+
+def load_sources_csv(csv_path=None, config=None):
+    """Read config/sources.csv into registry records; invalid rows fail loudly."""
+    path = Path(csv_path or SOURCES_CSV_PATH)
+    registry_config = config or load_registry_config()
+    with path.open(encoding="utf-8-sig", newline="") as csv_file:
+        reader = csv.DictReader(csv_file)
+        missing = [column for column in SOURCES_CSV_COLUMNS if column not in (reader.fieldnames or [])]
+        if missing:
+            raise ValueError(f"{path.name}: missing columns {missing}")
+        rows = list(reader)
+
+    added_at = datetime.now(timezone.utc).isoformat()
+    records = []
+    for line_number, row in enumerate(rows, start=2):
+        label = f"{path.name} line {line_number} ({row.get('name')})"
+        if row["license_status"] not in registry_config["license_statuses"]:
+            raise ValueError(f"{label}: invalid license_status {row['license_status']!r}")
+        if row["region"] not in registry_config["regions"]:
+            raise ValueError(f"{label}: invalid region {row['region']!r}")
+        if row["active"] not in {"0", "1"}:
+            raise ValueError(f"{label}: active must be 0 or 1")
+        if row["license_status"] == "paid" and row["active"] == "1":
+            raise ValueError(f"{label}: paid sources cannot be active without a licence")
+        try:
+            json.loads(row["notes"] or "{}")
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"{label}: notes is not valid JSON") from exc
+        tier = int(row["tier"])
+        records.append({
+            "name": row["name"],
+            "url": row["url"],
+            "feed_url": row["feed_url"] or None,
+            "feed_type": row["feed_type"],
+            "region": row["region"],
+            "tier": tier,
+            "reliability_weight": reliability_weight_for_tier(tier, registry_config),
+            "license_status": row["license_status"],
+            "language": row["language"],
+            "active": int(row["active"]),
+            "added_at": added_at,
+            "notes": row["notes"] or "{}",
+        })
+    return records
+
+
+def sync_sources_from_csv(csv_path=None, target_path=None):
+    """Build/refresh the SQLite registry from config/sources.csv (the source of truth)."""
+    records = load_sources_csv(csv_path)
+    return _write_source_records(records, database_path(target_path))
+
+
+def export_sources_csv(source_records, csv_path=None):
+    """One-off helper: write runtime source definitions as the CSV registry."""
+    config = load_registry_config()
+    path = Path(csv_path or SOURCES_CSV_PATH)
+    with path.open("w", encoding="utf-8", newline="") as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=SOURCES_CSV_COLUMNS)
+        writer.writeheader()
         for source in source_records:
             record = source_to_registry_record(source, config)
-            connection.execute(
-                """
-                INSERT INTO sources (
-                    name, url, feed_url, feed_type, region, tier, reliability_weight,
-                    license_status, language, active, added_at, notes
-                ) VALUES (
-                    :name, :url, :feed_url, :feed_type, :region, :tier, :reliability_weight,
-                    :license_status, :language, :active, :added_at, :notes
-                )
-                ON CONFLICT(name, url) DO UPDATE SET
-                    feed_url = excluded.feed_url,
-                    feed_type = excluded.feed_type,
-                    region = excluded.region,
-                    tier = excluded.tier,
-                    reliability_weight = excluded.reliability_weight,
-                    license_status = excluded.license_status,
-                    language = excluded.language,
-                    active = excluded.active,
-                    notes = excluded.notes
-                """,
-                record,
-            )
-    return target
+            writer.writerow({column: record[column] for column in SOURCES_CSV_COLUMNS})
+    return path
 
 
 def load_active_sources(source_records, target_path=None):

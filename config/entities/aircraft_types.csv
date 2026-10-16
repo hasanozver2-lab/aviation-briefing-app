@@ -1,0 +1,70 @@
+entity_id,slug,code,family,manufacturer,aliases
+aircraft:000001,a220,A220,A220,Airbus,Airbus A220|A220 family|CSeries|Bombardier CSeries
+aircraft:000002,a220-100,BCS1,A220,Airbus,A220-100|Airbus A220-100|CS100
+aircraft:000003,a220-300,BCS3,A220,Airbus,A220-300|Airbus A220-300|CS300
+aircraft:000004,a320-family,A320FAM,A320 family,Airbus,A320 family|Airbus A320 family|A320ceo family|A320neo family|A320 series
+aircraft:000005,a319,A319,A320 family,Airbus,Airbus A319|A319ceo
+aircraft:000006,a320,A320,A320 family,Airbus,Airbus A320|A320ceo|A320-200
+aircraft:000007,a321,A321,A320 family,Airbus,Airbus A321|A321ceo|A321-200
+aircraft:000008,a319neo,A19N,A320 family,Airbus,A319neo|Airbus A319neo
+aircraft:000009,a320neo,A20N,A320 family,Airbus,A320neo|Airbus A320neo
+aircraft:000010,a321neo,A21N,A320 family,Airbus,A321neo|Airbus A321neo
+aircraft:000011,a321xlr,A321XLR,A320 family,Airbus,A321XLR|Airbus A321XLR
+aircraft:000012,a330,A330,A330,Airbus,Airbus A330|A330 family|A330ceo
+aircraft:000013,a330-200,A332,A330,Airbus,A330-200|Airbus A330-200|A332
+aircraft:000014,a330-300,A333,A330,Airbus,A330-300|Airbus A330-300|A333
+aircraft:000015,a330-800,A338,A330,Airbus,A330-800|Airbus A330-800|A330-800neo
+aircraft:000016,a330-900,A339,A330,Airbus,A330-900|Airbus A330-900|A330neo|A330-900neo
+aircraft:000017,a340,A340,A340,Airbus,Airbus A340|A340-300|A340-600
+aircraft:000018,a350,A350,A350,Airbus,Airbus A350|A350 XWB|A350 family
+aircraft:000019,a350-900,A359,A350,Airbus,A350-900|Airbus A350-900|A359
+aircraft:000020,a350-1000,A35K,A350,Airbus,A350-1000|Airbus A350-1000|A35K
+aircraft:000021,a350f,A350F,A350,Airbus,A350F|A350 Freighter|Airbus A350F
+aircraft:000022,a380,A388,A380,Airbus,A380|Airbus A380|A380-800
+aircraft:000023,b737,B737FAM,737,Boeing,Boeing 737|737 family|737NG|737 Next Generation|737 Classic
+aircraft:000024,b737-700,B737,737,Boeing,737-700|Boeing 737-700|B737-700|737-700ER
+aircraft:000025,b737-800,B738,737,Boeing,737-800|Boeing 737-800|B737-800|737-800NG
+aircraft:000026,b737-900,B739,737,Boeing,737-900|737-900ER|Boeing 737-900
+aircraft:000027,b737-max,B737MAX,737 MAX,Boeing,737 MAX|Boeing 737 MAX|737MAX|B737 MAX
+aircraft:000028,b737-max-7,B37M,737 MAX,Boeing,737 MAX 7|737-7|Boeing 737 MAX 7
+aircraft:000029,b737-max-8,B38M,737 MAX,Boeing,737 MAX 8|737-8|Boeing 737 MAX 8
+aircraft:000030,b737-max-9,B39M,737 MAX,Boeing,737 MAX 9|737-9|Boeing 737 MAX 9
+aircraft:000031,b737-max-10,B3XM,737 MAX,Boeing,737 MAX 10|737-10|Boeing 737 MAX 10
+aircraft:000032,b747,B747,747,Boeing,Boeing 747|B747
+aircraft:000033,b747-400,B744,747,Boeing,747-400|Boeing 747-400|747-400F
+aircraft:000034,b747-8,B748,747,Boeing,747-8|747-8F|Boeing 747-8|747-8I|747-8 Intercontinental
+aircraft:000035,b757,B757,757,Boeing,Boeing 757|B757
+aircraft:000036,b757-200,B752,757,Boeing,757-200|Boeing 757-200
+aircraft:000037,b757-300,B753,757,Boeing,757-300|Boeing 757-300
+aircraft:000038,b767,B767,767,Boeing,Boeing 767|B767
+aircraft:000039,b767-300,B763,767,Boeing,767-300|767-300ER|767-300F|Boeing 767-300
+aircraft:000040,b767-400,B764,767,Boeing,767-400|767-400ER|Boeing 767-400
+aircraft:000041,b777,B777,777,Boeing,Boeing 777|B777
+aircraft:000042,b777-200,B772,777,Boeing,777-200|777-200ER|777-200LR|Boeing 777-200
+aircraft:000043,b777-300er,B77W,777,Boeing,777-300ER|Boeing 777-300ER|777-300
+aircraft:000044,b777f,B77F,777,Boeing,777F|777 Freighter|Boeing 777F|777-200F
+aircraft:000045,b777-8,B778,777X,Boeing,777-8|777-8F|Boeing 777-8
+aircraft:000046,b777-9,B779,777X,Boeing,777-9|777X|Boeing 777-9|Boeing 777X
+aircraft:000047,b787,B787,787,Boeing,Boeing 787|B787|Dreamliner|787 Dreamliner
+aircraft:000048,b787-8,B788,787,Boeing,787-8|Boeing 787-8
+aircraft:000049,b787-9,B789,787,Boeing,787-9|Boeing 787-9
+aircraft:000050,b787-10,B78X,787,Boeing,787-10|Boeing 787-10
+aircraft:000051,md-11,MD11,MD-11,McDonnell Douglas,MD-11|MD11|McDonnell Douglas MD-11
+aircraft:000052,e-jet,EJET,E-Jet,Embraer,E-Jet|E-Jets|Embraer E-Jet|Embraer E-Jets
+aircraft:000053,e170,E170,E-Jet,Embraer,E170|Embraer 170|ERJ-170|E-170
+aircraft:000054,e175,E75L,E-Jet,Embraer,E175|Embraer 175|E-175
+aircraft:000055,e190,E190,E-Jet,Embraer,E190|Embraer 190|E-190
+aircraft:000056,e195,E195,E-Jet,Embraer,E195|Embraer 195|E-195
+aircraft:000057,e2,E2FAM,E-Jet E2,Embraer,E-Jet E2|Embraer E2|E2 family
+aircraft:000058,e190-e2,E290,E-Jet E2,Embraer,E190-E2|E190 E2|Embraer E190-E2
+aircraft:000059,e195-e2,E295,E-Jet E2,Embraer,E195-E2|E195 E2|Embraer E195-E2
+aircraft:000060,atr-72,AT76,ATR,ATR,ATR 72|ATR72|ATR 72-600|ATR72-600|ATR-72
+aircraft:000061,atr-42,AT46,ATR,ATR,ATR 42|ATR42|ATR 42-600|ATR-42
+aircraft:000062,dash-8-400,DH8D,Dash 8,De Havilland Canada,Dash 8|Dash 8-400|Q400|DHC-8-400|De Havilland Canada Dash 8
+aircraft:000063,crj-700,CRJ7,CRJ,Bombardier,CRJ700|CRJ-700|Bombardier CRJ700
+aircraft:000064,crj-900,CRJ9,CRJ,Bombardier,CRJ900|CRJ-900|Bombardier CRJ900
+aircraft:000065,crj-1000,CRJX,CRJ,Bombardier,CRJ1000|CRJ-1000|Bombardier CRJ1000
+aircraft:000066,c919,C919,C919,COMAC,COMAC C919
+aircraft:000067,arj21,ARJ21,ARJ21,COMAC,COMAC ARJ21
+aircraft:000068,ssj100,SU95,Superjet,Sukhoi,Superjet 100|SSJ100|SSJ-100|Sukhoi Superjet
+aircraft:000069,mc-21,MC21,MC-21,Irkut,MC-21|Irkut MC-21
