@@ -223,6 +223,19 @@ def is_fx_series(series_id):
     return str(series_id).startswith("fx_usd_")
 
 
+def apply_display_settings(market):
+    """Read-time view of a stored market panel: without display_fx, no fx_usd_* items and no fx events.
+
+    Archives written before the switch (or with it on) still hold FX rows; they are hidden here, not rewritten.
+    """
+    if not isinstance(market, dict) or display_fx():
+        return market
+    visible = dict(market)
+    visible["items"] = [item for item in market.get("items", []) if not is_fx_series(item.get("series_id"))]
+    visible["events"] = [event for event in market.get("events", []) if event.get("event_type") != "fx_currency"]
+    return visible
+
+
 def provider_label(provider):
     return load_market_config()["providers"][provider]
 

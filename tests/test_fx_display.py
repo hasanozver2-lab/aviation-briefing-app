@@ -73,3 +73,16 @@ def test_fx_threshold_events_stay_in_the_database_but_not_in_the_panel(tmp_path,
     monkeypatch.setattr(market_data, "display_fx", lambda: True)
     shown = market_data.refresh_market_data(database, end_date=TODAY)
     assert any(event["event_type"] == "fx_currency" for event in shown["events"])
+
+
+def test_the_api_hides_fx_rows_that_an_older_archive_still_holds(monkeypatch):
+    from api import _engine, briefing_store, story_lifecycle
+    stored_market = {"status": "ok", "items": [{"series_id": "brent_spot"}, {"series_id": "fx_usd_try"}, {"series_id": "fx_usd_eur"}],
+                     "events": [{"event_type": "fx_currency"}, {"event_type": "fuel_energy"}]}
+    day = {"date": "2026-10-16", "status": "ok", "stories": [], "market": stored_market, "last_pipeline_run_at": "2026-10-16T08:00:00+00:00"}
+    monkeypatch.setattr(briefing_store, "read_json", lambda path: json.loads(json.dumps(day)) if path == briefing_store.latest_path() else None)
+    monkeypatch.setattr(story_lifecycle, "utc_now", lambda: story_lifecycle.parse_iso("2026-10-16T09:00:00+00:00"))
+    served = _engine.get_ready_briefing("daily")["market"]
+    assert [item["series_id"] for item in served["items"]] == ["brent_spot"] and [e["event_type"] for e in served["events"]] == ["fuel_energy"]
+    monkeypatch.setattr(market_data, "display_fx", lambda: True)
+    assert len(_engine.get_ready_briefing("daily")["market"]["items"]) == 3

@@ -1060,6 +1060,7 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         if mode == "hourly" and snapshot["date"] == today:
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode
+    snapshot["market"] = market_data.apply_display_settings(snapshot.get("market"))
     if store_unreadable:
         snapshot["status"] = "stale"
         snapshot["warning"] = "The live briefing data could not be read; the last committed snapshot is shown."

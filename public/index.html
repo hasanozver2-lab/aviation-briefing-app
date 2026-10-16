@@ -501,6 +501,7 @@
       const i = state.order.findIndex(s => storyKey(s) === state.articleId);
       if (i < 0) { closeArticle(); return; }
       const s = state.order[i], next = state.order[i + 1];
+      const lang = langOf(s);
       const src = s.original_source || {};
       const type = SOURCE_TYPES[src.source_type] || "Verified source";
       const analysis = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
@@ -515,7 +516,6 @@
       $("art-pos").textContent = `${i + 1} of ${state.order.length}`;
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
-      const lang = langOf(s);
       $("art-body").innerHTML = `
         <div class="kicker">${tagsHtml(s, true)}${isYesterday(s) ? "<span>Yesterday</span>" : ""}</div>
         <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
