@@ -80,6 +80,33 @@ Yerleşik resmi kaynak seti Lufthansa, Delta, Turkish Airlines, Emirates, Qatar 
 
 Pegasus Press Room için tarih kontrollü HTML adaptörü de aktiftir; yayın tarihi detay sayfasından doğrulanamayan duyurular akışa alınmaz. Bu kural özellikle saatlik radarın eski IR/duyurularla kirlenmesini önler.
 
+### 4.1 Kaynak sicili, lisans ve performans ölçümü
+
+Aktif kaynaklar `data/source_registry.sqlite3` içindeki SQLite sicilinde yönetilir. Şema ve idempotent migration dosyası [`migrations/001_source_registry.sql`](migrations/001_source_registry.sql) içindedir; güvenilirlik ağırlıkları yalnızca [`config/source_registry.json`](config/source_registry.json) üzerinden okunur.
+
+| Tier | Kaynak türü | Başlangıç güvenilirlik ağırlığı |
+| --- | --- | ---: |
+| 1 | Resmî havayolu, havalimanı, üretici, regülatör, EUROCONTROL, ICAO, IATA | 1.0 |
+| 2 | Sektör uzman yayını | 0.8 |
+| 3 | Büyük haber ajansı / finans medyası | 0.7 |
+| 4 | Yüksek hacimli genel veya bölgesel havacılık medyası | 0.4 |
+
+Sicili ve bölge × tier raporunu yeniden üretmek için:
+
+```powershell
+q:\DEV\.venv\Scripts\python.exe scripts\source_registry_report.py
+```
+
+Onaysız adaylar [`config/source_candidates.json`](config/source_candidates.json) içinde her zaman `active: false` olarak tutulur. Erişim testini çalıştırmak adayları aktifleştirmez:
+
+```powershell
+q:\DEV\.venv\Scripts\python.exe scripts\test_source_candidates.py
+```
+
+`license_status = "paid"` olan bir RSS/API kaynağında yalnızca başlık, yayın zamanı ve URL işlenir; gövde metni saklanmaz, Gemini'ye gönderilmez veya arayüzde yayınlanmaz.
+
+`source_stats` günlük toplama sonuçlarından kaynak katkısı, kümelerdeki madde sayısı, briefing'e giren kümeler ve ilk-haberleyen tahminini tutar. İlk-haberleyen metriği sadece bu uygulamanın topladığı kaynaklar arasındaki muhafazakâr başlık benzerliği karşılaştırmasıdır; pazar genelinde münhasır ilk yayın iddiası değildir. Vercel'in dosya sistemi kalıcı olmadığından, canlı Vercel ortamında kalıcı istatistik için `SOURCE_REGISTRY_DB_PATH` ile kalıcı disk/DB katmanı sağlanmalıdır; paketlenmiş SQLite dosyası kaynak seçiminde salt-okunur olarak çalışmaya devam eder.
+
 IATA dizinindeki tüm üyeler için kaynak URL'leri tek seferde güvenilir biçimde keşfedilemediği için kayıtlar doğrulanmış feed/API URL'leriyle genişletilir. Böylece özel (halka açık olmayan) havayolları ve RSS yayınlamayan siteler için yanlış/uydurma kaynak gösterilmez.
 
 ### 5. Tek Tıkla Paylaş / E-Posta Kopyala

@@ -1,0 +1,25 @@
+{
+  "tier_reliability_weights": {
+    "1": 1.0,
+    "2": 0.8,
+    "3": 0.7,
+    "4": 0.4
+  },
+  "regions": [
+    "Africa",
+    "Asia-Pacific",
+    "Europe",
+    "Global",
+    "Latin America",
+    "Middle East",
+    "North America",
+    "Turkey"
+  ],
+  "license_statuses": [
+    "public",
+    "paid",
+    "restricted",
+    "unknown"
+  ],
+  "paid_source_content_policy": "Store and process only title, publication time, and canonical URL. Do not store, summarize, publish, or send body text to the model."
+}

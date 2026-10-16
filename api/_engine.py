@@ -20,6 +20,11 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+try:
+    from . import source_registry
+except ImportError:
+    import source_registry
+
 # Windows cp1254 encoding fix
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
@@ -31,7 +36,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
 VALID_MODES = {"daily", "hourly"}
-SOURCE_POLICY_VERSION = "airline-only-v4"
+SOURCE_POLICY_VERSION = "airline-only-v5"
 RSS_FETCH_TIMEOUT_SECONDS = 10
 HTML_FETCH_TIMEOUT_SECONDS = 3
 HTML_DETAIL_DATE_TIMEOUT_SECONDS = 4
@@ -312,8 +317,8 @@ def is_airline_relevant(title, description="", source=None):
         return True
     return any(term in normalized for term in AIRLINE_RELEVANCE_TERMS)
 
-def get_rss_sources(max_hours=48):
-    """Return the built-in and deployment-configured airline source registry."""
+def get_builtin_source_records(max_hours=48):
+    """Return source definitions before SQLite governance flags are applied."""
     sources = [
         # 1. Turkey / THY and Turkish aviation
         _source_record("HavaHaber", "https://havahaber.com/feed/", "Turkey / THY and Turkish aviation"),
@@ -361,6 +366,11 @@ def get_rss_sources(max_hours=48):
     sources.extend(_configured_source_records())
     return [source for source in sources if source.get("url")]
 
+
+def get_rss_sources(max_hours=48):
+    """Return only the active feeds, decorated with source-governance metadata."""
+    return source_registry.load_active_sources(get_builtin_source_records(max_hours))
+
 def clean_html(raw_html):
     """HTML etiketlerini temizler."""
     if not raw_html:
@@ -396,9 +406,9 @@ def parse_feed_entries(content):
     return []
 
 
-def entry_values(entry):
+def entry_values(entry, include_description=True):
     title = _child_text(entry, {"title"})
-    description = _child_text(entry, {"description", "summary", "content"})
+    description = _child_text(entry, {"description", "summary", "content"}) if include_description else ""
     link = _child_text(entry, {"link"})
     if not link:
         for child in list(entry):
@@ -406,7 +416,7 @@ def entry_values(entry):
                 link = child.attrib["href"].strip()
                 break
     pub_date = _child_text(entry, {"pubdate", "published", "updated", "date", "issued"})
-    return title, link, clean_html(description), pub_date
+    return title, link, clean_html(description) if include_description else "", pub_date
 
 
 def canonicalize_url(value):
@@ -453,9 +463,12 @@ def _fetch_source_articles(source, cutoff, headers):
     """Fetch one source independently so a slow site cannot block the briefing."""
     source_name = source.get("name", "Unknown source")
     is_html_source = source.get("fetch_mode") == "html"
+    is_paid_source = source.get("license_status") == "paid" or source.get("license_required", False)
     timeout = HTML_FETCH_TIMEOUT_SECONDS if is_html_source else RSS_FETCH_TIMEOUT_SECONDS
 
     try:
+        if is_paid_source and is_html_source:
+            return [], "PaidSourceNeedsLicensedFeed"
         ctx = ssl.create_default_context()
         request = urllib.request.Request(source["url"], headers=headers)
         with urllib.request.urlopen(request, context=ctx, timeout=timeout) as response:
@@ -468,10 +481,10 @@ def _fetch_source_articles(source, cutoff, headers):
             if is_html_source:
                 title = item.get("title", "")
                 link = item.get("link", "")
-                description = item.get("description", "")
+                description = ""
                 pub_date = item.get("pub_date", "")
             else:
-                title, link, description, pub_date = entry_values(item)
+                title, link, description, pub_date = entry_values(item, include_description=not is_paid_source)
 
             if not title or not link:
                 continue
@@ -514,6 +527,11 @@ def _fetch_source_articles(source, cutoff, headers):
                 "airline": source.get("airline", ""),
                 "airline_code": source.get("airline_code", ""),
                 "license_required": bool(source.get("license_required", False)),
+                "license_status": source.get("license_status", "public"),
+                "source_id": source.get("source_id"),
+                "region": source.get("region", "Global"),
+                "tier": source.get("tier"),
+                "reliability_weight": source.get("reliability_weight"),
                 "topics": classify_topics(f"{title} {description}"),
                 "pub_date": pub_str,
                 "timestamp": pub_ts,
@@ -791,6 +809,10 @@ def normalize_generated_briefing(briefing, mode, article_metadata=None):
                 "airline": str(source_article.get("airline", source.get("airline", ""))),
                 "topics": source_article.get("topics", source.get("topics", [])),
                 "license_required": bool(source_article.get("license_required", source.get("license_required", False))),
+                "license_status": str(source_article.get("license_status", source.get("license_status", "public"))),
+                "region": str(source_article.get("region", source.get("region", "Global"))),
+                "tier": source_article.get("tier", source.get("tier")),
+                "reliability_weight": source_article.get("reliability_weight", source.get("reliability_weight")),
             },
             "related_news": text_list(raw_story.get("related_news")),
         })
@@ -853,6 +875,10 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
                 "airline": str(article.get("airline", "")),
                 "topics": article.get("topics", []),
                 "license_required": bool(article.get("license_required", False)),
+                "license_status": str(article.get("license_status", "public")),
+                "region": str(article.get("region", "Global")),
+                "tier": article.get("tier"),
+                "reliability_weight": article.get("reliability_weight"),
             },
             "related_news": [],
         })
@@ -887,6 +913,8 @@ def get_briefing(mode="daily", force_refresh=False):
     articles = fetch_rss_items(max_hours=48 if mode == "daily" else 2)
     print(f"{len(articles)} haber maddesi toplandı. Analiz ediliyor...")
     briefing = generate_briefing_with_gemini(articles, mode=mode)
+    if mode == "daily":
+        source_registry.record_source_statistics(articles, briefing)
     
     try:
         with open(cache_path, "w", encoding="utf-8") as f:

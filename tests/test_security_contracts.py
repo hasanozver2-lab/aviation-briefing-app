@@ -1,7 +1,9 @@
 import json
+import sqlite3
 from pathlib import Path
 
 from api import _engine
+from api import source_registry
 from api.briefing import handler as briefing_handler
 from api.refresh import handler as refresh_handler
 from scripts.dev_server import resolve_public_file
@@ -217,3 +219,90 @@ def test_public_refresh_uses_cached_briefing_endpoint_without_html_errors():
         assert "/api/refresh?mode=" not in page
         assert "const cacheBuster = requestLatest" in page
         assert "Invalid API response" in page
+
+
+def test_source_registry_migrates_current_sources_with_configured_tier_weights(tmp_path):
+    database = tmp_path / "source_registry.sqlite3"
+    source_registry.migrate_sources(_engine.get_builtin_source_records(), database)
+
+    with sqlite3.connect(database) as connection:
+        count = connection.execute("SELECT COUNT(*) FROM sources").fetchone()[0]
+        lufthansa = connection.execute(
+            "SELECT tier, reliability_weight, license_status FROM sources WHERE name = 'Lufthansa Group Newsroom'"
+        ).fetchone()
+        flightglobal = connection.execute(
+            "SELECT tier, reliability_weight FROM sources WHERE name = 'FlightGlobal'"
+        ).fetchone()
+        source_stats_exists = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'source_stats'"
+        ).fetchone()
+
+    assert count == 36
+    assert lufthansa == (1, 1.0, "public")
+    assert flightglobal == (2, 0.8)
+    assert source_stats_exists is not None
+
+
+def test_paid_feed_keeps_body_out_of_article_processing(monkeypatch):
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback):
+            return False
+
+        def read(self):
+            return b'''<rss><channel><item>
+                <title>Airline financial result</title>
+                <link>https://example.com/result</link>
+                <description>Licensed body text must never be kept.</description>
+            </item></channel></rss>'''
+
+    monkeypatch.setattr(_engine.urllib.request, "urlopen", lambda *_args, **_kwargs: FakeResponse())
+    articles, error = _engine._fetch_source_articles(
+        {
+            "name": "Licensed source",
+            "url": "https://example.com/feed",
+            "category_hint": "Other areas",
+            "source_type": "mainstream",
+            "license_status": "paid",
+        },
+        _engine.utc_now() - _engine.timedelta(days=1),
+        {},
+    )
+
+    assert error == ""
+    assert articles[0]["description"] == ""
+    assert articles[0]["license_status"] == "paid"
+
+
+def test_source_statistics_tracks_first_reporter_and_weekly_gaps(tmp_path):
+    database = tmp_path / "source_registry.sqlite3"
+    source_registry.migrate_sources([
+        {"name": "Source A", "url": "https://example.com/a", "category_hint": "Other areas"},
+        {"name": "Source B", "url": "https://example.com/b", "category_hint": "Other areas"},
+    ], database)
+    with sqlite3.connect(database) as connection:
+        source_ids = dict(connection.execute("SELECT name, id FROM sources"))
+
+    articles = [
+        {"title": "Airline opens new Istanbul route", "link": "https://example.com/a/route", "timestamp": 10, "source_id": source_ids["Source A"]},
+        {"title": "Airline opens new Istanbul route", "link": "https://example.com/b/route", "timestamp": 20, "source_id": source_ids["Source B"]},
+    ]
+    briefing = {"stories": [{"original_source": {"url": "https://example.com/a/route"}}]}
+
+    assert source_registry.record_source_statistics(articles, briefing, database, report_date="2026-10-16")
+    report = source_registry.weekly_source_report(database, end_date=__import__("datetime").date(2026, 10, 16))
+    fastest = {source["name"]: source for source in report["fastest_sources"]}
+
+    assert fastest["Source A"]["first_to_report_count"] == 1
+    assert fastest["Source A"]["clusters_included_in_brief"] == 1
+    assert {"region": "Africa", "tier": 1} in report["coverage_gaps"]
+
+
+def test_source_candidates_are_never_enabled_by_default():
+    project_dir = Path(__file__).resolve().parents[1]
+    candidates = json.loads((project_dir / "config" / "source_candidates.json").read_text(encoding="utf-8"))["candidates"]
+
+    assert candidates
+    assert all(candidate["active"] is False for candidate in candidates)
