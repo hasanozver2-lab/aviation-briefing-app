@@ -141,7 +141,6 @@
       <div class="mast-top">
         <span id="dateline">—</span>
         <div class="mast-actions">
-          <button id="btn-refresh" type="button">Refresh</button>
           <button id="btn-share" type="button">Share</button>
         </div>
       </div>
@@ -254,7 +253,6 @@
       const requestId = ++briefingRequestId;
       const keepsCurrent = requestLatest && state.data && state.data.mode === mode;
       if (!keepsCurrent) $("content").innerHTML = `<div class="state">${MODE[mode].loading}</div>`;
-      if (requestLatest) $("btn-refresh").disabled = true;
       try {
         const cacheBuster = requestLatest ? `&view=${Date.now()}` : "";
         const res = await fetch(`/api/briefing?mode=${encodeURIComponent(mode)}${cacheBuster}`, {
@@ -271,8 +269,6 @@
         console.error("Briefing load failed:", err);
         if (keepsCurrent) { showToast("Couldn't refresh — showing the last briefing."); return; }
         $("content").innerHTML = `<div class="state"><strong>The briefing couldn't be loaded.</strong>Please try again shortly.</div>`;
-      } finally {
-        if (requestLatest && requestId === briefingRequestId) $("btn-refresh").disabled = false;
       }
     }
 
@@ -518,7 +514,6 @@
         if (Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing();
       });
       checkForNewVersion();
-      $("btn-refresh").addEventListener("click", () => loadBriefing(state.mode, true));
       $("btn-share").addEventListener("click", shareBriefing);
       $("mkt-toggle").addEventListener("click", () => {
         const table = $("mkt-table"), open = table.hidden;
