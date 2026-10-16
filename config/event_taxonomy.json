@@ -369,7 +369,23 @@
         "ortaklık*",
         "birleşme*",
         "satın al*"
-      ]
+      ],
+      "aviation_context_terms": [
+        "airline*",
+        "airways",
+        "carrier*",
+        "aircraft",
+        "airport*",
+        "aviation",
+        "aerospace",
+        "flight*",
+        "fleet",
+        "havayolu*",
+        "havalimanı*",
+        "uçak*",
+        "uçuş*"
+      ],
+      "_doc": "Partnership words are everywhere (loyalty co-brands, restaurants); the type needs an aviation word in the title or description."
     },
     "regulation_policy": {
       "weight": 0.6,

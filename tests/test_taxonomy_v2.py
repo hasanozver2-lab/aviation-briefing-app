@@ -26,7 +26,7 @@ def test_new_types_exist_with_the_agreed_provisional_weights(name, weight):
 
 @pytest.mark.parametrize("title, expected", [
     ("Heathrow approves new terminal expansion", "airport_infrastructure"),
-    ("Air Example and Sky Partner form a joint venture", "partnerships_mna"),
+    ("Example Airlines and Sky Partner form a joint venture", "partnerships_mna"),
     ("EASA issues new airworthiness directive for engines", "regulation_policy"),
     ("ReFuelEU sustainable aviation fuel mandate here to stay", "sustainability_saf"),
     ("Emirates turns to Manila for first pilot recruitment drive", "workforce_hr"),
@@ -68,6 +68,27 @@ def test_keep_terms_rescue_a_defence_looking_title_with_civil_context():
 
 def test_unguarded_types_are_not_affected_by_the_typing_exclusion():
     assert kind("F-16 fighter jet crash kills pilot") == "safety_incident"
+
+
+# --- the two noise cases found on real data ---------------------------------------------------------------------
+
+def test_a_loyalty_co_brand_partnership_is_not_a_partnerships_mna_story():
+    assert kind("Aeroplan Members Get Rewarded for Coveted Dining Reservations and Experiences via Expanded DINR Partnership") is None
+
+
+def test_partnership_with_an_aviation_word_still_classifies():
+    assert kind("Airline and airport operator announce partnership") == "partnerships_mna"
+    assert kind("Airline acquires regional carrier in merger") == "partnerships_mna"
+
+
+@pytest.mark.parametrize("title", [
+    "MKE'den 3 adet daha elektrikli zırhlı personel taşıyıcı teslimatı",
+    "Army takes delivery of armored vehicles",
+    "Attack helicopter delivery completed ahead of schedule",
+])
+def test_armoured_vehicle_and_helicopter_deliveries_are_defence_not_fleet_orders(title):
+    assert story_lifecycle.is_military_story({"headline": title, "entities": {}}, RELEVANCE["selection"])
+    assert kind(title) != "fleet_orders"
 
 
 # --- read-time filter ------------------------------------------------------------------------------------------------
