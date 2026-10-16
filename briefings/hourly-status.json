@@ -1,1 +1,1 @@
-{"mode":"hourly","status":"ok","last_pipeline_run_at":"2026-10-16T09:31:55.177000+00:00","last_attempt_at":"2026-10-16T09:31:55.180262+00:00","error":""}
+{"mode":"hourly","status":"stale","last_pipeline_run_at":"","last_attempt_at":"2026-10-16T13:12:18.214229+00:00","error":"RuntimeError: AI analysis could not be generated; source summaries are shown instead."}
