@@ -77,7 +77,36 @@
           "havalimanı*",
           "havayolu*",
           "hava sahası*"
-        ]
+        ],
+        "exclude_commentary": true
+      },
+      "commentary": {
+        "_doc": "Finance commentary: a title pattern, or a finance event type from a source that is neither official nor tier <= trusted_max_tier. Its score is multiplied by score_multiplier and, with selection.exclude_commentary, it never enters the list.",
+        "title_patterns": [
+          "why i'd buy",
+          "should you buy",
+          "price target*",
+          "buy the dip",
+          "chance to buy",
+          "stock*",
+          "shares",
+          "undervalued",
+          "upside",
+          "analyst*",
+          "wall street",
+          "hisse*",
+          "hedef fiyat*",
+          "outperform*",
+          "underperform*",
+          "broader market",
+          "what you need to know"
+        ],
+        "finance_event_types": [
+          "airline_financials",
+          "capital_markets"
+        ],
+        "trusted_max_tier": 2,
+        "score_multiplier": 0.3
       }
     }
   }

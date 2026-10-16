@@ -955,7 +955,8 @@ def collect_run(market_database=None):
 
     candidates = [build_candidate_story(article, index) for index, article in enumerate(story_lifecycle.cluster_representatives(articles), start=1)]
     story_lifecycle.enrich_stories(candidates, articles)
-    selected = story_lifecycle.select_stories(candidates, story_lifecycle.load_relevance_config()["selection"])
+    relevance_config = story_lifecycle.load_relevance_config()
+    selected = story_lifecycle.select_stories(candidates, relevance_config["selection"], relevance_config.get("commentary"))
     source_registry.record_source_statistics(articles, {"stories": selected})
     print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold")
     return {"stories": selected, "market": market_panel, "articles": len(articles), "candidates": len(candidates)}
