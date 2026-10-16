@@ -219,7 +219,7 @@
     const STALE_AFTER_MINUTES = 180;
     const FRESHNESS_TICK_MS = 60 * 1000;
     const SOURCE_TYPES = { mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social" };
-    const MARKET_ORDER = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread", "fx_usd_eur", "fx_usd_gbp", "fx_usd_jpy", "fx_usd_cny", "fx_usd_inr", "fx_usd_try", "fx_usd_brl"];
+    const MARKET_ORDER = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread"];   // the strip shows fuel only; the API adds FX rows only when config market.display_fx is on
     const MARKET_LABELS = {
       brent_spot: ["Brent", "Brent spot"],
       us_gulf_coast_jet_fuel: ["Jet USGC", "US Gulf Coast jet fuel"],
@@ -421,14 +421,14 @@
     function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
 
     function renderMarket(market) {
-      if (!market) { $("market").hidden = true; return; }
-      const items = (Array.isArray(market.items) ? market.items : []).slice()
+      const items = (market && Array.isArray(market.items) ? market.items : []).slice()
         .sort((a, b) => (MARKET_ORDER.indexOf(a.series_id) + 99) % 99 - (MARKET_ORDER.indexOf(b.series_id) + 99) % 99);
       const label = (it) => {
         if (MARKET_LABELS[it.series_id]) return MARKET_LABELS[it.series_id];
         const m = /^fx_usd_([a-z]{3})$/.exec(it.series_id || "");
         return m ? [`USD/${m[1].toUpperCase()}`, `USD / ${m[1].toUpperCase()}`] : [it.name || it.series_id, it.name || it.series_id];
       };
+      if (!items.length) { $("market").hidden = true; return; }      // nothing to show: no empty strip
       const present = new Set(items.map(it => it.series_id));
       const missing = MARKET_ORDER.filter(id => !present.has(id)).map(id => label({ series_id: id })[0]);
       const chg = (it) => Number(it.changes && it.changes.daily_pct);
@@ -436,7 +436,7 @@
       const sources = [...new Set(items.map(it => String(it.source || "").split(";")[0].trim()).filter(Boolean))];
       const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
       $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
-        + (missing.length ? `<span class="mkt-miss">${items.length ? `${missing.length} unavailable` : "Market data unavailable"}</span>` : "");
+        + (missing.length ? `<span class="mkt-miss">${missing.length} unavailable</span>` : "");
       $("mkt-table").innerHTML = items.map(it => {
         const age = Number(it.age_days) || 0;
         const asOf = it.as_of ? `${it.as_of}${it.carried_forward && age > 0 ? ` · ${age} d old` : ""}` : "";

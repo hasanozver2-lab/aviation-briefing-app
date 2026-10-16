@@ -167,3 +167,11 @@ def test_text_colours_meet_aa_contrast_on_both_paper_tones(color_name):
     for background in ("paper", "paper-2"):
         ratio = contrast(css_color(color_name, html), css_color(background, html))
         assert ratio >= MIN_TEXT_CONTRAST, f"--{color_name} on --{background} is {ratio:.2f}:1"
+
+
+def test_the_market_strip_is_fuel_only_and_hides_when_empty():
+    html = page()
+    order = re.search(r"const MARKET_ORDER = (\[[^\]]*\])", html).group(1)
+    assert "fx_usd" not in order and "brent_spot" in order and "jet_fuel_brent_crack_spread" in order
+    assert "European Central Bank" not in html and "ECB" not in html
+    assert 'if (!items.length) { $("market").hidden = true; return; }' in html
