@@ -5,5 +5,4 @@ __pycache__/
 .venv/
 .vscode/
 *.log
-data/*.sqlite3
-briefing_cache*.json
+data/pipeline.sqlite3
