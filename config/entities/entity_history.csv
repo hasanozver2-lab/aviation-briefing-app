@@ -1,0 +1,8 @@
+entity_id,kind,value,valid_from,valid_to,needs_verification
+airport:000044,iata,IST,2019-04-06,,1
+airport:000080,iata,IST,,2019-04-06,1
+carrier:000092,alias,Vistara,,2024-11-12,1
+carrier:000037,alias,Alitalia,,2021-10-14,1
+carrier:000023,alias,AnadoluJet,,2024-03-22,1
+carrier:000023,alias,Anadolu Jet,,2024-03-22,1
+carrier:000136,alias,LAN Airlines,,2016-05-05,1

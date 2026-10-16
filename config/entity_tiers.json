@@ -1,0 +1,12 @@
+{
+  "_doc": "Carrier tier = weighted fleet (widebody x2, narrowbody x1, regional jet/turboprop x0.5), per brand. Cargo operators are excluded from the passenger tier and get cargo_tier from the same formula with regional feeders at x0.25. Group tier = sum of its non-cargo brands against the group thresholds. Contract (capacity purchase) regional carriers cannot rank better than capacity_purchase_best_tier. Airport tier = annual passengers in millions; tier 1-2 airports are hubs. A value at the minimum belongs to that tier (>=200 is tier 1).",
+  "fleet_weights": {"widebody": 2.0, "narrowbody": 1.0, "regional": 0.5},
+  "cargo_regional_weight": 0.25,
+  "carrier_tier_minimums": [200, 100, 50],
+  "group_tier_minimums": [400, 200, 100],
+  "capacity_purchase_best_tier": 2,
+  "airport_tier_minimums_millions": [50, 25, 10],
+  "hub_airport_max_tier": 2,
+  "operator_types": ["passenger", "cargo", "mixed"],
+  "metric_tolerance": 0.05
+}

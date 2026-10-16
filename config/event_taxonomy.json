@@ -1,29 +1,30 @@
 {
+  "_matching": "Terms match whole words (plural -s/-es and apostrophe suffixes tolerated). A trailing * makes the term a word-prefix stem for Turkish suffixes. ALL-CAPS terms up to 4 letters (SAF, ASK, RPK, USD) are case-sensitive. Casing in this file is therefore meaningful.",
   "event_types": {
     "fuel_energy": {
       "weight": 0.9,
-      "terms": ["jet fuel", "jet yakıt", "kerosene", "kerosen", "brent", "crude oil", "ham petrol", "oil price", "petrol fiyat", "crack spread", "rafineri marj", "fuel surcharge", "yakıt ek ücreti", "saf"]
+      "terms": ["jet fuel", "jet yakıt*", "kerosene", "kerosen*", "brent", "crude oil", "ham petrol*", "oil price", "petrol fiyat*", "crack spread", "rafineri marj*", "fuel surcharge", "yakıt ek ücret*", "SAF"]
     },
     "fx_currency": {
       "weight": 0.5,
-      "terms": ["currency", "exchange rate", "foreign exchange", "döviz", "kur", "usd", "dollar", "dolar", "euro", "sterling", "yen", "yuan", "rupee", "real"]
+      "terms": ["currency", "exchange rate", "foreign exchange", "döviz*", "USD", "dollar", "dolar*", "euro", "sterling", "yen", "yuan", "rupee", "brazilian real"]
     },
     "macro_demand": {
       "weight": 0.75,
-      "terms": ["passenger traffic", "yolcu trafiği", "consumer demand", "tüketici talebi", "travel demand", "seyahat talebi", "rpk", "ask", "load factor", "doluluk oran", "booking trend", "rezervasyon eğil", "disposable income", "harcanabilir gelir"]
+      "terms": ["passenger traffic", "yolcu trafiği", "consumer demand", "tüketici talep*", "travel demand", "seyahat talep*", "RPK", "ASK", "load factor", "doluluk oran*", "booking trend", "rezervasyon eğil*", "disposable income", "harcanabilir gelir*"]
     },
     "airline_financials": {
       "weight": 0.85,
-      "terms": ["earnings", "financial results", "quarterly results", "guidance", "revenue", "operating profit", "net profit", "finansal sonuç", "çeyrek sonuç", "beklenti", "gelir", "faaliyet kâr", "net kâr", "zarar", "temettü", "dividend"]
+      "terms": ["earnings", "financial results", "quarterly results", "guidance", "revenue", "operating profit", "net profit", "finansal sonuç*", "çeyrek sonuç*", "beklenti*", "gelir", "geliri", "gelirler", "gelirleri", "faaliyet kâr*", "net kâr*", "zarar*", "temettü*", "dividend"]
     },
     "capital_markets": {
       "weight": 0.45,
-      "terms": ["share", "share price", "stock", "bond", "credit rating", "analyst rating", "equity", "hisse", "tahvil", "kredi notu", "analist notu", "sermaye piyas", "buyback", "hisse geri alım"]
+      "terms": ["share", "share price", "stock", "bond", "credit rating", "analyst rating", "equity", "hisse*", "tahvil*", "kredi notu*", "analist notu*", "sermaye piyas*", "buyback", "hisse geri alım*"]
     },
     "geopolitics_airspace": {
       "weight": 0.95,
-      "terms": ["sanction", "yaptırım", "conflict", "çatışma", "war", "savaş", "missile", "füze", "airspace closure", "hava sahası kapan", "no-fly zone", "uçuşa yasak", "overflight", "üst uçuş", "geopolitical", "jeopolitik"],
-      "aviation_context_terms": ["airline", "airlines", "airways", "carrier", "havayolu", "taşıyıcı", "airport", "havalimanı", "airspace", "hava sahası", "flight", "uçuş", "aircraft", "uçak", "boeing", "airbus", "embraer", "turkish airlines", "lufthansa", "delta", "united", "emirates", "qatar airways"]
+      "terms": ["sanction", "yaptırım*", "conflict", "çatışma*", "war", "savaş*", "missile", "füze*", "airspace closure", "hava sahası kapan*", "no-fly zone", "uçuşa yasak*", "overflight", "üst uçuş*", "geopolitical", "jeopolitik*"],
+      "aviation_context_terms": ["airline", "airlines", "airways", "carrier", "havayolu*", "taşıyıcı*", "airport", "havalimanı*", "airspace", "hava sahası*", "flight", "uçuş*", "aircraft", "uçak*", "uçağ*", "boeing", "airbus", "embraer", "turkish airlines", "lufthansa", "delta", "united", "emirates", "qatar airways"]
     }
   }
 }

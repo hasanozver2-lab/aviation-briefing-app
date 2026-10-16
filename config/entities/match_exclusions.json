@@ -1,0 +1,4 @@
+{
+  "_doc": "Phrases inside which entity aliases must not count (e.g. the country 'United Arab Emirates' is not the airline Emirates). Same matching rules as aliases.",
+  "phrases": ["United Arab Emirates", "Emirates Stadium", "Etihad Stadium", "Etihad Campus", "Pegasus spyware", "Delta variant", "Delta Force"]
+}

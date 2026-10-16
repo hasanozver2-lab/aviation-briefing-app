@@ -11,7 +11,13 @@ import statistics
 import urllib.parse
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
+
+try:
+    from . import text_match
+except ImportError:
+    import text_match
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +29,7 @@ EIA_SPOT_ENDPOINT = "https://api.eia.gov/v2/petroleum/pri/spt/data/"
 ECB_EXR_ENDPOINT = "https://data-api.ecb.europa.eu/service/data/EXR"
 IATA_FUEL_MONITOR_URL = "https://www.iata.org/en/publications/economics/fuel-monitor/"
 FX_CURRENCIES = ("EUR", "GBP", "JPY", "CNY", "INR", "TRY", "BRL")
+FUEL_CONTEXT_TERMS = text_match.TermSet(["jet fuel", "yakıt*", "brent", "oil", "petrol*"], allow_plural=True)
 
 
 def utc_now():
@@ -474,22 +481,37 @@ def write_threshold_events(path, indicators, api_key=""):
     return published_events
 
 
+@lru_cache(maxsize=2)
+def _compiled_taxonomy(config_mtime_ns):
+    """Compile taxonomy terms once per config version; the mtime key picks up edits."""
+    compiled = {}
+    for event_type, rule in load_taxonomy_config()["event_types"].items():
+        context_terms = rule.get("aviation_context_terms")
+        compiled[event_type] = {
+            "weight": float(rule["weight"]),
+            "terms": text_match.TermSet(rule.get("terms", []), allow_plural=True),
+            "context": text_match.TermSet(context_terms, allow_plural=True) if context_terms else None,
+        }
+    return compiled
+
+
+def _taxonomy():
+    return _compiled_taxonomy(TAXONOMY_CONFIG_PATH.stat().st_mtime_ns)
+
+
 def classify_event_type(text):
-    normalized = str(text or "").casefold()
-    if not normalized:
+    prepared = text_match.prepare(text)
+    if not prepared.raw.strip():
         return None
-    taxonomy = load_taxonomy_config()["event_types"]
+    taxonomy = _taxonomy()
     ranked_matches = []
     for event_type, rule in taxonomy.items():
-        terms = rule.get("terms", [])
-        matches = sum(term.casefold() in normalized for term in terms)
+        matches = rule["terms"].count(prepared)
         if not matches:
             continue
-        if event_type == "geopolitics_airspace":
-            aviation_terms = rule.get("aviation_context_terms", [])
-            if not any(term.casefold() in normalized for term in aviation_terms):
-                continue
-        ranked_matches.append((matches, float(rule["weight"]), event_type))
+        if rule["context"] is not None and not rule["context"].any(prepared):
+            continue
+        ranked_matches.append((matches, rule["weight"], event_type))
     if not ranked_matches:
         return None
     matched_types = {event_type for _, _, event_type in ranked_matches}
@@ -518,9 +540,9 @@ def record_article_events(path, articles):
             if not classification:
                 continue
             occurred_on = _article_date(article).isoformat()
-            text = f"{article.get('title', '')} {article.get('description', '')}".casefold()
+            text = f"{article.get('title', '')} {article.get('description', '')}"
             related_market_event_id = None
-            if classification["event_type"] != "fuel_energy" and any(term in text for term in ("jet fuel", "yakıt", "brent", "oil", "petrol")):
+            if classification["event_type"] != "fuel_energy" and FUEL_CONTEXT_TERMS.any(text):
                 row = connection.execute(
                     "SELECT id FROM events WHERE event_type = 'fuel_energy' AND occurred_on = ? ORDER BY id DESC LIMIT 1",
                     (occurred_on,),

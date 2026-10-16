@@ -24,10 +24,12 @@ try:
     from . import source_registry
     from . import blob_store
     from . import market_data
+    from . import entities
 except ImportError:
     import source_registry
     import blob_store
     import market_data
+    import entities
 
 # Windows cp1254 encoding fix
 if hasattr(sys.stdout, 'reconfigure'):
@@ -39,6 +41,7 @@ if hasattr(sys.stderr, 'reconfigure'):
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = BASE_DIR.parent
 ENV_FILE = ROOT_DIR / ".env"
+PIPELINE_CONFIG_PATH = BASE_DIR / "config" / "pipeline.json"
 VALID_MODES = {"daily", "hourly"}
 SOURCE_POLICY_VERSION = "airline-only-v6"
 RSS_FETCH_TIMEOUT_SECONDS = 10
@@ -59,6 +62,18 @@ SECTION_ORDER = [
     "Route news",
     "Other areas",
 ]
+
+
+def load_description_limit():
+    """Characters of article description sent to the model; tunable without a code change."""
+    config = json.loads(PIPELINE_CONFIG_PATH.read_text(encoding="utf-8"))
+    limit = config["llm_description_max_chars"]
+    if not isinstance(limit, int) or limit <= 0:
+        raise ValueError("llm_description_max_chars must be a positive integer")
+    return limit
+
+
+DESCRIPTION_MAX_CHARS = load_description_limit()
 
 
 def validate_mode(mode):
@@ -592,6 +607,39 @@ def fetch_rss_items(max_hours=48):
         unique_articles.append(article)
     return unique_articles
 
+def build_compact_articles(articles, description_limit=None):
+    """Only title, source, time, a bounded description and deterministic labels go to the model."""
+    limit = description_limit or DESCRIPTION_MAX_CHARS
+    return [
+        {
+            "title": a["title"],
+            "source": a["source"],
+            "source_type": a.get("source_type", "trade_media"),
+            "official": bool(a.get("official", False)),
+            "airline": a.get("airline", ""),
+            "topics": a.get("topics", []),
+            "event_type": a.get("event_type"),
+            "entities": entities.compact_codes(a.get("entities") or entities.empty_entities()),
+            "published_at": a.get("pub_date", ""),
+            "category_hint": a.get("category_hint", ""),
+            "description": a["description"][:limit] if a.get("description") else "",
+            "link": a["link"]
+        }
+        for a in articles
+    ]
+
+
+def deterministic_fields(article):
+    """Rule-based labels computed before the model runs; the model never writes these."""
+    article = article if isinstance(article, dict) else {}
+    return {
+        "event_type": article.get("event_type"),
+        "entities": article.get("entities") or entities.empty_entities(),
+        "region_section": article.get("region_section", ""),
+        "secondary_tags": article.get("secondary_tags") or [],
+    }
+
+
 def generate_briefing_with_gemini(articles, mode="daily"):
     """Gemini 2.5 Flash ile haberleri prompt kurallarına göre analiz eder."""
     mode = validate_mode(mode)
@@ -604,22 +652,7 @@ def generate_briefing_with_gemini(articles, mode="daily"):
         )
 
     sample_articles = articles[:12]
-    # Sadece başlık, kaynak, yayın saati ve kısa açıklamayı göndererek token ve süre tasarrufu sağla
-    compact_articles = [
-        {
-            "title": a["title"],
-            "source": a["source"],
-            "source_type": a.get("source_type", "trade_media"),
-            "official": bool(a.get("official", False)),
-            "airline": a.get("airline", ""),
-            "topics": a.get("topics", []),
-            "published_at": a.get("pub_date", ""),
-            "category_hint": a.get("category_hint", ""),
-            "description": a["description"][:200] if a.get("description") else "",
-            "link": a["link"]
-        }
-        for a in sample_articles
-    ]
+    compact_articles = build_compact_articles(sample_articles)
     if not compact_articles:
         return fallback_briefing([], mode)
 
@@ -810,6 +843,7 @@ def normalize_generated_briefing(briefing, mode, article_metadata=None):
             "data_points": text_list(raw_story.get("data_points")),
             "strategic_impact": str(raw_story.get("strategic_impact", "")),
             "market_exposure": exposure,
+            **deterministic_fields(source_article),
             "thy_impact_assessment": str(raw_story.get("thy_impact_assessment", "")),
             "why_it_matters": str(raw_story.get("why_it_matters", "")),
             "original_source": {
@@ -876,6 +910,7 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
             "data_points": [],
             "strategic_impact": "",
             "market_exposure": [],
+            **deterministic_fields(article),
             "thy_impact_assessment": "",
             "why_it_matters": "",
             "original_source": {
@@ -911,6 +946,10 @@ def run_pipeline(mode="daily", market_database=None):
     mode = validate_mode(mode)
     print(f"Havacılık haberleri toplanıyor (Mod: {mode})...")
     local_market_database = market_data.database_path(market_database)
+    # The CSV files in config/ are the source of truth; SQLite is rebuilt from them on every run.
+    source_registry.sync_sources_from_csv()
+    entity_index = entities.EntityIndex.from_csv()
+    entities.sync_entities(local_market_database)
     market_panel = market_data.refresh_market_data(
         local_market_database,
         eia_api_key=_env_value("EIA_API_KEY"),
@@ -918,6 +957,7 @@ def run_pipeline(mode="daily", market_database=None):
     )
     articles = fetch_rss_items(max_hours=48 if mode == "daily" else 2)
     market_data.record_article_events(local_market_database, articles)
+    entities.annotate_articles(articles, entity_index)
     print(f"{len(articles)} haber maddesi toplandı. Analiz ediliyor...")
     briefing = generate_briefing_with_gemini(articles, mode=mode)
     if mode == "daily":
