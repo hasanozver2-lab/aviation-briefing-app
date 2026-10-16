@@ -371,7 +371,7 @@ def test_ready_briefing_reads_snapshot_and_marks_failed_pipeline_stale(monkeypat
     snapshot = {"mode": "daily", "status": "ok", "generated_at": "2026-10-16T08:00:00+00:00", "stories": []}
     stale_status = {"mode": "daily", "status": "stale", "last_attempt_at": "2026-10-16T09:00:00+00:00"}
 
-    monkeypatch.setattr(briefing_store, "read_json", lambda path: snapshot if path.endswith("daily.json") else stale_status)
+    monkeypatch.setattr(briefing_store, "read_json", lambda path: snapshot if path.endswith("latest.json") else stale_status)
     monkeypatch.setattr(_engine, "fetch_rss_items", lambda *_args: (_ for _ in ()).throw(AssertionError("API must not collect")))
 
     result = _engine.get_ready_briefing("daily")

@@ -496,23 +496,36 @@ def _compiled_taxonomy(config_mtime_ns):
     return compiled
 
 
+def _min_description_hits():
+    return int(load_taxonomy_config().get("min_description_hits", 2))
+
+
 def _taxonomy():
     return _compiled_taxonomy(TAXONOMY_CONFIG_PATH.stat().st_mtime_ns)
 
 
-def classify_event_type(text):
-    prepared = text_match.prepare(text)
-    if not prepared.raw.strip():
+def classify_event_type(text, description=""):
+    """Primary event type from the title (text) and optional description.
+
+    A type counts when a term is in the title, or at least min_description_hits distinct terms are
+    in the description; one stray hit in a long description is usually boilerplate.
+    """
+    title = text_match.prepare(text)
+    body = text_match.prepare(description)
+    if not title.raw.strip() and not body.raw.strip():
         return None
     taxonomy = _taxonomy()
+    minimum_body_hits = _min_description_hits()
+    combined = text_match.prepare(f"{title.raw} {body.raw}")
     ranked_matches = []
     for event_type, rule in taxonomy.items():
-        matches = rule["terms"].count(prepared)
-        if not matches:
+        title_terms = {term for term, _ in rule["terms"].matches(title)}
+        body_terms = {term for term, _ in rule["terms"].matches(body)}
+        if not title_terms and len(body_terms) < minimum_body_hits:
             continue
-        if rule["context"] is not None and not rule["context"].any(prepared):
+        if rule["context"] is not None and not rule["context"].any(combined):
             continue
-        ranked_matches.append((matches, rule["weight"], event_type))
+        ranked_matches.append((len(title_terms | body_terms), rule["weight"], event_type))
     if not ranked_matches:
         return None
     matched_types = {event_type for _, _, event_type in ranked_matches}
@@ -537,7 +550,7 @@ def record_article_events(path, articles):
     recorded_articles = []
     with sqlite3.connect(target) as connection:
         for article in articles:
-            classification = classify_event_type(f"{article.get('title', '')} {article.get('description', '')}")
+            classification = classify_event_type(article.get("title", ""), article.get("description", ""))
             if not classification:
                 continue
             occurred_on = _article_date(article).isoformat()

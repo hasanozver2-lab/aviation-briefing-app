@@ -1,19 +1,12 @@
 name: Publish aviation briefings
 
-# One hourly run produces both the daily and the hourly briefing and commits them to the
-# "briefing-data" branch in a single commit (at most 24 commits a day). Nothing is ever
-# committed to main, and pushes to briefing-data do not deploy (see vercel.json).
+# One hourly run collects, scores and archives the day's stories and commits the result to the
+# "briefing-data" branch in a single commit (at most 24 a day, none when nothing changed).
+# Nothing is ever committed to main, and pushes to briefing-data do not deploy (see vercel.json).
 on:
   schedule:
     - cron: "2 * * * *"
   workflow_dispatch:
-    inputs:
-      mode:
-        description: "Briefing mode to publish"
-        required: true
-        default: "all"
-        type: choice
-        options: [all, daily, hourly]
 
 # The narrowest permission that lets the job push the data branch with GITHUB_TOKEN.
 permissions:
@@ -37,5 +30,4 @@ jobs:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
           BRIEFING_STORE: github
           MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
-          MODE: ${{ inputs.mode || 'all' }}
-        run: python scripts/run_pipeline.py --mode "$MODE"
+        run: python scripts/run_pipeline.py

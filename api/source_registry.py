@@ -283,6 +283,11 @@ def _similarity(left, right):
     return len(left & right) / len(left | right)
 
 
+def title_similarity(left_title, right_title):
+    """Jaccard similarity of the meaningful title words, 0-1."""
+    return _similarity(_title_tokens(left_title), _title_tokens(right_title))
+
+
 def cluster_articles_for_stats(articles):
     """Create conservative same-event groups only for source-performance measurement."""
     ordered_articles = sorted(

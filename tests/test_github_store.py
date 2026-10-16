@@ -9,8 +9,6 @@ import pytest
 from api import _engine, briefing_store, blob_store, github_store, market_data
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_DIR))
-from scripts import run_pipeline  # noqa: E402
 
 
 def git(directory, *args):
@@ -171,7 +169,7 @@ def test_readable_store_wins_over_the_committed_cache(tmp_path, monkeypatch):
     cache.write_text(json.dumps({"mode": "daily", "stories": [{"id": "old"}]}), encoding="utf-8")
     monkeypatch.setattr(_engine, "CACHE_FILE_DAILY", cache)
     live = {"mode": "daily", "status": "ok", "generated_at": "2026-10-16T09:00:00+00:00", "stories": [{"id": "live"}]}
-    monkeypatch.setattr(briefing_store, "read_json", lambda path: live if path.endswith("daily.json") else {"status": "ok"})
+    monkeypatch.setattr(briefing_store, "read_json", lambda path: live if path.endswith("latest.json") else {"status": "ok"})
 
     result = _engine.get_ready_briefing("daily")
 
@@ -199,53 +197,6 @@ def test_present_eia_key_keeps_the_panel_complete(tmp_path, monkeypatch):
     monkeypatch.setattr(market_data, "fetch_ecb_fx_series", lambda start, end: {})
     panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", eia_api_key="key", end_date=date(2026, 10, 15))
     assert panel["skipped"] == [] and "missing_data_note" not in panel
-
-
-# --- one run, one commit ----------------------------------------------------------------
-
-def stub_pipeline(monkeypatch, failing=()):
-    def fake(mode):
-        if mode in failing:
-            raise RuntimeError("gemini unavailable")
-        return {"mode": mode, "status": "ok", "stories": [], "last_pipeline_run_at": "2026-10-16T09:00:00+00:00"}
-    monkeypatch.setattr(_engine, "run_pipeline", fake)
-
-
-def test_both_modes_are_published_in_a_single_call(monkeypatch):
-    stub_pipeline(monkeypatch)
-    published = []
-    monkeypatch.setattr(briefing_store, "publish", lambda files, message, repo_dir=None: published.append(files) or "ok")
-
-    assert run_pipeline.run(("daily", "hourly")) == 0
-
-    assert len(published) == 1
-    assert sorted(published[0]) == ["briefings/daily-status.json", "briefings/daily.json", "briefings/hourly-status.json", "briefings/hourly.json"]
-
-
-def test_a_failing_mode_keeps_its_old_briefing_and_still_publishes_the_other(monkeypatch):
-    stub_pipeline(monkeypatch, failing=("hourly",))
-    published = []
-    monkeypatch.setattr(briefing_store, "publish", lambda files, message, repo_dir=None: published.append(files) or "ok")
-
-    assert run_pipeline.run(("daily", "hourly")) == 1       # visible failure in the workflow
-
-    files = published[0]
-    assert "briefings/hourly.json" not in files             # last good hourly briefing is not overwritten
-    assert files["briefings/hourly-status.json"]["status"] == "stale"
-    assert files["briefings/daily.json"]["status"] == "ok"
-
-
-def test_a_publish_failure_fails_the_run(monkeypatch):
-    stub_pipeline(monkeypatch)
-    monkeypatch.setattr(briefing_store, "publish", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("push rejected")))
-    assert run_pipeline.run(("daily", "hourly")) == 1
-
-
-def test_out_dir_writes_files_locally_without_publishing(tmp_path, monkeypatch):
-    stub_pipeline(monkeypatch)
-    monkeypatch.setattr(briefing_store, "publish", lambda *a, **k: (_ for _ in ()).throw(AssertionError("must not publish")))
-    assert run_pipeline.run(("daily",), out_dir=tmp_path) == 0
-    assert json.loads((tmp_path / "briefings" / "daily.json").read_text(encoding="utf-8"))["mode"] == "daily"
 
 
 # --- repository configuration ---------------------------------------------------------

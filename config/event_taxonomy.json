@@ -3,28 +3,240 @@
   "event_types": {
     "fuel_energy": {
       "weight": 0.9,
-      "terms": ["jet fuel", "jet yakıt*", "kerosene", "kerosen*", "brent", "crude oil", "ham petrol*", "oil price", "petrol fiyat*", "crack spread", "rafineri marj*", "fuel surcharge", "yakıt ek ücret*", "SAF"]
+      "terms": [
+        "jet fuel",
+        "jet yakıt*",
+        "kerosene",
+        "kerosen*",
+        "brent",
+        "crude oil",
+        "ham petrol*",
+        "oil price",
+        "petrol fiyat*",
+        "crack spread",
+        "rafineri marj*",
+        "fuel surcharge",
+        "yakıt ek ücret*",
+        "SAF"
+      ]
     },
     "fx_currency": {
       "weight": 0.5,
-      "terms": ["currency", "exchange rate", "foreign exchange", "döviz*", "USD", "dollar", "dolar*", "euro", "sterling", "yen", "yuan", "rupee", "brazilian real"]
+      "terms": [
+        "currency",
+        "exchange rate",
+        "foreign exchange",
+        "döviz*",
+        "USD",
+        "dollar",
+        "dolar*",
+        "euro",
+        "sterling",
+        "yen",
+        "yuan",
+        "rupee",
+        "brazilian real"
+      ]
     },
     "macro_demand": {
       "weight": 0.75,
-      "terms": ["passenger traffic", "yolcu trafiği", "consumer demand", "tüketici talep*", "travel demand", "seyahat talep*", "RPK", "ASK", "load factor", "doluluk oran*", "booking trend", "rezervasyon eğil*", "disposable income", "harcanabilir gelir*"]
+      "terms": [
+        "passenger traffic",
+        "yolcu trafiği",
+        "consumer demand",
+        "tüketici talep*",
+        "travel demand",
+        "seyahat talep*",
+        "RPK",
+        "ASK",
+        "load factor",
+        "doluluk oran*",
+        "booking trend",
+        "rezervasyon eğil*",
+        "disposable income",
+        "harcanabilir gelir*"
+      ]
     },
     "airline_financials": {
       "weight": 0.85,
-      "terms": ["earnings", "financial results", "quarterly results", "guidance", "revenue", "operating profit", "net profit", "finansal sonuç*", "çeyrek sonuç*", "beklenti*", "gelir", "geliri", "gelirler", "gelirleri", "faaliyet kâr*", "net kâr*", "zarar*", "temettü*", "dividend"]
+      "terms": [
+        "earnings",
+        "financial results",
+        "quarterly results",
+        "guidance",
+        "revenue",
+        "operating profit",
+        "net profit",
+        "finansal sonuç*",
+        "çeyrek sonuç*",
+        "beklenti*",
+        "gelir",
+        "geliri",
+        "gelirler",
+        "gelirleri",
+        "faaliyet kâr*",
+        "net kâr*",
+        "zarar*",
+        "temettü*",
+        "dividend"
+      ]
     },
     "capital_markets": {
       "weight": 0.45,
-      "terms": ["share", "share price", "stock", "bond", "credit rating", "analyst rating", "equity", "hisse*", "tahvil*", "kredi notu*", "analist notu*", "sermaye piyas*", "buyback", "hisse geri alım*"]
+      "terms": [
+        "share",
+        "share price",
+        "stock",
+        "bond",
+        "credit rating",
+        "analyst rating",
+        "equity",
+        "hisse*",
+        "tahvil*",
+        "kredi notu*",
+        "analist notu*",
+        "sermaye piyas*",
+        "buyback",
+        "hisse geri alım*"
+      ]
     },
     "geopolitics_airspace": {
       "weight": 0.95,
-      "terms": ["sanction", "yaptırım*", "conflict", "çatışma*", "war", "savaş*", "missile", "füze*", "airspace closure", "hava sahası kapan*", "no-fly zone", "uçuşa yasak*", "overflight", "üst uçuş*", "geopolitical", "jeopolitik*"],
-      "aviation_context_terms": ["airline", "airlines", "airways", "carrier", "havayolu*", "taşıyıcı*", "airport", "havalimanı*", "airspace", "hava sahası*", "flight", "uçuş*", "aircraft", "uçak*", "uçağ*", "boeing", "airbus", "embraer", "turkish airlines", "lufthansa", "delta", "united", "emirates", "qatar airways"]
+      "terms": [
+        "sanction",
+        "yaptırım*",
+        "conflict",
+        "çatışma*",
+        "war",
+        "savaş*",
+        "missile",
+        "füze*",
+        "airspace closure",
+        "hava sahası kapan*",
+        "no-fly zone",
+        "uçuşa yasak*",
+        "overflight",
+        "üst uçuş*",
+        "geopolitical",
+        "jeopolitik*"
+      ],
+      "aviation_context_terms": [
+        "airline",
+        "airlines",
+        "airways",
+        "carrier",
+        "havayolu*",
+        "taşıyıcı*",
+        "airport",
+        "havalimanı*",
+        "airspace",
+        "hava sahası*",
+        "flight",
+        "uçuş*",
+        "aircraft",
+        "uçak*",
+        "uçağ*",
+        "boeing",
+        "airbus",
+        "embraer",
+        "turkish airlines",
+        "lufthansa",
+        "delta",
+        "united",
+        "emirates",
+        "qatar airways"
+      ]
+    },
+    "safety_incident": {
+      "weight": 0.95,
+      "terms": [
+        "crash*",
+        "accident*",
+        "emergency landing",
+        "mayday",
+        "runway excursion",
+        "collision",
+        "fatal",
+        "fatalities",
+        "evacuat*",
+        "engine failure",
+        "engine fire",
+        "bird strike",
+        "airprox",
+        "near miss",
+        "depressuri*",
+        "kaza*",
+        "acil iniş*",
+        "pist dışına"
+      ]
+    },
+    "operations_disruption": {
+      "weight": 0.8,
+      "terms": [
+        "strike*",
+        "walkout",
+        "industrial action",
+        "ground stop",
+        "grounded fleet",
+        "air traffic control outage",
+        "system outage",
+        "IT outage",
+        "IT failure",
+        "mass cancellations",
+        "cancels flights",
+        "flights cancelled",
+        "grev*",
+        "iş bırakma*",
+        "uçuşlar iptal*",
+        "sefer iptal*",
+        "seferler iptal*",
+        "hava muhalefeti",
+        "divert*",
+        "flights diverted",
+        "cancellations"
+      ]
+    },
+    "fleet_orders": {
+      "weight": 0.7,
+      "terms": [
+        "firm order",
+        "aircraft order",
+        "engine order",
+        "engine deal",
+        "engine agreement",
+        "places order",
+        "placed an order",
+        "record order",
+        "order for",
+        "orders for",
+        "memorandum of understanding",
+        "MOU",
+        "purchase agreement",
+        "lease agreement",
+        "sipariş*",
+        "anlaşma*",
+        "sözleşme*"
+      ]
+    },
+    "community_csr": {
+      "weight": 0.05,
+      "terms": [
+        "nonprofit",
+        "non-profit",
+        "charity",
+        "charitable",
+        "donation*",
+        "donates",
+        "food bank*",
+        "food pantry",
+        "scholarship*",
+        "volunteer*",
+        "philanthrop*",
+        "bağış*",
+        "hayır*"
+      ]
     }
-  }
+  },
+  "_eligibility": "A type applies when one of its terms is in the TITLE, or at least min_description_hits distinct terms are in the description. A single hit in a long description is usually boilerplate ('personal guidance' in a foundation blurb).",
+  "min_description_hits": 2
 }

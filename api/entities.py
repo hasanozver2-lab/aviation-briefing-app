@@ -593,17 +593,17 @@ class EntityIndex:
         group_spans = [[span for entity in self.groups for span in entity.spans(prepared)] for prepared in fields]
         return {
             "groups": [
-                {"entity_id": g["entity_id"], "slug": g["slug"], "name": g["name"], "region": g["region"]}
+                {"entity_id": g["entity_id"], "slug": g["slug"], "name": g["name"], "region": g["region"], "tier": g["tier"]}
                 for g in self._rank(self.groups, fields)
             ],
             "carriers": [
                 {"entity_id": c["entity_id"], "slug": c["slug"], "iata": c["iata"], "name": c["name"],
-                 "region": c["region"], "group_entity_id": c["parent_entity_id"]}
+                 "region": c["region"], "group_entity_id": c["parent_entity_id"], "tier": c["tier"] or c["cargo_tier"]}
                 for c in self._rank(self.carriers, fields, group_spans)
             ],
             "airports": [
                 {"entity_id": a["entity_id"], "slug": a["slug"], "iata": a["iata"], "name": a["name"],
-                 "country": a["country"]}
+                 "country": a["country"], "tier": a["tier"]}
                 for a in self._rank(self.airports, fields)
             ],
             "aircraft": [
