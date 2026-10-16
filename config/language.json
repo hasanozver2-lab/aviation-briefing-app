@@ -1,0 +1,18 @@
+{
+  "_doc": "Language rules, all deterministic (no LLM). A source's language comes from config/sources.csv (column language); only when a source is unknown, or has none, is the text itself inspected. A story is written in Turkish only when EVERY source covering it is Turkish; a mixed or English cluster is English. This file is the one place for that rule.",
+  "default_language": "en",
+  "story_rule": {
+    "turkish_only_language": "tr",
+    "otherwise": "en"
+  },
+  "detection": {
+    "_doc": "Fallback for unknown sources. Turkish when the text has at least one Turkish-only letter AND one common Turkish word, or at least min_word_hits common Turkish words.",
+    "turkish_only_letters": "ğşıİĞŞ",
+    "min_word_hits": 2,
+    "words": [
+      "ve", "bir", "bu", "için", "ile", "olarak", "daha", "çok", "gibi", "kadar", "sonra", "ancak", "yeni", "göre",
+      "uçak", "uçuş", "uçuşlar", "havayolu", "havalimanı", "yolcu", "sefer", "filo", "türk", "hava", "yolları", "başladı", "açıkladı",
+      "edildi", "oldu", "olan", "tarafından", "yılı", "milyon", "dolar", "teslim", "alacak", "yapacak"
+    ]
+  }
+}

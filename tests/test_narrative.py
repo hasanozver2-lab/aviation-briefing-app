@@ -62,7 +62,7 @@ def test_pending_stories_share_one_batched_call_and_are_stored_on_the_story():
 
     report, _ = fill(items, llm)
 
-    assert report == {"calls": 1, "narrated": 5, "pending": 0, "error": ""}
+    assert report == {"calls": 1, "narrated": 5, "rewritten": 0, "pending": 0, "error": ""}
     assert len(llm.requests) == 1 and len(llm.requests[0]) == 5
     assert all(item["narrative_status"] == "done" and item["lead"] == "A lead." for item in items)
     assert items[0]["narrative_generated_at"] == "2026-10-16T09:00:00+00:00"

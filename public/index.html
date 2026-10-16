@@ -250,6 +250,7 @@
     function isBreaking(story) { return badgeSet(story).has("breaking"); }
     function isTopLevel(story) { return TOP_LEVELS.includes(story.level); }
     function isPending(story) { return story.narrative_status === "pending"; }
+    function langOf(story) { return story && story.language === "tr" ? "tr" : "en"; }
     function isYesterday(story) { return story.carried_from === YESTERDAY; }
     function sourcesOf(story) { return Array.isArray(story.sources) ? story.sources : []; }
     function sourceCount(story) { return Math.max(Number(story.source_count) || 0, sourcesOf(story).length); }
@@ -257,11 +258,11 @@
       const badges = badgeSet(story);
       const level = LEVEL_LABELS[story.level];
       return [
-        level ? `<span class="lvl-${escapeHtml(story.level)}">${level}</span>` : "",
-        badges.has("breaking") ? `<span class="breaking">Breaking</span>` : "",
-        badges.has("new") ? `<span class="new">New</span>` : "",
-        badges.has("updated") ? `<span class="updated">Updated</span>` : "",
-        withRegion ? `<span>${escapeHtml(sectionOf(story))}</span>` : ""
+        level ? `<span lang="en" class="lvl-${escapeHtml(story.level)}">${level}</span>` : "",
+        badges.has("breaking") ? `<span lang="en" class="breaking">Breaking</span>` : "",
+        badges.has("new") ? `<span lang="en" class="new">New</span>` : "",
+        badges.has("updated") ? `<span lang="en" class="updated">Updated</span>` : "",
+        withRegion ? `<span lang="en">${escapeHtml(sectionOf(story))}</span>` : ""
       ].join("");
     }
     function sectionRank(name) { const i = SECTION_ORDER.indexOf(name); return i === -1 ? SECTION_ORDER.length : i; }
@@ -370,8 +371,8 @@
           <span class="row-num" aria-hidden="true">•</span>
           <span class="row-body">
             <span class="kicker">${tagsHtml(s, true)}</span>
-            <h3>${escapeHtml(s.headline)}</h3>
-            <span class="src">${meta}</span>
+            <h3 lang="${langOf(s)}">${escapeHtml(s.headline)}</h3>
+            <span class="src" lang="en">${meta}</span>
           </span>
         </button>`;
       };
@@ -380,27 +381,27 @@
         const tags = tagsHtml(s, withRegion);
         const count = sourceCount(s);
         const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
-        const body = isPending(s) ? `<p class="pending">Analysis pending</p>` : (s.why_it_matters ? `<p>${escapeHtml(s.why_it_matters)}</p>` : "");
+        const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${escapeHtml(s.why_it_matters)}</p>` : "");
         return `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
           <span class="row-num">${String(n).padStart(2, "0")}</span>
           <span class="row-body">
             ${tags ? `<span class="kicker">${tags}</span>` : ""}
-            <h3>${escapeHtml(s.headline)}</h3>
+            <h3 lang="${langOf(s)}">${escapeHtml(s.headline)}</h3>
             ${body}
-            <span class="src">${meta}</span>
+            <span class="src" lang="en">${meta}</span>
           </span>
         </button>`;
       };
 
       let html = stories.length ? "" : `<div class="state">${EMPTY_TEXT}</div>`;
-      if (block.length) html += `<section class="group"><div class="group-head eyebrow">Critical &amp; Important · ${block.length}</div></section>`;
+      if (block.length) html += `<section class="group"><div lang="en" class="group-head eyebrow">Critical &amp; Important · ${block.length}</div></section>`;
       if (lead) {
         const count = sourceCount(lead);
         html += `<article class="lead-story" role="button" tabindex="0" data-open="${escapeHtml(storyKey(lead))}">
           <div class="kicker">${tagsHtml(lead, true)}</div>
-          <h2>${escapeHtml(lead.headline)}</h2>
-          ${isPending(lead) ? `<p class="why">Analysis pending</p>` : (lead.why_it_matters ? `<p class="why">${escapeHtml(lead.why_it_matters)}</p>` : "")}
-          <div class="meta"><span>${escapeHtml([sourceName(lead), count > 1 ? `${count} sources` : ""].filter(Boolean).join(" · "))}</span><strong>Read the analysis →</strong></div>
+          <h2 lang="${langOf(lead)}">${escapeHtml(lead.headline)}</h2>
+          ${isPending(lead) ? `<p class="why" lang="en">Analysis pending</p>` : (lead.why_it_matters ? `<p class="why" lang="${langOf(lead)}">${escapeHtml(lead.why_it_matters)}</p>` : "")}
+          <div class="meta" lang="en"><span>${escapeHtml([sourceName(lead), count > 1 ? `${count} sources` : ""].filter(Boolean).join(" · "))}</span><strong>Read the analysis →</strong></div>
         </article>`;
       }
       if (blockRest.length) html += `<section class="group">${blockRest.map(compactRow).join("")}</section>`;
@@ -409,9 +410,9 @@
           `<button class="chip" type="button" data-filter="${escapeHtml(name)}" aria-pressed="${name === filter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
       </div></nav>`;
       groups.forEach(g => {
-        html += `<section class="group"><div class="group-head eyebrow">${escapeHtml(g.name)}</div>${g.items.map(s => row(s, false)).join("")}</section>`;
+        html += `<section class="group"><div lang="en" class="group-head eyebrow">${escapeHtml(g.name)}</div>${g.items.map(s => row(s, false)).join("")}</section>`;
       });
-      if (carried.length) html += `<section class="group"><div class="group-head eyebrow">Yesterday · ${carried.length}</div>${carried.map(s => row(s, false)).join("")}</section>`;
+      if (carried.length) html += `<section class="group"><div lang="en" class="group-head eyebrow">Yesterday · ${carried.length}</div>${carried.map(s => row(s, false)).join("")}</section>`;
       html += `<div class="end">— End of briefing —</div>`;
       $("content").innerHTML = html;
     }
@@ -505,28 +506,29 @@
       const analysis = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
       const dps = (s.data_points || []).map(d => `<span>${escapeHtml(d)}</span>`).join("");
       const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
-        `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p>${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
+        `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span lang="en" class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p lang="${lang}">${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
       const strategic = s.strategic_impact || "";
       const coverage = sourcesOf(s);
       const count = sourceCount(s);
-      const coverageHtml = coverage.length ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">${count > 1 ? `Covered by ${count} sources` : "Source"}</span><ul class="sources">${coverage.map(c =>
-        `<li><span class="by">${escapeHtml(c.name || "Source")}</span> — <a href="${safeExternalUrl(c.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title || c.url || "Read article")} ↗</a></li>`).join("")}</ul></div>` : "";
+      const coverageHtml = coverage.length ? `<div style="display:flex;flex-direction:column;gap:8px"><span lang="en" class="eyebrow">${count > 1 ? `Covered by ${count} sources` : "Source"}</span><ul class="sources">${coverage.map(c =>
+        `<li lang="${c.language === "tr" ? "tr" : "en"}"><span class="by">${escapeHtml(c.name || "Source")}</span> — <a href="${safeExternalUrl(c.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title || c.url || "Read article")} ↗</a></li>`).join("")}</ul></div>` : "";
       $("art-pos").textContent = `${i + 1} of ${state.order.length}`;
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
+      const lang = langOf(s);
       $("art-body").innerHTML = `
         <div class="kicker">${tagsHtml(s, true)}${isYesterday(s) ? "<span>Yesterday</span>" : ""}</div>
-        <h1 tabindex="-1">${escapeHtml(s.headline)}</h1>
-        <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
-        ${isPending(s) ? `<p class="art-pending">Analysis pending — the written analysis appears after the next update.</p>` : ""}
-        ${s.why_it_matters ? `<div class="art-why"><span class="eyebrow">Why it matters</span><p>${escapeHtml(s.why_it_matters)}</p></div>` : ""}
-        ${s.lead ? `<p class="art-lead">${escapeHtml(s.lead)}</p>` : ""}
-        ${analysis ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Analysis</span><ul class="bullets">${analysis}</ul></div>` : ""}
-        ${dps ? `<div class="datapoints">${dps}</div>` : ""}
-        ${strategic || exposure ? `<div class="impact"><span class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p>${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
+        <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
+        <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+        ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}
+        ${s.why_it_matters ? `<div class="art-why"><span lang="en" class="eyebrow">Why it matters</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
+        ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}
+        ${analysis ? `<div style="display:flex;flex-direction:column;gap:8px"><span lang="en" class="eyebrow">Analysis</span><ul class="bullets" lang="${lang}">${analysis}</ul></div>` : ""}
+        ${dps ? `<div class="datapoints" lang="${lang}">${dps}</div>` : ""}
+        ${strategic || exposure ? `<div class="impact"><span lang="en" class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p lang="${lang}">${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
         ${coverageHtml}
-        <a class="art-link" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>
-        ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span class="eyebrow" style="color:var(--muted)">Next story ↓</span><span>${escapeHtml(next.headline)}</span></button>` : ""}`;
+        <a class="art-link" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>
+        ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next story ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
       $("art-scroll").scrollTop = 0;
     }
     function stepArticle(delta, moveFocus = false) {

@@ -26,6 +26,7 @@ try:
     from . import market_data
     from . import entities
     from . import story_lifecycle
+    from . import language
     from .urls import canonicalize_url
 except ImportError:
     import source_registry
@@ -33,6 +34,7 @@ except ImportError:
     import market_data
     import entities
     import story_lifecycle
+    import language
     from urls import canonicalize_url
 
 # Windows cp1254 encoding fix
@@ -540,6 +542,7 @@ def _fetch_source_articles(source, cutoff, headers):
                 "link": link,
                 "description": description,
                 "source": article_source_name,
+                "language": language.article_language(source_name, f"{title} {description}"),
                 "category_hint": source["category_hint"],
                 "source_type": source.get("source_type", "trade_media"),
                 "official": bool(source.get("official", False)),

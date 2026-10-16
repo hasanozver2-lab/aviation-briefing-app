@@ -12,10 +12,11 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 try:
-    from . import clustering, source_registry, text_match
+    from . import clustering, language, source_registry, text_match
     from .urls import canonicalize_url
 except ImportError:
     import clustering
+    import language
     import source_registry
     import text_match
     from urls import canonicalize_url
@@ -34,7 +35,7 @@ HEAD_KEYS_TO_DROP = {"stories"}
 # a material update (narrative_status goes back to "pending" until then).
 NARRATIVE_FIELDS = (
     "headline", "lead", "detailed_analysis", "data_points", "strategic_impact", "market_exposure",
-    "why_it_matters", "thy_impact_assessment", "related_news", "narrative_generated_at",
+    "why_it_matters", "thy_impact_assessment", "related_news", "narrative_generated_at", "narrative_language",
 )
 NARRATIVE_PENDING = "pending"
 
@@ -157,7 +158,10 @@ def score_article(article, source_count, config=None):
 
 
 def _source_entry(article):
-    return {"name": str(article.get("source", "")), "url": str(article.get("link", "")), "title": str(article.get("title", ""))}
+    return {
+        "name": str(article.get("source", "")), "url": str(article.get("link", "")), "title": str(article.get("title", "")),
+        "language": article.get("language") or language.detect_language(f"{article.get('title', '')} {article.get('description', '')}"),
+    }
 
 
 def enrich_stories(stories, articles, relevance_config=None):
@@ -174,7 +178,8 @@ def enrich_stories(stories, articles, relevance_config=None):
         index = index_by_url.get(canonicalize_url(source.get("url")))
         if index is None:
             article = {}
-            sources = [{"name": str(source.get("source_name", "")), "url": str(source.get("url", "")), "title": str(source.get("title", ""))}]
+            sources = [{"name": str(source.get("source_name", "")), "url": str(source.get("url", "")), "title": str(source.get("title", "")),
+                        "language": language.article_language(source.get("source_name"), source.get("title", ""))}]
         else:
             article = articles[index]
             members = [articles[i] for i in cluster_by_index.get(index, [index])]
@@ -195,6 +200,7 @@ def enrich_stories(stories, articles, relevance_config=None):
             "source_count": max(1, len(publishers)),
             "published_at_iso": to_iso(datetime.fromtimestamp(published, tz=timezone.utc)) if isinstance(published, (int, float)) else "",
         })
+        story["language"] = language.story_language(story)
     return stories
 
 
@@ -462,6 +468,7 @@ def present_stories(day, now, config=None, levels=None):
     levels = load_relevance_config().get("levels") if levels is None else levels
     for story in day.get("stories", []):
         story["badges"] = compute_badges(story, now, config)
+        story["language"] = language.story_language(story)       # recomputed on every read: sources can be added after the story was stored
         if levels:
             level = level_for(story.get("relevance_score", 0), levels)
             story["level"] = level["name"] if level else "below"
