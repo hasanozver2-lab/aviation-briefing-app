@@ -4,13 +4,15 @@
       "eia_series": "RBRTE",
       "name": "Brent spot fiyatı",
       "unit": "USD/varil",
-      "source": "U.S. Energy Information Administration"
+      "source": "U.S. Energy Information Administration",
+      "fred_series": "DCOILBRENTEU"
     },
     "us_gulf_coast_jet_fuel": {
       "eia_series": "EER_EPJK_PF4_RGC_DPG",
       "name": "ABD Körfez Kıyısı jet yakıtı",
       "unit": "USD/galon",
-      "source": "U.S. Energy Information Administration"
+      "source": "U.S. Energy Information Administration",
+      "fred_series": "DJFUELUSGULF"
     }
   },
   "thresholds": {
@@ -18,6 +20,17 @@
     "crack_spread_standard_deviations": 1.5,
     "fx_daily_change_pct": 2.0
   },
-  "lookbacks_days": [1, 7, 30, 90, 365],
-  "iatanote": "IATA Jet Fuel Price Monitor yalnızca kaynak bağlantısı olarak gösterilir; Platts verisi çekilmez, saklanmaz veya yeniden yayınlanmaz."
+  "lookbacks_days": [
+    1,
+    7,
+    30,
+    90,
+    365
+  ],
+  "iatanote": "IATA Jet Fuel Price Monitor yalnızca kaynak bağlantısı olarak gösterilir; Platts verisi çekilmez, saklanmaz veya yeniden yayınlanmaz.",
+  "providers": {
+    "eia": "U.S. Energy Information Administration",
+    "fred": "FRED (EIA)",
+    "_doc": "EIA is primary when EIA_API_KEY is set; otherwise (or when EIA fails) FRED serves the same EIA series. FRED uses FRED_API_KEY when set, else the keyless fredgraph.csv."
+  }
 }
