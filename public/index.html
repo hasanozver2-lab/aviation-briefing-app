@@ -399,6 +399,7 @@
       $("article").setAttribute("aria-hidden", "true");
       document.body.classList.remove("article-open");
       if (!fromPop && history.state && history.state.article) history.back();
+      setTimeout(checkForNewVersion, 0);
     }
     function renderArticle() {
       const i = state.order.findIndex(s => storyKey(s) === state.articleId);
@@ -450,6 +451,32 @@
       else copy();
     }
 
+    // A home-screen app is frozen when it goes to the background and resumes with the OLD page code, so a
+    // new deployment never reaches it. The page therefore compares its own source with the server's when it
+    // returns to the foreground and every few minutes, and reloads itself when they differ.
+    let pageFingerprint = null;
+    function fingerprint(text) {
+      let hash = 2166136261;
+      for (let i = 0; i < text.length; i++) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+      return (hash >>> 0).toString(16) + ":" + text.length;
+    }
+    async function checkForNewVersion() {
+      try {
+        const res = await fetch(location.pathname, { cache: "no-store" });
+        if (!res.ok) return;
+        const current = fingerprint(await res.text());
+        if (pageFingerprint === null) { pageFingerprint = current; return; }
+        // Never replace the page under a reader who has a story open; the next check applies it.
+        if (current !== pageFingerprint && !state.articleId) location.reload();
+      } catch (err) {
+        console.error("Version check failed:", err);
+      }
+    }
+    async function backgroundRefresh() {
+      await checkForNewVersion();
+      await pollBriefing();
+    }
+
     // New stories are added without a reload: poll quietly, insert at once when the reader is at the top,
     // otherwise offer a "new stories" button so the reading position never jumps.
     async function pollBriefing() {
@@ -484,8 +511,13 @@
         if (state.pending) render(state.pending, state.mode);
         window.scrollTo(0, 0);
       });
-      setInterval(pollBriefing, POLL_INTERVAL_MS);
-      document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing(); });
+      setInterval(backgroundRefresh, POLL_INTERVAL_MS);
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) return;
+        checkForNewVersion();
+        if (Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing();
+      });
+      checkForNewVersion();
       $("btn-refresh").addEventListener("click", () => loadBriefing(state.mode, true));
       $("btn-share").addEventListener("click", shareBriefing);
       $("mkt-toggle").addEventListener("click", () => {
