@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Aviation Briefing">
   <link rel="apple-touch-icon" href="/static/icon.svg">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/static/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +17,7 @@
   <style>
     :root {
       --paper: #F4F1EA; --paper-2: #EBE6DB; --ink: #1B1A17; --ink-2: #2A2823; --body: #4A463F;
-      --muted: #5E5A52; --faint: #8C877C; --rule: #DDD7CB; --rule-2: #CFC8BA;
+      --muted: #5E5A52; --faint: #6A655B; --rule: #DDD7CB; --rule-2: #CFC8BA;
       --pos: oklch(0.46 0.11 150); --neg: oklch(0.50 0.16 28);
       --serif: 'Newsreader', Georgia, serif; --sans: 'IBM Plex Sans', -apple-system, 'Helvetica Neue', sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
       --pad: 22px;
@@ -35,13 +36,15 @@
     .mast-top { display: flex; justify-content: space-between; align-items: center; font: 500 11px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
     .mast-actions { display: flex; gap: 16px; }
     .mast-actions button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; padding: 6px 0; }
-    .mast-actions button[disabled] { opacity: .4; }
-    .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
+        .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
     .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
-    .today { padding: 6px 0 9px; font: 500 14px/1 var(--sans); color: var(--ink); border-bottom: 2px solid var(--ink); }
-    .today span { color: var(--faint); font-weight: 400; }
-    .counts { font: 400 12px/1 var(--sans); color: var(--muted); padding-bottom: 9px; white-space: nowrap; }
-    .stale { margin: 10px var(--pad) 0; padding: 10px 12px; background: var(--paper-2); font: 400 12.5px/1.4 var(--sans); color: var(--ink-2); }
+    .tabs { display: flex; gap: 22px; }
+    .tab { padding: 6px 0 9px; font: 500 14px/1 var(--sans); color: var(--faint); border-bottom: 2px solid transparent; }
+    .tab span { color: var(--faint); font-weight: 400; }
+    .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+    .mast-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
+    .mast-meta #updated { font-size: 11px; color: var(--faint); }
+    .stale { margin: 10px var(--pad) 0; padding: 10px 12px; background: var(--paper-2); font: 400 12.5px/1.4 var(--sans); color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
     .stale[hidden] { display: none; }
 
     .market { margin: 0 var(--pad); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
@@ -60,10 +63,13 @@
     .mkt-val small { font-size: 10px; color: var(--faint); }
     .mkt-chg { font: 500 12px/1 var(--mono); text-align: right; }
     .spark { width: 56px; height: 20px; display: block; }
-    .mkt-note { font: 400 11px/1.4 var(--sans); color: var(--faint); padding-top: 6px; }
+    .mkt-note { font: 400 11px/1.4 var(--sans); color: var(--muted); padding-top: 6px; }
+    .mkt-miss { color: var(--muted); font-weight: 400; }
 
     .lead-story { margin: 0 var(--pad); padding: 20px 0 22px; border-bottom: 1px solid var(--ink); display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
     .kicker { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .kicker .lvl-critical { color: var(--neg); }
+    .kicker .lvl-important { color: var(--ink); }
     .kicker .new { color: var(--ink); background: var(--paper-2); padding: 3px 5px; margin-top: -3px; }
     .kicker .updated { color: var(--ink); border: 1px solid var(--rule-2); padding: 2px 4px; margin-top: -3px; }
     .kicker .breaking { color: var(--paper); background: var(--neg); padding: 3px 5px; margin-top: -3px; }
@@ -78,7 +84,8 @@
     .filters-inner { display: flex; gap: 6px; overflow-x: auto; padding: 10px var(--pad); scrollbar-width: none; }
     .filters-inner::-webkit-scrollbar { display: none; }
     .chip { flex: none; padding: 8px 11px; border-radius: 999px; font: 500 12.5px/1 var(--sans); white-space: nowrap; color: var(--muted); }
-    .chip span { opacity: .6; margin-left: 3px; }
+    .chip span { color: var(--faint); margin-left: 3px; }
+    .chip[aria-pressed="true"] span { color: var(--rule-2); }
     .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 
     .group { padding: 0 var(--pad); }
@@ -89,7 +96,16 @@
     .row-body { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
     .row h3 { font: 500 20px/1.2 var(--serif); letter-spacing: -.01em; text-wrap: pretty; }
     .row p { font: 400 14px/1.5 var(--sans); color: var(--body); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .row .src { font: 400 12px/1 var(--sans); color: var(--muted); }
+    .row .src { font: 400 12px/1.3 var(--sans); color: var(--muted); }
+    .row.compact { padding: 12px 0 13px; }
+    .row.compact h3 { font-size: 18px; }
+    .row.compact .row-num { color: var(--muted); }
+    .row .pending, .art-pending { font: italic 400 14px/1.4 var(--serif); color: var(--muted); }
+    .art-pending { padding: 10px 12px; background: var(--paper-2); }
+    .sources { display: flex; flex-direction: column; gap: 8px; list-style: none; }
+    .sources li { font: 400 13.5px/1.4 var(--sans); color: var(--ink-2); }
+    .sources a { text-decoration: none; border-bottom: 1px solid var(--rule-2); }
+    .sources .by { color: var(--muted); font-weight: 600; }
     .end { padding: 28px var(--pad) calc(48px + env(safe-area-inset-bottom)); text-align: center; font: italic 400 14px/1 var(--serif); color: var(--faint); }
     .state { padding: 40px var(--pad); font: italic 400 17px/1.45 var(--serif); color: var(--muted); }
     .state strong { display: block; font-style: normal; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
@@ -100,11 +116,13 @@
     .art-bar .pos { font-size: 12px; color: var(--faint); }
     .art-nav { justify-self: end; display: flex; gap: 6px; }
     .art-nav button { width: 34px; height: 34px; font-size: 18px; }
-    .art-nav button[disabled] { color: var(--rule-2); }
+    .art-nav button[disabled] { color: var(--rule-2); cursor: default; }
     .art-back { justify-self: start; padding: 8px 0; }
     .art-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .art-body { padding: 22px var(--pad) calc(40px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
     .art-body h1 { font: 500 30px/1.12 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
+    .art-body h1:focus { outline: none; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
     .art-src { font: 400 12px/1.3 var(--sans); color: var(--muted); }
     .art-why { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 12px 0; display: flex; flex-direction: column; gap: 6px; }
     .art-why p { font: italic 400 17px/1.45 var(--serif); color: var(--ink-2); }
@@ -128,14 +146,14 @@
 
     .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
     .ios-prompt[hidden] { display: none; }
-    .ios-prompt button { color: var(--faint); font-size: 16px; }
+    .ios-prompt button { color: var(--paper-2); font-size: 16px; }
     #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 20px); transform: translate(-50%, 120px); background: var(--ink); color: var(--paper); padding: 10px 16px; font: 500 13px/1.3 var(--sans); z-index: 100; transition: transform .3s ease; pointer-events: none; }
     #toast.show { transform: translate(-50%, 0); }
     @media (min-width: 700px) { .title { font-size: 48px; } .lead-story h2 { font-size: 38px; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="wrap" id="wrap">
     <header class="mast">
       <div class="mast-top">
         <span id="dateline">—</span>
@@ -145,8 +163,11 @@
       </div>
       <div class="title">The Aviation Briefing</div>
       <div class="mast-row">
-        <div class="today">Today <span>· updates automatically</span></div>
-        <span class="counts" id="counts"></span>
+        <div class="tabs" role="tablist" aria-label="Briefing view">
+          <button class="tab" role="tab" id="tab-daily" data-mode="daily" aria-selected="true" aria-controls="content">Daily <span>· today</span></button>
+          <button class="tab" role="tab" id="tab-hourly" data-mode="hourly" aria-selected="false" aria-controls="content">Live <span>· last 2h</span></button>
+        </div>
+        <div class="mast-meta"><span id="counts"></span><span id="updated"></span></div>
       </div>
     </header>
 
@@ -154,7 +175,7 @@
       <span>Install on iPhone: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</span>
       <button type="button" id="ios-close" aria-label="Dismiss">✕</button>
     </div>
-    <div class="stale" id="stale" hidden></div>
+    <div class="stale" id="stale" role="status" hidden></div>
 
     <section class="market" id="market" hidden aria-label="Markets and fuel">
       <div class="ticker-row">
@@ -164,10 +185,12 @@
       <div class="mkt-table" id="mkt-table" hidden></div>
     </section>
 
-    <main id="content"><div class="state">Loading the briefing…</div></main>
+    <main id="content" role="tabpanel" aria-labelledby="tab-daily"><div class="state">Loading the briefing…</div></main>
   </div>
 
-  <div class="article" id="article" aria-hidden="true">
+  <button id="new-pill" type="button" hidden></button>
+
+  <div class="article" id="article" role="dialog" aria-modal="true" aria-label="Story" aria-hidden="true">
     <div class="art-bar">
       <button class="art-back" id="art-back" type="button">‹ Briefing</button>
       <span class="pos" id="art-pos"></span>
@@ -179,18 +202,22 @@
     <div class="art-scroll" id="art-scroll"><div class="art-body" id="art-body"></div></div>
   </div>
 
-  <button id="new-pill" type="button" hidden></button>
-  <div id="toast"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const SECTION_ORDER = [
-      "Europe", "Middle East & Gulf", "Asia-Pacific", "Americas", "Africa", "Manufacturers & Supply Chain", "Regulation & Airspace",
-      "Turkey / THY and Turkish aviation", "European and other global airlines", "Route news", "Other areas", "Other"
-    ];
-    const MODE = { daily: { empty: "No verified developments yet today.", loading: "Loading today's briefing…" } };
+    // Region chips follow the server's region_section; the old per-source "section" is not used.
+    const SECTION_ORDER = ["Europe", "Middle East & Gulf", "Asia-Pacific", "Americas", "Africa", "Manufacturers & Supply Chain", "Regulation & Airspace", "Other"];
+    const LEVEL_LABELS = { critical: "Critical", important: "Important", watch: "Watch" };
+    const TOP_LEVELS = ["critical", "important"];
+    const MODE = {
+      daily: { empty: "No verified developments yet today.", loading: "Loading today's briefing…" },
+      hourly: { empty: "No new verified developments in the last 2 hours.", loading: "Updating Live…" }
+    };
     const POLL_INTERVAL_MS = 5 * 60 * 1000;
     const MIN_POLL_GAP_MS = 60 * 1000;
     const SCROLL_TOP_THRESHOLD = 120;
+    const STALE_AFTER_MINUTES = 180;
+    const FRESHNESS_TICK_MS = 60 * 1000;
     const SOURCE_TYPES = { mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social" };
     const MARKET_ORDER = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread", "fx_usd_eur", "fx_usd_gbp", "fx_usd_jpy", "fx_usd_cny", "fx_usd_inr", "fx_usd_try", "fx_usd_brl"];
     const MARKET_LABELS = {
@@ -199,9 +226,9 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { mode: "daily", filter: "All", data: null, stories: [], order: [], articleId: null, newKeys: new Set(), pending: null, polling: false, lastPoll: 0 };
-    const previousKeysByMode = new Map();
+    const state = { mode: "daily", filter: "All", data: null, stories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
+    const initialHash = location.hash ? decodeURIComponent(location.hash.slice(1)) : "";
 
     const HTML_ESCAPE_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
     const $ = (id) => document.getElementById(id);
@@ -213,24 +240,35 @@
         return escapeHtml(parsed.href);
       } catch { return "#"; }
     }
+    // localStorage throws in private windows and when site data is blocked; the page must work without it.
+    const safeStorage = {
+      get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+      set(key, value) { try { localStorage.setItem(key, value); } catch { /* ignored */ } }
+    };
     function storyKey(story) {
       const url = story && story.original_source && story.original_source.url;
-      return String(story && (story.id || url || story.headline) || "story").trim().toLowerCase();
+      return String(story && (story.story_id || story.id || url || story.headline) || "story").trim().toLowerCase();
     }
     function dedupe(stories) {
       const seen = new Set();
       return stories.filter(s => { const k = storyKey(s); if (seen.has(k)) return false; seen.add(k); return true; });
     }
-    function sectionOf(story) { return story.region_section || story.section || "Other"; }
+    function sectionOf(story) { return story.region_section || "Other"; }
     function badgeSet(story) { return new Set(Array.isArray(story.badges) ? story.badges : []); }
-    function isNewStory(story) { return state.newKeys.has(storyKey(story)) || badgeSet(story).has("new"); }
     function isBreaking(story) { return badgeSet(story).has("breaking"); }
-    function tagsHtml(story) {
+    function isTopLevel(story) { return TOP_LEVELS.includes(story.level); }
+    function isPending(story) { return story.narrative_status === "pending"; }
+    function sourcesOf(story) { return Array.isArray(story.sources) ? story.sources : []; }
+    function sourceCount(story) { return Math.max(Number(story.source_count) || 0, sourcesOf(story).length); }
+    function tagsHtml(story, withRegion) {
       const badges = badgeSet(story);
+      const level = LEVEL_LABELS[story.level];
       return [
+        level ? `<span class="lvl-${escapeHtml(story.level)}">${level}</span>` : "",
         badges.has("breaking") ? `<span class="breaking">Breaking</span>` : "",
-        isNewStory(story) ? `<span class="new">New</span>` : "",
-        badges.has("updated") ? `<span class="updated">Updated</span>` : ""
+        badges.has("new") ? `<span class="new">New</span>` : "",
+        badges.has("updated") ? `<span class="updated">Updated</span>` : "",
+        withRegion ? `<span>${escapeHtml(sectionOf(story))}</span>` : ""
       ].join("");
     }
     function sectionRank(name) { const i = SECTION_ORDER.indexOf(name); return i === -1 ? SECTION_ORDER.length : i; }
@@ -272,25 +310,42 @@
       state.pending = null;
       $("new-pill").hidden = true;
       const stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
-      const prev = previousKeysByMode.get(mode);
-      state.newKeys = prev ? new Set(stories.map(storyKey).filter(k => !prev.has(k))) : new Set();
-      previousKeysByMode.set(mode, new Set(stories.map(storyKey)));
       state.stories = stories;
       const sections = new Set(stories.map(sectionOf));
       if (state.filter !== "All" && !sections.has(state.filter)) state.filter = "All";
 
       $("dateline").textContent = [data.date_str, data.time_str].filter(Boolean).join(" · ") || "—";
       const breakingCount = stories.filter(isBreaking).length;
-      $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"}` + (breakingCount ? ` · ${breakingCount} breaking` : "");
-      const stale = $("stale");
-      if (data.status === "stale") {
-        stale.hidden = false;
-        stale.textContent = "The latest update didn't complete. Showing the last successful briefing" + (data.last_pipeline_run_at ? ` from ${new Date(data.last_pipeline_run_at).toUTCString().slice(5, 22)} UTC.` : ".");
-      } else stale.hidden = true;
+      $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
+      state.updatedAt = parseTime(data.last_pipeline_run_at || data.generated_at);
+      renderFreshness();
 
       renderMarket(data.market);
       renderList();
       if (state.articleId) renderArticle();
+      openLinkedStory();
+    }
+
+    function parseTime(value) { const t = Date.parse(value || ""); return Number.isFinite(t) ? t : null; }
+    function ageText(minutes) {
+      if (minutes < 1) return "just now";
+      if (minutes < 60) return `${minutes} min ago`;
+      const hours = Math.floor(minutes / 60);
+      return `${hours} h${minutes % 60 ? ` ${minutes % 60} min` : ""} ago`;
+    }
+    // The band explains why the data may be old: the last pipeline run failed (status "stale") or no run reached the site for a while.
+    function renderFreshness() {
+      const data = state.data || {};
+      const minutes = state.updatedAt === null ? null : Math.max(0, Math.round((Date.now() - state.updatedAt) / 60000));
+      $("updated").textContent = minutes === null ? "" : `Updated ${ageText(minutes)}`;
+      const lines = [];
+      if (data.status === "stale") {
+        lines.push("The latest update didn't complete. Showing the last successful briefing" + (state.updatedAt !== null ? ` from ${new Date(state.updatedAt).toUTCString().slice(5, 22)} UTC.` : "."));
+      }
+      if (minutes !== null && minutes > STALE_AFTER_MINUTES) lines.push(`This briefing was last updated ${ageText(minutes)}. Newer stories may be missing.`);
+      const band = $("stale");
+      band.innerHTML = lines.map(l => `<div>${escapeHtml(l)}</div>`).join("");
+      band.hidden = !lines.length;
     }
 
     function renderList() {
@@ -300,72 +355,100 @@
       stories.forEach(s => { const k = sectionOf(s); counts[k] = (counts[k] || 0) + 1; });
       const sectionNames = Object.keys(counts).sort((a, b) => sectionRank(a) - sectionRank(b));
 
-      const lead = filter === "All" ? (stories.find(isBreaking) || stories[0]) : null;
-      const rest = stories.filter(s => s !== lead && (filter === "All" || sectionOf(s) === filter));
-      const groups = (filter === "All" ? sectionNames : [filter]).map(name => ({ name, items: rest.filter(s => sectionOf(s) === name) })).filter(g => g.items.length);
-      state.order = (lead ? [lead] : []).concat(...groups.map(g => g.items));
+      // "All" opens with a region-independent Critical & Important block (a short list of the top stories), then every story
+      // grouped by region. A region filter shows only that region's group, at every level. The reading order (prev/next)
+      // is the region order, so each story appears once in it even though the block repeats the top ones.
+      const showBlock = filter === "All";
+      const block = [];
+      const lead = showBlock ? (stories.find(isBreaking) || stories[0]) : null;
+      const blockRest = [];
+      const groups = (showBlock ? sectionNames : [filter]).map(name => ({ name, items: stories.filter(s => s !== lead && sectionOf(s) === name) })).filter(g => g.items.length);
+      state.order = [].concat(lead ? [lead] : [], ...groups.map(g => g.items));
+
+      let n = 0;
+      const compactRow = (s) => {
+        const count = sourceCount(s);
+        const meta = [sourceName(s), count > 1 ? `${count} sources` : ""].filter(Boolean).map(escapeHtml).join(" · ");
+        return `<button class="row compact" type="button" data-open="${escapeHtml(storyKey(s))}">
+          <span class="row-num" aria-hidden="true">•</span>
+          <span class="row-body">
+            <span class="kicker">${tagsHtml(s, true)}</span>
+            <h3>${escapeHtml(s.headline)}</h3>
+            <span class="src">${meta}</span>
+          </span>
+        </button>`;
+      };
+      const row = (s, withRegion) => {
+        n++;
+        const tags = tagsHtml(s, withRegion);
+        const count = sourceCount(s);
+        const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
+        const body = isPending(s) ? `<p class="pending">Analysis pending</p>` : (s.why_it_matters ? `<p>${escapeHtml(s.why_it_matters)}</p>` : "");
+        return `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
+          <span class="row-num">${String(n).padStart(2, "0")}</span>
+          <span class="row-body">
+            ${tags ? `<span class="kicker">${tags}</span>` : ""}
+            <h3>${escapeHtml(s.headline)}</h3>
+            ${body}
+            <span class="src">${meta}</span>
+          </span>
+        </button>`;
+      };
 
       let html = "";
+      if (block.length) html += `<section class="group"><div class="group-head eyebrow">Critical &amp; Important · ${block.length}</div></section>`;
       if (lead) {
-        html += `<article class="lead-story" data-open="${escapeHtml(storyKey(lead))}">
-          <div class="kicker">${kickerBits(lead, "Lead story")}</div>
+        const count = sourceCount(lead);
+        html += `<article class="lead-story" role="button" tabindex="0" data-open="${escapeHtml(storyKey(lead))}">
+          <div class="kicker">${tagsHtml(lead, true)}</div>
           <h2>${escapeHtml(lead.headline)}</h2>
-          ${lead.why_it_matters ? `<p class="why">${escapeHtml(lead.why_it_matters)}</p>` : ""}
-          <div class="meta"><span>${escapeHtml(sourceName(lead))}</span><strong>Read the analysis →</strong></div>
+          ${isPending(lead) ? `<p class="why">Analysis pending</p>` : (lead.why_it_matters ? `<p class="why">${escapeHtml(lead.why_it_matters)}</p>` : "")}
+          <div class="meta"><span>${escapeHtml([sourceName(lead), count > 1 ? `${count} sources` : ""].filter(Boolean).join(" · "))}</span><strong>Read the analysis →</strong></div>
         </article>`;
       }
+      if (blockRest.length) html += `<section class="group">${blockRest.map(compactRow).join("")}</section>`;
       html += `<nav class="filters" aria-label="Filter by region"><div class="filters-inner">
-        ${[["All", stories.length]].concat(sectionNames.map(n => [n, counts[n]])).map(([name, c]) =>
+        ${[["All", stories.length]].concat(sectionNames.map(name => [name, counts[name]])).map(([name, c]) =>
           `<button class="chip" type="button" data-filter="${escapeHtml(name)}" aria-pressed="${name === filter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
       </div></nav>`;
-      let n = lead ? 1 : 0;
       groups.forEach(g => {
-        html += `<section class="group"><div class="group-head eyebrow">${escapeHtml(g.name)}</div>`;
-        g.items.forEach(s => {
-          n++;
-          const flags = tagsHtml(s);
-          html += `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
-            <span class="row-num">${String(n).padStart(2, "0")}</span>
-            <span class="row-body">
-              ${flags ? `<span class="kicker">${flags}</span>` : ""}
-              <h3>${escapeHtml(s.headline)}</h3>
-              ${s.why_it_matters ? `<p>${escapeHtml(s.why_it_matters)}</p>` : ""}
-              <span class="src">${escapeHtml(sourceName(s))}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</span>
-            </span>
-          </button>`;
-        });
-        html += `</section>`;
+        html += `<section class="group"><div class="group-head eyebrow">${escapeHtml(g.name)}</div>${g.items.map(s => row(s, false)).join("")}</section>`;
       });
       html += `<div class="end">— End of briefing —</div>`;
       $("content").innerHTML = html;
     }
 
-    function kickerBits(s, first) {
-      return [`<span>${first}</span>`, `<span>${escapeHtml(sectionOf(s))}</span>`, tagsHtml(s)].join("");
-    }
     function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
 
     function renderMarket(market) {
-      const items = (market && Array.isArray(market.items) ? market.items : []).slice()
+      if (!market) { $("market").hidden = true; return; }
+      const items = (Array.isArray(market.items) ? market.items : []).slice()
         .sort((a, b) => (MARKET_ORDER.indexOf(a.series_id) + 99) % 99 - (MARKET_ORDER.indexOf(b.series_id) + 99) % 99);
-      if (!items.length) { $("market").hidden = true; return; }
       const label = (it) => {
         if (MARKET_LABELS[it.series_id]) return MARKET_LABELS[it.series_id];
         const m = /^fx_usd_([a-z]{3})$/.exec(it.series_id || "");
         return m ? [`USD/${m[1].toUpperCase()}`, `USD / ${m[1].toUpperCase()}`] : [it.name || it.series_id, it.name || it.series_id];
       };
+      const present = new Set(items.map(it => it.series_id));
+      const missing = MARKET_ORDER.filter(id => !present.has(id)).map(id => label({ series_id: id })[0]);
       const chg = (it) => Number(it.changes && it.changes.daily_pct);
       const cls = (v) => Number.isFinite(v) ? (v >= 0 ? "up" : "down") : "";
-      $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("");
+      const sources = [...new Set(items.map(it => String(it.source || "").split(";")[0].trim()).filter(Boolean))];
+      const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
+      $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
+        + (missing.length ? `<span class="mkt-miss">${items.length ? `${missing.length} unavailable` : "Market data unavailable"}</span>` : "");
       $("mkt-table").innerHTML = items.map(it => {
-        const asOf = it.as_of ? `${it.as_of}${it.carried_forward ? " · last valid value" : ""}` : "";
+        const age = Number(it.age_days) || 0;
+        const asOf = it.as_of ? `${it.as_of}${it.carried_forward && age > 0 ? ` · ${age} d old` : ""}` : "";
         return `<div class="mkt-line">
           <span class="mkt-name">${escapeHtml(label(it)[1])}<small>${escapeHtml(asOf)}</small></span>
           ${sparkline(it.sparkline)}
           <span class="mkt-val">${fmtNumber(it.value, 3)} <small>${escapeHtml(it.unit || "")}</small></span>
           <span class="mkt-chg ${cls(chg(it))}">${fmtChange(chg(it))}</span>
         </div>`;
-      }).join("") + `<p class="mkt-note">EIA · ECB reference rates. Jet fuel is the US Gulf Coast series, not a global price.${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
+      }).join("")
+        + (missing.length ? `<p class="mkt-note">Unavailable right now: ${escapeHtml(missing.join(", "))}.</p>` : "")
+        + `<p class="mkt-note">${sourceNote}Jet fuel is the US Gulf Coast series, not a global price.${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
       $("market").hidden = false;
     }
     function sparkline(points) {
@@ -377,20 +460,43 @@
     }
 
     function openArticle(key, push = true) {
+      if (!state.articleId) rememberTrigger(key);
       state.articleId = key;
       renderArticle();
       $("article").classList.add("open");
       $("article").setAttribute("aria-hidden", "false");
+      $("wrap").inert = true;                       // keyboard and screen-reader focus stay inside the open story
       document.body.classList.add("article-open");
       if (push) history.pushState({ article: key }, "", "#" + encodeURIComponent(key));
+      focusArticleHeading();
+    }
+    // The same story can appear twice (top block and its region), so remember which copy opened it.
+    function rowsFor(key) { return [...document.querySelectorAll("[data-open]")].filter(el => el.dataset.open === key && !$("article").contains(el)); }
+    function rememberTrigger(key) {
+      state.lastTrigger = document.activeElement;
+      state.lastTriggerIndex = Math.max(0, rowsFor(key).indexOf(document.activeElement));
     }
     function closeArticle(fromPop = false) {
+      const key = state.articleId;
       state.articleId = null;
       $("article").classList.remove("open");
       $("article").setAttribute("aria-hidden", "true");
+      $("wrap").inert = false;
       document.body.classList.remove("article-open");
+      returnFocus(key);
       if (!fromPop && history.state && history.state.article) history.back();
       setTimeout(checkForNewVersion, 0);
+    }
+    function focusArticleHeading() {
+      const heading = $("art-body").querySelector("h1");
+      if (heading) heading.focus({ preventScroll: true });
+    }
+    // Closing returns focus to the row that opened the story (the list is re-rendered, so look the row up by key).
+    function returnFocus(key) {
+      const rows = key ? rowsFor(key) : [];
+      const target = state.lastTrigger && state.lastTrigger.isConnected && state.lastTrigger !== document.body ? state.lastTrigger : (rows[state.lastTriggerIndex] || rows[0]);
+      if (target) target.focus({ preventScroll: true });
+      state.lastTrigger = null;
     }
     function renderArticle() {
       const i = state.order.findIndex(s => storyKey(s) === state.articleId);
@@ -403,29 +509,46 @@
       const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
         `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p>${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
       const strategic = s.strategic_impact || "";
+      const coverage = sourcesOf(s);
+      const count = sourceCount(s);
+      const coverageHtml = coverage.length ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">${count > 1 ? `Covered by ${count} sources` : "Source"}</span><ul class="sources">${coverage.map(c =>
+        `<li><span class="by">${escapeHtml(c.name || "Source")}</span> — <a href="${safeExternalUrl(c.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.title || c.url || "Read article")} ↗</a></li>`).join("")}</ul></div>` : "";
       $("art-pos").textContent = `${i + 1} of ${state.order.length}`;
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
       $("art-body").innerHTML = `
-        <div class="kicker"><span>${escapeHtml(sectionOf(s))}</span>${tagsHtml(s)}</div>
-        <h1>${escapeHtml(s.headline)}</h1>
-        <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+        <div class="kicker">${tagsHtml(s, true)}</div>
+        <h1 tabindex="-1">${escapeHtml(s.headline)}</h1>
+        <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+        ${isPending(s) ? `<p class="art-pending">Analysis pending — the written analysis appears after the next update.</p>` : ""}
         ${s.why_it_matters ? `<div class="art-why"><span class="eyebrow">Why it matters</span><p>${escapeHtml(s.why_it_matters)}</p></div>` : ""}
         ${s.lead ? `<p class="art-lead">${escapeHtml(s.lead)}</p>` : ""}
         ${analysis ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Analysis</span><ul class="bullets">${analysis}</ul></div>` : ""}
         ${dps ? `<div class="datapoints">${dps}</div>` : ""}
         ${strategic || exposure ? `<div class="impact"><span class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p>${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
+        ${coverageHtml}
         <a class="art-link" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>
         ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span class="eyebrow" style="color:var(--muted)">Next story ↓</span><span>${escapeHtml(next.headline)}</span></button>` : ""}`;
       $("art-scroll").scrollTop = 0;
     }
-    function stepArticle(delta) {
+    function stepArticle(delta, moveFocus = false) {
       const i = state.order.findIndex(s => storyKey(s) === state.articleId);
       const target = state.order[i + delta];
       if (!target) return;
       state.articleId = storyKey(target);
       history.replaceState({ article: state.articleId }, "", "#" + encodeURIComponent(state.articleId));
       renderArticle();
+      if (moveFocus) focusArticleHeading();
+    }
+    // A shared link (#story-id) opens that story once the list has loaded; an id that is no longer in this view is dropped quietly.
+    let linkedStoryHandled = !initialHash;
+    function openLinkedStory() {
+      if (linkedStoryHandled) return;
+      linkedStoryHandled = true;
+      const key = initialHash.trim().toLowerCase();
+      history.replaceState(null, "", location.pathname + location.search);
+      if (state.order.some(s => storyKey(s) === key)) openArticle(key, true);
+      else showToast("That story is no longer in this briefing.");
     }
 
     function shareBriefing() {
@@ -440,6 +563,15 @@
       const copy = () => navigator.clipboard.writeText(text).then(() => showToast("Briefing copied to clipboard.")).catch(() => showToast("Couldn't copy."));
       if (navigator.share) navigator.share({ title: state.data.heading || "The Aviation Briefing", text }).catch(copy);
       else copy();
+    }
+
+    function setMode(mode) {
+      state.mode = mode; state.filter = "All";
+      document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.mode === mode)));
+      $("content").setAttribute("aria-labelledby", "tab-" + mode);
+      if (state.articleId) closeArticle();
+      window.scrollTo(0, 0);
+      loadBriefing(mode);
     }
 
     // A home-screen app is frozen when it goes to the background and resumes with the OLD page code, so a
@@ -474,10 +606,12 @@
       if (document.hidden || state.polling || !state.data) return;
       state.polling = true;
       state.lastPoll = Date.now();
+      const polledMode = state.mode;
       try {
-        const res = await fetch(`/api/briefing?mode=${state.mode}`, { cache: "default", headers: { "Accept": "application/json" } });
+        const res = await fetch(`/api/briefing?mode=${polledMode}`, { cache: "default", headers: { "Accept": "application/json" } });
         if (!res.ok || !(res.headers.get("content-type") || "").includes("application/json")) return;
-        applyPolled(await res.json());
+        const data = await res.json();
+        if (polledMode === state.mode) applyPolled(data);
       } catch (err) {
         console.error("Background refresh failed:", err);
       } finally {
@@ -497,14 +631,17 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { if (t.dataset.mode !== state.mode) setMode(t.dataset.mode); }));
       $("new-pill").addEventListener("click", () => {
         if (state.articleId) closeArticle();
         if (state.pending) render(state.pending, state.mode);
         window.scrollTo(0, 0);
       });
       setInterval(backgroundRefresh, POLL_INTERVAL_MS);
+      setInterval(renderFreshness, FRESHNESS_TICK_MS);
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) return;
+        renderFreshness();
         checkForNewVersion();
         if (Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing();
       });
@@ -523,12 +660,18 @@
           const top = document.querySelector(".filters").getBoundingClientRect().top + window.scrollY;
           renderList();
           if (window.scrollY > top) window.scrollTo(0, top);
+          const pressed = [...document.querySelectorAll("[data-filter]")].find(el => el.dataset.filter === state.filter);
+          if (pressed) pressed.focus({ preventScroll: true });
           return;
         }
         const item = e.target.closest("[data-open]");
         if (item) openArticle(item.dataset.open);
       });
-      $("art-body").addEventListener("click", (e) => { const n = e.target.closest("[data-open]"); if (n) stepArticle(1); });
+      $("content").addEventListener("keydown", (e) => {
+        const lead = e.target.closest(".lead-story");
+        if (lead && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openArticle(lead.dataset.open); }
+      });
+      $("art-body").addEventListener("click", (e) => { const n = e.target.closest("[data-open]"); if (n) stepArticle(1, true); });
       $("art-back").addEventListener("click", () => closeArticle());
       $("art-prev").addEventListener("click", () => stepArticle(-1));
       $("art-next").addEventListener("click", () => stepArticle(1));
@@ -545,10 +688,9 @@
 
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const standalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
-      if (isIos && !standalone && !localStorage.getItem("ios_prompt_dismissed")) $("ios-prompt").hidden = false;
-      $("ios-close").addEventListener("click", () => { $("ios-prompt").hidden = true; localStorage.setItem("ios_prompt_dismissed", "true"); });
+      if (isIos && !standalone && !safeStorage.get("ios_prompt_dismissed")) $("ios-prompt").hidden = false;
+      $("ios-close").addEventListener("click", () => { $("ios-prompt").hidden = true; safeStorage.set("ios_prompt_dismissed", "true"); });
 
-      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
       loadBriefing(state.mode);
     });
   </script>
