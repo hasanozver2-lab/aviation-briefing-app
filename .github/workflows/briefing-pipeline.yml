@@ -1,9 +1,11 @@
 name: Publish aviation briefings
 
+# One hourly run produces both the daily and the hourly briefing and commits them to the
+# "briefing-data" branch in a single commit (at most 24 commits a day). Nothing is ever
+# committed to main, and pushes to briefing-data do not deploy (see vercel.json).
 on:
   schedule:
     - cron: "2 * * * *"
-    - cron: "*/30 * * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -13,51 +15,27 @@ on:
         type: choice
         options: [all, daily, hourly]
 
+# The narrowest permission that lets the job push the data branch with GITHUB_TOKEN.
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: aerobrief-publish
+  cancel-in-progress: false
 
 jobs:
-  daily:
-    # One run per mode at a time; a newer queued run replaces an older queued one, a running one finishes.
-    concurrency:
-      group: aerobrief-daily
-      cancel-in-progress: false
-    if: >-
-      (github.event_name == 'schedule' && github.event.schedule == '2 * * * *') ||
-      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'daily' || inputs.mode == 'all'))
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Publish daily briefing
+      - name: Publish briefings to the briefing-data branch
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          BLOB_PUBLIC_BASE_URL: ${{ secrets.BLOB_PUBLIC_BASE_URL }}
+          BRIEFING_STORE: github
           MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
-        run: python scripts/run_pipeline.py --mode daily
-
-  hourly:
-    concurrency:
-      group: aerobrief-hourly
-      cancel-in-progress: false
-    if: >-
-      (github.event_name == 'schedule' && github.event.schedule == '*/30 * * * *') ||
-      (github.event_name == 'workflow_dispatch' && (inputs.mode == 'hourly' || inputs.mode == 'all'))
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Publish hourly briefing
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          BLOB_PUBLIC_BASE_URL: ${{ secrets.BLOB_PUBLIC_BASE_URL }}
-          MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
-        run: python scripts/run_pipeline.py --mode hourly
+          MODE: ${{ inputs.mode || 'all' }}
+        run: python scripts/run_pipeline.py --mode "$MODE"

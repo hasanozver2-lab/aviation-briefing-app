@@ -29,6 +29,7 @@ EIA_SPOT_ENDPOINT = "https://api.eia.gov/v2/petroleum/pri/spt/data/"
 ECB_EXR_ENDPOINT = "https://data-api.ecb.europa.eu/service/data/EXR"
 IATA_FUEL_MONITOR_URL = "https://www.iata.org/en/publications/economics/fuel-monitor/"
 FX_CURRENCIES = ("EUR", "GBP", "JPY", "CNY", "INR", "TRY", "BRL")
+MISSING_EIA_NOTE = "Brent ve ABD Körfez Kıyısı jet yakıtı göstergeleri bu yayında yok: EIA anahtarı tanımlı değil."
 FUEL_CONTEXT_TERMS = text_match.TermSet(["jet fuel", "yakıt*", "brent", "oil", "petrol*"], allow_plural=True)
 
 
@@ -611,13 +612,18 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
     config = load_market_config()["series"]
     observations = {}
     errors = []
-    try:
-        observations["brent_spot"] = fetch_eia_series(config["brent_spot"]["eia_series"], eia_api_key, start, today)
-        observations["us_gulf_coast_jet_fuel"] = fetch_eia_series(
-            config["us_gulf_coast_jet_fuel"]["eia_series"], eia_api_key, start, today
-        )
-    except Exception as exc:
-        errors.append(f"EIA: {type(exc).__name__}")
+    skipped = []
+    if not str(eia_api_key or "").strip():
+        # Without an EIA key the pipeline still runs: fuel indicators are skipped, ECB rates continue.
+        skipped.append("EIA")
+    else:
+        try:
+            observations["brent_spot"] = fetch_eia_series(config["brent_spot"]["eia_series"], eia_api_key, start, today)
+            observations["us_gulf_coast_jet_fuel"] = fetch_eia_series(
+                config["us_gulf_coast_jet_fuel"]["eia_series"], eia_api_key, start, today
+            )
+        except Exception as exc:
+            errors.append(f"EIA: {type(exc).__name__}")
     try:
         observations.update(fetch_ecb_fx_series(start, today))
     except Exception as exc:
@@ -626,7 +632,10 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
         upsert_observations(target, observations)
     panel, indicators = build_market_panel(target)
     panel["errors"] = errors
-    if errors and panel["status"] == "ok":
+    panel["skipped"] = skipped
+    if skipped:
+        panel["missing_data_note"] = MISSING_EIA_NOTE
+    if (errors or skipped) and panel["status"] == "ok":
         panel["status"] = "partial"
     panel["events"] = write_threshold_events(target, indicators, gemini_api_key) if indicators else []
     return panel
