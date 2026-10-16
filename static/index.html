@@ -38,10 +38,8 @@
     .mast-actions button[disabled] { opacity: .4; }
     .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
     .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
-    .tabs { display: flex; gap: 22px; }
-    .tab { padding: 6px 0 9px; font: 500 14px/1 var(--sans); color: var(--faint); border-bottom: 2px solid transparent; }
-    .tab span { color: var(--faint); font-weight: 400; }
-    .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+    .today { padding: 6px 0 9px; font: 500 14px/1 var(--sans); color: var(--ink); border-bottom: 2px solid var(--ink); }
+    .today span { color: var(--faint); font-weight: 400; }
     .counts { font: 400 12px/1 var(--sans); color: var(--muted); padding-bottom: 9px; white-space: nowrap; }
     .stale { margin: 10px var(--pad) 0; padding: 10px 12px; background: var(--paper-2); font: 400 12.5px/1.4 var(--sans); color: var(--ink-2); }
     .stale[hidden] { display: none; }
@@ -68,6 +66,10 @@
     .kicker { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
     .kicker .prio { color: var(--neg); }
     .kicker .new { color: var(--ink); background: var(--paper-2); padding: 3px 5px; margin-top: -3px; }
+    .kicker .updated { color: var(--ink); border: 1px solid var(--rule-2); padding: 2px 4px; margin-top: -3px; }
+    .kicker .breaking { color: var(--paper); background: var(--neg); padding: 3px 5px; margin-top: -3px; }
+    #new-pill { position: fixed; top: calc(env(safe-area-inset-top) + 62px); left: 50%; transform: translateX(-50%); z-index: 20; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 999px; font: 600 12px/1 var(--sans); letter-spacing: .04em; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+    #new-pill[hidden] { display: none; }
     .lead-story h2 { font: 500 31px/1.1 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
     .lead-story .why { font: italic 400 17px/1.45 var(--serif); color: #3A3732; text-wrap: pretty; }
     .meta { display: flex; justify-content: space-between; gap: 10px; font: 400 12px/1.3 var(--sans); color: var(--muted); }
@@ -145,10 +147,7 @@
       </div>
       <div class="title">The Aviation Briefing</div>
       <div class="mast-row">
-        <div class="tabs" role="tablist" aria-label="Briefing view">
-          <button class="tab" role="tab" data-mode="daily" aria-selected="true">Daily <span>· 48h</span></button>
-          <button class="tab" role="tab" data-mode="hourly" aria-selected="false">Live radar <span>· 60 min</span></button>
-        </div>
+        <div class="today">Today <span>· updates automatically</span></div>
         <span class="counts" id="counts"></span>
       </div>
     </header>
@@ -182,6 +181,7 @@
     <div class="art-scroll" id="art-scroll"><div class="art-body" id="art-body"></div></div>
   </div>
 
+  <button id="new-pill" type="button" hidden></button>
   <div id="toast"></div>
 
   <script>
@@ -189,10 +189,10 @@
       "Europe", "Middle East & Gulf", "Asia-Pacific", "Americas", "Africa", "Manufacturers & Supply Chain", "Regulation & Airspace",
       "Turkey / THY and Turkish aviation", "European and other global airlines", "Route news", "Other areas", "Other"
     ];
-    const MODE = {
-      daily: { empty: "No verified developments in the last 48 hours.", loading: "Loading the daily briefing…" },
-      hourly: { empty: "No new verified developments in the last 60 minutes.", loading: "Updating live radar…" }
-    };
+    const MODE = { daily: { empty: "No verified developments yet today.", loading: "Loading today's briefing…" } };
+    const POLL_INTERVAL_MS = 5 * 60 * 1000;
+    const MIN_POLL_GAP_MS = 60 * 1000;
+    const SCROLL_TOP_THRESHOLD = 120;
     const SOURCE_TYPES = { mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social" };
     const MARKET_ORDER = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread", "fx_usd_eur", "fx_usd_gbp", "fx_usd_jpy", "fx_usd_cny", "fx_usd_inr", "fx_usd_try", "fx_usd_brl"];
     const MARKET_LABELS = {
@@ -201,7 +201,7 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { mode: "daily", filter: "All", data: null, stories: [], order: [], articleId: null, newKeys: new Set() };
+    const state = { mode: "daily", filter: "All", data: null, stories: [], order: [], articleId: null, newKeys: new Set(), pending: null, polling: false, lastPoll: 0 };
     const previousKeysByMode = new Map();
     let briefingRequestId = 0;
 
@@ -228,6 +228,17 @@
       return /(critical|urgent|emergency|security|safety|accident|divert|closure|strike|warning|alarm|hijack|disrupt)/i.test(text);
     }
     function sectionOf(story) { return story.section || "Other"; }
+    function badgeSet(story) { return new Set(Array.isArray(story.badges) ? story.badges : []); }
+    function isNewStory(story) { return state.newKeys.has(storyKey(story)) || badgeSet(story).has("new"); }
+    function tagsHtml(story, includePriority = true) {
+      const badges = badgeSet(story);
+      return [
+        includePriority && isPriority(story) ? `<span class="prio">Priority</span>` : "",
+        badges.has("breaking") ? `<span class="breaking">Breaking</span>` : "",
+        isNewStory(story) ? `<span class="new">New</span>` : "",
+        badges.has("updated") ? `<span class="updated">Updated</span>` : ""
+      ].join("");
+    }
     function sectionRank(name) { const i = SECTION_ORDER.indexOf(name); return i === -1 ? SECTION_ORDER.length : i; }
     function tone(impact) {
       const r = String(impact || "").toLowerCase();
@@ -267,6 +278,8 @@
 
     function render(data, mode) {
       state.data = Object.assign({ mode }, data);
+      state.pending = null;
+      $("new-pill").hidden = true;
       const stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
       const prev = previousKeysByMode.get(mode);
       state.newKeys = prev ? new Set(stories.map(storyKey).filter(k => !prev.has(k))) : new Set();
@@ -319,7 +332,7 @@
         html += `<section class="group"><div class="group-head eyebrow">${escapeHtml(g.name)}</div>`;
         g.items.forEach(s => {
           n++;
-          const flags = [isPriority(s) ? `<span class="prio">Priority</span>` : "", state.newKeys.has(storyKey(s)) ? `<span class="new">New</span>` : ""].join("");
+          const flags = tagsHtml(s);
           html += `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
             <span class="row-num">${String(n).padStart(2, "0")}</span>
             <span class="row-body">
@@ -337,8 +350,7 @@
     }
 
     function kickerBits(s, first) {
-      return [`<span class="${first === "Priority" ? "prio" : ""}">${first}</span>`, `<span>${escapeHtml(sectionOf(s))}</span>`,
-        state.newKeys.has(storyKey(s)) ? `<span class="new">New</span>` : ""].join("");
+      return [`<span class="${first === "Priority" ? "prio" : ""}">${first}</span>`, `<span>${escapeHtml(sectionOf(s))}</span>`, tagsHtml(s, false)].join("");
     }
     function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
 
@@ -403,7 +415,7 @@
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
       $("art-body").innerHTML = `
-        <div class="kicker">${isPriority(s) ? `<span class="prio">Priority</span>` : ""}<span>${escapeHtml(sectionOf(s))}</span></div>
+        <div class="kicker">${isPriority(s) ? `<span class="prio">Priority</span>` : ""}<span>${escapeHtml(sectionOf(s))}</span>${tagsHtml(s, false)}</div>
         <h1>${escapeHtml(s.headline)}</h1>
         <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
         ${s.why_it_matters ? `<div class="art-why"><span class="eyebrow">Why it matters</span><p>${escapeHtml(s.why_it_matters)}</p></div>` : ""}
@@ -438,16 +450,42 @@
       else copy();
     }
 
-    function setMode(mode) {
-      state.mode = mode; state.filter = "All";
-      document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.mode === mode)));
-      if (state.articleId) closeArticle();
-      window.scrollTo(0, 0);
-      loadBriefing(mode);
+    // New stories are added without a reload: poll quietly, insert at once when the reader is at the top,
+    // otherwise offer a "new stories" button so the reading position never jumps.
+    async function pollBriefing() {
+      if (document.hidden || state.polling || !state.data) return;
+      state.polling = true;
+      state.lastPoll = Date.now();
+      try {
+        const res = await fetch(`/api/briefing?mode=${state.mode}`, { cache: "default", headers: { "Accept": "application/json" } });
+        if (!res.ok || !(res.headers.get("content-type") || "").includes("application/json")) return;
+        applyPolled(await res.json());
+      } catch (err) {
+        console.error("Background refresh failed:", err);
+      } finally {
+        state.polling = false;
+      }
+    }
+    function applyPolled(data) {
+      const known = new Set(state.stories.map(storyKey));
+      const arrived = dedupe(Array.isArray(data.stories) ? data.stories : []).filter(s => !known.has(storyKey(s)));
+      const atTop = window.scrollY < SCROLL_TOP_THRESHOLD && !state.articleId;
+      const label = `${arrived.length} new ${arrived.length === 1 ? "story" : "stories"}`;
+      if (!arrived.length) { if (atTop) render(data, state.mode); return; }
+      if (atTop) { render(data, state.mode); showToast(`${label} added`); return; }
+      state.pending = data;
+      $("new-pill").textContent = `↑ ${label}`;
+      $("new-pill").hidden = false;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { if (t.dataset.mode !== state.mode) setMode(t.dataset.mode); }));
+      $("new-pill").addEventListener("click", () => {
+        if (state.articleId) closeArticle();
+        if (state.pending) render(state.pending, state.mode);
+        window.scrollTo(0, 0);
+      });
+      setInterval(pollBriefing, POLL_INTERVAL_MS);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden && Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing(); });
       $("btn-refresh").addEventListener("click", () => loadBriefing(state.mode, true));
       $("btn-share").addEventListener("click", shareBriefing);
       $("mkt-toggle").addEventListener("click", () => {
