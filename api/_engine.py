@@ -22,12 +22,12 @@ import xml.etree.ElementTree as ET
 
 try:
     from . import source_registry
-    from . import blob_store
+    from . import briefing_store
     from . import market_data
     from . import entities
 except ImportError:
     import source_registry
-    import blob_store
+    import briefing_store
     import market_data
     import entities
 
@@ -980,15 +980,19 @@ def _read_local_briefing_cache(mode):
 def get_ready_briefing(mode="daily"):
     """Read a completed briefing; this function never collects feeds or calls an LLM."""
     mode = validate_mode(mode)
-    snapshot = blob_store.get_public_json(blob_store.briefing_path(mode))
-    pipeline_status = blob_store.get_public_json(blob_store.pipeline_status_path(mode)) or {}
-    if not isinstance(snapshot, dict):
+    snapshot = briefing_store.read_json(briefing_store.briefing_path(mode))
+    pipeline_status = briefing_store.read_json(briefing_store.pipeline_status_path(mode)) or {}
+    store_unreadable = not isinstance(snapshot, dict)
+    if store_unreadable:
         snapshot = _read_local_briefing_cache(mode)
     if not isinstance(snapshot, dict):
         return build_briefing_payload(mode, [], status="unavailable", warning="No completed pipeline snapshot is available yet.")
 
     snapshot["last_pipeline_run_at"] = snapshot.get("last_pipeline_run_at") or snapshot.get("generated_at", "")
-    if pipeline_status.get("status") == "stale":
+    if store_unreadable:
+        snapshot["status"] = "stale"
+        snapshot["warning"] = "The live briefing data could not be read; the last committed snapshot is shown."
+    elif pipeline_status.get("status") == "stale":
         snapshot["status"] = "stale"
         snapshot["warning"] = "The latest pipeline attempt failed; the last successful briefing is shown."
         snapshot["last_pipeline_attempt_at"] = pipeline_status.get("last_attempt_at", "")

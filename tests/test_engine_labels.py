@@ -48,10 +48,10 @@ def test_fallback_story_without_labels_has_explicit_empty_defaults():
 
 
 def test_read_only_api_path_does_not_need_pipeline_config(tmp_path, monkeypatch):
-    from api import blob_store
+    from api import briefing_store
     monkeypatch.setattr(_engine, "PIPELINE_CONFIG_PATH", tmp_path / "missing.json")
     monkeypatch.setattr(_engine, "CACHE_FILE_DAILY", tmp_path / "missing_daily.json")
-    monkeypatch.setattr(blob_store, "get_public_json", lambda path: None)
+    monkeypatch.setattr(briefing_store, "read_json", lambda path: None)
     assert _engine.get_ready_briefing("daily")["status"] == "unavailable"
     with pytest.raises(FileNotFoundError):
         _engine.build_compact_articles([{"title": "T", "source": "S", "link": "https://example.com/a", "description": "x"}])
