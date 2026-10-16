@@ -2,1496 +2,495 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Aviation Briefing | Executive Intelligence</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#C70A0C">
-  
-  <!-- iOS PWA Meta Tags -->
+  <title>The Aviation Briefing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F1EA">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Aviation Briefing">
   <link rel="apple-touch-icon" href="/static/icon.svg">
   <link rel="manifest" href="/static/manifest.json">
-
-  <!-- Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --thy-red: #C70A0C;
-      --thy-red-hover: #A5080A;
-      --thy-red-soft: rgba(199, 10, 12, 0.08);
-      --bg-page: #F3F4F6;
-      --bg-card: #FFFFFF;
-      --text-main: #111827;
-      --text-muted: #4B5563;
-      --text-subtle: #6B7280;
-      --border-color: #E5E7EB;
-      --border-accent: rgba(199, 10, 12, 0.25);
-      --card-radius: 14px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      font-size: 16px;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-page);
-      color: var(--text-main);
-      line-height: 1.5;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Fixed Top App Bar */
-    header.app-bar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background-color: var(--thy-red);
-      color: #FFFFFF;
-      padding: 12px 16px;
-      box-shadow: 0 2px 8px rgba(199, 10, 12, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 32px;
-      height: 32px;
-      background: #FFFFFF;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-    }
-
-    .brand-title {
-      font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-    }
-
-    .brand-sub {
-      font-size: 0.72rem;
-      opacity: 0.9;
-      font-weight: 500;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .bar-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .icon-btn {
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #FFFFFF;
-      border-radius: 8px;
-      padding: 7px 10px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: background 0.15s ease;
-    }
-
-    .icon-btn:active {
-      background: rgba(255, 255, 255, 0.35);
-      transform: scale(0.97);
-    }
-
-    /* Main Container */
-    main.container {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    /* Mode Switcher Tabs */
-    .mode-switcher {
-      display: flex;
-      background: #E5E7EB;
-      padding: 4px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-    }
-
-    .mode-tab {
-      flex: 1;
-      padding: 8px 12px;
-      text-align: center;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      color: var(--text-muted);
-      border: none;
-      background: transparent;
-      transition: all 0.2s ease;
-    }
-
-    .mode-tab.active {
-      background: #FFFFFF;
-      color: var(--thy-red);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .mode-tab-label,
-    .mode-tab-meta {
-      display: block;
-    }
-
-    .mode-tab-meta {
-      margin-top: 2px;
-      font-size: 0.68rem;
-      font-weight: 500;
-      color: var(--text-subtle);
-      letter-spacing: 0.02em;
-    }
-
-    .mode-tab.active .mode-tab-meta {
-      color: var(--thy-red);
-      opacity: 0.8;
-    }
-
-    /* Executive Briefing Intro Card */
-    .intro-banner {
-      background: #FFFFFF;
-      border-radius: var(--card-radius);
-      padding: 18px 20px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color);
-      border-left: 5px solid var(--thy-red);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .briefing-heading {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--text-main);
-      letter-spacing: -0.02em;
-      margin-bottom: 4px;
-    }
-
-    .briefing-intro-text {
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-      line-height: 1.45;
-    }
-
-    .briefing-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.78rem;
-      color: var(--text-subtle);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--thy-red-soft);
-      color: var(--thy-red);
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 6px;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--thy-red);
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .briefing-context {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-      font-size: 0.78rem;
-    }
-
-    .briefing-context-title {
-      display: block;
-      color: var(--text-main);
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .briefing-context-window {
-      display: block;
-      margin-top: 2px;
-      color: var(--text-subtle);
-    }
-
-    .radar-note {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      color: #166534;
-      background: #DCFCE7;
-      border: 1px solid #BBF7D0;
-      font-size: 0.7rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .radar-note[hidden] {
-      display: none;
-    }
-
-    .pulse-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .pulse-item {
-      min-width: 0;
-      padding: 10px 11px;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      background: #F9FAFB;
-    }
-
-    .pulse-item span {
-      display: block;
-      overflow: hidden;
-      color: var(--text-subtle);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-overflow: ellipsis;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .pulse-item strong {
-      display: block;
-      margin-top: 3px;
-      color: var(--text-main);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
-    }
-
-    .market-panel { background: #FFFFFF; border: 1px solid var(--border-color); border-radius: var(--card-radius); box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: hidden; }
-    .market-panel[hidden] { display: none; }
-    .market-panel-header { align-items: flex-start; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; justify-content: space-between; padding: 15px 16px 12px; }
-    .market-panel-title { color: var(--text-main); font-size: 0.96rem; font-weight: 800; letter-spacing: -0.01em; }
-    .market-panel-subtitle, .market-source-note { color: var(--text-subtle); font-size: 0.72rem; line-height: 1.4; margin-top: 3px; }
-    .market-grid { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px 16px; }
-    .market-item { background: #F9FAFB; border: 1px solid var(--border-color); border-radius: 10px; min-width: 0; padding: 10px; }
-    .market-name { color: var(--text-subtle); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
-    .market-value-row { align-items: baseline; display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-    .market-value { color: var(--text-main); font-family: 'JetBrains Mono', monospace; font-size: 0.98rem; font-weight: 700; }
-    .market-unit, .market-change, .market-date { color: var(--text-subtle); font-size: 0.67rem; }
-    .market-change.up { color: #166534; font-weight: 700; } .market-change.down { color: var(--thy-red); font-weight: 700; }
-    .market-sparkline { display: block; height: 28px; margin-top: 7px; width: 100%; }
-    .market-panel-footer { border-top: 1px solid var(--border-color); padding: 10px 16px 12px; }
-    .market-iata-link { color: var(--thy-red); font-size: 0.72rem; font-weight: 700; text-decoration: none; }
-
-    /* LAYER 1: Top Summary List */
-    #top-summary {
-      scroll-margin-top: 75px;
-    }
-
-    .summary-card {
-      background: #FFFFFF;
-      border-radius: var(--card-radius);
-      padding: 18px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .summary-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-    }
-
-    .summary-card-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--thy-red);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .summary-section-group {
-      margin-bottom: 16px;
-    }
-
-    .summary-section-group:last-child {
-      margin-bottom: 0;
-    }
-
-    .summary-section-title {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-subtle);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .summary-section-title::before {
-      content: "";
-      width: 3px;
-      height: 12px;
-      background: var(--thy-red);
-      border-radius: 2px;
-      display: inline-block;
-    }
-
-    .summary-headline-list {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .summary-item a {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--text-main);
-      font-weight: 600;
-      font-size: 0.92rem;
-      line-height: 1.4;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: #F9FAFB;
-      border: 1px solid transparent;
-      transition: all 0.15s ease;
-    }
-
-    .summary-item a:hover, .summary-item a:active {
-      background: var(--thy-red-soft);
-      border-color: var(--border-accent);
-      color: var(--thy-red);
-    }
-
-    .summary-bullet {
-      color: var(--thy-red);
-      font-size: 1.1rem;
-      line-height: 1;
-      margin-top: 2px;
-    }
-
-    /* Section Separators */
-    .section-divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 32px 0 16px 0;
-    }
-
-    .section-divider-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--text-main);
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-    }
-
-    .section-divider-line {
-      height: 2px;
-      background: #E5E7EB;
-      flex: 1;
-    }
-
-    /* LAYER 2: Detailed Story Blocks */
-    .story-card {
-      background: var(--bg-card);
-      border-radius: var(--card-radius);
-      padding: 20px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-      scroll-margin-top: 80px;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .story-card.radar-story {
-      border-left: 4px solid #2878B8;
-    }
-
-    .story-card.is-new {
-      box-shadow: 0 0 0 2px rgba(40, 120, 184, 0.16), var(--shadow-md);
-    }
-
-    .story-card-topline {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .story-time {
-      color: var(--text-subtle);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      white-space: nowrap;
-    }
-
-    .story-fresh {
-      display: inline-flex;
-      align-items: center;
-      margin-left: 6px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      color: #0F4C81;
-      background: #E0F2FE;
-      font-size: 0.62rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      vertical-align: middle;
-    }
-
-    .radar-story .story-lead {
-      display: -webkit-box;
-      overflow: hidden;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
-    }
-
-    .empty-state {
-      padding: 24px 18px;
-      border: 1px dashed var(--border-color);
-      border-radius: 12px;
-      background: #F9FAFB;
-      text-align: center;
-    }
-
-    .empty-state strong {
-      display: block;
-      color: var(--text-main);
-      font-size: 0.95rem;
-    }
-
-    .empty-state p {
-      margin-top: 5px;
-      color: var(--text-subtle);
-      font-size: 0.82rem;
-    }
-
-    .story-badge {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--thy-red);
-      background: var(--thy-red-soft);
-      padding: 3px 8px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
-
-    .story-headline {
-      font-size: 1.15rem;
-      font-weight: 800;
-      line-height: 1.35;
-      color: var(--text-main);
-      letter-spacing: -0.015em;
-      margin-bottom: 10px;
-    }
-
-    .story-lead {
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 16px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .story-subheading {
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-main);
-      margin: 14px 0 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .analysis-list {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      margin-bottom: 14px;
-    }
-
-    .analysis-list li {
-      font-size: 0.88rem;
-      color: var(--text-main);
-      line-height: 1.45;
-      position: relative;
-      padding-left: 16px;
-    }
-
-    .analysis-list li::before {
-      content: "▪";
-      position: absolute;
-      left: 0;
-      color: var(--thy-red);
-      font-size: 0.95rem;
-    }
-
-    /* Data Points Box */
-    .data-points-box {
-      background: #F9FAFB;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-
-    .data-points-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--thy-red);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .data-points-list {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .data-points-list li {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-main);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .pro-tag {
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      background: var(--thy-red);
-      color: #FFFFFF;
-      padding: 2px 7px;
-      border-radius: 4px;
-      margin-left: 6px;
-      vertical-align: middle;
-      box-shadow: 0 1px 3px rgba(199, 10, 12, 0.3);
-    }
-
-    /* Executive Strategic & Market Impact Box */
-    .strategic-impact-box {
-      background: #F8FAFC;
-      border: 1px solid #E2E8F0;
-      border-left: 4px solid #0F172A;
-      border-radius: 0 10px 10px 0;
-      padding: 13px 15px;
-      margin-bottom: 14px;
-    }
-
-    .strategic-impact-title {
-      font-size: 0.78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #0F172A;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .strategic-impact-text {
-      font-size: 0.88rem;
-      color: #1E293B;
-      font-weight: 500;
-      line-height: 1.5;
-    }
-
-    /* Market Exposure Grid & Chips */
-    .exposure-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px dashed #CBD5E1;
-    }
-
-    .exposure-item {
-      display: flex;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 6px;
-      font-size: 0.82rem;
-      line-height: 1.35;
-    }
-
-    .exposure-carrier {
-      font-weight: 700;
-      color: #0F172A;
-    }
-
-    .exposure-badge {
-      display: inline-block;
-      font-size: 0.70rem;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 12px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-
-    .badge-positive {
-      background: #DCFCE7;
-      color: #166534;
-      border: 1px solid #BBF7D0;
-    }
-
-    .badge-adverse {
-      background: #FEE2E2;
-      color: #991B1B;
-      border: 1px solid #FECACA;
-    }
-
-    .badge-neutral {
-      background: #F1F5F9;
-      color: #334155;
-      border: 1px solid #CBD5E1;
-    }
-
-    .exposure-desc {
-      color: #475569;
-      font-size: 0.8rem;
-    }
-
-    /* Fallback Legacy THY Box */
-    .thy-assessment-box {
-      background: var(--thy-red-soft);
-      border-left: 4px solid var(--thy-red);
-      border-radius: 0 8px 8px 0;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-
-    .thy-assessment-title {
-      font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--thy-red);
-      margin-bottom: 4px;
-    }
-
-    .thy-assessment-text {
-      font-size: 0.88rem;
-      color: #7A0607;
-      font-weight: 500;
-      line-height: 1.45;
-    }
-
-    /* Why It Matters Box */
-    .why-it-matters-box {
-      background: #F3F4F6;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 16px;
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .why-it-matters-label {
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    /* Card Footer: Source & Back to Top */
-    .card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-color);
-      margin-top: 14px;
-      font-size: 0.82rem;
-    }
-
-    .source-link {
-      color: var(--thy-red);
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--thy-red-soft);
-      padding: 5px 10px;
-      border-radius: 6px;
-      transition: background 0.15s ease;
-    }
-
-    .source-link:active {
-      background: rgba(199, 10, 12, 0.18);
-    }
-
-    .back-to-top-btn {
-      color: var(--thy-red);
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 8px;
-      border-radius: 6px;
-      transition: background 0.15s ease;
-    }
-
-    .back-to-top-btn:active {
-      background: #E5E7EB;
-    }
-
-    /* iOS Add to Home Screen Banner */
-    .ios-prompt-banner {
-      background: #1F2937;
-      color: #FFFFFF;
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 0.82rem;
-      box-shadow: var(--shadow-md);
-    }
-
-    .ios-prompt-text {
-      flex: 1;
-      line-height: 1.35;
-    }
-
-    .ios-prompt-close {
-      background: transparent;
-      border: none;
-      color: #9CA3AF;
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    /* Toast Notification */
-    #toast {
-      position: fixed;
-      bottom: calc(env(safe-area-inset-bottom) + 20px);
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #111827;
-      color: #FFFFFF;
-      padding: 10px 18px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 1000;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      pointer-events: none;
-    }
-
-    #toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Loading Spinner */
-    .loading-container {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(199, 10, 12, 0.2);
-      border-top-color: var(--thy-red);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px auto;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+      --paper: #F4F1EA; --paper-2: #EBE6DB; --ink: #1B1A17; --ink-2: #2A2823; --body: #4A463F;
+      --muted: #5E5A52; --faint: #8C877C; --rule: #DDD7CB; --rule-2: #CFC8BA;
+      --pos: oklch(0.46 0.11 150); --neg: oklch(0.50 0.16 28);
+      --serif: 'Newsreader', Georgia, serif; --sans: 'IBM Plex Sans', -apple-system, 'Helvetica Neue', sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --pad: 22px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { font-size: 16px; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; padding-top: env(safe-area-inset-top); }
+    body.article-open { overflow: hidden; }
+    a { color: inherit; text-underline-offset: 2px; }
+    a:hover { opacity: .7; }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    .eyebrow { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; }
+
+    header.mast { padding: 12px var(--pad) 0; display: flex; flex-direction: column; gap: 10px; }
+    .mast-top { display: flex; justify-content: space-between; align-items: center; font: 500 11px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .mast-actions { display: flex; gap: 16px; }
+    .mast-actions button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; padding: 6px 0; }
+    .mast-actions button[disabled] { opacity: .4; }
+    .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
+    .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+    .tabs { display: flex; gap: 22px; }
+    .tab { padding: 6px 0 9px; font: 500 14px/1 var(--sans); color: var(--faint); border-bottom: 2px solid transparent; }
+    .tab span { color: var(--faint); font-weight: 400; }
+    .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+    .counts { font: 400 12px/1 var(--sans); color: var(--muted); padding-bottom: 9px; white-space: nowrap; }
+    .stale { margin: 10px var(--pad) 0; padding: 10px 12px; background: var(--paper-2); font: 400 12.5px/1.4 var(--sans); color: var(--ink-2); }
+    .stale[hidden] { display: none; }
+
+    .market { margin: 0 var(--pad); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
+    .market[hidden] { display: none; }
+    .ticker-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+    .ticker { flex: 1; min-width: 0; display: flex; gap: 14px; overflow-x: auto; white-space: nowrap; font: 500 12px/1 var(--mono); scrollbar-width: none; }
+    .ticker::-webkit-scrollbar { display: none; }
+    .up { color: var(--pos); } .down { color: var(--neg); }
+    .mkt-toggle { flex: none; font: 600 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 6px 0; }
+    .mkt-table[hidden] { display: none; }
+    .mkt-table { padding-bottom: 10px; }
+    .mkt-line { display: grid; grid-template-columns: minmax(0,1fr) 56px auto 54px; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--rule); }
+    .mkt-name { font: 400 13.5px/1.25 var(--sans); color: #3A3732; }
+    .mkt-name small { display: block; font-size: 10.5px; color: var(--faint); margin-top: 2px; }
+    .mkt-val { font: 500 13.5px/1 var(--mono); white-space: nowrap; }
+    .mkt-val small { font-size: 10px; color: var(--faint); }
+    .mkt-chg { font: 500 12px/1 var(--mono); text-align: right; }
+    .spark { width: 56px; height: 20px; display: block; }
+    .mkt-note { font: 400 11px/1.4 var(--sans); color: var(--faint); padding-top: 6px; }
+
+    .lead-story { margin: 0 var(--pad); padding: 20px 0 22px; border-bottom: 1px solid var(--ink); display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
+    .kicker { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .kicker .prio { color: var(--neg); }
+    .kicker .new { color: var(--ink); background: var(--paper-2); padding: 3px 5px; margin-top: -3px; }
+    .lead-story h2 { font: 500 31px/1.1 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
+    .lead-story .why { font: italic 400 17px/1.45 var(--serif); color: #3A3732; text-wrap: pretty; }
+    .meta { display: flex; justify-content: space-between; gap: 10px; font: 400 12px/1.3 var(--sans); color: var(--muted); }
+    .meta strong { font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+    .filters { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 1px solid var(--rule); }
+    .filters-inner { display: flex; gap: 6px; overflow-x: auto; padding: 10px var(--pad); scrollbar-width: none; }
+    .filters-inner::-webkit-scrollbar { display: none; }
+    .chip { flex: none; padding: 8px 11px; border-radius: 999px; font: 500 12.5px/1 var(--sans); white-space: nowrap; color: var(--muted); }
+    .chip span { opacity: .6; margin-left: 3px; }
+    .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+    .group { padding: 0 var(--pad); }
+    .group-head { display: flex; align-items: center; gap: 10px; padding: 22px 0 2px; }
+    .group-head::after { content: ""; flex: 1; height: 1px; background: var(--ink); }
+    .row { display: grid; grid-template-columns: 26px minmax(0,1fr); gap: 6px; padding: 15px 0 16px; border-bottom: 1px solid var(--rule); cursor: pointer; text-align: left; width: 100%; }
+    .row-num { font: 400 15px/1.4 var(--serif); color: var(--faint); }
+    .row-body { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .row h3 { font: 500 20px/1.2 var(--serif); letter-spacing: -.01em; text-wrap: pretty; }
+    .row p { font: 400 14px/1.5 var(--sans); color: var(--body); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .row .src { font: 400 12px/1 var(--sans); color: var(--muted); }
+    .end { padding: 28px var(--pad) calc(48px + env(safe-area-inset-bottom)); text-align: center; font: italic 400 14px/1 var(--serif); color: var(--faint); }
+    .state { padding: 40px var(--pad); font: italic 400 17px/1.45 var(--serif); color: var(--muted); }
+    .state strong { display: block; font-style: normal; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+
+    .article { position: fixed; inset: 0; z-index: 50; background: var(--paper); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); transform: translateX(100%); transition: transform .28s cubic-bezier(.2,.7,.2,1); visibility: hidden; }
+    .article.open { transform: none; visibility: visible; }
+    .art-bar { flex: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 10px var(--pad) 12px; border-bottom: 1px solid var(--rule); font: 500 14px/1 var(--sans); }
+    .art-bar .pos { font-size: 12px; color: var(--faint); }
+    .art-nav { justify-self: end; display: flex; gap: 6px; }
+    .art-nav button { width: 34px; height: 34px; font-size: 18px; }
+    .art-nav button[disabled] { color: var(--rule-2); }
+    .art-back { justify-self: start; padding: 8px 0; }
+    .art-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .art-body { padding: 22px var(--pad) calc(40px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 16px; }
+    .art-body h1 { font: 500 30px/1.12 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
+    .art-src { font: 400 12px/1.3 var(--sans); color: var(--muted); }
+    .art-why { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 12px 0; display: flex; flex-direction: column; gap: 6px; }
+    .art-why p { font: italic 400 17px/1.45 var(--serif); color: var(--ink-2); }
+    .art-lead { font: 400 18px/1.5 var(--serif); color: var(--ink-2); text-wrap: pretty; }
+    .bullets { display: flex; flex-direction: column; gap: 8px; list-style: none; }
+    .bullets li { display: grid; grid-template-columns: 14px 1fr; font: 400 14.5px/1.5 var(--sans); color: var(--ink-2); }
+    .bullets li::before { content: "—"; }
+    .datapoints { display: flex; flex-wrap: wrap; gap: 6px; }
+    .datapoints span { font: 500 12px/1 var(--mono); padding: 7px 9px; border: 1px solid var(--rule-2); border-radius: 3px; }
+    .impact { background: var(--paper-2); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .impact > p { font: 400 14px/1.5 var(--sans); color: var(--ink-2); }
+    .exp { display: flex; flex-direction: column; gap: 3px; padding-top: 9px; border-top: 1px solid #D6CFC1; }
+    .exp-head { display: flex; justify-content: space-between; gap: 10px; font: 600 13px/1.3 var(--sans); }
+    .exp-head span:last-child { font-weight: 500; text-align: right; color: var(--muted); }
+    .exp-head .up, .exp-head .down { color: inherit; }
+    .exp-head span.up { color: var(--pos); } .exp-head span.down { color: var(--neg); }
+    .exp p { font: 400 12.5px/1.45 var(--sans); color: var(--muted); }
+    .art-link { font: italic 400 14px/1.45 var(--serif); color: #3A3732; }
+    .next { margin-top: 8px; border-top: 3px double var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; text-align: left; width: 100%; }
+    .next span:last-child { font: 500 20px/1.2 var(--serif); text-wrap: pretty; }
+
+    .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
+    .ios-prompt[hidden] { display: none; }
+    .ios-prompt button { color: var(--faint); font-size: 16px; }
+    #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 20px); transform: translate(-50%, 120px); background: var(--ink); color: var(--paper); padding: 10px 16px; font: 500 13px/1.3 var(--sans); z-index: 100; transition: transform .3s ease; pointer-events: none; }
+    #toast.show { transform: translate(-50%, 0); }
+    @media (min-width: 700px) { .title { font-size: 48px; } .lead-story h2 { font-size: 38px; } }
   </style>
 </head>
 <body>
-
-  <!-- Top Fixed Bar -->
-  <header class="app-bar">
-    <div class="brand-group">
-      <div class="brand-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="#C70A0C">
-          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-title">AeroBrief <span class="pro-tag">PRO</span></div>
-        <div class="brand-sub">Havacılık Profesyonellerinin Brifingi</div>
-      </div>
-    </div>
-    <div class="bar-actions">
-      <button class="icon-btn" id="btn-refresh" title="Yenile">
-        <span>↻</span> Yenile
-      </button>
-      <button class="icon-btn" id="btn-share" title="Bülteni Kopyala / Paylaş">
-        <span>📋</span> Paylaş
-      </button>
-    </div>
-  </header>
-
-  <main class="container">
-
-    <!-- Mode Selector Tabs -->
-    <div class="mode-switcher" role="tablist" aria-label="Briefing görünümü">
-      <button class="mode-tab active" data-mode="daily" role="tab" aria-selected="true">
-        <span class="mode-tab-label">Günlük Brifing</span>
-        <span class="mode-tab-meta">Son 48 saat</span>
-      </button>
-      <button class="mode-tab" data-mode="hourly" role="tab" aria-selected="false">
-        <span class="mode-tab-label">Canlı Radar</span>
-        <span class="mode-tab-meta">Son 60 dakika</span>
-      </button>
-    </div>
-
-    <!-- iOS "Ana Ekrana Ekle" Bilgilendirmesi -->
-    <div class="ios-prompt-banner" id="ios-prompt" style="display: none;">
-      <div class="ios-prompt-text">
-        📱 <strong>iPhone'a Yükleyin:</strong> Safari'de alttaki <strong>Paylaş (⎋)</strong> butonuna basıp <strong>"Ana Ekrana Ekle"</strong>yi seçerek tam ekran uygulama olarak kullanabilirsiniz.
-      </div>
-      <button class="ios-prompt-close" onclick="dismissIosPrompt()">✕</button>
-    </div>
-
-    <!-- Executive Briefing Heading & Intro Card -->
-    <section class="intro-banner" id="intro-banner">
-      <div class="briefing-context">
-        <div>
-          <span class="briefing-context-title" id="briefing-context-title">Günün özeti</span>
-          <span class="briefing-context-window" id="briefing-context-window">Son 48 saat</span>
-        </div>
-        <span class="radar-note" id="radar-note" hidden>● Yeni akış takipte</span>
-      </div>
-      <h1 class="briefing-heading" id="briefing-heading">Aviation Briefing | Loading...</h1>
-      <p class="briefing-intro-text" id="briefing-intro">Below is a summary of the most important verified aviation developments from the last 48 hours.</p>
-      <div class="briefing-meta">
-        <span class="status-badge"><span class="status-dot"></span> <span id="status-label">Günlük akış</span></span>
-        <span id="briefing-time">-</span>
-      </div>
-      <div class="pulse-grid" aria-label="Briefing özeti">
-        <div class="pulse-item"><span>Toplam haber</span><strong id="pulse-story-count">-</strong></div>
-        <div class="pulse-item"><span>Öncelikli</span><strong id="pulse-critical-count">-</strong></div>
-        <div class="pulse-item"><span>Son güncelleme</span><strong id="pulse-updated-at">-</strong></div>
-      </div>
-    </section>
-
-    <section class="market-panel" id="market-panel" hidden aria-label="Piyasa ve Yakıt">
-      <div class="market-panel-header"><div><h2 class="market-panel-title">Piyasa ve Yakıt</h2><p class="market-panel-subtitle" id="market-panel-subtitle">Veri yükleniyor</p></div></div>
-      <div class="market-grid" id="market-grid"></div>
-      <div class="market-panel-footer"><p class="market-source-note" id="market-source-note"></p><a class="market-iata-link" id="iata-monitor-link" href="#" target="_blank" rel="noopener noreferrer" hidden>IATA Jet Fuel Price Monitor ↗</a></div>
-    </section>
-
-    <!-- LAYER 1: Top Summary List -->
-    <section class="summary-card" id="top-summary">
-      <div class="summary-card-header">
-        <div class="summary-card-title">
-          <span>📑</span> <span id="summary-title">Günün önemli gelişmeleri</span>
-        </div>
-        <div id="summary-scope" style="font-size: 0.75rem; color: var(--text-subtle);">48 SAAT</div>
-      </div>
-      <div id="summary-content">
-        <div class="loading-container">
-          <div class="spinner"></div>
-          <p style="font-size: 0.85rem; color: var(--text-subtle);">Haber özetleri yükleniyor...</p>
+  <div class="wrap">
+    <header class="mast">
+      <div class="mast-top">
+        <span id="dateline">—</span>
+        <div class="mast-actions">
+          <button id="btn-refresh" type="button">Refresh</button>
+          <button id="btn-share" type="button">Share</button>
         </div>
       </div>
+      <div class="title">The Aviation Briefing</div>
+      <div class="mast-row">
+        <div class="tabs" role="tablist" aria-label="Briefing view">
+          <button class="tab" role="tab" data-mode="daily" aria-selected="true">Daily <span>· 48h</span></button>
+          <button class="tab" role="tab" data-mode="hourly" aria-selected="false">Live radar <span>· 60 min</span></button>
+        </div>
+        <span class="counts" id="counts"></span>
+      </div>
+    </header>
+
+    <div class="ios-prompt" id="ios-prompt" hidden>
+      <span>Install on iPhone: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</span>
+      <button type="button" id="ios-close" aria-label="Dismiss">✕</button>
+    </div>
+    <div class="stale" id="stale" hidden></div>
+
+    <section class="market" id="market" hidden aria-label="Markets and fuel">
+      <div class="ticker-row">
+        <div class="ticker" id="ticker"></div>
+        <button class="mkt-toggle" id="mkt-toggle" type="button" aria-expanded="false">All indicators</button>
+      </div>
+      <div class="mkt-table" id="mkt-table" hidden></div>
     </section>
 
-    <!-- LAYER 2: Detailed Story Blocks -->
-    <section id="detailed-stories">
-      <!-- Dinamik olarak JS ile üretilecek -->
-    </section>
+    <main id="content"><div class="state">Loading the briefing…</div></main>
+  </div>
 
-  </main>
+  <div class="article" id="article" aria-hidden="true">
+    <div class="art-bar">
+      <button class="art-back" id="art-back" type="button">‹ Briefing</button>
+      <span class="pos" id="art-pos"></span>
+      <div class="art-nav">
+        <button id="art-prev" type="button" aria-label="Previous story">↑</button>
+        <button id="art-next" type="button" aria-label="Next story">↓</button>
+      </div>
+    </div>
+    <div class="art-scroll" id="art-scroll"><div class="art-body" id="art-body"></div></div>
+  </div>
 
-  <div id="toast">Bülten panoya kopyalandı!</div>
+  <div id="toast"></div>
 
   <script>
-    let currentMode = "daily";
-    let briefingData = null;
-    let briefingRequestId = 0;
-
-    const HTML_ESCAPE_MAP = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
+    const SECTION_ORDER = [
+      "Europe", "Middle East & Gulf", "Asia-Pacific", "Americas", "Africa", "Manufacturers & Supply Chain", "Regulation & Airspace",
+      "Turkey / THY and Turkish aviation", "European and other global airlines", "Route news", "Other areas", "Other"
+    ];
+    const MODE = {
+      daily: { empty: "No verified developments in the last 48 hours.", loading: "Loading the daily briefing…" },
+      hourly: { empty: "No new verified developments in the last 60 minutes.", loading: "Updating live radar…" }
+    };
+    const SOURCE_TYPES = { mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social" };
+    const MARKET_ORDER = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread", "fx_usd_eur", "fx_usd_gbp", "fx_usd_jpy", "fx_usd_cny", "fx_usd_inr", "fx_usd_try", "fx_usd_brl"];
+    const MARKET_LABELS = {
+      brent_spot: ["Brent", "Brent spot"],
+      us_gulf_coast_jet_fuel: ["Jet USGC", "US Gulf Coast jet fuel"],
+      jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    function escapeHtml(value) {
-      return String(value ?? "").replace(/[&<>"']/g, character => HTML_ESCAPE_MAP[character]);
-    }
+    const state = { mode: "daily", filter: "All", data: null, stories: [], order: [], articleId: null, newKeys: new Set() };
+    const previousKeysByMode = new Map();
+    let briefingRequestId = 0;
 
-    function safeAnchorId(value, fallback) {
-      const normalized = String(value || fallback).replace(/[^A-Za-z0-9_-]/g, "-");
-      return normalized || fallback;
-    }
-
+    const HTML_ESCAPE_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    const $ = (id) => document.getElementById(id);
+    function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, c => HTML_ESCAPE_MAP[c]); }
     function safeExternalUrl(value) {
       try {
         const parsed = new URL(String(value || ""), window.location.origin);
         if (!["http:", "https:"].includes(parsed.protocol)) return "#";
         return escapeHtml(parsed.href);
-      } catch {
-        return "#";
-      }
+      } catch { return "#"; }
     }
-
-    // Sabit Bölüm Sırası (Prompt kuralı)
-    const SECTION_ORDER = [
-      "Turkey / THY and Turkish aviation",
-      "European and other global airlines",
-      "Route news",
-      "Other areas"
-    ];
-
-    const MODE_CONFIG = {
-      daily: {
-        contextTitle: "Günün özeti",
-        windowLabel: "Son 48 saat",
-        statusLabel: "Günlük akış",
-        summaryTitle: "Günün önemli gelişmeleri",
-        scopeLabel: "48 SAAT",
-        loadingLabel: "Günlük briefing hazırlanıyor...",
-        emptyTitle: "Bu dönem için doğrulanmış haber bulunamadı.",
-        emptyDetail: "Yeni kaynaklar toplandığında günlük özet burada görünecek."
-      },
-      hourly: {
-        contextTitle: "Canlı gelişme takibi",
-        windowLabel: "Son 60 dakika",
-        statusLabel: "Canlı radar",
-        summaryTitle: "Son saatin gelişmeleri",
-        scopeLabel: "60 DK",
-        loadingLabel: "Canlı radar güncelleniyor...",
-        emptyTitle: "Son 60 dakikada yeni doğrulanmış gelişme yok.",
-        emptyDetail: "Yeni bir gelişme geldiğinde bu akış otomatik olarak güncellenecek."
-      }
-    };
-
-    const previousStoryKeysByMode = new Map();
-
-    function getModeConfig(mode) {
-      return MODE_CONFIG[mode] || MODE_CONFIG.daily;
+    function storyKey(story) {
+      const url = story && story.original_source && story.original_source.url;
+      return String(story && (story.id || url || story.headline) || "story").trim().toLowerCase();
     }
-
-    function getStoryKey(story) {
-      const sourceUrl = story && story.original_source && story.original_source.url;
-      return String(story && (story.id || sourceUrl || story.headline) || "story")
-        .trim()
-        .toLowerCase();
-    }
-
-    function deduplicateStories(stories) {
+    function dedupe(stories) {
       const seen = new Set();
-      return stories.filter(story => {
-        const key = getStoryKey(story);
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
+      return stories.filter(s => { const k = storyKey(s); if (seen.has(k)) return false; seen.add(k); return true; });
     }
-
-    function isCriticalStory(story) {
-      const haystack = [
-        story && story.headline,
-        story && story.lead,
-        story && story.why_it_matters,
-        story && story.strategic_impact
-      ].join(" ").toLowerCase();
-      return /(critical|urgent|emergency|security|safety|accident|divert|closure|strike|warning|alarm|disrupt)/i.test(haystack);
+    function isPriority(story) {
+      const text = [story.headline, story.lead, story.why_it_matters, story.strategic_impact].join(" ");
+      return /(critical|urgent|emergency|security|safety|accident|divert|closure|strike|warning|alarm|hijack|disrupt)/i.test(text);
     }
-
-    function updateModeUi(mode) {
-      const config = getModeConfig(mode);
-      currentMode = mode;
-      document.body.dataset.mode = mode;
-      document.querySelectorAll(".mode-tab").forEach(tab => {
-        const isActive = tab.dataset.mode === mode;
-        tab.classList.toggle("active", isActive);
-        tab.setAttribute("aria-selected", String(isActive));
-      });
-      document.getElementById("briefing-context-title").textContent = config.contextTitle;
-      document.getElementById("briefing-context-window").textContent = config.windowLabel;
-      document.getElementById("status-label").textContent = config.statusLabel;
-      document.getElementById("summary-title").textContent = config.summaryTitle;
-      document.getElementById("summary-scope").textContent = config.scopeLabel;
-      document.getElementById("radar-note").hidden = mode !== "hourly";
-      document.getElementById("btn-refresh").title = config.contextTitle + " yenile";
+    function sectionOf(story) { return story.section || "Other"; }
+    function sectionRank(name) { const i = SECTION_ORDER.indexOf(name); return i === -1 ? SECTION_ORDER.length : i; }
+    function tone(impact) {
+      const r = String(impact || "").toLowerCase();
+      if (/neg|adverse|risk|cost|headwind|pressure|disrupt/.test(r)) return "down";
+      if (/pos|growth|opp|hedged/.test(r)) return "up";
+      return "";
     }
+    function fmtNumber(v, digits) { const n = Number(v); return Number.isFinite(n) ? new Intl.NumberFormat("en-GB", { maximumFractionDigits: digits }).format(n) : "–"; }
+    function fmtChange(v) { const n = Number(v); if (!Number.isFinite(n)) return ""; return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(1) + "%"; }
+    function showToast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2500); }
 
-    function updatePulse(stories, data) {
-      document.getElementById("pulse-story-count").textContent = String(stories.length);
-      document.getElementById("pulse-critical-count").textContent = String(stories.filter(isCriticalStory).length);
-      document.getElementById("pulse-updated-at").textContent = data.time_str || "-";
-    }
-
-    function formatMarketValue(value) { const numericValue = Number(value); return Number.isFinite(numericValue) ? new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 3 }).format(numericValue) : "-"; }
-    function formatMarketChange(value) { const numericValue = Number(value); if (!Number.isFinite(numericValue)) return ""; return `${numericValue > 0 ? "+" : ""}${new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 1 }).format(numericValue)}%`; }
-    function marketSparkline(points) { const values = (Array.isArray(points) ? points : []).map(point => Number(point && point.value)).filter(Number.isFinite); if (values.length < 2) return ""; const minimum = Math.min(...values); const span = Math.max(...values) - minimum || 1; const coordinates = values.map((value, index) => `${((index / (values.length - 1)) * 100).toFixed(2)},${(26 - ((value - minimum) / span) * 24).toFixed(2)}`).join(" "); return `<svg class="market-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none" aria-label="Son 30 gözlem"><polyline fill="none" stroke="#C70A0C" stroke-width="2" points="${coordinates}" /></svg>`; }
-    function renderMarketPanel(market) {
-      const panel = document.getElementById("market-panel"); const rawItems = market && Array.isArray(market.items) ? market.items : [];
-      if (!rawItems.length) { panel.hidden = true; return; }
-      const priority = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread", "fx_usd_eur", "fx_usd_gbp", "fx_usd_jpy", "fx_usd_cny", "fx_usd_inr", "fx_usd_try", "fx_usd_brl"];
-      const items = [...rawItems].sort((left, right) => priority.indexOf(left.series_id) - priority.indexOf(right.series_id));
-      document.getElementById("market-grid").innerHTML = items.map(item => { const dailyChange = Number(item.changes && item.changes.daily_pct); const changeClass = Number.isFinite(dailyChange) ? (dailyChange >= 0 ? "up" : "down") : ""; const asOf = item.as_of ? `${item.as_of}${item.carried_forward ? " · son geçerli değer" : ""}` : "-"; return `<article class="market-item"><div class="market-name">${escapeHtml(item.name || item.series_id)}</div><div class="market-value-row"><span class="market-value">${formatMarketValue(item.value)}</span><span class="market-unit">${escapeHtml(item.unit || "")}</span>${Number.isFinite(dailyChange) ? `<span class="market-change ${changeClass}">${formatMarketChange(dailyChange)}</span>` : ""}</div>${marketSparkline(item.sparkline)}<div class="market-date">${escapeHtml(asOf)} · ${escapeHtml(item.source || "")}</div></article>`; }).join("");
-      const datedItems = items.filter(item => item.as_of).map(item => item.as_of); document.getElementById("market-panel-subtitle").textContent = datedItems.length ? `Son değerler · veri tarihi ${datedItems.sort()[datedItems.length - 1]}` : "Son değerler"; document.getElementById("market-source-note").textContent = [market.note, market.missing_data_note].filter(Boolean).join(" ") || "Kaynak ve veri tarihi her kalemde gösterilir.";
-      const iataLink = document.getElementById("iata-monitor-link"); const iataUrl = safeExternalUrl(market.iata_monitor && market.iata_monitor.url); iataLink.href = iataUrl; iataLink.hidden = iataUrl === "#"; panel.hidden = false;
-    }
-
-    function emptyStateHtml(title, detail) {
-      return '<div class="empty-state"><strong>' + escapeHtml(title) + '</strong><p>' + escapeHtml(detail) + '</p></div>';
-    }
-
-    // Sayfa Yüklendiğinde
-    document.addEventListener("DOMContentLoaded", () => {
-      checkIosPrompt();
-      setupTabs();
-      updateModeUi(currentMode);
-      loadBriefing(currentMode);
-
-      document.getElementById("btn-refresh").addEventListener("click", () => {
-        loadBriefing(currentMode, true);
-      });
-
-      document.getElementById("btn-share").addEventListener("click", () => {
-        shareBriefing();
-      });
-    });
-
-    // Sekmeler
-    function setupTabs() {
-      document.querySelectorAll(".mode-tab").forEach(tab => {
-        tab.addEventListener("click", () => {
-          currentMode = tab.dataset.mode;
-          updateModeUi(currentMode);
-          loadBriefing(currentMode);
-        });
-      });
-    }
-
-    // iOS Ana Ekrana Ekle Kontrolü
-    function checkIosPrompt() {
-      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-      const dismissed = localStorage.getItem("ios_prompt_dismissed");
-      if (isIos && !isStandalone && !dismissed) {
-        document.getElementById("ios-prompt").style.display = "flex";
-      }
-    }
-
-    function dismissIosPrompt() {
-      document.getElementById("ios-prompt").style.display = "none";
-      localStorage.setItem("ios_prompt_dismissed", "true");
-    }
-
-    // Brifingi API'dan Yükle
     async function loadBriefing(mode, requestLatest = false) {
       const requestId = ++briefingRequestId;
-      const config = getModeConfig(mode);
-      const summaryEl = document.getElementById("summary-content");
-      const storiesEl = document.getElementById("detailed-stories");
-      const refreshButton = document.getElementById("btn-refresh");
-      const keepsCurrentBriefing = requestLatest && briefingData && briefingData.mode === mode;
-
-      updateModeUi(mode);
-      if (!keepsCurrentBriefing) {
-        summaryEl.innerHTML = `
-          <div class="loading-container">
-            <div class="spinner"></div>
-            <p style="font-size: 0.85rem; color: var(--text-subtle);">${config.loadingLabel}</p>
-          </div>
-        `;
-        storiesEl.innerHTML = "";
-      }
-      if (requestLatest) {
-        refreshButton.disabled = true;
-        refreshButton.setAttribute("aria-busy", "true");
-      }
-
+      const keepsCurrent = requestLatest && state.data && state.data.mode === mode;
+      if (!keepsCurrent) $("content").innerHTML = `<div class="state">${MODE[mode].loading}</div>`;
+      if (requestLatest) $("btn-refresh").disabled = true;
       try {
         const cacheBuster = requestLatest ? `&view=${Date.now()}` : "";
-        const endpoint = `/api/briefing?mode=${encodeURIComponent(mode)}${cacheBuster}`;
-        const res = await fetch(endpoint, {
+        const res = await fetch(`/api/briefing?mode=${encodeURIComponent(mode)}${cacheBuster}`, {
           cache: requestLatest ? "no-store" : "default",
           headers: { "Accept": "application/json" }
         });
         if (!res.ok) throw new Error("HTTP error " + res.status);
-        if (!(res.headers.get("content-type") || "").includes("application/json")) {
-          throw new Error("Invalid API response");
-        }
+        if (!(res.headers.get("content-type") || "").includes("application/json")) throw new Error("Invalid API response");
         const data = await res.json();
         if (requestId !== briefingRequestId) return;
-        briefingData = data;
-        renderBriefing(data);
+        render(data, mode);
       } catch (err) {
         if (requestId !== briefingRequestId) return;
-        console.error("Yükleme hatası:", err);
-        if (keepsCurrentBriefing) {
-          showToast("Güncel briefing yüklenemedi; son briefing gösteriliyor.");
+        console.error("Briefing load failed:", err);
+        if (keepsCurrent) { showToast("Couldn't refresh — showing the last briefing."); return; }
+        $("content").innerHTML = `<div class="state"><strong>The briefing couldn't be loaded.</strong>Please try again shortly.</div>`;
+      } finally {
+        if (requestLatest && requestId === briefingRequestId) $("btn-refresh").disabled = false;
+      }
+    }
+
+    function render(data, mode) {
+      state.data = Object.assign({ mode }, data);
+      const stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
+      const prev = previousKeysByMode.get(mode);
+      state.newKeys = prev ? new Set(stories.map(storyKey).filter(k => !prev.has(k))) : new Set();
+      previousKeysByMode.set(mode, new Set(stories.map(storyKey)));
+      state.stories = stories;
+      const sections = new Set(stories.map(sectionOf));
+      if (state.filter !== "All" && !sections.has(state.filter)) state.filter = "All";
+
+      $("dateline").textContent = [data.date_str, data.time_str].filter(Boolean).join(" · ") || "—";
+      const prioCount = stories.filter(isPriority).length;
+      $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${prioCount} priority`;
+      const stale = $("stale");
+      if (data.status === "stale") {
+        stale.hidden = false;
+        stale.textContent = "The latest update didn't complete. Showing the last successful briefing" + (data.last_pipeline_run_at ? ` from ${new Date(data.last_pipeline_run_at).toUTCString().slice(5, 22)} UTC.` : ".");
+      } else stale.hidden = true;
+
+      renderMarket(data.market);
+      renderList();
+      if (state.articleId) renderArticle();
+    }
+
+    function renderList() {
+      const { stories, filter, mode } = state;
+      if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${MODE[mode].empty}</div><div class="end">— End of briefing —</div>`; return; }
+      const counts = {};
+      stories.forEach(s => { const k = sectionOf(s); counts[k] = (counts[k] || 0) + 1; });
+      const sectionNames = Object.keys(counts).sort((a, b) => sectionRank(a) - sectionRank(b));
+
+      const lead = filter === "All" ? (stories.find(isPriority) || stories[0]) : null;
+      const rest = stories.filter(s => s !== lead && (filter === "All" || sectionOf(s) === filter));
+      const groups = (filter === "All" ? sectionNames : [filter]).map(name => ({ name, items: rest.filter(s => sectionOf(s) === name) })).filter(g => g.items.length);
+      state.order = (lead ? [lead] : []).concat(...groups.map(g => g.items));
+
+      let html = "";
+      if (lead) {
+        html += `<article class="lead-story" data-open="${escapeHtml(storyKey(lead))}">
+          <div class="kicker">${kickerBits(lead, isPriority(lead) ? "Priority" : "Lead story")}</div>
+          <h2>${escapeHtml(lead.headline)}</h2>
+          ${lead.why_it_matters ? `<p class="why">${escapeHtml(lead.why_it_matters)}</p>` : ""}
+          <div class="meta"><span>${escapeHtml(sourceName(lead))}</span><strong>Read the analysis →</strong></div>
+        </article>`;
+      }
+      html += `<nav class="filters" aria-label="Filter by region"><div class="filters-inner">
+        ${[["All", stories.length]].concat(sectionNames.map(n => [n, counts[n]])).map(([name, c]) =>
+          `<button class="chip" type="button" data-filter="${escapeHtml(name)}" aria-pressed="${name === filter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
+      </div></nav>`;
+      let n = lead ? 1 : 0;
+      groups.forEach(g => {
+        html += `<section class="group"><div class="group-head eyebrow">${escapeHtml(g.name)}</div>`;
+        g.items.forEach(s => {
+          n++;
+          const flags = [isPriority(s) ? `<span class="prio">Priority</span>` : "", state.newKeys.has(storyKey(s)) ? `<span class="new">New</span>` : ""].join("");
+          html += `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
+            <span class="row-num">${String(n).padStart(2, "0")}</span>
+            <span class="row-body">
+              ${flags ? `<span class="kicker">${flags}</span>` : ""}
+              <h3>${escapeHtml(s.headline)}</h3>
+              ${s.why_it_matters ? `<p>${escapeHtml(s.why_it_matters)}</p>` : ""}
+              <span class="src">${escapeHtml(sourceName(s))}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</span>
+            </span>
+          </button>`;
+        });
+        html += `</section>`;
+      });
+      html += `<div class="end">— End of briefing —</div>`;
+      $("content").innerHTML = html;
+    }
+
+    function kickerBits(s, first) {
+      return [`<span class="${first === "Priority" ? "prio" : ""}">${first}</span>`, `<span>${escapeHtml(sectionOf(s))}</span>`,
+        state.newKeys.has(storyKey(s)) ? `<span class="new">New</span>` : ""].join("");
+    }
+    function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
+
+    function renderMarket(market) {
+      const items = (market && Array.isArray(market.items) ? market.items : []).slice()
+        .sort((a, b) => (MARKET_ORDER.indexOf(a.series_id) + 99) % 99 - (MARKET_ORDER.indexOf(b.series_id) + 99) % 99);
+      if (!items.length) { $("market").hidden = true; return; }
+      const label = (it) => {
+        if (MARKET_LABELS[it.series_id]) return MARKET_LABELS[it.series_id];
+        const m = /^fx_usd_([a-z]{3})$/.exec(it.series_id || "");
+        return m ? [`USD/${m[1].toUpperCase()}`, `USD / ${m[1].toUpperCase()}`] : [it.name || it.series_id, it.name || it.series_id];
+      };
+      const chg = (it) => Number(it.changes && it.changes.daily_pct);
+      const cls = (v) => Number.isFinite(v) ? (v >= 0 ? "up" : "down") : "";
+      $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("");
+      $("mkt-table").innerHTML = items.map(it => {
+        const asOf = it.as_of ? `${it.as_of}${it.carried_forward ? " · last valid value" : ""}` : "";
+        return `<div class="mkt-line">
+          <span class="mkt-name">${escapeHtml(label(it)[1])}<small>${escapeHtml(asOf)}</small></span>
+          ${sparkline(it.sparkline)}
+          <span class="mkt-val">${fmtNumber(it.value, 3)} <small>${escapeHtml(it.unit || "")}</small></span>
+          <span class="mkt-chg ${cls(chg(it))}">${fmtChange(chg(it))}</span>
+        </div>`;
+      }).join("") + `<p class="mkt-note">EIA · ECB reference rates. Jet fuel is the US Gulf Coast series, not a global price.${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
+      $("market").hidden = false;
+    }
+    function sparkline(points) {
+      const v = (Array.isArray(points) ? points : []).map(p => Number(p && p.value)).filter(Number.isFinite);
+      if (v.length < 2) return `<span></span>`;
+      const mn = Math.min(...v), sp = Math.max(...v) - mn || 1;
+      const pts = v.map((x, i) => `${(i / (v.length - 1) * 100).toFixed(1)},${(26 - (x - mn) / sp * 24).toFixed(1)}`).join(" ");
+      return `<svg class="spark" viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="#1B1A17" stroke-width="1.3" vector-effect="non-scaling-stroke" points="${pts}"/></svg>`;
+    }
+
+    function openArticle(key, push = true) {
+      state.articleId = key;
+      renderArticle();
+      $("article").classList.add("open");
+      $("article").setAttribute("aria-hidden", "false");
+      document.body.classList.add("article-open");
+      if (push) history.pushState({ article: key }, "", "#" + encodeURIComponent(key));
+    }
+    function closeArticle(fromPop = false) {
+      state.articleId = null;
+      $("article").classList.remove("open");
+      $("article").setAttribute("aria-hidden", "true");
+      document.body.classList.remove("article-open");
+      if (!fromPop && history.state && history.state.article) history.back();
+    }
+    function renderArticle() {
+      const i = state.order.findIndex(s => storyKey(s) === state.articleId);
+      if (i < 0) { closeArticle(); return; }
+      const s = state.order[i], next = state.order[i + 1];
+      const src = s.original_source || {};
+      const type = SOURCE_TYPES[src.source_type] || "Verified source";
+      const analysis = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
+      const dps = (s.data_points || []).map(d => `<span>${escapeHtml(d)}</span>`).join("");
+      const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
+        `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p>${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
+      const strategic = s.strategic_impact || "";
+      $("art-pos").textContent = `${i + 1} of ${state.order.length}`;
+      $("art-prev").disabled = i === 0;
+      $("art-next").disabled = !next;
+      $("art-body").innerHTML = `
+        <div class="kicker">${isPriority(s) ? `<span class="prio">Priority</span>` : ""}<span>${escapeHtml(sectionOf(s))}</span></div>
+        <h1>${escapeHtml(s.headline)}</h1>
+        <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+        ${s.why_it_matters ? `<div class="art-why"><span class="eyebrow">Why it matters</span><p>${escapeHtml(s.why_it_matters)}</p></div>` : ""}
+        ${s.lead ? `<p class="art-lead">${escapeHtml(s.lead)}</p>` : ""}
+        ${analysis ? `<div style="display:flex;flex-direction:column;gap:8px"><span class="eyebrow">Analysis</span><ul class="bullets">${analysis}</ul></div>` : ""}
+        ${dps ? `<div class="datapoints">${dps}</div>` : ""}
+        ${strategic || exposure ? `<div class="impact"><span class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p>${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
+        <a class="art-link" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>
+        ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span class="eyebrow" style="color:var(--muted)">Next story ↓</span><span>${escapeHtml(next.headline)}</span></button>` : ""}`;
+      $("art-scroll").scrollTop = 0;
+    }
+    function stepArticle(delta) {
+      const i = state.order.findIndex(s => storyKey(s) === state.articleId);
+      const target = state.order[i + delta];
+      if (!target) return;
+      state.articleId = storyKey(target);
+      history.replaceState({ article: state.articleId }, "", "#" + encodeURIComponent(state.articleId));
+      renderArticle();
+    }
+
+    function shareBriefing() {
+      if (!state.data) return;
+      let text = `${state.data.heading || "The Aviation Briefing"}\n${state.data.intro_sentence || ""}\n`;
+      const order = state.order.length ? state.order : state.stories;
+      order.forEach(s => {
+        text += `\n• ${s.headline}\n`;
+        if (s.why_it_matters) text += `  ${s.why_it_matters}\n`;
+        if (s.original_source && s.original_source.url) text += `  ${s.original_source.url}\n`;
+      });
+      const copy = () => navigator.clipboard.writeText(text).then(() => showToast("Briefing copied to clipboard.")).catch(() => showToast("Couldn't copy."));
+      if (navigator.share) navigator.share({ title: state.data.heading || "The Aviation Briefing", text }).catch(copy);
+      else copy();
+    }
+
+    function setMode(mode) {
+      state.mode = mode; state.filter = "All";
+      document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.mode === mode)));
+      if (state.articleId) closeArticle();
+      window.scrollTo(0, 0);
+      loadBriefing(mode);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { if (t.dataset.mode !== state.mode) setMode(t.dataset.mode); }));
+      $("btn-refresh").addEventListener("click", () => loadBriefing(state.mode, true));
+      $("btn-share").addEventListener("click", shareBriefing);
+      $("mkt-toggle").addEventListener("click", () => {
+        const table = $("mkt-table"), open = table.hidden;
+        table.hidden = !open;
+        $("mkt-toggle").textContent = open ? "Hide" : "All indicators";
+        $("mkt-toggle").setAttribute("aria-expanded", String(open));
+      });
+      $("content").addEventListener("click", (e) => {
+        const chip = e.target.closest("[data-filter]");
+        if (chip) {
+          state.filter = chip.dataset.filter;
+          const top = document.querySelector(".filters").getBoundingClientRect().top + window.scrollY;
+          renderList();
+          if (window.scrollY > top) window.scrollTo(0, top);
           return;
         }
-        summaryEl.innerHTML = `
-          <div style="padding: 16px; text-align: center; color: var(--thy-red);">
-            <p><strong>Briefing şu an yüklenemedi.</strong></p>
-            <p style="font-size: 0.8rem; color: var(--text-subtle); margin-top: 4px;">Lütfen kısa süre sonra tekrar deneyin.</p>
-          </div>
-        `;
-      } finally {
-        if (requestLatest && requestId === briefingRequestId) {
-          refreshButton.disabled = false;
-          refreshButton.removeAttribute("aria-busy");
-        }
-      }
-    }
-
-    // Brifingi Ekrana Çiz
-    function renderBriefing(data) {
-      const mode = data.mode || currentMode;
-      const config = getModeConfig(mode);
-      document.getElementById("briefing-heading").textContent = data.heading || "Aviation Briefing";
-      document.getElementById("briefing-intro").textContent = data.intro_sentence || "";
-      document.getElementById("briefing-time").textContent = `${data.date_str || ''} • ${data.time_str || ''}`;
-
-      const stories = deduplicateStories(Array.isArray(data.stories) ? data.stories : []);
-      const previousStoryKeys = previousStoryKeysByMode.get(mode);
-      const previousKeys = previousStoryKeys || new Set();
-      const newStoryKeys = previousStoryKeys
-        ? new Set(stories.map(getStoryKey).filter(key => !previousKeys.has(key)))
-        : new Set();
-      previousStoryKeysByMode.set(mode, new Set(stories.map(getStoryKey)));
-      updatePulse(stories, data);
-      renderMarketPanel(data.market);
-
-      // Bölümlere göre grupla
-      const grouped = {};
-      SECTION_ORDER.forEach(sec => grouped[sec] = []);
-
-      stories.forEach(story => {
-        const sec = story.section || "Other areas";
-        if (!grouped[sec]) grouped[sec] = [];
-        grouped[sec].push(story);
+        const item = e.target.closest("[data-open]");
+        if (item) openArticle(item.dataset.open);
+      });
+      $("art-body").addEventListener("click", (e) => { const n = e.target.closest("[data-open]"); if (n) stepArticle(1); });
+      $("art-back").addEventListener("click", () => closeArticle());
+      $("art-prev").addEventListener("click", () => stepArticle(-1));
+      $("art-next").addEventListener("click", () => stepArticle(1));
+      window.addEventListener("popstate", (e) => {
+        if (e.state && e.state.article && state.stories.length) openArticle(e.state.article, false);
+        else if (state.articleId) closeArticle(true);
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!state.articleId) return;
+        if (e.key === "Escape") closeArticle();
+        if (e.key === "ArrowDown" || e.key === "j") stepArticle(1);
+        if (e.key === "ArrowUp" || e.key === "k") stepArticle(-1);
       });
 
-      // 1. LAYER 1: Top Summary List
-      let summaryHtml = "";
-      SECTION_ORDER.forEach(secName => {
-        const items = grouped[secName] || [];
-        if (items.length === 0) return;
+      const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const standalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+      if (isIos && !standalone && !localStorage.getItem("ios_prompt_dismissed")) $("ios-prompt").hidden = false;
+      $("ios-close").addEventListener("click", () => { $("ios-prompt").hidden = true; localStorage.setItem("ios_prompt_dismissed", "true"); });
 
-        summaryHtml += `
-          <div class="summary-section-group">
-            <div class="summary-section-title">${escapeHtml(secName)}</div>
-            <ul class="summary-headline-list">
-        `;
-
-        items.forEach(item => {
-          const itemId = safeAnchorId(item.id, "story");
-          const headline = escapeHtml(item.headline);
-          const itemKey = getStoryKey(item);
-          const freshBadge = newStoryKeys.has(itemKey) ? '<span class="story-fresh">Yeni</span>' : "";
-          summaryHtml += `
-            <li class="summary-item">
-              <a href="#${itemId}">
-                <span class="summary-bullet">›</span>
-                <span>${headline}${freshBadge}</span>
-              </a>
-            </li>
-          `;
-        });
-
-        summaryHtml += `
-            </ul>
-          </div>
-        `;
-      });
-
-      document.getElementById("summary-content").innerHTML = summaryHtml || emptyStateHtml(config.emptyTitle, config.emptyDetail);
-
-      // 2. LAYER 2: Detailed Story Blocks
-      let storiesHtml = "";
-      SECTION_ORDER.forEach((secName, secIdx) => {
-        const items = grouped[secName] || [];
-        if (items.length === 0) return;
-
-        storiesHtml += `
-          <div class="section-divider">
-            <h2 class="section-divider-title">${secIdx + 1}. ${escapeHtml(secName)}</h2>
-            <div class="section-divider-line"></div>
-          </div>
-        `;
-
-        items.forEach(item => {
-          const itemId = safeAnchorId(item.id, "story");
-          const itemKey = getStoryKey(item);
-          const isNew = newStoryKeys.has(itemKey);
-          const cardClass = "story-card" + (mode === "hourly" ? " radar-story" : "") + (isNew ? " is-new" : "");
-          const section = escapeHtml(item.section);
-          const headline = escapeHtml(item.headline);
-          const lead = escapeHtml(item.lead);
-          const storyTime = escapeHtml(item.published_at || "");
-          const storyTimeMarkup = storyTime ? '<span class="story-time">' + storyTime + '</span>' : "";
-          const freshBadge = isNew ? '<span class="story-fresh">Yeni</span>' : "";
-
-          // Analysis Bullets
-          const analysisBullets = (item.detailed_analysis || [])
-            .map(b => `<li>${escapeHtml(b)}</li>`)
-            .join("");
-
-          // Data Points (Concrete numbers)
-          let dataPointsHtml = "";
-          if (item.data_points && item.data_points.length > 0) {
-            const dataList = item.data_points.map(d => `<li>• ${escapeHtml(d)}</li>`).join("");
-            dataPointsHtml = `
-              <div class="data-points-box">
-                <div class="data-points-title">📊 Data Points:</div>
-                <ul class="data-points-list">
-                  ${dataList}
-                </ul>
-              </div>
-            `;
-          }
-
-          // Executive Strategic & Market Impact
-          let impactHtml = "";
-          const strategicText = escapeHtml(item.strategic_impact || item.thy_impact_assessment || "");
-          const exposureList = Array.isArray(item.market_exposure) ? item.market_exposure : [];
-
-          if (strategicText || exposureList.length > 0) {
-            let exposureMarkup = "";
-            if (exposureList.length > 0) {
-              exposureMarkup = `
-                <div class="exposure-grid">
-                  ${exposureList.map(exp => {
-                    const impactValue = String(exp.impact || "");
-                    const impactRaw = impactValue.toLowerCase();
-                    const carrier = escapeHtml(exp.carrier || "Stakeholder");
-                    const impact = escapeHtml(impactValue || "Neutral");
-                    const details = exp.details ? escapeHtml(exp.details) : "";
-                    let badgeClass = "badge-neutral";
-                    if (impactRaw.includes("pos") || impactRaw.includes("growth") || impactRaw.includes("opp") || impactRaw.includes("hedged")) {
-                      badgeClass = "badge-positive";
-                    } else if (impactRaw.includes("neg") || impactRaw.includes("adverse") || impactRaw.includes("risk") || impactRaw.includes("cost") || impactRaw.includes("headwind") || impactRaw.includes("pressure") || impactRaw.includes("disrupt")) {
-                      badgeClass = "badge-adverse";
-                    }
-                    return `
-                      <div class="exposure-item">
-                        <span class="exposure-carrier">${carrier}:</span>
-                        <span class="exposure-badge ${badgeClass}">${impact}</span>
-                        ${details ? `<span class="exposure-desc">${details}</span>` : ""}
-                      </div>
-                    `;
-                  }).join("")}
-                </div>
-              `;
-            }
-
-            impactHtml = `
-              <div class="strategic-impact-box">
-                <div class="strategic-impact-title">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                  Strategic & Market Impact
-                </div>
-                ${strategicText ? `<div class="strategic-impact-text">${strategicText}</div>` : ""}
-                ${exposureMarkup}
-              </div>
-            `;
-          }
-
-          // Why It Matters
-          let whyItMattersHtml = "";
-          if (item.why_it_matters) {
-            whyItMattersHtml = `
-              <div class="why-it-matters-box">
-                <span class="why-it-matters-label">Why it matters:</span> ${escapeHtml(item.why_it_matters)}
-              </div>
-            `;
-          }
-
-          // Original Source Link (Doğrudan Yayıncı Sayfası)
-          const sourceObj = item.original_source || {};
-          const sourceTitle = escapeHtml(sourceObj.title || "Read full article");
-          const sourceName = sourceObj.source_name ? ` (${escapeHtml(sourceObj.source_name)})` : "";
-          const sourceTypeLabels = {mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social"};
-          const sourceTypeLabel = sourceTypeLabels[sourceObj.source_type] || "Verified source";
-          const articleUrl = safeExternalUrl(sourceObj.url);
-
-          storiesHtml += `
-            <article class="${cardClass}" id="${itemId}">
-              <div class="story-card-topline">
-                <div><span class="story-badge">${section}</span>${freshBadge}</div>
-                ${storyTimeMarkup}
-              </div>
-              <h3 class="story-headline">${headline}</h3>
-              <p class="story-lead">${lead}</p>
-
-              <div class="story-subheading">Detailed Analysis:</div>
-              <ul class="analysis-list">
-                ${analysisBullets}
-              </ul>
-
-              ${dataPointsHtml}
-              ${impactHtml}
-              ${whyItMattersHtml}
-
-              <div class="card-footer">
-                <a href="${articleUrl}" target="_blank" rel="noopener noreferrer" class="source-link">
-                  Original source: [${sourceTitle}]${sourceName} · ${sourceTypeLabel}${sourceObj.official ? " · Official" : ""} ↗
-                </a>
-                <a href="#top-summary" class="back-to-top-btn">
-                  Back to top summary ↑
-                </a>
-              </div>
-            </article>
-          `;
-        });
-      });
-
-      document.getElementById("detailed-stories").innerHTML = storiesHtml || emptyStateHtml(config.emptyTitle, config.emptyDetail);
-    }
-
-    // iOS PWA Harici Link Açıcı
-    function openExternalLink(event, url) {
-      if (!url) return;
-      // iOS PWA içinde Safari'yi yeni pencerede açmaya zorla
-      if (window.navigator && window.navigator.standalone) {
-        event.preventDefault();
-        window.open(url, '_blank', 'noopener,noreferrer');
-      }
-    }
-
-    // Paylaş & Panoya Kopyala
-    function shareBriefing() {
-      if (!briefingData) return;
-
-      let text = `${briefingData.heading}\n`;
-      text += `${briefingData.intro_sentence}\n\n`;
-
-      SECTION_ORDER.forEach(secName => {
-        const items = (briefingData.stories || []).filter(s => s.section === secName);
-        if (items.length === 0) return;
-        text += `\n=== ${secName.toUpperCase()} ===\n`;
-        items.forEach(it => {
-          text += `\n• ${it.headline}\n`;
-          text += `  ${it.lead}\n`;
-          const impactText = it.strategic_impact || it.thy_impact_assessment;
-          if (impactText) {
-            text += `  Strategic Impact: ${impactText}\n`;
-          }
-          if (it.original_source && it.original_source.url) {
-            text += `  Source: ${it.original_source.url}\n`;
-          }
-        });
-      });
-
-      if (navigator.share) {
-        navigator.share({
-          title: briefingData.heading,
-          text: text
-        }).catch(() => copyToClipboard(text));
-      } else {
-        copyToClipboard(text);
-      }
-    }
-
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        showToast("Bülten metni panoya kopyalandı!");
-      }).catch(err => {
-        showToast("Kopyalanamadı.");
-      });
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.classList.add("show");
-      setTimeout(() => {
-        t.classList.remove("show");
-      }, 2500);
-    }
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+      loadBriefing(state.mode);
+    });
   </script>
 </body>
 </html>
