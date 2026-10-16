@@ -110,8 +110,8 @@ def test_v1_failed_this_regression_which_is_why_v2_exists():
 
 # --- breaking needs an allowed event type --------------------------------------------------------------------------------
 
-def stored(event_type, score_value=95.0):
-    return {"story_id": "s", "event_type": event_type, "relevance_score": score_value,
+def stored(event_type, score_value=95.0, reliability=1.0):
+    return {"story_id": "s", "event_type": event_type, "relevance_score": score_value, "score_components": {"source_reliability": reliability},
             "first_seen_at": story_lifecycle.to_iso(NOW), "last_updated_at": story_lifecycle.to_iso(NOW),
             "published_at_iso": story_lifecycle.to_iso(NOW - timedelta(hours=1))}
 
@@ -161,3 +161,47 @@ def test_cluster_representative_is_the_most_reliable_source_then_the_earliest():
     ]
     chosen = story_lifecycle.cluster_representatives(articles)
     assert sorted(item["link"] for item in chosen) == ["https://c.example/1", "https://d.example/1"]
+
+
+def test_company_results_are_breaking_only_from_a_reliable_source():
+    assert "breaking" in story_lifecycle.compute_badges(stored("airline_financials", reliability=1.0), NOW, BADGES)
+    assert "breaking" in story_lifecycle.compute_badges(stored("airline_financials", reliability=0.8), NOW, BADGES)
+    # stock commentary on a finance site (reliability 0.7) is not breaking news
+    assert "breaking" not in story_lifecycle.compute_badges(stored("airline_financials", reliability=0.7), NOW, BADGES)
+
+
+def test_the_source_requirement_applies_only_to_the_configured_types():
+    assert "breaking" in story_lifecycle.compute_badges(stored("safety_incident", reliability=0.4), NOW, BADGES)
+
+
+# --- military and defence items are out of scope ------------------------------------------------------------------------
+
+SELECTION = V2["selection"]
+
+
+def military(headline, carriers=()):
+    return {"headline": headline, "relevance_score": 99.0, "story_id": headline, "entities": {"carriers": [{"slug": c} for c in carriers], "groups": []}}
+
+
+@pytest.mark.parametrize("headline", [
+    "Australia's $1.7B air battle system links RAAF F-35As to missile defense network",
+    "Ukraine claims six Russian Su-34 bombers damaged in Neptune missile strike",
+    "MSB'den F-35 ve C-130J açıklaması: 6 savaş uçağı için temaslar sürüyor",
+    "Belçika, bu yıl Ukrayna'ya 10 'F-16' savaş uçağı teslim edecek",
+])
+def test_military_stories_without_an_airline_are_not_selected(headline):
+    assert story_lifecycle.select_stories([military(headline)], SELECTION) == []
+
+
+@pytest.mark.parametrize("headline, carriers", [
+    ("Qantas to carry F-35 parts on its freighters", ["qantas"]),                       # an airline is involved
+    ("Missile strike closes airspace over the region; carriers reroute", []),            # civil aviation context
+    ("Airport shut after drone alert near an air force base", []),
+    ("Pilot survives Louisiana Cessna crash after engine falls off", []),                # not military at all
+])
+def test_civil_aviation_stories_are_kept_even_when_military_words_appear(headline, carriers):
+    assert len(story_lifecycle.select_stories([military(headline, carriers)], SELECTION)) == 1
+
+
+def test_v1_does_not_exclude_anything():
+    assert len(story_lifecycle.select_stories([military("RAAF F-35A bombers")], V1["selection"])) == 1

@@ -12,10 +12,12 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 try:
-    from . import source_registry
+    from . import clustering, source_registry, text_match
     from .urls import canonicalize_url
 except ImportError:
+    import clustering
     import source_registry
+    import text_match
     from urls import canonicalize_url
 
 
@@ -137,7 +139,7 @@ def enrich_stories(stories, articles, relevance_config=None):
     config = relevance_config or load_relevance_config()
     index_by_url = {canonicalize_url(article.get("link")): index for index, article in enumerate(articles)}
     cluster_by_index = {}
-    for indexes in source_registry.cluster_articles_for_stats(articles):
+    for indexes in clustering.cluster_articles(articles):
         for index in indexes:
             cluster_by_index[index] = indexes
 
@@ -173,15 +175,30 @@ def enrich_stories(stories, articles, relevance_config=None):
 def cluster_representatives(articles):
     """One article per group of near-identical titles: the most reliable source, earliest among equals."""
     representatives = []
-    for indexes in source_registry.cluster_articles_for_stats(articles):
+    for indexes in clustering.cluster_articles(articles):
         members = [articles[index] for index in indexes]
         representatives.append(max(members, key=lambda a: (a.get("reliability_weight") or 0, bool(a.get("official")), -a.get("timestamp", 0))))
     return representatives
 
 
+def is_military_story(story, selection):
+    """Defence/military items that do not involve any airline or civil aviation context are out of scope."""
+    exclude_terms = selection.get("exclude_terms")
+    if not exclude_terms:
+        return False
+    title = story.get("headline", "")
+    if not text_match.TermSet(exclude_terms).any(title) or text_match.TermSet(selection.get("keep_terms", [])).any(title):
+        return False
+    entities = story.get("entities") or {}
+    return not (entities.get("carriers") or entities.get("groups"))
+
+
 def select_stories(stories, selection):
-    """Stories at or above the score threshold, best first, at most max_per_run."""
-    eligible = [story for story in stories if float(story.get("relevance_score", 0)) >= selection["min_score"]]
+    """Stories at or above the score threshold, best first, at most max_per_run; military items are dropped."""
+    eligible = [
+        story for story in stories
+        if float(story.get("relevance_score", 0)) >= selection["min_score"] and not is_military_story(story, selection)
+    ]
     eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))
     return eligible[: selection["max_per_run"]]
 
@@ -225,6 +242,34 @@ def find_match(story, candidates, threshold):
                 if similarity > best_similarity:
                     best, best_similarity = candidate, similarity
     return best if best_similarity >= threshold else None
+
+
+def _is_same_story(story, candidate, threshold):
+    if candidate.get("story_id") == story.get("story_id") or _story_urls(story) & _story_urls(candidate):
+        return True
+    return any(
+        source_registry.title_similarity(title, other) >= threshold
+        for title in _story_titles(story) for other in _story_titles(candidate)
+    )
+
+
+def _consolidate(stored, story, threshold):
+    """The stored story an incoming one belongs to. Several stored stories that turn out to be the same
+    event (they were archived before they could be clustered) are folded into the oldest one: its
+    first_seen_at and narrative stay, no source is lost, only the duplicate entries disappear."""
+    matches = [candidate for candidate in stored if _is_same_story(story, candidate, threshold)]
+    if not matches:
+        return None
+    primary = min(matches, key=lambda item: (item.get("first_seen_at", ""), item.get("story_id", "")))
+    for other in matches:
+        if other is primary:
+            continue
+        known = _story_urls(primary)
+        primary["sources"] = primary.get("sources", []) + [entry for entry in other.get("sources", []) if canonicalize_url(entry.get("url")) not in known]
+        stored.remove(other)
+    if len(matches) > 1:
+        primary["source_count"] = len({entry["name"] for entry in primary["sources"] if entry.get("name")}) or 1
+    return primary
 
 
 def _dedupe_incoming(stories, threshold):
@@ -285,7 +330,7 @@ def build_day(existing_day, previous_day, briefings, now, config=None):
     stored = [copy.deepcopy(story) for story in (existing_day or {}).get("stories", []) if story.get("story_id")]
     previous = [story for story in (previous_day or {}).get("stories", []) if story.get("story_id")]
     for story in _dedupe_incoming([s for briefing in ordered for s in briefing.get("stories", [])], threshold):
-        target = find_match(story, stored, threshold)
+        target = _consolidate(stored, story, threshold)
         if target is None:
             carried = find_match(story, previous, threshold)
             if carried is not None:
@@ -318,7 +363,7 @@ def compute_badges(story, now, config=None):
     age = hours(first_seen)
     badges = []
     breaking = config["breaking"]
-    allowed_type = story.get("event_type") in breaking["allowed_event_types"]
+    allowed_type = story.get("event_type") in breaking["allowed_event_types"] and _meets_type_requirement(story, breaking)
     if allowed_type and fresh_publication and 0 <= age <= breaking["max_age_hours"] and float(story.get("relevance_score", 0)) >= breaking["critical_score"]:
         badges.append(BADGE_BREAKING)
     if fresh_publication and 0 <= age <= config["new"]["max_age_hours"]:
@@ -327,6 +372,14 @@ def compute_badges(story, now, config=None):
     if updated_at and updated_at > first_seen and 0 <= hours(updated_at) <= config["updated"]["max_age_hours"]:
         badges.append(BADGE_UPDATED)
     return badges
+
+
+def _meets_type_requirement(story, breaking):
+    """Some types are only breaking from reliable sources (company results yes, stock commentary no)."""
+    requirement = breaking.get("type_requirements", {}).get(story.get("event_type"))
+    if not requirement:
+        return True
+    return float((story.get("score_components") or {}).get("source_reliability", 0)) >= requirement["min_source_reliability"]
 
 
 def _order_key(story):

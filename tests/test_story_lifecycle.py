@@ -100,6 +100,50 @@ def test_unrelated_stories_are_not_merged():
     assert len(build(first, {"daily": briefing(other)}, NOW + HOUR)["stories"]) == 2
 
 
+# --- duplicates archived before they could be clustered -------------------------------------------------------------
+
+DISTINCT_HEADLINES = ["Alpha engines agreement signed", "Bravo lounge reopens Frankfurt", "Charlie pilots ballot result", "Delta cargo terminal expansion"]
+
+
+def cluster_story(urls, score=78.0, headline="THY and CFM sign MOU for 600 engines"):
+    item = story(url=urls[0], headline=headline, score=score, publishers=("Wire A",))
+    item["sources"] = [{"name": f"Wire {index}", "url": url, "title": f"title {index}"} for index, url in enumerate(urls)]
+    item["source_count"] = len(urls)
+    return item
+
+
+def test_stored_duplicates_are_folded_into_the_oldest_story_without_losing_a_source():
+    urls = [f"https://outlet{index}.example/thy-cfm" for index in range(4)]
+    day = None
+    for index, url in enumerate(urls):                      # four outlets archived at different hours as four stories
+        day = build(day, {"daily": briefing(story(url=url, headline=DISTINCT_HEADLINES[index], title=DISTINCT_HEADLINES[index]))}, NOW + index * HOUR)
+    assert len(day["stories"]) == 4
+    oldest = min(day["stories"], key=lambda item: item["first_seen_at"])
+
+    merged = build(day, {"daily": briefing(cluster_story(urls))}, NOW + 5 * HOUR)
+
+    assert len(merged["stories"]) == 1
+    item = merged["stories"][0]
+    assert item["story_id"] == oldest["story_id"] and item["first_seen_at"] == oldest["first_seen_at"]
+    assert {entry["url"] for entry in item["sources"]} >= set(urls)
+
+
+def test_folding_duplicates_is_stable_on_the_next_run():
+    urls = [f"https://outlet{index}.example/thy-cfm" for index in range(3)]
+    day = None
+    for index, url in enumerate(urls):
+        day = build(day, {"daily": briefing(story(url=url, headline=DISTINCT_HEADLINES[index], title=DISTINCT_HEADLINES[index]))}, NOW + index * HOUR)
+    merged = build(day, {"daily": briefing(cluster_story(urls))}, NOW + 4 * HOUR)
+    again = build(merged, {"daily": briefing(cluster_story(urls))}, NOW + 5 * HOUR)
+    assert story_lifecycle.fingerprint(again) == story_lifecycle.fingerprint(merged)
+
+
+def test_unrelated_stored_stories_are_not_folded():
+    first = build(None, {"daily": briefing(story(), story(url="https://example.com/b", headline="Airbus A220 order", title="Airbus A220 order"))}, NOW)
+    second = build(first, {"daily": briefing(story(url="https://example.com/c", headline="Qantas network update", title="Qantas network update"))}, NOW + HOUR)
+    assert len(second["stories"]) == 3
+
+
 # --- a story whose score changed -----------------------------------------------------------
 
 def test_score_change_at_the_threshold_marks_the_story_updated():

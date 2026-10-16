@@ -64,7 +64,6 @@
 
     .lead-story { margin: 0 var(--pad); padding: 20px 0 22px; border-bottom: 1px solid var(--ink); display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
     .kicker { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
-    .kicker .prio { color: var(--neg); }
     .kicker .new { color: var(--ink); background: var(--paper-2); padding: 3px 5px; margin-top: -3px; }
     .kicker .updated { color: var(--ink); border: 1px solid var(--rule-2); padding: 2px 4px; margin-top: -3px; }
     .kicker .breaking { color: var(--paper); background: var(--neg); padding: 3px 5px; margin-top: -3px; }
@@ -222,17 +221,13 @@
       const seen = new Set();
       return stories.filter(s => { const k = storyKey(s); if (seen.has(k)) return false; seen.add(k); return true; });
     }
-    function isPriority(story) {
-      const text = [story.headline, story.lead, story.why_it_matters, story.strategic_impact].join(" ");
-      return /(critical|urgent|emergency|security|safety|accident|divert|closure|strike|warning|alarm|hijack|disrupt)/i.test(text);
-    }
-    function sectionOf(story) { return story.section || "Other"; }
+    function sectionOf(story) { return story.region_section || story.section || "Other"; }
     function badgeSet(story) { return new Set(Array.isArray(story.badges) ? story.badges : []); }
     function isNewStory(story) { return state.newKeys.has(storyKey(story)) || badgeSet(story).has("new"); }
-    function tagsHtml(story, includePriority = true) {
+    function isBreaking(story) { return badgeSet(story).has("breaking"); }
+    function tagsHtml(story) {
       const badges = badgeSet(story);
       return [
-        includePriority && isPriority(story) ? `<span class="prio">Priority</span>` : "",
         badges.has("breaking") ? `<span class="breaking">Breaking</span>` : "",
         isNewStory(story) ? `<span class="new">New</span>` : "",
         badges.has("updated") ? `<span class="updated">Updated</span>` : ""
@@ -285,8 +280,8 @@
       if (state.filter !== "All" && !sections.has(state.filter)) state.filter = "All";
 
       $("dateline").textContent = [data.date_str, data.time_str].filter(Boolean).join(" · ") || "—";
-      const prioCount = stories.filter(isPriority).length;
-      $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${prioCount} priority`;
+      const breakingCount = stories.filter(isBreaking).length;
+      $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"}` + (breakingCount ? ` · ${breakingCount} breaking` : "");
       const stale = $("stale");
       if (data.status === "stale") {
         stale.hidden = false;
@@ -305,7 +300,7 @@
       stories.forEach(s => { const k = sectionOf(s); counts[k] = (counts[k] || 0) + 1; });
       const sectionNames = Object.keys(counts).sort((a, b) => sectionRank(a) - sectionRank(b));
 
-      const lead = filter === "All" ? (stories.find(isPriority) || stories[0]) : null;
+      const lead = filter === "All" ? (stories.find(isBreaking) || stories[0]) : null;
       const rest = stories.filter(s => s !== lead && (filter === "All" || sectionOf(s) === filter));
       const groups = (filter === "All" ? sectionNames : [filter]).map(name => ({ name, items: rest.filter(s => sectionOf(s) === name) })).filter(g => g.items.length);
       state.order = (lead ? [lead] : []).concat(...groups.map(g => g.items));
@@ -313,7 +308,7 @@
       let html = "";
       if (lead) {
         html += `<article class="lead-story" data-open="${escapeHtml(storyKey(lead))}">
-          <div class="kicker">${kickerBits(lead, isPriority(lead) ? "Priority" : "Lead story")}</div>
+          <div class="kicker">${kickerBits(lead, "Lead story")}</div>
           <h2>${escapeHtml(lead.headline)}</h2>
           ${lead.why_it_matters ? `<p class="why">${escapeHtml(lead.why_it_matters)}</p>` : ""}
           <div class="meta"><span>${escapeHtml(sourceName(lead))}</span><strong>Read the analysis →</strong></div>
@@ -346,7 +341,7 @@
     }
 
     function kickerBits(s, first) {
-      return [`<span class="${first === "Priority" ? "prio" : ""}">${first}</span>`, `<span>${escapeHtml(sectionOf(s))}</span>`, tagsHtml(s, false)].join("");
+      return [`<span>${first}</span>`, `<span>${escapeHtml(sectionOf(s))}</span>`, tagsHtml(s)].join("");
     }
     function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
 
@@ -412,7 +407,7 @@
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
       $("art-body").innerHTML = `
-        <div class="kicker">${isPriority(s) ? `<span class="prio">Priority</span>` : ""}<span>${escapeHtml(sectionOf(s))}</span>${tagsHtml(s, false)}</div>
+        <div class="kicker"><span>${escapeHtml(sectionOf(s))}</span>${tagsHtml(s)}</div>
         <h1>${escapeHtml(s.headline)}</h1>
         <div class="art-src">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
         ${s.why_it_matters ? `<div class="art-why"><span class="eyebrow">Why it matters</span><p>${escapeHtml(s.why_it_matters)}</p></div>` : ""}
