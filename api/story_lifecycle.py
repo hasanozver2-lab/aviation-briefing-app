@@ -220,14 +220,18 @@ def is_military_story(story, selection):
 
 
 def select_stories(stories, selection, commentary=None):
-    """Stories at or above the score threshold, best first, at most max_per_run; military items are dropped."""
+    """Stories to archive: the listed ones (score >= min_score, at most max_per_run) and the archive-only low band
+    (archive_min_score <= score < min_score, at most max_low_per_run). Military items and finance commentary are dropped."""
+    archive_minimum = selection.get("archive_min_score", selection["min_score"])
     eligible = [
         story for story in stories
-        if float(story.get("relevance_score", 0)) >= selection["min_score"] and not is_military_story(story, selection)
+        if float(story.get("relevance_score", 0)) >= archive_minimum and not is_military_story(story, selection)
         and not (selection.get("exclude_commentary") and is_finance_commentary(story, commentary))
     ]
     eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))
-    return eligible[: selection["max_per_run"]]
+    listed = [story for story in eligible if float(story["relevance_score"]) >= selection["min_score"]][: selection["max_per_run"]]
+    low = [story for story in eligible if float(story["relevance_score"]) < selection["min_score"]][: selection.get("max_low_per_run", selection["max_per_run"])]
+    return listed + low
 
 
 def stable_story_id(source_url, headline=""):
@@ -419,11 +423,30 @@ def _order_key(story):
     )
 
 
-def present_stories(day, now, config=None):
-    """Set badges on every story and order them: breaking first, then score, then newest."""
+def level_for(score, levels):
+    """The score band a story falls into (highest min_score it reaches), or None below every band."""
+    for level in sorted(levels, key=lambda item: -item["min_score"]):
+        if float(score) >= level["min_score"]:
+            return level
+    return None
+
+
+def is_listed(story):
+    """Whether the story belongs in the main list (the archive-only low band does not)."""
+    return story.get("listed", True)
+
+
+def present_stories(day, now, config=None, levels=None):
+    """Set badges and score band on every story and order them: breaking first, then score, then newest."""
     config = config or load_badges_config()
+    levels = load_relevance_config().get("levels") if levels is None else levels
     for story in day.get("stories", []):
         story["badges"] = compute_badges(story, now, config)
+        if levels:
+            level = level_for(story.get("relevance_score", 0), levels)
+            story["level"] = level["name"] if level else "below"
+            story["level_label"] = level["label"] if level else ""
+            story["listed"] = bool(level and level["listed"])
     day["stories"] = sorted(day.get("stories", []), key=_order_key)
     return day
 

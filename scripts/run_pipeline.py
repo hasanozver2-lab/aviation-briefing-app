@@ -94,8 +94,9 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
     report = {"calls": 0, "narrated": 0, "pending": 0, "error": ""}
     if day:
         description_limit = _engine.load_description_limit()
-        report = narrate(day["stories"], api_key, description_limit, now=now)
         story_lifecycle.present_stories(day, now, config)
+        # The archive-only low band costs no LLM calls; it is narrated if its score ever reaches the list.
+        report = narrate([story for story in day["stories"] if story_lifecycle.is_listed(story)], api_key, description_limit, now=now)
 
     files = {}
     if day and story_lifecycle.fingerprint(day) != story_lifecycle.fingerprint(existing_day):

@@ -144,12 +144,14 @@ def test_selection_keeps_stories_at_or_above_the_threshold_best_first_up_to_the_
     assert [item["relevance_score"] for item in chosen] == [80, 60, 45]
 
 
-def test_the_active_selection_threshold_keeps_the_critical_story_and_drops_the_community_one():
+def test_the_critical_story_ranks_in_a_higher_band_than_the_community_announcement():
     thy = article(THY_CFM_TITLE, THY_CFM_TEXT, reliability=0.4, official=False)
     delta = article(DELTA_TITLE, DELTA_TEXT, reliability=1.0, official=True)
-    minimum = V2["selection"]["min_score"]
-    assert score(thy, 1) >= minimum
-    assert score(delta, 1) < minimum
+    thy_level = story_lifecycle.level_for(score(thy, 1), V2["levels"])
+    delta_level = story_lifecycle.level_for(score(delta, 1), V2["levels"])
+    assert thy_level["name"] == "important"                  # worst case: one trade outlet
+    assert delta_level["name"] == "watch"                    # best case community story lands in the lowest listed band
+    assert thy_level["min_score"] > delta_level["min_score"]
 
 
 def test_cluster_representative_is_the_most_reliable_source_then_the_earliest():

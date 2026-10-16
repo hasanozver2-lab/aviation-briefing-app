@@ -44,7 +44,7 @@
       },
       "corroboration_full_at_sources": 3,
       "selection": {
-        "min_score": 45,
+        "min_score": 40,
         "max_per_run": 12,
         "exclude_terms": [
           "F-35*",
@@ -78,7 +78,9 @@
           "havayolu*",
           "hava sahası*"
         ],
-        "exclude_commentary": true
+        "exclude_commentary": true,
+        "archive_min_score": 35,
+        "max_low_per_run": 12
       },
       "commentary": {
         "_doc": "Finance commentary: a title pattern, or a finance event type from a source that is neither official nor tier <= trusted_max_tier. Its score is multiplied by score_multiplier and, with selection.exclude_commentary, it never enters the list.",
@@ -107,7 +109,34 @@
         ],
         "trusted_max_tier": 2,
         "score_multiplier": 0.3
-      }
+      },
+      "levels": [
+        {
+          "name": "critical",
+          "label": "Kritik",
+          "min_score": 60,
+          "listed": true
+        },
+        {
+          "name": "important",
+          "label": "Önemli",
+          "min_score": 45,
+          "listed": true
+        },
+        {
+          "name": "watch",
+          "label": "İzle",
+          "min_score": 40,
+          "listed": true
+        },
+        {
+          "name": "low",
+          "label": "Arşiv",
+          "min_score": 35,
+          "listed": false
+        }
+      ],
+      "_levels_doc": "Score bands. 'listed' levels appear in the main list; 'low' stories are written to the archive file but only returned by the API with include_low=1. Stories scoring below the lowest band are not archived (selection.archive_min_score)."
     }
   }
 }
