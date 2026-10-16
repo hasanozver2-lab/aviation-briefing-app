@@ -17,7 +17,7 @@ Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 | `config/event_taxonomy.json` | event_type terimleri | okunur |
 | `config/pipeline.json` | `llm_description_max_chars` (800) | okunur |
 
-`data/*.sqlite3` ve `briefing_cache*.json` git'te takipli değil; pipeline her çalışmada SQLite'ı CSV'den yeniden kurar (`_engine.run_pipeline`).
+`data/*.sqlite3` git'te takipli değil; pipeline her çalışmada SQLite'ı CSV'den yeniden kurar (`_engine.run_pipeline`). `briefing_cache_*.json` **geçici olarak takipli kalıyor**: 2026-10-16 itibarıyla canlı site Blob'dan değil bu dosyalardan servis ediliyor (hiç Blob yayını yapılmadı). İlk başarılı Blob yayınından sonra takipten çıkarılacak (ayrı commit, önce onay).
 Ücretli bir kaynak CSV'de `active=1` olamaz (yükleme hata verir).
 
 ## Kalıcı kimlik kuralları (değiştirilemez)
@@ -54,4 +54,7 @@ Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 - **`thy_impact_assessment` / THY merceği** prompt, şema ve arayüzde duruyor (`market_read` geçişi Adım 3).
 - **`index.html` hâlâ `user-scalable=no`** (erişilebilirlik).
 - **Spirit Airlines filosu 0.** Doğrulama kaynağı (Wikipedia) 2026-05-02'de faaliyetin durduğunu yazıyor; tek kaynak, `needs_verification=1` bırakıldı. Gerçekse satır tier 4'e düşmüş olur.
+- **Filo rakamlarının kaynağı Wikipedia (CC BY-SA).** Tier hesabı için yeterli; ancak varlık sayfalarında filo rakamı gösterilecekse kaynak gösterimi (atıf) ve lisans uyumu (CC BY-SA, türev veri paylaşımı koşulu) ayrıca ele alınmalı; `verification_source` sütunu atıf için başlangıç noktası.
+- **Canlı yayın hattı doğrulanmadı.** 2026-10-16: GitHub'da "Publish aviation briefings" için hiç çalışma kaydı yok ve canlı `/api/briefing` 14 Ekim tarihli commit'li önbelleği döndürüyor (`status`/`market` alanları yok). Secrets, ilk çalışma ve Blob okuma adresi (`BLOB_PUBLIC_BASE_URL`) doğrulanmalı.
+- **Aynı depodan üç Vercel projesi yayın alıyor:** `aviation-briefing-app-drvd` (canlı site), `aviation-briefing-app-5w38` ve `aviation-briefing-app`. Amaçları belirsiz; kullanılmayanlar silinmeden önce sahibine sorulacak.
 - **Seed rakamları kısmen doğrulanmış tahmin.** Doğrulama turu `reports/entity_seed_review.md` üzerinden.
