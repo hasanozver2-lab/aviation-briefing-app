@@ -16,8 +16,7 @@
         "crack spread",
         "rafineri marj*",
         "fuel surcharge",
-        "yakıt ek ücret*",
-        "SAF"
+        "yakıt ek ücret*"
       ]
     },
     "fx_currency": {
@@ -215,7 +214,26 @@
         "lease agreement",
         "sipariş*",
         "anlaşma*",
-        "sözleşme*"
+        "sözleşme*",
+        "takes delivery",
+        "delivers",
+        "delivery of",
+        "deliveries",
+        "delivered its",
+        "retires",
+        "retire*",
+        "retirement",
+        "phase out",
+        "phase-out",
+        "retrofit*",
+        "refurbish*",
+        "cabin refresh",
+        "cabin renewal",
+        "cabin upgrade",
+        "cabin refit",
+        "sale-leaseback",
+        "teslimat*",
+        "emekli*"
       ]
     },
     "community_csr": {
@@ -233,7 +251,17 @@
         "volunteer*",
         "philanthrop*",
         "bağış*",
-        "hayır*"
+        "hayır*",
+        "autism",
+        "autistic",
+        "accessib*",
+        "wheelchair*",
+        "disabilit*",
+        "special needs",
+        "sensory room",
+        "inclusiv*",
+        "erişilebilir*",
+        "engelli*"
       ]
     },
     "route_network_change": {
@@ -295,8 +323,160 @@
         "maiden flight",
         "maiden commercial flight"
       ]
+    },
+    "airport_infrastructure": {
+      "weight": 0.5,
+      "terms": [
+        "new terminal",
+        "terminal expansion",
+        "terminal building",
+        "runway",
+        "airport expansion",
+        "airport construction",
+        "airport redevelopment",
+        "airport investment",
+        "airport modernis*",
+        "airport moderniz*",
+        "new airport",
+        "airport capacity",
+        "slot allocation",
+        "slot rules",
+        "control tower",
+        "havalimanı yatırım*",
+        "terminal binası",
+        "pist inşa*"
+      ]
+    },
+    "partnerships_mna": {
+      "weight": 0.65,
+      "terms": [
+        "partnership",
+        "partners with",
+        "teams up",
+        "joint venture",
+        "strategic alliance",
+        "alliance",
+        "acquires",
+        "acquisition of",
+        "acquisition",
+        "takeover",
+        "merger",
+        "merges",
+        "equity stake",
+        "stake in",
+        "buys stake",
+        "collaboration",
+        "ortaklık*",
+        "birleşme*",
+        "satın al*"
+      ],
+      "aviation_context_terms": [
+        "airline*",
+        "airways",
+        "carrier*",
+        "aircraft",
+        "airport*",
+        "aviation",
+        "aerospace",
+        "flight*",
+        "fleet",
+        "havayolu*",
+        "havalimanı*",
+        "uçak*",
+        "uçuş*"
+      ],
+      "_doc": "Partnership words are everywhere (loyalty co-brands, restaurants); the type needs an aviation word in the title or description."
+    },
+    "regulation_policy": {
+      "weight": 0.6,
+      "terms": [
+        "regulator*",
+        "regulation*",
+        "regulatory",
+        "airworthiness directive*",
+        "certification",
+        "antitrust",
+        "passenger rights",
+        "aviation tax",
+        "air passenger duty",
+        "levy",
+        "fined",
+        "lawsuit*",
+        "court ruling",
+        "ruling",
+        "ban on",
+        "bans",
+        "regulatory approval",
+        "EASA approval",
+        "FAA approval",
+        "düzenleme*",
+        "yönetmelik*",
+        "SHGM"
+      ]
+    },
+    "sustainability_saf": {
+      "weight": 0.45,
+      "terms": [
+        "SAF",
+        "sustainable aviation fuel",
+        "biofuel*",
+        "hydrogen",
+        "eVTOL",
+        "net zero",
+        "net-zero",
+        "decarboni*",
+        "emissions",
+        "carbon",
+        "electric aircraft",
+        "ReFuelEU",
+        "e-fuel*",
+        "sürdürülebilir havacılık yakıtı",
+        "karbon*",
+        "emisyon*"
+      ]
+    },
+    "workforce_hr": {
+      "weight": 0.3,
+      "terms": [
+        "pilot recruitment",
+        "recruit*",
+        "hiring",
+        "hires",
+        "pilot shortage",
+        "collective agreement",
+        "labour dispute",
+        "labor dispute",
+        "appoints",
+        "appointed",
+        "new CEO",
+        "chief executive",
+        "chief operating officer",
+        "cabin crew",
+        "training academy",
+        "apprentice*",
+        "cadet*",
+        "layoffs",
+        "job cuts",
+        "workforce",
+        "işe alım*",
+        "pilot alım*",
+        "atandı",
+        "atama*"
+      ]
     }
   },
   "_eligibility": "A type applies when one of its terms is in the TITLE, or at least min_description_hits distinct terms are in the description. A single hit in a long description is usually boilerplate ('personal guidance' in a foundation blurb).",
-  "min_description_hits": 2
+  "min_description_hits": 2,
+  "_provisional_v2": "fleet_orders and community_csr were widened and airport_infrastructure, partnerships_mna, regulation_policy, sustainability_saf and workforce_hr added with provisional weights; all pending user approval. Typing is skipped for the guarded types for stories the relevance exclusion lists (defence, investment commentary) remove.",
+  "typing_exclusions": {
+    "_doc": "Exclusion lists run BEFORE type matching: an article whose title hits selection.exclude_terms (and no keep_terms) or commentary.title_patterns in config/relevance.json gets none of the guarded types, so 'agreement' in a missile-deal headline cannot become partnerships_mna. The lists themselves stay in relevance.json (one source of truth).",
+    "guarded_types": [
+      "fleet_orders",
+      "airport_infrastructure",
+      "partnerships_mna",
+      "regulation_policy",
+      "sustainability_saf",
+      "workforce_hr"
+    ]
+  }
 }

@@ -218,7 +218,7 @@ def test_one_unavailable_source_does_not_block_other_feed_results(monkeypatch):
 
 def test_public_refresh_uses_cached_briefing_endpoint_without_html_errors():
     project_dir = Path(__file__).resolve().parents[1]
-    for relative_path in ("index.html", "public/index.html", "static/index.html"):
+    for relative_path in ("public/index.html",):
         page = (project_dir / relative_path).read_text(encoding="utf-8")
         assert "/api/refresh?mode=" not in page
         assert "const cacheBuster = requestLatest" in page

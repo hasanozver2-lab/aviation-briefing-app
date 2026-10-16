@@ -1,4 +1,4 @@
-"""The three index.html copies are one UI; these checks pin the single-screen behaviour."""
+"""public/index.html is the only UI source (Vercel serves public/); these checks pin the single-screen behaviour."""
 
 import re
 from pathlib import Path
@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
-COPIES = ("index.html", "public/index.html", "static/index.html")
+COPIES = ("public/index.html",)
+IGNORED_DIRS = {".git", "node_modules", ".venv", "__pycache__", ".playwright-cli", ".pytest_cache"}
 ALLOWED_EXTERNAL_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com"}
 
 
@@ -14,8 +15,13 @@ def page(relative_path="public/index.html"):
     return (PROJECT_DIR / relative_path).read_text(encoding="utf-8")
 
 
-def test_the_three_copies_are_identical():
-    assert len({page(path) for path in COPIES}) == 1
+def test_index_html_has_exactly_one_copy_and_it_is_in_public():
+    # Vercel serves public/; a second copy elsewhere silently drifts (static/index.html did, for weeks).
+    found = sorted(
+        path.relative_to(PROJECT_DIR).as_posix() for path in PROJECT_DIR.rglob("index.html")
+        if not IGNORED_DIRS & set(path.relative_to(PROJECT_DIR).parts)
+    )
+    assert found == ["public/index.html"]
 
 
 @pytest.mark.parametrize("path", COPIES)
