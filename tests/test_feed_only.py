@@ -276,3 +276,13 @@ def test_a_headline_only_summary_is_never_written_to_the_archive(tmp_path, monke
     archive = json.loads(next((tmp_path / "briefings").glob("2026-*.json")).read_text(encoding="utf-8"))
     assert ("story-h", "publisher summary that must not be stored") in seen, "the model still receives the summary in memory"
     assert all(item["source_description"] == "" for item in archive["stories"]), "nothing of the publisher's text reaches the archive file"
+
+
+def test_a_stored_address_is_read_even_if_one_item_is_incomplete():
+    # a dated-link page or a feed with one malformed item: strict verification at storage time, lenient reading afterwards
+    feed = (f'<?xml version="1.0"?><rss version="2.0"><channel><item><title>Airline X opens base</title><link>https://wire.example/a1</link><pubDate>{RECENT}</pubDate></item>'
+            f'<item><title>No date on this one</title><link>https://wire.example/a2</link></item></channel></rss>').encode()
+    site = Site({"https://wire.example/feed": (200, feed)})
+    articles, report = feed_sources.read_source(source(), DISCOVERED, fetcher_for(site), NOW, NOW - timedelta(hours=48))
+    assert [a["title"] for a in articles] == ["Airline X opens base"] and report["rediscovered"] is False and report["status"] == "active"
+    assert site.log == ["https://wire.example/feed"], "no re-discovery was needed"
