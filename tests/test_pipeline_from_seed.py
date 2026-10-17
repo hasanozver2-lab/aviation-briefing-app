@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from api import _engine, briefing_store, market_data, source_registry
+from api import _engine, source_catalog, briefing_store, market_data, source_registry
 
 
 ARTICLES = [
@@ -34,7 +34,7 @@ def isolated_pipeline(tmp_path, monkeypatch):
     monkeypatch.setattr(_engine, "CACHE_FILE_DAILY", tmp_path / "briefing_cache_daily.json")
     monkeypatch.setattr(_engine, "CACHE_FILE_HOURLY", tmp_path / "briefing_cache_hourly.json")
     monkeypatch.setattr(_engine, "GEMINI_API_KEY", "")
-    monkeypatch.setattr(_engine, "fetch_rss_items", lambda max_hours=48: [dict(article) for article in ARTICLES])
+    monkeypatch.setattr(_engine, "fetch_rss_items", lambda max_hours=48, report=None, recovered=None: [dict(article) for article in ARTICLES])
     monkeypatch.setattr(market_data, "refresh_market_data", lambda *args, **kwargs: {"indicators": []})
     assert not registry_db.exists() and not market_db.exists()
     return registry_db, market_db
@@ -46,8 +46,9 @@ def test_pipeline_builds_registry_and_entities_from_the_seed_alone(isolated_pipe
     collected = _engine.collect_run(market_database=market_db)
 
     with sqlite3.connect(registry_db) as connection:
-        assert connection.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 39
-        assert connection.execute("SELECT COUNT(*) FROM sources WHERE active = 1").fetchone()[0] == 36
+        rows = source_catalog.read_rows()
+        assert connection.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == len(rows)
+        assert connection.execute("SELECT COUNT(*) FROM sources WHERE active = 1").fetchone()[0] == sum(1 for row in rows if row["status"] == "active")
     with sqlite3.connect(market_db) as connection:
         assert connection.execute("SELECT COUNT(*) FROM carriers").fetchone()[0] > 100
         assert connection.execute("SELECT COUNT(*) FROM airports").fetchone()[0] > 100

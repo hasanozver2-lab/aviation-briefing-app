@@ -1,0 +1,22 @@
+{
+  "_doc": "Catalog source types (config/sources.csv column source_type) mapped onto the EXISTING reliability model: the tier picks the reliability weight from config/source_registry.json (1: 1.0, 2: 0.8, 3: 0.7, 4: 0.4) and 'official' feeds the official-source bonus in config/relevance.json. No weight or threshold is changed here. aviation_filter: items must pass the aviation keyword/entity filter before they are used (general feeds). A row may override it with notes.aviation_filter.",
+  "types": {
+    "airline_ir": {"tier": 1, "official": true, "aviation_filter": false, "label": "Airline IR"},
+    "regulator": {"tier": 1, "official": true, "aviation_filter": false, "label": "Regulator"},
+    "exchange": {"tier": 1, "official": true, "aviation_filter": true, "label": "Exchange filing"},
+    "oem": {"tier": 1, "official": true, "aviation_filter": false, "label": "Manufacturer"},
+    "trade": {"tier": 2, "official": false, "aviation_filter": false, "label": "Aviation media"},
+    "tech_vendor": {"tier": 4, "official": false, "aviation_filter": true, "label": "Industry vendor"},
+    "wire_headline": {"tier": 3, "official": false, "aviation_filter": true, "label": "Press headline"}
+  },
+  "legacy_type_map": {
+    "airline_newsroom": "airline_ir",
+    "airline_ir": "airline_ir",
+    "official_social": "airline_ir",
+    "trade_media": "trade",
+    "mainstream": "wire_headline"
+  },
+  "statuses": ["active", "disabled_blocked", "no_extractable_feed", "no_public_feed", "excluded_policy"],
+  "commercial_use_risks": ["low", "medium", "high"],
+  "modes": ["full", "feed_only"]
+}

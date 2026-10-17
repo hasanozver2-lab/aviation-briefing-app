@@ -21,19 +21,24 @@ sys.path.insert(0, str(PROJECT_DIR))
 from api import _engine
 from api import briefing_store
 from api import narrative
+from api import source_catalog
+from api import source_retry
 from api import story_lifecycle
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
+STATUS_FETCH_ERROR = "error"
+HEADLINE_ONLY = "headline_only"
+HEARTBEAT_HOURS = 3      # source health is written at least this often even when nothing else changed
 
 
 def timestamp(now=None):
     return (now or datetime.now(timezone.utc)).isoformat(timespec="seconds")
 
 
-def collect():
-    """Return (collected, error_message); exactly one of them is empty."""
+def collect(recovered=None):
+    """Return (collected, error_message); exactly one of them is empty. `recovered`: sources the weekly retry brought back."""
     try:
-        return _engine.collect_run(), ""
+        return (_engine.collect_run(recovered=recovered) if recovered else _engine.collect_run()), ""
     except Exception as exc:
         message = f"{type(exc).__name__}: {exc}"[:500]
         print(f"Collection failed: {message}", file=sys.stderr)
@@ -45,8 +50,43 @@ def day_payload(collected, now):
     return {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
 
 
-def status_payload(collection_error, narrative_report, now):
-    return {
+def source_health(source_report, existing_status, now, retry=None):
+    """Per source: last status, last successful read and articles in the last 24 hours. Unresolved sources only show up here."""
+    report = dict(source_report or {})
+    for row in source_catalog.read_rows():
+        report.setdefault(row["name"], {"status": row["status"], "error": row["reason"], "articles": 0})
+    previous = (existing_status or {}).get("sources", {})
+    health = {}
+    for name, entry in sorted(report.items()):
+        read_ok = entry["status"] == "active" and not entry.get("error")
+        health[name] = {
+            "status": entry["status"] if (read_ok or entry["status"] != "active") else STATUS_FETCH_ERROR,
+            "last_ok_at": timestamp(now) if read_ok else previous.get(name, {}).get("last_ok_at", ""),
+            "articles_24h": entry.get("articles_24h", 0),
+            "error": entry.get("error", ""),
+        }
+        prior = previous.get(name, {})
+        for key in ("last_retry_at", "retry_feed", "recovered_at", "retry_note"):
+            if key in prior:
+                health[name][key] = prior[key]
+        attempt = (retry or {}).get(name)
+        if attempt:
+            health[name]["last_retry_at"] = attempt["at"]
+            if attempt["valid"]:
+                health[name].update(retry_feed={"feed_url": attempt["feed_url"], "method": attempt["method"]}, recovered_at=attempt["at"])
+                health[name].pop("retry_note", None)
+            else:
+                health[name]["retry_note"] = attempt["reason"]
+    return health
+
+
+def source_summary(health):
+    ok = sum(1 for entry in health.values() if entry["status"] == "active")
+    return {"sources": len(health), "reading_ok": ok, "unresolved": len(health) - ok}
+
+
+def status_payload(collection_error, narrative_report, now, collected=None, existing_status=None, retry=None):
+    payload = {
         "status": STATUS_STALE if collection_error else STATUS_OK,
         "errors": {"collect": collection_error} if collection_error else {},
         "narrative_pending": narrative_report["pending"],
@@ -54,12 +94,26 @@ def status_payload(collection_error, narrative_report, now):
         "narrative_calls": narrative_report["calls"],
         "last_attempt_at": timestamp(now),
     }
+    if collected is not None:
+        health = source_health(collected.get("source_report"), existing_status, now, retry)
+        payload.update(sources=health, source_summary=source_summary(health))
+    elif existing_status and "sources" in existing_status:
+        payload.update(sources=existing_status["sources"], source_summary=existing_status.get("source_summary", {}))
+    return payload
 
 
-def status_changed(existing, new):
-    """Timestamps, call counts and error wording move every run and must not cause a commit on their own."""
+def status_changed(existing, new, now=None):
+    """Timestamps, call counts and error wording move every run and must not cause a commit on their own. A source's
+    status flipping does; so does a stale heartbeat, so the per-source times in status.json never go more than HEARTBEAT_HOURS old."""
     keys = ("status", "errors", "narrative_pending")
-    return any((existing or {}).get(key) != new[key] for key in keys)
+    if any((existing or {}).get(key) != new[key] for key in keys):
+        return True
+    old_sources = {name: entry["status"] for name, entry in (existing or {}).get("sources", {}).items()}
+    if old_sources != {name: entry["status"] for name, entry in new.get("sources", {}).items()}:
+        return True
+    last = story_lifecycle.parse_iso((existing or {}).get("last_attempt_at"))
+    current = story_lifecycle.parse_iso(new["last_attempt_at"])
+    return bool(new.get("sources") and (last is None or (current - last).total_seconds() >= HEARTBEAT_HOURS * 3600))
 
 
 def write_local(files, out_dir):
@@ -81,7 +135,7 @@ def make_reader(out_dir):
     return read_local
 
 
-def plan_files(collected, collection_error, read, now, api_key, narrate=narrative.fill_pending):
+def plan_files(collected, collection_error, read, now, api_key, narrate=narrative.fill_pending, retry=None):
     """Decide which files must be written for this run (possibly none). Returns (files, narrative_report)."""
     config = story_lifecycle.load_badges_config()
     today = story_lifecycle.day_key(now, config)
@@ -96,24 +150,51 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
         description_limit = _engine.load_description_limit()
         story_lifecycle.present_stories(day, now, config)
         # The archive-only low band costs no LLM calls; it is narrated if its score ever reaches the list.
+        # A headline-only story's publisher summary is held in memory for the model call and never written to the archive.
+        incoming = {item["story_id"]: item for item in (collected or {}).get("stories", [])}
+        for story in day["stories"]:
+            if story.get("basis") == HEADLINE_ONLY and not story.get("source_description") and story["story_id"] in incoming:
+                story["source_description"] = incoming[story["story_id"]].get("source_description", "")
         report = narrate([story for story in day["stories"] if story_lifecycle.is_listed(story)], api_key, description_limit, now=now)
+        for story in day["stories"]:
+            if story.get("basis") == HEADLINE_ONLY:
+                story["source_description"] = ""
 
     files = {}
     if day and story_lifecycle.fingerprint(day) != story_lifecycle.fingerprint(existing_day):
         files[day_path] = day
         files[briefing_store.latest_path()] = day
-    new_status = status_payload(collection_error, report, now)
-    if status_changed(read(briefing_store.status_path()), new_status):
+    existing_status = read(briefing_store.status_path())
+    new_status = status_payload(collection_error, report, now, collected, existing_status, retry)
+    if status_changed(existing_status, new_status):
         files[briefing_store.status_path()] = new_status
     return files, report
+
+
+OVERRIDES_PATH = PROJECT_DIR / "config" / "source_status_overrides.json"
+
+
+def weekly_retry(read, now):
+    """Retry the sources that are disabled_blocked (once per source per week, one request each). Returns (results, recovered).
+    Whatever goes wrong here is logged and ignored: a retry never fails the run."""
+    try:
+        previous_status = read(briefing_store.status_path())
+        overrides = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8")) if OVERRIDES_PATH.is_file() else {}
+        results = source_retry.retry_blocked(source_catalog.read_rows(), previous_status, overrides, now)
+        return results, source_retry.recovered_sources(previous_status, results)
+    except Exception as exc:
+        print(f"Weekly source retry skipped: {type(exc).__name__}: {exc}"[:300], file=sys.stderr)
+        return {}, {}
 
 
 def run(out_dir=None, now=None, api_key=None, narrate=narrative.fill_pending):
     now = now or datetime.now(timezone.utc)
     api_key = _engine.GEMINI_API_KEY if api_key is None else api_key
-    collected, collection_error = collect()
+    reader = make_reader(out_dir)
+    retry, recovered = weekly_retry(reader, now)
+    collected, collection_error = collect(recovered)
     try:
-        files, report = plan_files(collected, collection_error, make_reader(out_dir), now, api_key, narrate)
+        files, report = plan_files(collected, collection_error, reader, now, api_key, narrate, retry)
         print(f"Narratives: calls={report['calls']} narrated={report['narrated']} pending={report['pending']}"
               + (f" (LLM unavailable: {report['error']}; will retry next run)" if report["error"] else ""))
         if not files:

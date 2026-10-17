@@ -82,7 +82,20 @@
           "warship*",
           "submarine*",
           "SİHA*",
-          "kamikaze drone*"
+          "kamikaze drone*",
+          "general aviation",
+          "specialised operations",
+          "glider*",
+          "sailplane*",
+          "microlight*",
+          "ultralight*",
+          "flex-wing",
+          "paraglid*",
+          "paramotor*",
+          "autogyro*",
+          "gyrocopter*",
+          "hot-air balloon*",
+          "light aircraft"
         ],
         "keep_terms": [
           "airspace",
@@ -97,7 +110,8 @@
         ],
         "exclude_commentary": true,
         "archive_min_score": 35,
-        "max_low_per_run": 12
+        "max_low_per_run": 12,
+        "_exclude_terms_doc": "Out of scope unless the headline has an airline/airport/passenger context (keep_terms) or names a carrier: defence items and, since the source expansion, general-aviation accidents (BEA lists gliders, microlights and light aircraft as 'General aviation' / 'Specialised operations')."
       },
       "commentary": {
         "_doc": "Finance commentary: a title pattern, or a finance event type from a source that is neither official nor tier <= trusted_max_tier. Its score is multiplied by score_multiplier and, with selection.exclude_commentary, it never enters the list.",

@@ -1,0 +1,10 @@
+{
+  "_doc": "Strict aviation relevance for general feeds (exchange notices, wire/press headlines, vendors, group-wide feeds). An item passes with ONE of these keywords as a whole word in its title or short summary, or with a matched carrier, airline group or aircraft entity. Deliberately narrower than the broad business words (revenue, order, security ...) the older airline-feed filter accepts, because a general feed is full of those.",
+  "keywords": [
+    "airline", "airlines", "airways", "aviation", "airport", "airports", "aircraft", "airliner", "jetliner", "aerospace", "flight", "flights",
+    "air traffic", "airspace", "jet fuel", "sustainable aviation fuel", "cabin crew", "pilot", "pilots", "air cargo", "freighter", "fleet",
+    "boeing", "airbus", "embraer", "comac", "bombardier", "atr", "cfm", "pratt & whitney", "rolls-royce",
+    "faa", "easa", "iata", "icao", "ntsb", "air force one",
+    "havayolu", "havacılık", "havalimanı", "uçuş", "uçak"
+  ]
+}
