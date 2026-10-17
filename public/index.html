@@ -210,7 +210,8 @@
     const SCROLL_TOP_THRESHOLD = 120;
     const STALE_AFTER_MINUTES = 180;
     const FRESHNESS_TICK_MS = 60 * 1000;
-    const SOURCE_TYPES = { mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social" };
+    const SOURCE_TYPES = { mainstream: "Mainstream", trade_media: "Aviation media", airline_ir: "Airline IR", airline_newsroom: "Official newsroom", official_social: "Official social",
+      regulator: "Regulator", exchange: "Exchange filing", oem: "Manufacturer", trade: "Aviation media", tech_vendor: "Industry vendor", wire_headline: "Press headline" };
     const MARKET_ORDER = ["brent_spot", "us_gulf_coast_jet_fuel", "jet_fuel_brent_crack_spread"];   // the strip shows fuel only; the API adds FX rows only when config market.display_fx is on
     const MARKET_LABELS = {
       brent_spot: ["Brent", "Brent spot"],
@@ -520,6 +521,7 @@
         <div class="kicker">${tagsHtml(s, true)}${isYesterday(s) ? "<span>Yesterday</span>" : ""}</div>
         <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
         <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+        ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
         ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}
         ${s.why_it_matters ? `<div class="art-why"><span lang="en" class="eyebrow">Why it matters</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
         ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}

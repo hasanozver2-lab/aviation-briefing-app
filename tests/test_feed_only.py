@@ -253,3 +253,26 @@ def test_a_full_mode_story_keeps_its_description_and_figures():
 
     narrative.fill_pending([story], "key", 800, post=post, sleep=lambda s: None, now=NOW)
     assert story["data_points"] == ["70 jets"] and story["source_description"] == "details"
+
+
+def test_a_headline_only_summary_is_never_written_to_the_archive(tmp_path, monkeypatch):
+    from scripts import run_pipeline
+    story = {"id": "story-h", "story_id": "story-h", "section": "Route news", "region_section": "Europe", "headline": "Airline X opens base", "event_type": None, "relevance_score": 70,
+             "narrative_status": "pending", "lead": "", "basis": "headline_only", "source_description": "publisher summary that must not be stored", "source_count": 1,
+             "original_source": {"url": "https://wire.example/h", "title": "Airline X opens base", "source_name": "Wire Example"},
+             "sources": [{"name": "Wire Example", "url": "https://wire.example/h", "title": "Airline X opens base"}], "published_at_iso": story_lifecycle.to_iso(NOW)}
+    low = dict(story, story_id="story-low", id="story-low", relevance_score=36, original_source={"url": "https://wire.example/low", "title": "Low band item", "source_name": "Wire Example"},
+               sources=[{"name": "Wire Example", "url": "https://wire.example/low", "title": "Low band item"}], headline="Low band item")
+    monkeypatch.setattr(_engine, "collect_run", lambda: {"stories": [copy.deepcopy(story), copy.deepcopy(low)], "articles": 5, "candidates": 2, "market": {"status": "ok", "items": [], "events": []}, "source_report": {}})
+    seen = []
+
+    def narrate(stories, api_key, limit, now=None):
+        seen.extend((s["story_id"], s.get("source_description")) for s in stories)
+        for s in stories:
+            s["narrative_status"] = "done"
+        return {"calls": 1, "narrated": len(stories), "pending": 0, "error": ""}
+
+    run_pipeline.run(out_dir=tmp_path, now=NOW, api_key="k", narrate=narrate)
+    archive = json.loads(next((tmp_path / "briefings").glob("2026-*.json")).read_text(encoding="utf-8"))
+    assert ("story-h", "publisher summary that must not be stored") in seen, "the model still receives the summary in memory"
+    assert all(item["source_description"] == "" for item in archive["stories"]), "nothing of the publisher's text reaches the archive file"

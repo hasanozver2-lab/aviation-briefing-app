@@ -26,6 +26,7 @@ from api import story_lifecycle
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
 STATUS_FETCH_ERROR = "error"
+HEADLINE_ONLY = "headline_only"
 HEARTBEAT_HOURS = 3      # source health is written at least this often even when nothing else changed
 
 
@@ -136,7 +137,15 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
         description_limit = _engine.load_description_limit()
         story_lifecycle.present_stories(day, now, config)
         # The archive-only low band costs no LLM calls; it is narrated if its score ever reaches the list.
+        # A headline-only story's publisher summary is held in memory for the model call and never written to the archive.
+        incoming = {item["story_id"]: item for item in (collected or {}).get("stories", [])}
+        for story in day["stories"]:
+            if story.get("basis") == HEADLINE_ONLY and not story.get("source_description") and story["story_id"] in incoming:
+                story["source_description"] = incoming[story["story_id"]].get("source_description", "")
         report = narrate([story for story in day["stories"] if story_lifecycle.is_listed(story)], api_key, description_limit, now=now)
+        for story in day["stories"]:
+            if story.get("basis") == HEADLINE_ONLY:
+                story["source_description"] = ""
 
     files = {}
     if day and story_lifecycle.fingerprint(day) != story_lifecycle.fingerprint(existing_day):

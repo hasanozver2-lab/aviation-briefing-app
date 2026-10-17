@@ -179,3 +179,10 @@ def test_the_market_strip_is_fuel_only_and_hides_when_empty():
     assert "fx_usd" not in order and "brent_spot" in order and "jet_fuel_brent_crack_spread" in order
     assert "European Central Bank" not in html and "ECB" not in html
     assert 'if (!items.length) { $("market").hidden = true; return; }' in html
+
+
+def test_headline_only_stories_say_so_and_the_new_source_types_have_labels():
+    html = page()
+    assert 's.basis === "headline_only"' in html and "Based on the publisher's headline and short summary only" in html
+    for source_type in ("regulator", "exchange", "oem", "trade", "tech_vendor", "wire_headline"):
+        assert f"{source_type}:" in html.split("const SOURCE_TYPES")[1].split("};")[0]
