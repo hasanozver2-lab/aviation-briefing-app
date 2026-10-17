@@ -244,3 +244,39 @@ def test_the_recorded_overrides_are_the_agreed_ones():
     assert all(sources[name] == {"status": "disabled_blocked", "reason": "SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı", "no_retry": True} for name in sec)
     assert not any("@" in entry["reason"] for entry in sources.values()), "no e-mail address anywhere"
     assert set(sources) <= {row["name"] for row in source_catalog.read_rows()}
+
+
+# --- the 90-day window for legacy HTML scrapers ---------------------------------------------------------------------------------
+
+def test_a_scraper_that_found_items_only_older_than_a_week_keeps_the_source_active(monkeypatch):
+    seen_cutoffs = []
+    old_article = {"title": "Carrier press release about winter schedule", "link": "https://wire.example/n1", "source": "Wire Example", "timestamp": (NOW - timedelta(days=30)).timestamp(), "description": ""}
+
+    def legacy(source, cutoff):
+        seen_cutoffs.append(cutoff)
+        return ([dict(old_article)] if old_article["timestamp"] >= cutoff.timestamp() else []), ""
+
+    r = row(mode="full", source_type="airline_ir")
+    site = Site({"https://wire.example/": (200, HOME)})
+    monkeypatch.setattr(fd, "PoliteFetcher", lambda **kw: REAL_FETCHER(fetch=site, sleep=lambda s: None, **{k: v for k, v in kw.items() if k != "fetch"}))
+    record, articles = source_probe.probe_source(r, feed_sources.source_record(r), {r["name"]: {"name": r["name"], "url": r["url"], "fetch_mode": "html"}}, {}, NOW, legacy_fetch=legacy)
+    assert record["status"] == "active" and record["method"] == "legacy_scraper"
+    assert record["items_90d"] == 1 and record["items_7d"] == 0 and articles == [], "yield is still measured over 7 days"
+    assert NOW - seen_cutoffs[0] == timedelta(days=fd.VALID_WINDOW_DAYS)
+
+
+def test_a_scraper_with_nothing_for_90_days_is_no_extractable_feed_with_a_reason(monkeypatch):
+    r = row(mode="full", source_type="airline_ir")
+    site = Site({"https://wire.example/": (200, HOME)})
+    monkeypatch.setattr(fd, "PoliteFetcher", lambda **kw: REAL_FETCHER(fetch=site, sleep=lambda s: None, **{k: v for k, v in kw.items() if k != "fetch"}))
+    record, _ = source_probe.probe_source(r, feed_sources.source_record(r), {r["name"]: {"name": r["name"], "url": r["url"], "fetch_mode": "html"}}, {}, NOW, legacy_fetch=lambda s, c: ([], ""))
+    assert record["status"] == "no_extractable_feed" and "scraper returned no items in the last 90 days" in record["reason"]
+
+
+def test_air_india_stays_blocked_and_is_left_to_the_weekly_retry_southwest_and_singapore_are_no_extractable_feed():
+    import csv
+    rows_by_name = {r["name"]: r for r in source_catalog.read_rows()}
+    assert rows_by_name["Air India Newsroom"]["status"] == "disabled_blocked"
+    overrides = json.loads((PROJECT / "config" / "source_status_overrides.json").read_text(encoding="utf-8"))["sources"]
+    assert "Air India Newsroom" not in overrides, "not pinned: the weekly retry may bring it back"
+    assert overrides["Singapore Airlines Newsroom"]["status"] == "no_extractable_feed" and "404" in overrides["Singapore Airlines Newsroom"]["reason"]

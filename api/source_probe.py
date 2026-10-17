@@ -97,11 +97,15 @@ def _probe_source(row, source, builtin_by_name, discovered, now, fetch=None, leg
         if not fetcher.allowed(legacy_source["url"]):
             result = fd.DiscoveryResult(fd.STATUS_ROBOTS, reason=f"robots.txt disallows {urlparse(legacy_source['url']).path or '/'} for {fd.ROBOTS_TOKEN}")
         else:
-            legacy_articles, legacy_error = legacy_fetch(legacy_source, cutoff)
-            # An RSS source that answered is working even if it was quiet this week; an HTML scraper that returns nothing is not.
+            # Judged over the same 90-day window as feed verification: a quiet week must not close a scraper that still reads the page.
+            validity_cutoff = now - timedelta(days=fd.VALID_WINDOW_DAYS)
+            legacy_articles, legacy_error = legacy_fetch(legacy_source, validity_cutoff)
+            # An RSS source that answered is working even if it was quiet; an HTML scraper that returns nothing for 90 days is not.
             legacy_found = bool(legacy_articles) or (not legacy_error and legacy_source.get("fetch_mode") != "html")
             if legacy_articles:
-                method, articles, items_7d = LEGACY_METHOD, legacy_articles, len(legacy_articles)
+                items_90d = len(legacy_articles)
+                articles = [a for a in legacy_articles if a.get("timestamp", 0) >= cutoff.timestamp()]
+                method, items_7d = LEGACY_METHOD, len(articles)
                 for article in articles:
                     article["source"] = row["name"]          # a legacy article may carry the publisher named in its title
                     article.setdefault("language", row["language"])
@@ -109,6 +113,8 @@ def _probe_source(row, source, builtin_by_name, discovered, now, fetch=None, leg
                 method = LEGACY_METHOD
             elif legacy_error and result.status == fd.STATUS_NO_FEED:
                 result = fd.DiscoveryResult(fd.STATUS_BLOCKED if "403" in legacy_error or "Timeout" in legacy_error else fd.STATUS_NO_FEED, reason=legacy_error, http_code=result.http_code)
+            elif not legacy_error and result.status == fd.STATUS_NO_FEED:
+                result = fd.DiscoveryResult(fd.STATUS_NO_FEED, http_code=result.http_code, reason="the HTML scraper returned no items in the last 90 days and no feed, sitemap, JSON-LD or dated list was found")
     status, reason = suggest_status(row, result, legacy_found)
     record.update(status=status, reason=reason, method=method, feed_url=result.feed_url if result.status == fd.STATUS_FOUND else "", http_code=result.http_code,
                   seconds=round(time.monotonic() - started, 2), requests=fetcher.requests, items_7d=items_7d, items_90d=items_90d, robots=fetcher.robots_note(source["discovery_urls"][0]))
