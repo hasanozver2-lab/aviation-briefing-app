@@ -1,0 +1,150 @@
+{
+ "_doc": "Measured on 2026-10-17 from one laptop and one moment with the same driver (one collection pass, no per-run cap, 48 h window): main before this branch vs this branch. Not the production archive; the runner sees a different network.",
+ "before": {
+  "seconds": 22.1,
+  "articles": 107,
+  "candidates": 95,
+  "listed_by_level": {
+   "critical": 3,
+   "important": 10,
+   "watch": 3
+  },
+  "listed_total": 16,
+  "sources_in_catalog_active": 36,
+  "sources_read_without_error": null,
+  "sources_attempted": null
+ },
+ "after": {
+  "seconds": 18.8,
+  "articles": 93,
+  "candidates": 85,
+  "listed_by_level": {
+   "critical": 7,
+   "important": 10,
+   "watch": 5
+  },
+  "listed_total": 22,
+  "sources_in_catalog_active": 28,
+  "sources_read_without_error": 28,
+  "sources_attempted": 75
+ },
+ "full_run_with_narratives": {
+  "seconds": 67,
+  "gemini_calls": 2,
+  "stories_narrated": 12,
+  "note": "scripts/run_pipeline.py --out-dir (dry run), real Gemini, from the laptop"
+ },
+ "probe_workflow_seconds_on_runner": 253.7,
+ "clustering_validation": {
+  "merged_examples": [
+   {
+    "story_id": "story-1c2ce9b5a516",
+    "headline": "New Airbus A350-1000 to Begin Scheduled Service to Tokyo",
+    "kinds": [
+     "airline_ir",
+     "trade"
+    ],
+    "sources": [
+     "Lufthansa Group Newsroom",
+     "AirDataNews",
+     "AeroTime",
+     "Aviation24"
+    ],
+    "origin": "live archive 2026-10-17"
+   },
+   {
+    "story_id": "story-50868a65320a",
+    "headline": "Air Canada Expands Canada-U.S. Connectivity for Summer 2027",
+    "kinds": [
+     "airline_ir",
+     "trade",
+     "wire_headline"
+    ],
+    "sources": [
+     "Air Canada News Releases",
+     "AeroTime",
+     "Yahoo Finance Aviation"
+    ],
+    "origin": "live archive 2026-10-17"
+   },
+   {
+    "story_id": "story-1ff366f2a122",
+    "headline": "Turkish Airlines and CFM sign MOU for more than 600 LEAP-1B engines",
+    "kinds": [
+     "trade",
+     "wire_headline"
+    ],
+    "sources": [
+     "AeroTime",
+     "HavaHaber",
+     "Tolga Özbek Havacılık",
+     "Yahoo Finance (THY & Pegasus)"
+    ],
+    "origin": "live archive 2026-10-17"
+   },
+   {
+    "story_id": "story-1c2ce9b5a516",
+    "headline": "Lufthansa selects Tokyo as first destination for Airbus A350-1000",
+    "kinds": [
+     "airline_ir",
+     "trade"
+    ],
+    "sources": [
+     "Lufthansa Group Newsroom",
+     "AeroTime",
+     "AirDataNews"
+    ],
+    "origin": "runner probe 2026-10-17 (7-day window)"
+   }
+  ],
+  "regulator_with_press": "none in the data: FAA, EASA, ANAC, AAIB and BEA items appeared in the 7-day window but no press item about the same event was published, so no regulator story merged with press",
+  "not_merged": [
+   {
+    "why": "same order, two stories",
+    "a": "AeroTime: Airbus secures order for 75 A320neo family aircraft from ACG",
+    "b": "AirDataNews: Airbus wins order for 75 A320neo Family jets",
+    "shared": [
+     "a320neo",
+     "airbus",
+     "family",
+     "order"
+    ]
+   },
+   {
+    "why": "same roll-out, separate story",
+    "a": "AeroTime: Saab rolls out Sweden's first GlobalEye as NATO prepares to follow",
+    "b": "Aviation24 / AirDataNews: Saab unveils Sweden's first GlobalEye surveillance aircraft",
+    "shared": [
+     "first",
+     "globaleye",
+     "saab",
+     "sweden"
+    ]
+   },
+   {
+    "why": "same strike, separate story",
+    "a": "AeroTime: Ukraine says Neptune missile strike hit six Russian bombers",
+    "b": "AirDataNews: Ukraine claims six Russian Su-34 bombers damaged",
+    "shared": [
+     "bombers",
+     "missile",
+     "neptune",
+     "russian",
+     "strike",
+     "ukraine"
+    ]
+   }
+  ],
+  "rule_change": "none: the clustering rules were not widened"
+ },
+ "tech_vendor": {
+  "active": [
+   "Accelya News"
+  ],
+  "items_7d": 2,
+  "pass_aviation_filter": 1,
+  "above_min_score": 0,
+  "listed": 0,
+  "suggested_reliability": "keep tier 4 (weight 0.4), the lowest existing tier; no vendor item reached the list in the window, so no further reduction is proposed"
+ }
+}
