@@ -1059,6 +1059,19 @@
    "region": "Turkey",
    "language": "tr",
    "mode": "full"
+  },
+  {
+   "group": "H",
+   "name": "Google Alerts (wire headlines)",
+   "urls": [
+    "https://www.google.com/alerts"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "aviation_filter": true,
+   "timeout_s": 10
   }
  ]
 }

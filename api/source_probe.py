@@ -13,9 +13,10 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
 try:
-    from . import clustering, entities, feed_discovery as fd, feed_sources, market_data, safety_context, source_catalog, story_lifecycle
+    from . import alert_feeds, clustering, entities, feed_discovery as fd, feed_sources, market_data, safety_context, source_catalog, story_lifecycle
     from .urls import canonicalize_url
 except ImportError:
+    import alert_feeds
     import clustering
     import entities
     import feed_discovery as fd
@@ -58,6 +59,8 @@ def suggest_status(row, result, legacy_found):
 
 def probe_source(row, source, builtin_by_name, discovered, now, fetch=None, legacy_fetch=None):
     """Probe one source; a crash inside the probe becomes a recorded reason, never a missing result."""
+    if row["name"] == alert_feeds.SOURCE_NAME:
+        return _alert_record(row, source), []
     try:
         return _probe_source(row, source, builtin_by_name, discovered, now, fetch, legacy_fetch)
     except Exception as exc:
@@ -66,6 +69,13 @@ def probe_source(row, source, builtin_by_name, discovered, now, fetch=None, lega
                   "reason": f"probe error: {type(exc).__name__}: {str(exc)[:120]}", "method": "", "feed_url": "", "http_code": 0, "seconds": 0.0, "requests": 0, "items_7d": 0,
                   "items_90d": 0, "robots": ""}
         return record, []
+
+
+def _alert_record(row, source):
+    """Google Alerts has no public address to probe: its feeds are secret and read only by the daily pipeline."""
+    return {"name": row["name"], "slug": source["slug"], "host": feed_sources.host_of(source), "source_type": row["source_type"], "mode": row["mode"], "tier": int(row["tier"]),
+            "legacy": False, "official": source["official"], "aviation_filter": source["aviation_filter"], "status": source_catalog.STATUS_ACTIVE, "reason": "",
+            "method": "alert_feeds", "feed_url": "", "http_code": 0, "seconds": 0.0, "requests": 0, "items_7d": 0, "items_90d": 0, "robots": "not probed"}
 
 
 def _probe_source(row, source, builtin_by_name, discovered, now, fetch=None, legacy_fetch=None):

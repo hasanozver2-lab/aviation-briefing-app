@@ -79,7 +79,8 @@ def test_tiers_follow_the_source_types_unless_a_row_says_otherwise():
 FEED_ONLY_NAMES = {"Reuters Aviation", "Bloomberg Aviation", "Financial Times Aviation", "The New York Times", "The Washington Post", "The Wall Street Journal", "Associated Press Aviation",
                    "The Economist", "Nikkei Asia", "The Air Current", "Aviation Week", "ch-aviation", "CAPA Centre for Aviation", "CNBC Airlines", "Cirium Thought Cloud", "OAG Blog", "AvHerald",
                    # wire services: terms restrict republishing, so only title, link and short summary are used
-                   "PR Newswire Travel Sector", "PR Newswire Heavy Industry Sector", "GlobeNewswire Transportation Feed", "Business Wire Feeds"}
+                   "PR Newswire Travel Sector", "PR Newswire Heavy Industry Sector", "GlobeNewswire Transportation Feed", "Business Wire Feeds",
+                   "Google Alerts (wire headlines)"}
 STANDARD_PRESS = {"FlightGlobal", "Simple Flying", "AeroTime", "Routes Online News", "PhocusWire", "China Travel News"}
 
 

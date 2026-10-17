@@ -52,6 +52,10 @@
    "status": "no_public_feed",
    "reason": "KAP'ın belgelenmiş açık RSS/API'si ve okunabilir şartlar sayfası yok; duyuru listesi betikle üretiliyor, otomatik okuma denenmedi",
    "no_retry": true
+  },
+  "Google Alerts (wire headlines)": {
+   "status": "active",
+   "reason": "Google Alerts kişisel kullanım; yayıncı başlıkları ticari katmanda yeniden değerlendirilecek"
   }
  }
 }
