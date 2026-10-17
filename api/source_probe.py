@@ -55,6 +55,18 @@ def suggest_status(row, result, legacy_found):
 
 
 def probe_source(row, source, builtin_by_name, discovered, now, fetch=None, legacy_fetch=None):
+    """Probe one source; a crash inside the probe becomes a recorded reason, never a missing result."""
+    try:
+        return _probe_source(row, source, builtin_by_name, discovered, now, fetch, legacy_fetch)
+    except Exception as exc:
+        record = {"name": row["name"], "slug": source["slug"], "host": feed_sources.host_of(source), "source_type": row["source_type"], "mode": row["mode"], "tier": int(row["tier"]),
+                  "legacy": row["name"] in builtin_by_name, "official": source["official"], "aviation_filter": source["aviation_filter"], "status": "no_extractable_feed",
+                  "reason": f"probe error: {type(exc).__name__}: {str(exc)[:120]}", "method": "", "feed_url": "", "http_code": 0, "seconds": 0.0, "requests": 0, "items_7d": 0,
+                  "items_90d": 0, "robots": ""}
+        return record, []
+
+
+def _probe_source(row, source, builtin_by_name, discovered, now, fetch=None, legacy_fetch=None):
     """Probe one source. Returns (record, articles); articles are in the last RECENT_DAYS days and built from feed fields only."""
     fetcher = fd.PoliteFetcher(timeout=PROBE_TIMEOUT_SECONDS, **({"fetch": fetch} if fetch else {}))
     cutoff = now - timedelta(days=RECENT_DAYS)

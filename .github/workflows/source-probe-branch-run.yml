@@ -28,3 +28,4 @@ jobs:
           name: source-probe
           path: probe-output/source_probe.json
           retention-days: 30
+# run 2: discovery hardened against invalid URLs

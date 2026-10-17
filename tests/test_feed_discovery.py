@@ -273,3 +273,12 @@ def test_the_fetcher_uses_the_wildcard_rules():
     site = Site({"https://pub.example/robots.txt": (200, "User-agent: *\nDisallow: */feed"), "https://pub.example/": (200, "<html></html>")})
     fetcher = fetcher_for(site)
     assert not fetcher.allowed("https://pub.example/feed") and fetcher.allowed("https://pub.example/news")
+
+
+def test_an_invalid_or_relative_candidate_never_crashes_a_discovery():
+    robots = "User-agent: *\nDisallow: /nothing\nSitemap: /relative-sitemap.xml\n"
+    site = Site({"https://pub.example/robots.txt": (200, robots), "https://pub.example/": (200, "<html></html>"), "https://pub.example/relative-sitemap.xml": (200, NEWS_SITEMAP)})
+    result = run(site)
+    assert result.status == fd.STATUS_FOUND and result.method == "sitemap"
+    assert fd.urllib_fetch("://broken", {}, 1).error == "InvalidURL"
+    assert fetcher_for(site).allowed("not a url") is True

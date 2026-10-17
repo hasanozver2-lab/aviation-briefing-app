@@ -78,6 +78,8 @@ def utc_now():
 def urllib_fetch(url, headers, timeout):
     """The default transport: plain urllib with the project's headers only (no cookie jar, no proxy configuration of ours)."""
     started = time.monotonic()
+    if urllib.parse.urlparse(url).scheme not in ("http", "https") or not urllib.parse.urlparse(url).netloc:
+        return Response(0, b"", {}, url, 0.0, "InvalidURL")
     request = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(request, timeout=timeout) as reply:
@@ -172,13 +174,15 @@ class PoliteFetcher:
 
     def robots_for(self, url):
         parsed = urllib.parse.urlparse(url)
+        if not (parsed.scheme in ("http", "https") and parsed.netloc):
+            return RobotsRules(), [], "invalid url"
         origin = f"{parsed.scheme}://{parsed.netloc}"
         if origin not in self._robots:
             response = self.get(f"{origin}/robots.txt")
             sitemaps = []
             if response.status == 200:
                 lines = response.body.decode("utf-8", errors="replace").splitlines()
-                sitemaps = [line.split(":", 1)[1].strip() for line in lines if line.lower().startswith("sitemap:")]
+                sitemaps = [urllib.parse.urljoin(origin + "/", line.split(":", 1)[1].strip()) for line in lines if line.lower().startswith("sitemap:")]
                 self._robots[origin] = (RobotsRules(lines), sitemaps, "read")
             else:
                 # 4xx: no restrictions (RFC 9309); unreachable: nothing to obey, noted in the report
@@ -472,7 +476,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
     all_pages_disallowed = bool(pages) and disallowed_pages == len(pages)
     seen = set()
     for url, is_advertised in [(u, True) for u in advertised] + [(u, False) for u in guessed]:
-        if url in seen or all_pages_disallowed:
+        if url in seen or all_pages_disallowed or urllib.parse.urlparse(url).scheme not in ("http", "https"):
             continue
         seen.add(url)
         outcome = try_candidate(url, is_advertised)
