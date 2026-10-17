@@ -15,17 +15,17 @@
   "sources_attempted": null
  },
  "after": {
-  "seconds": 18.8,
-  "articles": 93,
-  "candidates": 85,
+  "seconds": 20.5,
+  "articles": 92,
+  "candidates": 84,
   "listed_by_level": {
-   "critical": 7,
-   "important": 10,
+   "critical": 3,
+   "important": 9,
    "watch": 5
   },
-  "listed_total": 22,
-  "sources_in_catalog_active": 28,
-  "sources_read_without_error": 28,
+  "listed_total": 17,
+  "sources_in_catalog_active": 27,
+  "sources_read_without_error": 27,
   "sources_attempted": 75
  },
  "full_run_with_narratives": {
@@ -34,7 +34,7 @@
   "stories_narrated": 12,
   "note": "scripts/run_pipeline.py --out-dir (dry run), real Gemini, from the laptop"
  },
- "probe_workflow_seconds_on_runner": 253.7,
+ "probe_workflow_seconds_on_runner": 246.5,
  "clustering_validation": {
   "merged_examples": [
    {
@@ -146,5 +146,134 @@
   "above_min_score": 0,
   "listed": 0,
   "suggested_reliability": "keep tier 4 (weight 0.4), the lowest existing tier; no vendor item reached the list in the window, so no further reduction is proposed"
- }
+ },
+ "after_previous_measurement": {
+  "seconds": 18.8,
+  "articles": 93,
+  "candidates": 85,
+  "listed_by_level": {
+   "critical": 7,
+   "important": 10,
+   "watch": 5
+  },
+  "listed_total": 22,
+  "sources_in_catalog_active": 28,
+  "sources_read_without_error": 28,
+  "sources_attempted": 75
+ },
+ "critical_check": {
+  "pass": "bu bilgisayardan tek toplama geçişi, 48 saat, üst sınırsız",
+  "note": "Önceki ölçümdeki yedi Critical hikâyenin ayrıntısı kaydedilmemişti; haberler ve kaynaklar o gün ile bugün arasında değişti. Aşağıdaki, düzeltmeden ÖNCEKİ bugünkü geçişin altı Critical hikâyesidir (bu geçişte yedinci yok).",
+  "before_fix": [
+   {
+    "headline": "THY ve CFM’den dev anlaşma: 600’den fazla LEAP-1B motoru için imzalar atıldı",
+    "source_count": 3,
+    "event_type": "fleet_orders",
+    "score": 73.5,
+    "new_sources": [],
+    "verdict": "doğru",
+    "note": "Gerçek filo anlaşması (600+ LEAP-1B motor); HavaHaber, Tolga Özbek, AeroTime kümesi."
+   },
+   {
+    "headline": "Air India Frankfurt–Delhi flight diverts to Jaipur after suspected accidental hijack alert",
+    "source_count": 1,
+    "event_type": "safety_incident",
+    "score": 68.8,
+    "new_sources": [],
+    "verdict": "doğru",
+    "note": "Gerçek emniyet olayı: kaçırma alarmı nedeniyle yönlendirme, Aviation24."
+   },
+   {
+    "headline": "Lufthansa selects Tokyo as first destination for Airbus A350-1000",
+    "source_count": 2,
+    "event_type": "route_network_change",
+    "score": 65.5,
+    "new_sources": [],
+    "verdict": "doğru",
+    "note": "Gerçek ağ haberi: A350-1000'in ilk hattı; Lufthansa resmî haber odası + AeroTime."
+   },
+   {
+    "headline": "16/10/2026 General aviation Investigation Opening Accident to the Centrair 101 registered F-CHEZ on 06/10/2026",
+    "source_count": 1,
+    "event_type": "safety_incident",
+    "score": 61.8,
+    "new_sources": [
+     "BEA News"
+    ],
+    "verdict": "yanlış sınıflandırma",
+    "note": "BEA'nın «General aviation» / «Specialised operations» soruşturma bildirimi (planör, mikrolayt, hafif uçak); ticari havacılık için önemli olay değil, ama resmî tier-1 kaynak + safety_incident (0,95) ile 61,8 aldı."
+   },
+   {
+    "headline": "16/10/2026 Specialised operations Investigation Opening Accident to the Piper PA18 registered OO-VVA on 12/08/",
+    "source_count": 1,
+    "event_type": "safety_incident",
+    "score": 61.8,
+    "new_sources": [
+     "BEA News"
+    ],
+    "verdict": "yanlış sınıflandırma",
+    "note": "BEA'nın «General aviation» / «Specialised operations» soruşturma bildirimi (planör, mikrolayt, hafif uçak); ticari havacılık için önemli olay değil, ama resmî tier-1 kaynak + safety_incident (0,95) ile 61,8 aldı."
+   },
+   {
+    "headline": "16/10/2026 General aviation Investigation Opening Accident to the flex-wing microlight Ellipse Alizé Swissauto",
+    "source_count": 1,
+    "event_type": "safety_incident",
+    "score": 61.8,
+    "new_sources": [
+     "BEA News"
+    ],
+    "verdict": "yanlış sınıflandırma",
+    "note": "BEA'nın «General aviation» / «Specialised operations» soruşturma bildirimi (planör, mikrolayt, hafif uçak); ticari havacılık için önemli olay değil, ama resmî tier-1 kaynak + safety_incident (0,95) ile 61,8 aldı."
+   }
+  ],
+  "fix": "config/relevance.json selection.exclude_terms: general aviation, specialised operations, glider*, sailplane*, microlight*, ultralight*, flex-wing, paraglid*, paramotor*, autogyro*, gyrocopter*, hot-air balloon*, light aircraft (airline/airport/passenger bağlamı ya da taşıyıcı adı olan başlıklar korunur). Ağırlık değişmedi.",
+  "after": {
+   "critical": 3,
+   "important": 9,
+   "watch": 5
+  },
+  "remaining_observations": [
+   "BEA «Specialised operations … Serious incident to the Airbus AS350» hâlâ Watch'ta: «AS350» (helikopter) Alaska Airlines'ın «AS» kodu + «350» uçuş numarası sanılıyor, taşıyıcı varlığı muafiyeti devreye giriyor (varlık tohumlarında AS350 uçak olarak yok).",
+   "«Pilot survives Louisiana Cessna crash…» (Important 48,8) ve «Nijerya'da özel jetin kapısı havada koptu» (Important 48,8) eski kaynaklardan gelen genel havacılık/özel jet haberleri; bu dalda eklenmedi, kapsam dışı terimleri başlığa uymuyor.",
+   "«The world's most important airspace is a sliver of sky between two wars» (The Air Current, Important 54,8): özellik yazısı, geopolitics_airspace; sınır vaka, düzeltilmedi."
+  ]
+ },
+ "mode_changes": [
+  {
+   "name": "FlightGlobal",
+   "from": "feed_only",
+   "to": "full",
+   "note": "bu dala girmeden önce de standart toplama modundaydı; önceki moduna döndü"
+  },
+  {
+   "name": "Simple Flying",
+   "from": "feed_only",
+   "to": "full",
+   "note": "bu dala girmeden önce de standart toplama modundaydı; önceki moduna döndü"
+  },
+  {
+   "name": "AeroTime",
+   "from": "feed_only",
+   "to": "full",
+   "note": "bu dala girmeden önce de standart toplama modundaydı; önceki moduna döndü"
+  },
+  {
+   "name": "Routes Online News",
+   "from": "feed_only",
+   "to": "full",
+   "note": "yeni kaynak; robots.txt izin verdiği sürece standart modda"
+  },
+  {
+   "name": "PhocusWire",
+   "from": "feed_only",
+   "to": "full",
+   "note": "yeni kaynak; robots.txt izin verdiği sürece standart modda"
+  },
+  {
+   "name": "China Travel News",
+   "from": "feed_only",
+   "to": "full",
+   "note": "yeni kaynak; robots.txt izin verdiği sürece standart modda"
+  }
+ ]
 }

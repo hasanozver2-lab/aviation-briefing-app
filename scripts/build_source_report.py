@@ -64,10 +64,11 @@ def main():
         f"User-Agent: `{probe['user_agent']}`. Ham çıktı: `reports/source_probe.json`; doğrulanan besleme adresleri: `config/feeds_discovered.json`; şart incelemesi: `config/source_terms_review.json`.", "",
         "## Özet", "",
         f"- Katalogda {len(rows)} kaynak var; durumlar: " + ", ".join(f"{status} {count}" for status, count in sorted(by_status.items())) + ".",
-        "- Tek User-Agent (kişisel e-posta yok, tarayıcı kimliği yok), robots.txt (joker karakter destekli), alan adı başına sıralı çekim ve koşullu istek uygulanıyor; makale sayfası çekilmiyor.",
-        "- `feed_only` kaynaklarda yalnızca yayıncının halka açık RSS/Atom beslemesi kullanılır (site haritası, JSON-LD ve sayfa kazıma yok). Besleme özeti yalnızca modele bir kez verilir, arşive yazılmaz, API'de dönmez; anlatıdan, başlıkta ve özette olmayan her sayı silinir.",
-        "- Sondanın getirdiği değişiklik büyük: tarayıcı kimliğini bırakıp dürüst User-Agent'a geçince daha önce okunan birkaç resmî haber odası da 403/zaman aşımı vermeye başladı (Air Canada, Qantas, Japan Airlines, JetBlue, LATAM, Copa, FlightGlobal, Turkish Airlines Blog ve diğerleri). Bunlar `disabled_blocked` olarak, HTTP koduyla ve sebebiyle listede duruyor.",
-        "- SEC EDGAR: altı şirketin hepsi 403 veriyor. SEC adil erişim politikası User-Agent içinde iletişim e-postası istiyor; proje kuralı kişisel e-posta yasakladığı için bu kaynaklar kapalı. Çözüm kararı kullanıcıda (örneğin proje için ayrılmış, kişisel olmayan bir adres).", "",
+        "- Tek User-Agent: `Mozilla/5.0 (compatible; aviation-briefing-app/1.0; +https://github.com/hasanozver2-lab/aviation-briefing-app)` (kendini tanıtma kalıbı, hiçbir tarayıcıyı taklit etmez, kişisel e-posta yok); robots.txt (joker karakter destekli) uygulanıyor, alan adı başına sıralı çekim, koşullu istek; makale sayfası çekilmiyor.",
+        "- `feed_only` yalnızca ücretli duvarlı ya da kısıtlayıcı şartlı basında (16 kaynak + AvHerald); orada yalnızca halka açık RSS/Atom, özet arşive yazılmaz, anlatıda başlık/özette olmayan sayı silinir.",
+        "- **User-Agent değişikliği hiçbir bloklu kaynağı açmadı**: aynı çalıştırıcıda önceki ve yeni User-Agent ile yapılan iki sondada aynı kaynaklar 403/zaman aşımı verdi; engel başlıktan değil çalıştırıcının ağından (veri merkezi IP'si) geliyor.",
+        "- SEC EDGAR (altı kaynak) `disabled_blocked`: «SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı». Air Canada ve Textron Aviation şartları otomatik erişimi açıkça yasakladığı için `excluded_policy` (alıntı ve bağlantı `reason` alanında).",
+        "- Bloklu kaynaklar günlük pipeline içinde 7 günde bir, tek istekle yeniden denenir; geçerli içerik gelirse kaynak `active` olur ve `status.json`'a yazılır.", "",
         "## Kaynak başına sonuç", ""] + source_table(rows, probe_by_name) + ["",
         "`7 g öğe`: son 7 günde besleme/sayfadan gelen öğe. `havacılık filtresi`: sıkı havacılık filtresinden (genel beslemelerde) geçen. `≥ min_score 40`: öğenin hikâyesinin skoru 40 ve üstü. `listeye giren`: bu hikâyelerden savunma ve yatırım yorumu süzgecinden de geçenler. Skorlama DEĞİŞTİRİLMEDİ; ağırlıklar ve eşikler aynen duruyor.", "",
         "## Aktif kaynak sayısı önce / sonra", "",
@@ -97,10 +98,19 @@ def main():
               "| Hikâye | Türler | Birleşen kaynaklar | Kaynak |", "|---|---|---|---|"]
     for example in cluster["merged_examples"]:
         lines.append(f"| `{example['story_id']}` {cell(example['headline'])} | {', '.join(example['kinds'])} | {', '.join(example['sources'])} | {example['origin']} |")
-    lines += ["", f"Düzenleyici + basın: {cluster['regulator_with_press']}.", "", "Birleşmeyen örnekler (kural genişletilmedi):", ""]
+    lines += ["", f"Düzenleyici + basın: {cluster['regulator_with_press']}.", "", "Birleşmeyen örnekler (kural genişletilmedi; eksik sinyaller `docs/HANDOFF.md` «Kümeleme borcu»):", ""]
     for miss in cluster["not_merged"]:
         lines.append(f"- {miss['why']}: «{miss['a']}» ↔ «{miss['b']}» (ortak sözcükler: {', '.join(miss['shared'])})")
-    lines += ["", f"Kümeleme kuralı değişikliği: {cluster['rule_change']}.", ""] + legal_section(rows, terms)
+    lines += ["", f"Kümeleme kuralı değişikliği: {cluster['rule_change']}.", ""]
+    lines += ["## Mod değişiklikleri (feed_only → standart)", "", "| Kaynak | Önce | Sonra | Not |", "|---|---|---|---|"]
+    lines += [f"| {item['name']} | {item['from']} | {item['to']} | {cell(item['note'])} |" for item in metrics["mode_changes"]]
+    check = metrics["critical_check"]
+    lines += ["", "## Critical kalite kontrolü", "", check["note"], "", "| Başlık | Kaynak sayısı | event_type | Skor | Katkı veren yeni kaynak | Karar |", "|---|--:|---|--:|---|---|"]
+    lines += [f"| {cell(item['headline'])} | {item['source_count']} | {item['event_type']} | {item['score']} | {', '.join(item['new_sources']) or '—'} | **{item['verdict']}** — {cell(item['note'])} |" for item in check["before_fix"]]
+    lines += ["", f"Düzeltme (taksonomi/kural, ağırlık değil): {check['fix']}", "",
+              f"Düzeltmeden sonra aynı geçiş: Critical {check['after'].get('critical', 0)}, Important {check['after'].get('important', 0)}, Watch {check['after'].get('watch', 0)}. Kalan gözlemler:", ""]
+    lines += [f"- {item}" for item in check["remaining_observations"]]
+    lines += [""] + legal_section(rows, terms)
     (REPORTS / "source_expansion.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"reports/source_expansion.md: {len(lines)} lines")
     return 0

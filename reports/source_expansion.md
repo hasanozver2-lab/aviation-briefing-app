@@ -1,14 +1,15 @@
 # Kaynak genişletme raporu
 
-Çalıştırıcı sondası: 2026-10-17T07:26:23+00:00 (Linux-6.17.0-1022-azure-x86_64-with-glibc2.39, Python 3.12.15), süre 253.7 sn. User-Agent: `aviation-briefing-app (github.com/hasanozver2-lab/aviation-briefing-app)`. Ham çıktı: `reports/source_probe.json`; doğrulanan besleme adresleri: `config/feeds_discovered.json`; şart incelemesi: `config/source_terms_review.json`.
+Çalıştırıcı sondası: 2026-10-17T07:51:40+00:00 (Linux-6.17.0-1022-azure-x86_64-with-glibc2.39, Python 3.12.15), süre 246.5 sn. User-Agent: `Mozilla/5.0 (compatible; aviation-briefing-app/1.0; +https://github.com/hasanozver2-lab/aviation-briefing-app)`. Ham çıktı: `reports/source_probe.json`; doğrulanan besleme adresleri: `config/feeds_discovered.json`; şart incelemesi: `config/source_terms_review.json`.
 
 ## Özet
 
-- Katalogda 95 kaynak var; durumlar: active 28, disabled_blocked 32, excluded_policy 9, no_extractable_feed 19, no_public_feed 7.
-- Tek User-Agent (kişisel e-posta yok, tarayıcı kimliği yok), robots.txt (joker karakter destekli), alan adı başına sıralı çekim ve koşullu istek uygulanıyor; makale sayfası çekilmiyor.
-- `feed_only` kaynaklarda yalnızca yayıncının halka açık RSS/Atom beslemesi kullanılır (site haritası, JSON-LD ve sayfa kazıma yok). Besleme özeti yalnızca modele bir kez verilir, arşive yazılmaz, API'de dönmez; anlatıdan, başlıkta ve özette olmayan her sayı silinir.
-- Sondanın getirdiği değişiklik büyük: tarayıcı kimliğini bırakıp dürüst User-Agent'a geçince daha önce okunan birkaç resmî haber odası da 403/zaman aşımı vermeye başladı (Air Canada, Qantas, Japan Airlines, JetBlue, LATAM, Copa, FlightGlobal, Turkish Airlines Blog ve diğerleri). Bunlar `disabled_blocked` olarak, HTTP koduyla ve sebebiyle listede duruyor.
-- SEC EDGAR: altı şirketin hepsi 403 veriyor. SEC adil erişim politikası User-Agent içinde iletişim e-postası istiyor; proje kuralı kişisel e-posta yasakladığı için bu kaynaklar kapalı. Çözüm kararı kullanıcıda (örneğin proje için ayrılmış, kişisel olmayan bir adres).
+- Katalogda 95 kaynak var; durumlar: active 27, disabled_blocked 31, excluded_policy 11, no_extractable_feed 19, no_public_feed 7.
+- Tek User-Agent: `Mozilla/5.0 (compatible; aviation-briefing-app/1.0; +https://github.com/hasanozver2-lab/aviation-briefing-app)` (kendini tanıtma kalıbı, hiçbir tarayıcıyı taklit etmez, kişisel e-posta yok); robots.txt (joker karakter destekli) uygulanıyor, alan adı başına sıralı çekim, koşullu istek; makale sayfası çekilmiyor.
+- `feed_only` yalnızca ücretli duvarlı ya da kısıtlayıcı şartlı basında (16 kaynak + AvHerald); orada yalnızca halka açık RSS/Atom, özet arşive yazılmaz, anlatıda başlık/özette olmayan sayı silinir.
+- **User-Agent değişikliği hiçbir bloklu kaynağı açmadı**: aynı çalıştırıcıda önceki ve yeni User-Agent ile yapılan iki sondada aynı kaynaklar 403/zaman aşımı verdi; engel başlıktan değil çalıştırıcının ağından (veri merkezi IP'si) geliyor.
+- SEC EDGAR (altı kaynak) `disabled_blocked`: «SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı». Air Canada ve Textron Aviation şartları otomatik erişimi açıkça yasakladığı için `excluded_policy` (alıntı ve bağlantı `reason` alanında).
+- Bloklu kaynaklar günlük pipeline içinde 7 günde bir, tek istekle yeniden denenir; geçerli içerik gelirse kaynak `active` olur ve `status.json`'a yazılır.
 
 ## Kaynak başına sonuç
 
@@ -17,9 +18,9 @@
 | HavaHaber | trade | active | rss | 200 | 50 | 25 | 10 | 8 | tr | medium | — |
 | Tolga Özbek Havacılık | trade | active | rss | 200 | 10 | 10 | 1 | 1 | tr | medium | — |
 | Yahoo Finance (THY & Pegasus) | wire_headline | excluded_policy | — | — | 0 | 0 | 0 | 0 | en | high | — |
-| Simple Flying | trade | active | rss | 200 | 10 | 10 | 0 | 0 | en | high | headline_only |
-| FlightGlobal | trade | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | headline_only |
-| AeroTime | trade | active | rss | 200 | 67 | 25 | 7 | 5 | en | high | headline_only |
+| Simple Flying | trade | active | rss | 200 | 10 | 10 | 0 | 0 | en | high | — |
+| FlightGlobal | trade | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | — |
+| AeroTime | trade | active | rss | 200 | 67 | 25 | 7 | 5 | en | high | — |
 | Aviation24 | trade | active | rss | 200 | 10 | 10 | 3 | 3 | en | medium | — |
 | AirDataNews | trade | active | rss | 200 | 25 | 25 | 5 | 4 | en | medium | — |
 | Flightradar24 | trade | active | rss | 200 | 4 | 4 | 0 | 0 | en | medium | — |
@@ -38,7 +39,7 @@
 | Southwest Newsroom | airline_ir | no_extractable_feed | — | 200 | 0 | 0 | 0 | 0 | en | medium | — |
 | Air France Press Releases | airline_ir | active | rss | 200 | 0 | 0 | 0 | 0 | en | medium | — |
 | KLM Newsroom | airline_ir | active | rss | 200 | 1 | 1 | 1 | 1 | en | medium | — |
-| Air Canada News Releases | airline_ir | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | high | — |
+| Air Canada News Releases | airline_ir | excluded_policy | — | 403 | 0 | 0 | 0 | 0 | en | high | — |
 | Ryanair Newsroom | airline_ir | active | html | 200 | 4 | 4 | 3 | 3 | en | high | — |
 | easyJet Media Centre | airline_ir | no_extractable_feed | — | 403 | 0 | 0 | 0 | 0 | en | medium | — |
 | Qantas Newsroom | airline_ir | disabled_blocked | — | — | 0 | 0 | 0 | 0 | en | medium | — |
@@ -91,10 +92,10 @@
 | CAPA Centre for Aviation | trade | no_public_feed | — | 404 | 0 | 0 | 0 | 0 | en | medium | headline_only |
 | Cirium Thought Cloud | trade | no_public_feed | — | 200 | 0 | 0 | 0 | 0 | en | medium | headline_only |
 | OAG Blog | trade | no_public_feed | — | 404 | 0 | 0 | 0 | 0 | en | high | headline_only |
-| Routes Online News | trade | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | headline_only |
+| Routes Online News | trade | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | — |
 | AvHerald | trade | excluded_policy | — | — | 0 | 0 | 0 | 0 | en | high | headline_only |
-| PhocusWire | trade | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | headline_only |
-| China Travel News | trade | disabled_blocked | — | — | 0 | 0 | 0 | 0 | en | medium | headline_only |
+| PhocusWire | trade | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | — |
+| China Travel News | trade | disabled_blocked | — | — | 0 | 0 | 0 | 0 | en | medium | — |
 | PROS News | tech_vendor | no_extractable_feed | — | 200 | 0 | 0 | 0 | 0 | en | high | — |
 | Amadeus Newsroom | tech_vendor | no_extractable_feed | — | 200 | 0 | 0 | 0 | 0 | en | high | — |
 | Sabre Insights | tech_vendor | no_extractable_feed | — | 200 | 0 | 0 | 0 | 0 | en | medium | — |
@@ -108,7 +109,7 @@
 | Rolls-Royce Press Releases | oem | active | rss | 200 | 3 | 0 | 0 | 0 | en | medium | — |
 | Safran News | oem | disabled_blocked | — | 403 | 0 | 0 | 0 | 0 | en | medium | — |
 | Bombardier News | oem | active | rss | 200 | 2 | 2 | 1 | 1 | en | high | — |
-| Textron Aviation Newsroom | oem | active | html | 200 | 1 | 1 | 1 | 1 | en | high | — |
+| Textron Aviation Newsroom | oem | excluded_policy | html | 200 | 1 | 1 | 1 | 1 | en | high | — |
 
 `7 g öğe`: son 7 günde besleme/sayfadan gelen öğe. `havacılık filtresi`: sıkı havacılık filtresinden (genel beslemelerde) geçen. `≥ min_score 40`: öğenin hikâyesinin skoru 40 ve üstü. `listeye giren`: bu hikâyelerden savunma ve yatırım yorumu süzgecinden de geçenler. Skorlama DEĞİŞTİRİLMEDİ; ağırlıklar ve eşikler aynen duruyor.
 
@@ -116,8 +117,8 @@
 
 | | Önce (main) | Sonra (bu dal) |
 |---|--:|--:|
-| Katalogda aktif | 36 | 28 |
-| Hatasız okunan (tek geçiş, bu bilgisayar) | kaydedilmedi | 28 |
+| Katalogda aktif | 36 | 27 |
+| Hatasız okunan (tek geçiş, bu bilgisayar) | kaydedilmedi | 27 |
 
 Önceki sürüm kaynak başına sonuç tutmuyordu; bu yüzden "önce" için yalnızca katalog sayısı var. Katalogdaki 36 aktif kaynağın 12'si GitHub çalıştırıcısında her çalışmada atlanıyordu (önceki rapor).
 
@@ -127,11 +128,11 @@ Measured on 2026-10-17 from one laptop and one moment with the same driver (one 
 
 | Kademe | Önce | Sonra |
 |---|--:|--:|
-| Critical | 3 | 7 |
-| Important | 10 | 10 |
+| Critical | 3 | 3 |
+| Important | 10 | 9 |
 | Watch | 3 | 5 |
-| Toplam (listede) | 16 | 22 |
-| Makale / aday hikâye | 107 / 95 | 93 / 85 |
+| Toplam (listede) | 16 | 17 |
+| Makale / aday hikâye | 107 / 95 | 92 / 84 |
 
 ## tech_vendor gürültüsü
 
@@ -139,9 +140,9 @@ Aktif tech_vendor: Accelya News. 7 günde 2 öğe, 1 tanesi havacılık filtresi
 
 ## Çalışma süresi ve Gemini
 
-- Toplama geçişi (tüm kaynaklar, bu bilgisayar): 18.8 sn (önce 22.1 sn).
+- Toplama geçişi (tüm kaynaklar, bu bilgisayar): 20.5 sn (önce 22.1 sn).
 - Tam çalışma (toplama + anlatı + yayın hazırlığı, kuru çalıştırma, gerçek Gemini): 67 sn; **Gemini çağrısı 2** (çalışma başına üst sınır 2, çağrı başına 8 hikâye; 12 hikâye anlatıldı).
-- Sonda iş akışı (95 kaynak, GitHub çalıştırıcısı): 253.7 sn; zaman sınırı 30 dk.
+- Sonda iş akışı (95 kaynak, GitHub çalıştırıcısı): 246.5 sn; zaman sınırı 30 dk.
 
 ## Kümeleme doğrulaması
 
@@ -156,13 +157,45 @@ Aynı olayın farklı kaynak türlerinden kopyalarının tek hikâyede birleşti
 
 Düzenleyici + basın: none in the data: FAA, EASA, ANAC, AAIB and BEA items appeared in the 7-day window but no press item about the same event was published, so no regulator story merged with press.
 
-Birleşmeyen örnekler (kural genişletilmedi):
+Birleşmeyen örnekler (kural genişletilmedi; eksik sinyaller `docs/HANDOFF.md` «Kümeleme borcu»):
 
 - same order, two stories: «AeroTime: Airbus secures order for 75 A320neo family aircraft from ACG» ↔ «AirDataNews: Airbus wins order for 75 A320neo Family jets» (ortak sözcükler: a320neo, airbus, family, order)
 - same roll-out, separate story: «AeroTime: Saab rolls out Sweden's first GlobalEye as NATO prepares to follow» ↔ «Aviation24 / AirDataNews: Saab unveils Sweden's first GlobalEye surveillance aircraft» (ortak sözcükler: first, globaleye, saab, sweden)
 - same strike, separate story: «AeroTime: Ukraine says Neptune missile strike hit six Russian bombers» ↔ «AirDataNews: Ukraine claims six Russian Su-34 bombers damaged» (ortak sözcükler: bombers, missile, neptune, russian, strike, ukraine)
 
 Kümeleme kuralı değişikliği: none: the clustering rules were not widened.
+
+## Mod değişiklikleri (feed_only → standart)
+
+| Kaynak | Önce | Sonra | Not |
+|---|---|---|---|
+| FlightGlobal | feed_only | full | bu dala girmeden önce de standart toplama modundaydı; önceki moduna döndü |
+| Simple Flying | feed_only | full | bu dala girmeden önce de standart toplama modundaydı; önceki moduna döndü |
+| AeroTime | feed_only | full | bu dala girmeden önce de standart toplama modundaydı; önceki moduna döndü |
+| Routes Online News | feed_only | full | yeni kaynak; robots.txt izin verdiği sürece standart modda |
+| PhocusWire | feed_only | full | yeni kaynak; robots.txt izin verdiği sürece standart modda |
+| China Travel News | feed_only | full | yeni kaynak; robots.txt izin verdiği sürece standart modda |
+
+## Critical kalite kontrolü
+
+Önceki ölçümdeki yedi Critical hikâyenin ayrıntısı kaydedilmemişti; haberler ve kaynaklar o gün ile bugün arasında değişti. Aşağıdaki, düzeltmeden ÖNCEKİ bugünkü geçişin altı Critical hikâyesidir (bu geçişte yedinci yok).
+
+| Başlık | Kaynak sayısı | event_type | Skor | Katkı veren yeni kaynak | Karar |
+|---|--:|---|--:|---|---|
+| THY ve CFM’den dev anlaşma: 600’den fazla LEAP-1B motoru için imzalar atıldı | 3 | fleet_orders | 73.5 | — | **doğru** — Gerçek filo anlaşması (600+ LEAP-1B motor); HavaHaber, Tolga Özbek, AeroTime kümesi. |
+| Air India Frankfurt–Delhi flight diverts to Jaipur after suspected accidental hijack alert | 1 | safety_incident | 68.8 | — | **doğru** — Gerçek emniyet olayı: kaçırma alarmı nedeniyle yönlendirme, Aviation24. |
+| Lufthansa selects Tokyo as first destination for Airbus A350-1000 | 2 | route_network_change | 65.5 | — | **doğru** — Gerçek ağ haberi: A350-1000'in ilk hattı; Lufthansa resmî haber odası + AeroTime. |
+| 16/10/2026 General aviation Investigation Opening Accident to the Centrair 101 registered F-CHEZ on 06/10/2026 | 1 | safety_incident | 61.8 | BEA News | **yanlış sınıflandırma** — BEA'nın «General aviation» / «Specialised operations» soruşturma bildirimi (planör, mikrolayt, hafif uçak); ticari havacılık için önemli olay değil, ama resmî tier-1 kaynak + safety_incident (0,95) ile 61,8 aldı. |
+| 16/10/2026 Specialised operations Investigation Opening Accident to the Piper PA18 registered OO-VVA on 12/08/ | 1 | safety_incident | 61.8 | BEA News | **yanlış sınıflandırma** — BEA'nın «General aviation» / «Specialised operations» soruşturma bildirimi (planör, mikrolayt, hafif uçak); ticari havacılık için önemli olay değil, ama resmî tier-1 kaynak + safety_incident (0,95) ile 61,8 aldı. |
+| 16/10/2026 General aviation Investigation Opening Accident to the flex-wing microlight Ellipse Alizé Swissauto | 1 | safety_incident | 61.8 | BEA News | **yanlış sınıflandırma** — BEA'nın «General aviation» / «Specialised operations» soruşturma bildirimi (planör, mikrolayt, hafif uçak); ticari havacılık için önemli olay değil, ama resmî tier-1 kaynak + safety_incident (0,95) ile 61,8 aldı. |
+
+Düzeltme (taksonomi/kural, ağırlık değil): config/relevance.json selection.exclude_terms: general aviation, specialised operations, glider*, sailplane*, microlight*, ultralight*, flex-wing, paraglid*, paramotor*, autogyro*, gyrocopter*, hot-air balloon*, light aircraft (airline/airport/passenger bağlamı ya da taşıyıcı adı olan başlıklar korunur). Ağırlık değişmedi.
+
+Düzeltmeden sonra aynı geçiş: Critical 3, Important 9, Watch 5. Kalan gözlemler:
+
+- BEA «Specialised operations … Serious incident to the Airbus AS350» hâlâ Watch'ta: «AS350» (helikopter) Alaska Airlines'ın «AS» kodu + «350» uçuş numarası sanılıyor, taşıyıcı varlığı muafiyeti devreye giriyor (varlık tohumlarında AS350 uçak olarak yok).
+- «Pilot survives Louisiana Cessna crash…» (Important 48,8) ve «Nijerya'da özel jetin kapısı havada koptu» (Important 48,8) eski kaynaklardan gelen genel havacılık/özel jet haberleri; bu dalda eklenmedi, kapsam dışı terimleri başlığa uymuyor.
+- «The world's most important airspace is a sliver of sky between two wars» (The Air Current, Important 54,8): özellik yazısı, geopolitics_airspace; sınır vaka, düzeltilmedi.
 
 ## Ücretli katman öncesi hukuki değerlendirme gerektiren kaynaklar
 
@@ -179,7 +212,7 @@ Kümeleme kuralı değişikliği: none: the clustering rules were not widened.
 | Bloomberg Aviation | excluded_policy | evet | 'solely for your own noncommercial use'; no copying/redistribution; may not use any 'scraper,' 'robot,' 'bot,' 'spider' ... to access, acquire, copy, or monitor the Service. | https://www.bloomberg.com/notices/tos/ |
 | Delta News Hub | active | evet | Delta.com terms: access only for "personal use for non-commercial purposes"; bars "crawler, indexer, robot, spider, scraper" and "reproduce, reuse, republish" w/o written permission. RSS not mentioned; news.delta.com own terms 404. | https://www.delta.com/us/en/legal/terms-of-use |
 | Emirates Newsroom | active | evet | 'You agree to use the Website only for personal, noncommercial use.' RSS/reuse not addressed; only the visible part of terms was read. | https://www.emirates.com/us/english/information/terms-and-conditions/ |
-| Air Canada News Releases | disabled_blocked | evet | 'Use of the Website for any other purpose, including any commercial use or purpose, is expressly prohibited.' Bans 'automated scripts, robots, crawls, screen scrapers'; no re-dissemination of content. RSS not addressed. | https://www.aircanada.com/ca/en/aco/home/legal/terms-of-use.html |
+| Air Canada News Releases | excluded_policy | evet | 'Use of the Website for any other purpose, including any commercial use or purpose, is expressly prohibited.' Bans 'automated scripts, robots, crawls, screen scrapers'; no re-dissemination of content. RSS not addressed. | https://www.aircanada.com/ca/en/aco/home/legal/terms-of-use.html |
 | Ryanair Newsroom | active | evet | Content may be used 'only as strictly required for permitted personal, non-commercial purposes'; 'screen scraping' via automated systems to extract data for commercial purposes 'is strictly prohibited'. | https://www.ryanair.com/gb/en/corporate/terms-of-use |
 | ANA Group Press Releases | no_extractable_feed | evet | 'Downloading, printing or otherwise reproducing the ANA Website is permitted only for private use'; 'may not reproduce, alter... distribute' Content without permission; no copying/quoting on other sites. | https://www.ana.co.jp/en/jp/guide/terms/website/ |
 | JetBlue Investor News | disabled_blocked | evet | Site use "only for personal, non-commercial use"; may not "republish, distribute" content; robots/spiders/page-scrapers need prior written consent (8.1.5). Digital Assets excepted. | https://ir.jetblue.com/terms-of-use/default.aspx |
@@ -203,7 +236,7 @@ Kümeleme kuralı değişikliği: none: the clustering rules were not widened.
 | Embraer News | no_extractable_feed | evet | Sec 2: site content owned by provider; "express prohibition to copy, reproduce, download or make any other type of use thereof", "for commercial purposes or not". No mention of scraping or RSS. | https://www.embraer.com/terms-of-use/en/ |
 | GE Aerospace News | active | evet | Material only for "personal and non-commercial use"; other use incl. "distribution, transmission, publication" prohibited; use for competitive purposes banned. Scraping not named. | https://www.geaerospace.com/terms |
 | Bombardier News | active | evet | Site "may be used by you only for personal, non-commercial purposes"; materials may not be "redistributed, broadcast, published, copied" without prior written consent. Scraping not mentioned. | https://bombardier.com/en/terms-of-use |
-| Textron Aviation Newsroom | active | evet | 'Any resale or commercial use of this Site or its contents ... any use of data mining, robots, or similar data gathering and extraction rules ... is prohibited'; redistribution for commercial purposes prohibited. | https://txtav.com/en/terms-of-use |
+| Textron Aviation Newsroom | excluded_policy | evet | 'Any resale or commercial use of this Site or its contents ... any use of data mining, robots, or similar data gathering and extraction rules ... is prohibited'; redistribution for commercial purposes prohibited. | https://txtav.com/en/terms-of-use |
 
 ### Orta risk (belirsiz ya da okunamadı) — 53 kaynak
 
