@@ -983,6 +983,82 @@
    "language": "en",
    "mode": "full",
    "aviation_filter": true
+  },
+  {
+   "group": "G",
+   "name": "PR Newswire Travel Sector",
+   "catalog_key": "wire/prnewswire/travel",
+   "urls": [
+    "https://www.prnewswire.com/rss/travel-latest-news/travel-latest-news-list.rss"
+   ],
+   "source_type": "airline_ir",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "aviation_filter": true
+  },
+  {
+   "group": "G",
+   "name": "PR Newswire Heavy Industry Sector",
+   "catalog_key": "wire/prnewswire/heavy-industry",
+   "urls": [
+    "https://www.prnewswire.com/rss/heavy-industry-manufacturing-latest-news/heavy-industry-manufacturing-latest-news-list.rss"
+   ],
+   "source_type": "oem",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "aviation_filter": true
+  },
+  {
+   "group": "G",
+   "name": "GlobeNewswire Transportation Feed",
+   "catalog_key": "wire/globenewswire",
+   "urls": [
+    "https://www.globenewswire.com/rssfeed"
+   ],
+   "source_type": "airline_ir",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "aviation_filter": true
+  },
+  {
+   "group": "G",
+   "name": "Business Wire Feeds",
+   "catalog_key": "wire/businesswire",
+   "urls": [
+    "https://www.businesswire.com/newsroom"
+   ],
+   "source_type": "airline_ir",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "aviation_filter": true
+  },
+  {
+   "group": "G",
+   "name": "KAP THYAO Disclosures",
+   "catalog_key": "kap/thyao",
+   "urls": [
+    "https://www.kap.org.tr/en/"
+   ],
+   "source_type": "exchange",
+   "region": "Turkey",
+   "language": "tr",
+   "mode": "feed_only"
+  },
+  {
+   "group": "G",
+   "name": "KAP PGSUS Disclosures",
+   "catalog_key": "kap/pgsus",
+   "urls": [
+    "https://www.kap.org.tr/en/"
+   ],
+   "source_type": "exchange",
+   "region": "Turkey",
+   "language": "tr",
+   "mode": "feed_only"
   }
  ]
 }

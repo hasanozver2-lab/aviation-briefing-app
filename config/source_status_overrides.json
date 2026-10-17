@@ -38,6 +38,16 @@
    "status": "disabled_blocked",
    "reason": "SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı",
    "no_retry": true
+  },
+  "KAP THYAO Disclosures": {
+   "status": "no_public_feed",
+   "reason": "KAP'ın belgelenmiş açık RSS/API'si ve okunabilir şartlar sayfası yok; duyuru listesi betikle üretiliyor, otomatik okuma denenmedi",
+   "no_retry": true
+  },
+  "KAP PGSUS Disclosures": {
+   "status": "no_public_feed",
+   "reason": "KAP'ın belgelenmiş açık RSS/API'si ve okunabilir şartlar sayfası yok; duyuru listesi betikle üretiliyor, otomatik okuma denenmedi",
+   "no_retry": true
   }
  }
 }

@@ -59,7 +59,9 @@ def registrable_key(url):
 def row_key(row):
     """Catalog identity of a row: the SEC company for EDGAR rows, otherwise the publisher's registrable domain."""
     notes = notes_of(row)
-    return f"sec/{notes['cik']}" if notes.get("cik") else registrable_key(row["url"])
+    if notes.get("cik"):
+        return f"sec/{notes['cik']}"
+    return notes.get("catalog_key") or registrable_key(row["url"])
 
 
 def read_rows(path=None):
@@ -109,7 +111,7 @@ def new_row(entry, types):
         "category_hint": "European and other global airlines", "official": type_config["official"], "source_type": entry["source_type"],
         "discovery_urls": entry["urls"],
     }
-    for key in ("airline", "airline_code", "cik", "edgar_items", "aviation_filter", "discovery_urls"):
+    for key in ("airline", "airline_code", "cik", "edgar_items", "aviation_filter", "discovery_urls", "catalog_key"):
         if key in entry:
             notes[key] = entry[key]
     is_sec = bool(entry.get("cik"))
@@ -143,7 +145,7 @@ def merge_expansion(rows, expansion, types=None):
     report = {"updated": [], "added": [], "merged_same_domain": []}
     for entry in expansion["sources"]:
         is_sec = bool(entry.get("cik"))
-        key = f"sec/{entry['cik']}" if is_sec else registrable_key(entry["urls"][0])
+        key = f"sec/{entry['cik']}" if is_sec else entry.get("catalog_key") or registrable_key(entry["urls"][0])
         row = by_key.get(key)
         if row is None:
             row = new_row(entry, types)
