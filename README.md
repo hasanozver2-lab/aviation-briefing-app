@@ -138,6 +138,9 @@ IATA dizinindeki tüm üyeler için kaynak URL'leri tek seferde güvenilir biçi
 
 ---
 
+## Yerel probe (kendi bilgisayarınızdan kaynak denemesi)
+GitHub çalıştırıcısı bazı haber odalarından 403 ya da zaman aşımı alır; kendi ağınızdan açılanları görmek için `python scripts/probe_local.py` komutunu çalıştırın (Python 3.11 ya da üstü; ek paket gerekmez, yalnızca standart kütüphane kullanılır, `requirements.txt` bunu not eder; bu depoda kullanılan sürüm Python 3.12). Betik 95 kaynağın hepsini aynı kendini tanıtan User-Agent ve robots.txt kurallarıyla, alan adı başına sıralı dener; her kaynak için HTTP kodunu, süreyi ve son 90 gündeki öğe sayısını `reports/probe_local.json` dosyasına yazar ve çalıştırıcı sonucuyla (`reports/source_probe.json`) karşılaştıran bir özet basar: hangi kaynaklar yalnızca sizin ağınızdan açılıyor. Betik yalnızca okur; veri dalına, arşive, kaynak listesine ya da herhangi bir secret'a yazmaz.
+
 ## 🚀 Başlatma
 
 Terminalden veya `start_app.cmd` dosyasına çift tıklayarak başlatabilirsiniz:

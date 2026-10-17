@@ -1,2 +1,4 @@
 # Aviation Briefing App Dependencies
 # Note: Core scraper and parser use Python standard library (urllib, xml, json, ssl)
+# scripts/probe_local.py and the source probe need no third-party packages (Python 3.11+ standard library only).
+# Browser tests (optional, tests/test_language.py) use playwright, installed separately; they skip when it is missing.
