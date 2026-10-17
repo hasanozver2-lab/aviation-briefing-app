@@ -161,3 +161,27 @@ def test_no_weight_or_threshold_changed():
     assert types["safety_incident"]["weight"] == 0.95 and types["operations_disruption"]["weight"] == 0.8
     assert SELECTION["min_score"] == 40 and SELECTION["archive_min_score"] == 35
     assert [(level["name"], level["min_score"]) for level in RELEVANCE["levels"]] == [("critical", 60), ("important", 45), ("watch", 40), ("low", 35)]
+
+
+def candidate(title, score, demoted=None):
+    url = f"https://example.com/{abs(hash(title))}"
+    item = {"story_id": story_lifecycle.stable_story_id(url), "headline": title, "relevance_score": score, "entities": {"carriers": [], "groups": []},
+            "original_source": {"url": url, "title": title, "source_name": "Wire", "tier": 2, "official": False}}
+    if demoted:
+        item["context_demoted_from"] = demoted
+    return item
+
+
+def test_a_demoted_story_stays_in_the_hidden_archive_band_however_low_it_scores():
+    stories = [candidate("Cessna crash in Louisiana", 28.5, "safety_incident"), candidate("Unrelated low score item", 28.5), candidate("Airline order", 55)]
+    chosen = story_lifecycle.select_stories(stories, SELECTION)
+    assert {item["headline"] for item in chosen} == {"Cessna crash in Louisiana", "Airline order"}
+    kept = next(item for item in chosen if item["headline"].startswith("Cessna"))
+    level = story_lifecycle.level_for(kept["relevance_score"], RELEVANCE["levels"])
+    assert level is None, "below every band: archived, never listed"
+
+
+def test_the_candidate_story_carries_the_demotion_marker():
+    article = typed_article("Pilot survives Louisiana Cessna crash after engine falls off", link="https://x.example/c1", source="Trade", published=None)
+    article.update({"source_type": "trade_media", "timestamp": 0, "pub_date": ""})
+    assert _engine.build_candidate_story(article)["context_demoted_from"] == "safety_incident"

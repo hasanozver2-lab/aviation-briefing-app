@@ -1021,6 +1021,7 @@ def build_candidate_story(article, index=1):
         "related_news": [],
         "narrative_status": "pending",
         **({"basis": article["basis"]} if article.get("basis") else {}),
+        **({"context_demoted_from": article["context_demoted_from"]} if article.get("context_demoted_from") else {}),
     }
 
 
