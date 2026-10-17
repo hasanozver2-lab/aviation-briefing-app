@@ -635,29 +635,39 @@ def fetch_rss_items(max_hours=48, report=None):
     """
     report = report if report is not None else {}
     cutoff = utc_now() - timedelta(hours=max_hours)
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-    }
+    # One honest User-Agent for every source (no browser impersonation); robots.txt is obeyed and the sources of one host
+    # are read one after the other, different hosts in parallel.
+    headers = {"User-Agent": feed_discovery.USER_AGENT, "Accept": "application/rss+xml, application/atom+xml, application/xml;q=0.9, text/html;q=0.8, */*;q=0.5"}
     sources = get_rss_sources(max_hours)
+    hosts = {}
+    for source in sources:
+        hosts.setdefault(source_catalog.registrable_key(source.get("url", "")), []).append(source)
 
-    articles = []
-    worker_count = max(1, min(SOURCE_FETCH_WORKERS, len(sources)))
-    with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix="briefing-feed") as executor:
-        futures = {
-            executor.submit(_fetch_source_articles, source, cutoff, headers): source
-            for source in sources
-        }
-        for future in as_completed(futures):
-            source = futures[future]
+    def read_host(host_sources):
+        fetcher = feed_discovery.PoliteFetcher()
+        results = []
+        for number, source in enumerate(host_sources):
+            if number:
+                time.sleep(feed_discovery.SAME_HOST_GAP_SECONDS)
             try:
-                source_articles, error_name = future.result()
+                if not fetcher.allowed(source["url"]):
+                    results.append((source, [], "robots.txt disallows this address", "excluded_policy"))
+                    continue
+                source_articles, error_name = _fetch_source_articles(source, cutoff, headers)
             except Exception as exc:
                 source_articles, error_name = [], describe_fetch_error(exc)
-            articles.extend(source_articles)
-            report[source.get("name", "Unknown source")] = {"status": "active", "error": error_name, "articles": len(source_articles)}
-            if error_name:
-                print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
+            results.append((source, source_articles, error_name, "active"))
+        return results
+
+    articles = []
+    worker_count = max(1, min(SOURCE_FETCH_WORKERS, len(hosts)))
+    with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix="briefing-feed") as executor:
+        for host_results in executor.map(read_host, hosts.values()):
+            for source, source_articles, error_name, status in host_results:
+                articles.extend(source_articles)
+                report[source.get("name", "Unknown source")] = {"status": status, "error": error_name, "articles": len(source_articles)}
+                if error_name:
+                    print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
 
     articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv))
     articles.sort(key=lambda article: article.get("timestamp", 0), reverse=True)
