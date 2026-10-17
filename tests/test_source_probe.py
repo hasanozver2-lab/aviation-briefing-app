@@ -184,3 +184,44 @@ def test_the_probe_workflow_is_manual_read_only_and_cannot_touch_briefing_data()
     assert "contents: read" in code and "contents: write" not in code
     assert "secrets." not in code and "briefing-data" not in code and "git push" not in code and "run_pipeline" not in code
     assert "upload-artifact" in code and "scripts/probe_sources.py" in code
+
+
+# --- method restriction and the legacy path ---------------------------------------------------------------------------------
+
+NEWS_SITEMAP = (f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="{fd.NEWS_SITEMAP_NS}"><url><loc>https://wire.example/n1</loc>'
+                f'<news:news><news:publication_date>{(NOW - timedelta(hours=3)).isoformat()}</news:publication_date><news:title>Airline signs engine deal</news:title></news:news></url></urlset>')
+
+
+def test_a_feed_only_source_may_not_fall_back_to_a_sitemap(monkeypatch):
+    pages = {"https://wire.example/": (200, HOME), "https://wire.example/news-sitemap.xml": (200, NEWS_SITEMAP)}
+    record, _ = probe_one(pages, monkeypatch)
+    assert record["status"] == "no_public_feed" and record["method"] == ""
+
+
+def test_a_web_source_may_use_a_news_sitemap(monkeypatch):
+    pages = {"https://wire.example/": (200, HOME), "https://wire.example/news-sitemap.xml": (200, NEWS_SITEMAP)}
+    record, _ = probe_one(pages, monkeypatch, mode="full", source_type="airline_ir")
+    assert record["status"] == "active" and record["method"] == "sitemap"
+
+
+def test_a_stored_sitemap_address_is_not_kept_for_a_feed_only_source():
+    rows, discovered, _ = source_probe.apply_probe([row()], probe_doc(method="sitemap", feed_url="https://wire.example/news-sitemap.xml"), terms(), {}, NOW)
+    assert discovered == {} and rows[0]["feed_url"] == ""
+
+
+def test_the_legacy_path_obeys_robots_txt(monkeypatch):
+    pages = {"https://wire.example/robots.txt": (200, "User-agent: *\nDisallow: /"), "https://wire.example/": (200, HOME)}
+    record, _ = probe_one(pages, monkeypatch, legacy=lambda source, cutoff: ([{"title": "x" * 30, "link": "l", "source": "s", "timestamp": NOW.timestamp()}], ""), mode="full", source_type="airline_ir")
+    assert record["status"] == "excluded_policy" and "robots.txt disallows" in record["reason"]
+
+
+def test_a_quiet_legacy_rss_source_that_answered_is_working_but_a_silent_html_scraper_is_not(monkeypatch):
+    pages = {"https://wire.example/": (200, HOME)}
+    quiet_rss, _ = probe_one(pages, monkeypatch, legacy=lambda source, cutoff: ([], ""), mode="full", source_type="airline_ir")
+    assert quiet_rss["status"] == "active" and quiet_rss["method"] == "legacy_scraper"
+    original = fd.PoliteFetcher
+    r = row(mode="full", source_type="airline_ir")
+    site = Site(pages)
+    monkeypatch.setattr(fd, "PoliteFetcher", lambda **kw: REAL_FETCHER(fetch=site, sleep=lambda s: None, **{k: v for k, v in kw.items() if k != "fetch"}))
+    record, _ = source_probe.probe_source(r, feed_sources.source_record(r), {r["name"]: {"name": r["name"], "url": r["url"], "fetch_mode": "html"}}, {}, NOW, legacy_fetch=lambda s, c: ([], ""))
+    assert record["status"] == "no_extractable_feed"

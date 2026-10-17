@@ -124,6 +124,11 @@ def article_from_item(item, source):
     return article
 
 
+def allowed_methods(source):
+    """feed_only sources may only use a public RSS/Atom feed; others may also use a news sitemap, JSON-LD or dated links."""
+    return fd.FEED_ONLY_METHODS if source["mode"] == MODE_FEED_ONLY else None
+
+
 def read_source(source, discovered, fetcher, now, cutoff, relogger=print):
     """Fetch one catalog source through its stored feed address. Returns (articles, report).
 
@@ -137,13 +142,13 @@ def read_source(source, discovered, fetcher, now, cutoff, relogger=print):
         method_items = fd.items_from_url(fetcher, entry["feed_url"])
         items = method_items[1]
         ok, _, _ = fd.validate_items(items, now) if items else (False, 0, "")
-        if ok:
+        if ok and (allowed_methods(source) is None or method_items[0] in allowed_methods(source)):
             result = fd.DiscoveryResult(fd.STATUS_FOUND, entry["feed_url"], method_items[0], items=items, http_code=method_items[2].status)
         else:
             relogger(f"[{source['name']}] stored feed address stopped working ({method_items[2].error or method_items[2].status}); discovering again for this run.")
             report["rediscovered"] = True
     if result is None:
-        result = fd.discover(fetcher, source["discovery_urls"], now=now)
+        result = fd.discover(fetcher, source["discovery_urls"], now=now, allowed_methods=allowed_methods(source))
         if result.status != fd.STATUS_FOUND:
             report.update(status=result.status, error=result.reason, http=result.http_code)
             return [], report

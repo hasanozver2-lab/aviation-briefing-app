@@ -29,3 +29,4 @@ jobs:
           path: probe-output/source_probe.json
           retention-days: 30
 # run 2: discovery hardened against invalid URLs
+# run 3: feed_only restricted to RSS/Atom, legacy path obeys robots

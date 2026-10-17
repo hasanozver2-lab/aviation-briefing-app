@@ -401,7 +401,10 @@ def items_from_url(fetcher, url):
 FEED_METHODS = (METHOD_RSS, METHOD_ATOM, METHOD_SITEMAP)
 
 
-def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, explicit_feed_url=None):
+FEED_ONLY_METHODS = (METHOD_RSS, METHOD_ATOM)      # press/data sources: only the publisher's own public RSS/Atom feed, never a sitemap or page scrape
+
+
+def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, explicit_feed_url=None, allowed_methods=None):
     """Find a verified public feed for a publisher. `urls` are the page addresses to start from; the order is the preference.
 
     Result precedence: a verified feed wins; otherwise "blocked" if the site refused us (401/403/429/timeout) on the way;
@@ -410,6 +413,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
     """
     now = now or utc_now()
     started = fetcher.requests
+    method_ok = lambda method: allowed_methods is None or method in allowed_methods
     state = {"blocked": None, "robots": None, "last": Response()}
     path_of = lambda url: urllib.parse.urlparse(url).path or "/"
 
@@ -442,7 +446,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
                 if child_method == METHOD_SITEMAP:
                     method, items = child_method, child_items
                     break
-        if method is None:
+        if method is None or not method_ok(method):
             return None
         ok, recent, _ = validate_items(items, now)
         return found(DiscoveryResult(STATUS_FOUND, url, method, recent, items, response.status, response.seconds)) if ok else None
@@ -468,7 +472,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
             method, items = classify_body(response.body, response.final_url or page_url)
             if method in FEED_METHODS:                       # the address we were given is itself a feed (e.g. SEC EDGAR Atom)
                 ok, recent, _ = validate_items(items, now)
-                if ok:
+                if ok and method_ok(method):
                     return found(DiscoveryResult(STATUS_FOUND, page_url, method, recent, items, response.status, response.seconds))
                 continue
             pages_html[page_url] = response.body.decode("utf-8", errors="replace")
@@ -508,7 +512,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
     for page_url, page in pages_html.items():
         for method, items in ((METHOD_JSONLD, parse_jsonld(page)), (METHOD_HTML, parse_dated_links(page, page_url))):
             ok, recent, _ = validate_items(items, now)
-            if ok:
+            if ok and method_ok(method):
                 return found(DiscoveryResult(STATUS_FOUND, page_url, method, recent, items, 200, state["last"].seconds))
     if state["blocked"] and not pages_html:
         return found(state["blocked"])

@@ -10,6 +10,7 @@ import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse
 
 try:
     from . import clustering, entities, feed_discovery as fd, feed_sources, market_data, source_catalog, story_lifecycle
@@ -78,10 +79,10 @@ def _probe_source(row, source, builtin_by_name, discovered, now, fetch=None, leg
     if stored:
         method, items, response = fd.items_from_url(fetcher, stored["feed_url"])
         ok, _, _ = fd.validate_items(items, now) if items else (False, 0, "")
-        if ok:
+        if ok and (feed_sources.allowed_methods(source) is None or method in feed_sources.allowed_methods(source)):
             result = fd.DiscoveryResult(fd.STATUS_FOUND, stored["feed_url"], method, items=items, http_code=response.status, seconds=response.seconds)
     if result is None:
-        result = fd.discover(fetcher, source["discovery_urls"], now=now)
+        result = fd.discover(fetcher, source["discovery_urls"], now=now, allowed_methods=feed_sources.allowed_methods(source))
     articles, items_7d, items_90d = [], 0, result.item_count_90d
     method = result.method if result.status == fd.STATUS_FOUND else ""
     if result.status == fd.STATUS_FOUND:
@@ -92,15 +93,21 @@ def _probe_source(row, source, builtin_by_name, discovered, now, fetch=None, leg
     legacy_found = False
     if result.status != fd.STATUS_FOUND and record["legacy"] and legacy_fetch:
         legacy_source = {**builtin_by_name[row["name"]], "timeout_s": int(row["timeout_s"]), "mode": row["mode"]}
-        legacy_articles, legacy_error = legacy_fetch(legacy_source, cutoff)
-        legacy_found = bool(legacy_articles)
-        if legacy_found:
-            method, articles, items_7d = LEGACY_METHOD, legacy_articles, len(legacy_articles)
-            for article in articles:
-                article["source"] = row["name"]          # a legacy article may carry the publisher named in its title
-                article.setdefault("language", row["language"])
-        elif legacy_error and result.status == fd.STATUS_NO_FEED:
-            result = fd.DiscoveryResult(fd.STATUS_BLOCKED if "403" in legacy_error or "Timeout" in legacy_error else fd.STATUS_NO_FEED, reason=legacy_error, http_code=result.http_code)
+        if not fetcher.allowed(legacy_source["url"]):
+            result = fd.DiscoveryResult(fd.STATUS_ROBOTS, reason=f"robots.txt disallows {urlparse(legacy_source['url']).path or '/'} for {fd.ROBOTS_TOKEN}")
+        else:
+            legacy_articles, legacy_error = legacy_fetch(legacy_source, cutoff)
+            # An RSS source that answered is working even if it was quiet this week; an HTML scraper that returns nothing is not.
+            legacy_found = bool(legacy_articles) or (not legacy_error and legacy_source.get("fetch_mode") != "html")
+            if legacy_articles:
+                method, articles, items_7d = LEGACY_METHOD, legacy_articles, len(legacy_articles)
+                for article in articles:
+                    article["source"] = row["name"]          # a legacy article may carry the publisher named in its title
+                    article.setdefault("language", row["language"])
+            elif legacy_found:
+                method = LEGACY_METHOD
+            elif legacy_error and result.status == fd.STATUS_NO_FEED:
+                result = fd.DiscoveryResult(fd.STATUS_BLOCKED if "403" in legacy_error or "Timeout" in legacy_error else fd.STATUS_NO_FEED, reason=legacy_error, http_code=result.http_code)
     status, reason = suggest_status(row, result, legacy_found)
     record.update(status=status, reason=reason, method=method, feed_url=result.feed_url if result.status == fd.STATUS_FOUND else "", http_code=result.http_code,
                   seconds=round(time.monotonic() - started, 2), requests=fetcher.requests, items_7d=items_7d, items_90d=items_90d, robots=fetcher.robots_note(source["discovery_urls"][0]))
@@ -235,7 +242,7 @@ def apply_probe(rows, probe, terms_review, discovered, now=None):
         previous = row["status"]
         row["status"], row["reason"], row["active"] = status, reason, "1" if status == source_catalog.STATUS_ACTIVE else "0"
         slug = source_catalog.source_slug(row["name"])
-        if status == source_catalog.STATUS_ACTIVE and record["method"] in FEED_METHODS:
+        if status == source_catalog.STATUS_ACTIVE and record["method"] in FEED_METHODS and not (row["mode"] == "feed_only" and record["method"] not in fd.FEED_ONLY_METHODS):
             row["timeout_s"] = str(max(int(row["timeout_s"]), PROBE_TIMEOUT_SECONDS))
             row["feed_url"] = record["feed_url"]
             kept = discovered.get(slug, {})
