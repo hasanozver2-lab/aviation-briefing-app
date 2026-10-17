@@ -1,7 +1,8 @@
 """Polite discovery and reading of publishers' PUBLIC feeds.
 
 Rules this module enforces for every source:
-* one honest User-Agent, no cookies, no login, no browser impersonation, no proxy, no paywall workaround;
+* one self-identifying User-Agent (a "Mozilla/5.0 (compatible; ...)" product token that names this project and links to it; it does not
+  imitate any browser), no cookies, no login, no proxy, no paywall workaround;
 * robots.txt is read once per host and obeyed (a disallowed path is never requested);
 * requests to one host are sequential with a pause between them; a discovery takes at most
   MAX_REQUESTS_PER_DISCOVERY requests; different hosts may run in parallel (the caller groups by host);
@@ -23,8 +24,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
-USER_AGENT = "aviation-briefing-app (github.com/hasanozver2-lab/aviation-briefing-app)"
-ROBOTS_TOKEN = "aviation-briefing-app"
+USER_AGENT = "Mozilla/5.0 (compatible; aviation-briefing-app/1.0; +https://github.com/hasanozver2-lab/aviation-briefing-app)"
+ROBOTS_TOKEN = "aviation-briefing-app"      # the product token robots.txt groups are matched against
 MAX_REQUESTS_PER_DISCOVERY = 14
 SAME_HOST_GAP_SECONDS = 1.0
 VALID_WINDOW_DAYS = 90
@@ -425,7 +426,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
         return outcome
 
     def robots_reason(url):
-        return f"robots.txt disallows {path_of(url)} for {USER_AGENT.split()[0]}"
+        return f"robots.txt disallows {path_of(url)} for {ROBOTS_TOKEN}"
 
     def try_candidate(url, advertised):
         """Read one candidate as a feed/sitemap. Only candidates the publisher itself points to count as a robots exclusion."""

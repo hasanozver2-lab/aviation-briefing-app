@@ -129,13 +129,17 @@ def test_a_timeout_is_reported_as_blocked():
     assert result.status == fd.STATUS_BLOCKED and "TimeoutError" in result.reason
 
 
-def test_the_user_agent_is_the_project_one_and_no_cookie_or_browser_headers_are_sent():
+def test_the_user_agent_identifies_the_project_and_no_cookie_or_login_headers_are_sent():
     site = Site({"https://pub.example/": (200, HOME_WITH_ALTERNATE), "https://pub.example/custom/news.xml": (200, GOOD_RSS)})
     run(site)
+    expected = "Mozilla/5.0 (compatible; aviation-briefing-app/1.0; +https://github.com/hasanozver2-lab/aviation-briefing-app)"
+    assert fd.USER_AGENT == expected
     for _, headers in site.log:
-        assert headers["User-Agent"] == "aviation-briefing-app (github.com/hasanozver2-lab/aviation-briefing-app)"
+        assert headers["User-Agent"] == expected
         assert not {"Cookie", "Authorization", "Referer"} & set(headers)
-        assert "Mozilla" not in headers["User-Agent"] and "@" not in headers["User-Agent"]
+    assert "@" not in expected, "no e-mail address in the User-Agent"
+    assert fd.ROBOTS_TOKEN in expected and "github.com/hasanozver2-lab/aviation-briefing-app" in expected, "it names the project and links to it"
+    assert not any(browser in expected for browser in ("Chrome", "Safari", "Firefox", "AppleWebKit", "Gecko", "Windows", "Macintosh")), "it never imitates a browser"
 
 
 def test_conditional_headers_are_sent_when_validators_are_known():

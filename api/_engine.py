@@ -635,7 +635,7 @@ def fetch_rss_items(max_hours=48, report=None):
     """
     report = report if report is not None else {}
     cutoff = utc_now() - timedelta(hours=max_hours)
-    # One honest User-Agent for every source (no browser impersonation); robots.txt is obeyed and the sources of one host
+    # One self-identifying User-Agent for every source; robots.txt is obeyed and the sources of one host
     # are read one after the other, different hosts in parallel.
     headers = {"User-Agent": feed_discovery.USER_AGENT, "Accept": "application/rss+xml, application/atom+xml, application/xml;q=0.9, text/html;q=0.8, */*;q=0.5"}
     sources = get_rss_sources(max_hours)
