@@ -574,6 +574,7 @@ def _compiled_taxonomy(config_mtime_ns):
     for event_type, rule in load_taxonomy_config()["event_types"].items():
         context_terms = rule.get("aviation_context_terms")
         compiled[event_type] = {
+            "exclude_when_rule": rule.get("exclude_when_rule"),
             "weight": float(rule["weight"]),
             "terms": text_match.TermSet(rule.get("terms", []), allow_plural=True),
             "context": text_match.TermSet(context_terms, allow_plural=True) if context_terms else None,
@@ -587,6 +588,12 @@ def _min_description_hits():
 
 def _taxonomy():
     return _compiled_taxonomy(TAXONOMY_CONFIG_PATH.stat().st_mtime_ns)
+
+
+def _military_strike_applies(prepared_text):
+    """True for a strike in a military context ("missile strike", "airstrike") that no labour context contradicts."""
+    from . import story_lifecycle  # lazy, as in is_excluded_from_typing
+    return story_lifecycle.military_strike_matches(prepared_text, story_lifecycle.load_relevance_config()["selection"])
 
 
 def is_excluded_from_typing(title):
@@ -620,11 +627,14 @@ def classify_event_type(text, description=""):
     taxonomy = _taxonomy()
     minimum_body_hits = _min_description_hits()
     combined = text_match.prepare(f"{title.raw} {body.raw}")
+    military_strike = _military_strike_applies(combined)
     guarded_types = set(load_taxonomy_config().get("typing_exclusions", {}).get("guarded_types", []))
     skip_guarded = bool(guarded_types) and is_excluded_from_typing(title.raw)
     ranked_matches = []
     for event_type, rule in taxonomy.items():
         if skip_guarded and event_type in guarded_types:
+            continue
+        if military_strike and rule.get("exclude_when_rule") == "military_strike":
             continue
         title_terms = {term for term, _ in rule["terms"].matches(title)}
         body_terms = {term for term, _ in rule["terms"].matches(body)}

@@ -29,6 +29,7 @@ try:
     from . import language
     from . import feed_discovery
     from . import feed_sources
+    from . import safety_context
     from . import source_catalog
     from .urls import canonicalize_url
 except ImportError:
@@ -40,6 +41,7 @@ except ImportError:
     import language
     import feed_discovery
     import feed_sources
+    import safety_context
     import source_catalog
     from urls import canonicalize_url
 
@@ -1019,6 +1021,7 @@ def build_candidate_story(article, index=1):
         "related_news": [],
         "narrative_status": "pending",
         **({"basis": article["basis"]} if article.get("basis") else {}),
+        **({"context_demoted_from": article["context_demoted_from"]} if article.get("context_demoted_from") else {}),
     }
 
 
@@ -1057,6 +1060,7 @@ def collect_run(market_database=None, recovered=None):
         raise RuntimeError("No articles could be collected from any source")
     market_data.record_article_events(local_market_database, articles)
     entities.annotate_articles(articles, entity_index)
+    safety_context.enforce(articles)
 
     candidates = [build_candidate_story(article, index) for index, article in enumerate(story_lifecycle.cluster_representatives(articles), start=1)]
     story_lifecycle.enrich_stories(candidates, articles)
@@ -1094,6 +1098,7 @@ def run_pipeline(mode="daily", market_database=None):
     articles = fetch_rss_items(max_hours=48 if mode == "daily" else 2)
     market_data.record_article_events(local_market_database, articles)
     entities.annotate_articles(articles, entity_index)
+    safety_context.enforce(articles)
     print(f"{len(articles)} haber maddesi toplandı. Analiz ediliyor...")
     briefing = generate_briefing_with_gemini(articles, mode=mode)
     story_lifecycle.enrich_stories(briefing["stories"], articles)

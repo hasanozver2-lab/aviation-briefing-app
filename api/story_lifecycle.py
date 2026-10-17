@@ -213,13 +213,24 @@ def cluster_representatives(articles):
     return representatives
 
 
+def military_strike_matches(text, selection):
+    """A strike with a military context and no labour context (selection.military_strike)."""
+    rule = selection.get("military_strike")
+    if not rule:
+        return False
+    prepared = text_match.prepare(text)
+    return (text_match.TermSet(rule["requires"]).any(prepared) and text_match.TermSet(rule["context"]).any(prepared)
+            and not text_match.TermSet(rule["unless"]).any(prepared))
+
+
 def is_military_story(story, selection):
     """Defence/military items that do not involve any airline or civil aviation context are out of scope."""
     exclude_terms = selection.get("exclude_terms")
     if not exclude_terms:
         return False
     title = story.get("headline", "")
-    if not text_match.TermSet(exclude_terms).any(title) or text_match.TermSet(selection.get("keep_terms", [])).any(title):
+    is_defence_item = text_match.TermSet(exclude_terms).any(title) or military_strike_matches(title, selection)
+    if not is_defence_item or text_match.TermSet(selection.get("keep_terms", [])).any(title):
         return False
     entities = story.get("entities") or {}
     return not (entities.get("carriers") or entities.get("groups"))
@@ -249,9 +260,11 @@ def select_stories(stories, selection, commentary=None):
     """Stories to archive: the listed ones (score >= min_score, at most max_per_run) and the archive-only low band
     (archive_min_score <= score < min_score, at most max_low_per_run). Military items and finance commentary are dropped."""
     archive_minimum = selection.get("archive_min_score", selection["min_score"])
+    # A story whose safety type was dropped for lack of an airline context (general aviation, contextless crashes) stays in the
+    # archive-only band however low it scores: it is hidden from the list, not lost.
     eligible = [
         story for story in stories
-        if float(story.get("relevance_score", 0)) >= archive_minimum and not is_military_story(story, selection)
+        if (float(story.get("relevance_score", 0)) >= archive_minimum or story.get("context_demoted_from")) and not is_military_story(story, selection)
         and not (selection.get("exclude_commentary") and is_finance_commentary(story, commentary))
     ]
     eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))

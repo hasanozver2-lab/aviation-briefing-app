@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
 try:
-    from . import clustering, entities, feed_discovery as fd, feed_sources, market_data, source_catalog, story_lifecycle
+    from . import clustering, entities, feed_discovery as fd, feed_sources, market_data, safety_context, source_catalog, story_lifecycle
     from .urls import canonicalize_url
 except ImportError:
     import clustering
@@ -21,6 +21,7 @@ except ImportError:
     import feed_discovery as fd
     import feed_sources
     import market_data
+    import safety_context
     import source_catalog
     import story_lifecycle
     from urls import canonicalize_url
@@ -158,6 +159,7 @@ def measure(articles, records, relevance_config=None):
         result = market_data.classify_event_type(article["title"], article.get("description", ""))
         article["event_type"], article["event_weight"] = (result["event_type"], result["event_weight"]) if result else (None, None)
     entities.annotate_articles(articles, index)
+    safety_context.enforce(articles)
     for article in articles:
         record = by_name[article["source"]]
         if article["source"] in needs_filter and not feed_sources.passes_aviation_filter(article, index, config):
