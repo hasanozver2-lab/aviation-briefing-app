@@ -221,10 +221,10 @@ def test_vercel_config_disables_deployments_for_the_data_branch():
     assert github_store.VERCEL_CONFIG["git"]["deploymentEnabled"] == {github_store.DEFAULT_BRANCH: False}
 
 
-def test_workflow_is_one_hourly_job_with_only_contents_write():
+def test_workflow_is_one_scheduled_job_with_only_contents_write():
     workflow = (PROJECT_DIR / ".github" / "workflows" / "briefing-pipeline.yml").read_text(encoding="utf-8")
     code = "\n".join(line for line in workflow.splitlines() if not line.lstrip().startswith("#"))
-    assert code.count("cron:") == 1 and 'cron: "2 * * * *"' in code
+    assert code.count("cron:") == 1 and 'cron: "7,22,37,52 * * * *"' in code
     assert "permissions:\n  contents: write" in code
     assert code.count("permissions:") == 1
     assert code.count("jobs:\n  publish:") == 1 and code.count("runs-on:") == 1

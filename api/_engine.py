@@ -480,6 +480,14 @@ def parse_published_datetime(value):
     return parsed
 
 
+def describe_fetch_error(exc):
+    """Error name for the run log; an HTTP failure carries its status code (403 = blocked, 404 = moved) so it can be told apart."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return f"HTTPError {exc.code}"
+    reason = getattr(exc, "reason", None)
+    return f"{type(exc).__name__} ({type(reason).__name__})" if reason is not None and not isinstance(reason, str) else type(exc).__name__
+
+
 def _fetch_source_articles(source, cutoff, headers):
     """Fetch one source independently so a slow site cannot block the briefing."""
     source_name = source.get("name", "Unknown source")
@@ -560,7 +568,7 @@ def _fetch_source_articles(source, cutoff, headers):
             })
         return articles, ""
     except Exception as exc:
-        return [], type(exc).__name__
+        return [], describe_fetch_error(exc)
 
 
 def fetch_rss_items(max_hours=48):
@@ -586,7 +594,7 @@ def fetch_rss_items(max_hours=48):
             try:
                 source_articles, error_name = future.result()
             except Exception as exc:
-                source_articles, error_name = [], type(exc).__name__
+                source_articles, error_name = [], describe_fetch_error(exc)
             articles.extend(source_articles)
             if error_name:
                 print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
