@@ -21,9 +21,12 @@ sys.path.insert(0, str(PROJECT_DIR))
 from api import _engine
 from api import briefing_store
 from api import narrative
+from api import source_catalog
 from api import story_lifecycle
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
+STATUS_FETCH_ERROR = "error"
+HEARTBEAT_HOURS = 3      # source health is written at least this often even when nothing else changed
 
 
 def timestamp(now=None):
@@ -45,8 +48,31 @@ def day_payload(collected, now):
     return {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
 
 
-def status_payload(collection_error, narrative_report, now):
-    return {
+def source_health(source_report, existing_status, now):
+    """Per source: last status, last successful read and articles in the last 24 hours. Unresolved sources only show up here."""
+    report = dict(source_report or {})
+    for row in source_catalog.read_rows():
+        report.setdefault(row["name"], {"status": row["status"], "error": row["reason"], "articles": 0})
+    previous = (existing_status or {}).get("sources", {})
+    health = {}
+    for name, entry in sorted(report.items()):
+        read_ok = entry["status"] == "active" and not entry.get("error")
+        health[name] = {
+            "status": entry["status"] if (read_ok or entry["status"] != "active") else STATUS_FETCH_ERROR,
+            "last_ok_at": timestamp(now) if read_ok else previous.get(name, {}).get("last_ok_at", ""),
+            "articles_24h": entry.get("articles_24h", 0),
+            "error": entry.get("error", ""),
+        }
+    return health
+
+
+def source_summary(health):
+    ok = sum(1 for entry in health.values() if entry["status"] == "active")
+    return {"sources": len(health), "reading_ok": ok, "unresolved": len(health) - ok}
+
+
+def status_payload(collection_error, narrative_report, now, collected=None, existing_status=None):
+    payload = {
         "status": STATUS_STALE if collection_error else STATUS_OK,
         "errors": {"collect": collection_error} if collection_error else {},
         "narrative_pending": narrative_report["pending"],
@@ -54,12 +80,26 @@ def status_payload(collection_error, narrative_report, now):
         "narrative_calls": narrative_report["calls"],
         "last_attempt_at": timestamp(now),
     }
+    if collected is not None:
+        health = source_health(collected.get("source_report"), existing_status, now)
+        payload.update(sources=health, source_summary=source_summary(health))
+    elif existing_status and "sources" in existing_status:
+        payload.update(sources=existing_status["sources"], source_summary=existing_status.get("source_summary", {}))
+    return payload
 
 
-def status_changed(existing, new):
-    """Timestamps, call counts and error wording move every run and must not cause a commit on their own."""
+def status_changed(existing, new, now=None):
+    """Timestamps, call counts and error wording move every run and must not cause a commit on their own. A source's
+    status flipping does; so does a stale heartbeat, so the per-source times in status.json never go more than HEARTBEAT_HOURS old."""
     keys = ("status", "errors", "narrative_pending")
-    return any((existing or {}).get(key) != new[key] for key in keys)
+    if any((existing or {}).get(key) != new[key] for key in keys):
+        return True
+    old_sources = {name: entry["status"] for name, entry in (existing or {}).get("sources", {}).items()}
+    if old_sources != {name: entry["status"] for name, entry in new.get("sources", {}).items()}:
+        return True
+    last = story_lifecycle.parse_iso((existing or {}).get("last_attempt_at"))
+    current = story_lifecycle.parse_iso(new["last_attempt_at"])
+    return bool(new.get("sources") and (last is None or (current - last).total_seconds() >= HEARTBEAT_HOURS * 3600))
 
 
 def write_local(files, out_dir):
@@ -102,8 +142,9 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
     if day and story_lifecycle.fingerprint(day) != story_lifecycle.fingerprint(existing_day):
         files[day_path] = day
         files[briefing_store.latest_path()] = day
-    new_status = status_payload(collection_error, report, now)
-    if status_changed(read(briefing_store.status_path()), new_status):
+    existing_status = read(briefing_store.status_path())
+    new_status = status_payload(collection_error, report, now, collected, existing_status)
+    if status_changed(existing_status, new_status):
         files[briefing_store.status_path()] = new_status
     return files, report
 
