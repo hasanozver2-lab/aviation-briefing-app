@@ -31,6 +31,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          ALERT_FEEDS: ${{ secrets.ALERT_FEEDS }}
           BRIEFING_STORE: github
           MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
         run: python scripts/run_pipeline.py

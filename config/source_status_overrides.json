@@ -38,6 +38,10 @@
    "status": "disabled_blocked",
    "reason": "SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı",
    "no_retry": true
+  },
+  "Google Alerts (wire headlines)": {
+   "status": "active",
+   "reason": "Google Alerts kişisel kullanım; yayıncı başlıkları ticari katmanda yeniden değerlendirilecek"
   }
  }
 }

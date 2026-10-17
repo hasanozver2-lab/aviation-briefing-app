@@ -856,6 +856,15 @@
    "automated_reading_forbidden": false,
    "quote": "",
    "read": false
+  },
+  "Google Alerts (wire headlines)": {
+   "terms_url": "https://policies.google.com/terms",
+   "commercial_use_risk": "high",
+   "summary": "Google Alerts kişisel kullanım; yayıncı başlıkları ticari katmanda yeniden değerlendirilecek",
+   "robots": "Not applicable: the subscriber's own alert feeds are read once per daily run; no publisher page is fetched.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
   }
  }
 }

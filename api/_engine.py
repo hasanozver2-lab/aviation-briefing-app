@@ -29,6 +29,7 @@ try:
     from . import language
     from . import feed_discovery
     from . import feed_sources
+    from . import alert_feeds
     from . import safety_context
     from . import source_catalog
     from .urls import canonicalize_url
@@ -41,6 +42,7 @@ except ImportError:
     import language
     import feed_discovery
     import feed_sources
+    import alert_feeds
     import safety_context
     import source_catalog
     from urls import canonicalize_url
@@ -590,7 +592,7 @@ def _fetch_source_articles(source, cutoff, headers):
 def _read_catalog_feeds(cutoff, report, entity_index_factory=None, recovered=None):
     """Catalog sources read through their discovered feeds: hosts in parallel, the sources of one host strictly in turn."""
     rows = source_catalog.read_rows()
-    handled = {source["name"] for source in get_builtin_source_records()}
+    handled = {source["name"] for source in get_builtin_source_records()} | {alert_feeds.SOURCE_NAME}    # alerts have their own reader
     recovered = recovered or {}
     sources = feed_sources.catalog_feed_sources(rows, handled)
     discovered = feed_sources.load_discovered()
@@ -687,6 +689,8 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
                     print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
 
     articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv, recovered=recovered))
+    alert_articles, report[alert_feeds.SOURCE_NAME] = alert_feeds.collect(_env_value(alert_feeds.ENV_NAME), utc_now(), cutoff, entity_index_factory=entities.EntityIndex.from_csv)
+    articles.extend(alert_articles)
     articles.sort(key=lambda article: article.get("timestamp", 0), reverse=True)
     seen_links = set()
     unique_articles = []
@@ -698,7 +702,7 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
         unique_articles.append(article)
     day_ago = (utc_now() - timedelta(hours=24)).timestamp()
     for article in unique_articles:
-        entry = report.setdefault(article["source"], {"status": "active", "error": "", "articles": 0})
+        entry = report.setdefault(alert_feeds.SOURCE_NAME if article.get("via_alert") else article["source"], {"status": "active", "error": "", "articles": 0})
         entry["articles_24h"] = entry.get("articles_24h", 0) + (1 if article.get("timestamp", 0) >= day_ago else 0)
     return unique_articles
 
