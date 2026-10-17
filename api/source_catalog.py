@@ -96,8 +96,8 @@ def legacy_defaults(row, types):
         "official": "true" if notes.get("official") else "false",
         "mode": "full",
         "timeout_s": str(FEED_TIMEOUT_SECONDS if is_rss else DEFAULT_TIMEOUT_SECONDS),
-        "status": STATUS_ACTIVE if row.get("active") == "1" else "excluded_policy",
-        "reason": "",
+        "status": STATUS_ACTIVE if row.get("active") == "1" else "no_extractable_feed",
+        "reason": "" if row.get("active") == "1" else "not probed yet",
         "commercial_use_risk": "",
     }
 
@@ -161,8 +161,6 @@ def merge_expansion(rows, expansion, types=None):
         row["notes"] = json.dumps(notes, ensure_ascii=False, sort_keys=True)
         row["source_type"] = entry["source_type"]
         row["mode"] = entry["mode"]
-        if row.get("active") != "1" and row.get("status") not in types["statuses"][:1] + ["disabled_blocked", "no_public_feed", "no_extractable_feed"]:
-            row["status"], row["reason"] = "no_extractable_feed", "not probed yet"
         if row.get("license_status") == "paid":
             row["license_status"] = "public"      # only the publisher's public feed is used, never a licensed API
         row["official"] = "true" if types["types"][entry["source_type"]]["official"] else "false"
