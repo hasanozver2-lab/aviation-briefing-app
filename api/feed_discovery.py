@@ -1,0 +1,455 @@
+"""Polite discovery and reading of publishers' PUBLIC feeds.
+
+Rules this module enforces for every source:
+* one honest User-Agent, no cookies, no login, no browser impersonation, no proxy, no paywall workaround;
+* robots.txt is read once per host and obeyed (a disallowed path is never requested);
+* requests to one host are sequential with a pause between them; a discovery takes at most
+  MAX_REQUESTS_PER_DISCOVERY requests; different hosts may run in parallel (the caller groups by host);
+* only headline, link, publication time and the short feed summary are read - article pages are never fetched.
+
+A feed counts as verified only when it is valid XML (or a sitemap / JSON-LD / dated-link list) with at least one item,
+a title, a link and a date on every item, and at least one item from the last 90 days.
+"""
+
+import html as html_lib
+import json
+import re
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+import xml.etree.ElementTree as ET
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
+from urllib.robotparser import RobotFileParser
+
+USER_AGENT = "aviation-briefing-app (github.com/hasanozver2-lab/aviation-briefing-app)"
+MAX_REQUESTS_PER_DISCOVERY = 14
+SAME_HOST_GAP_SECONDS = 1.0
+VALID_WINDOW_DAYS = 90
+MAX_BODY_BYTES = 3_000_000
+KNOWN_FEED_PATHS = ("/feed", "/feed/", "/rss", "/rss.xml", "/atom.xml")
+SITEMAP_PATHS = ("/news-sitemap.xml", "/sitemap.xml")
+METHOD_RSS, METHOD_ATOM, METHOD_SITEMAP, METHOD_JSONLD, METHOD_HTML = "rss", "atom", "sitemap", "jsonld", "html"
+NEWS_SITEMAP_NS = "http://www.google.com/schemas/sitemap-news/0.9"
+
+STATUS_FOUND = "found"
+STATUS_NO_FEED = "no_extractable_feed"
+STATUS_BLOCKED = "disabled_blocked"
+STATUS_ROBOTS = "excluded_policy"
+
+
+@dataclass
+class Response:
+    status: int = 0
+    body: bytes = b""
+    headers: dict = field(default_factory=dict)
+    final_url: str = ""
+    seconds: float = 0.0
+    error: str = ""
+
+
+@dataclass
+class Item:
+    title: str
+    link: str
+    published: datetime = None
+    summary: str = ""
+
+
+@dataclass
+class DiscoveryResult:
+    status: str
+    feed_url: str = ""
+    method: str = ""
+    item_count_90d: int = 0
+    items: list = field(default_factory=list)
+    http_code: int = 0
+    seconds: float = 0.0
+    requests: int = 0
+    reason: str = ""
+
+
+def utc_now():
+    return datetime.now(timezone.utc)
+
+
+def urllib_fetch(url, headers, timeout):
+    """The default transport: plain urllib with the project's headers only (no cookie jar, no proxy configuration of ours)."""
+    started = time.monotonic()
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as reply:
+            body = reply.read(MAX_BODY_BYTES)
+            return Response(reply.status, body, dict(reply.headers), reply.geturl(), time.monotonic() - started)
+    except urllib.error.HTTPError as exc:
+        return Response(exc.code, b"", dict(exc.headers or {}), url, time.monotonic() - started, f"HTTPError {exc.code}")
+    except Exception as exc:  # timeouts, resets, DNS: the name is what the report needs
+        return Response(0, b"", {}, url, time.monotonic() - started, type(exc).__name__)
+
+
+class PoliteFetcher:
+    """Sequential, throttled, robots-aware reader for ONE host at a time (callers run hosts in parallel, never one host twice)."""
+
+    def __init__(self, fetch=urllib_fetch, timeout=10, gap_seconds=SAME_HOST_GAP_SECONDS, sleep=time.sleep, validators=None):
+        self.fetch, self.timeout, self.gap, self.sleep = fetch, timeout, gap_seconds, sleep
+        self.validators = validators if validators is not None else {}     # url -> {"etag", "last_modified"} kept in memory for the run
+        self.requests = 0
+        self._last_request_at = {}
+        self._robots = {}
+
+    def headers(self, url, conditional=True):
+        headers = {"User-Agent": USER_AGENT, "Accept": "application/rss+xml, application/atom+xml, application/xml;q=0.9, text/html;q=0.8, */*;q=0.5"}
+        known = self.validators.get(url) if conditional else None
+        if known:
+            if known.get("etag"):
+                headers["If-None-Match"] = known["etag"]
+            if known.get("last_modified"):
+                headers["If-Modified-Since"] = known["last_modified"]
+        return headers
+
+    def get(self, url, conditional=False):
+        host = urllib.parse.urlparse(url).hostname or ""
+        wait = self.gap - (time.monotonic() - self._last_request_at.get(host, -1e9))
+        if wait > 0:
+            self.sleep(wait)
+        self._last_request_at[host] = time.monotonic()
+        self.requests += 1
+        response = self.fetch(url, self.headers(url, conditional), self.timeout)
+        self._last_request_at[host] = time.monotonic()
+        if response.status == 200:
+            self.validators[url] = {"etag": response.headers.get("ETag", ""), "last_modified": response.headers.get("Last-Modified", "")}
+        return response
+
+    def robots_for(self, url):
+        parsed = urllib.parse.urlparse(url)
+        origin = f"{parsed.scheme}://{parsed.netloc}"
+        if origin not in self._robots:
+            response = self.get(f"{origin}/robots.txt")
+            parser = RobotFileParser()
+            sitemaps = []
+            if response.status == 200:
+                lines = response.body.decode("utf-8", errors="replace").splitlines()
+                parser.parse(lines)
+                sitemaps = [line.split(":", 1)[1].strip() for line in lines if line.lower().startswith("sitemap:")]
+                self._robots[origin] = (parser, sitemaps, "read")
+            else:
+                parser.parse([])      # 4xx: no restrictions (RFC 9309); unreachable: nothing to obey, noted in the report
+                self._robots[origin] = (parser, sitemaps, f"robots.txt {response.status or response.error}")
+        return self._robots[origin]
+
+    def allowed(self, url):
+        parser, _, _ = self.robots_for(url)
+        return parser.can_fetch(USER_AGENT, url)
+
+    def robots_note(self, url):
+        return self.robots_for(url)[2]
+
+    def sitemaps(self, url):
+        return self.robots_for(url)[1]
+
+
+# ------------------------------------------------------------------------------------------------ parsing
+
+def parse_datetime(value):
+    if not value:
+        return None
+    text = str(value).strip()
+    try:
+        parsed = parsedate_to_datetime(text)
+    except (TypeError, ValueError, IndexError, OverflowError):
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+def _local(tag):
+    return tag.rsplit("}", 1)[-1].lower()
+
+
+def _text(element, names):
+    for child in element:
+        if _local(child.tag) in names:
+            value = "".join(child.itertext()).strip()
+            if value:
+                return value
+    return ""
+
+
+def _link(entry):
+    link = _text(entry, {"link"})
+    if link:
+        return link
+    for child in entry:
+        if _local(child.tag) == "link" and child.attrib.get("href") and child.attrib.get("rel", "alternate") == "alternate":
+            return child.attrib["href"].strip()
+    return ""
+
+
+def clean_text(value):
+    return " ".join(html_lib.unescape(re.sub(r"<.*?>", " ", value or "")).split())
+
+
+def safe_xml_root(content):
+    """Parse feed XML; documents declaring entities are refused (entity-expansion attacks)."""
+    if b"<!ENTITY" in content[:5000].upper() or b"<!DOCTYPE" in content[:200].upper() and b"[" in content[:2000]:
+        raise ValueError("DTD with entities refused")
+    return ET.fromstring(content)
+
+
+def parse_feed(content):
+    """(method, items) for RSS 2.0, RSS 1.0 (RDF) and Atom; raises ValueError for anything else."""
+    root = safe_xml_root(content)
+    name = _local(root.tag)
+    if name == "rss":
+        channel = next((child for child in root if _local(child.tag) == "channel"), None)
+        entries = [child for child in (channel if channel is not None else []) if _local(child.tag) == "item"]
+        method = METHOD_RSS
+    elif name == "feed":
+        entries, method = [child for child in root if _local(child.tag) == "entry"], METHOD_ATOM
+    elif name == "rdf":
+        entries, method = [child for child in root if _local(child.tag) == "item"], METHOD_RSS
+    else:
+        raise ValueError(f"not a feed: <{name}>")
+    items = [Item(clean_text(_text(entry, {"title"})), _link(entry), parse_datetime(_text(entry, {"pubdate", "published", "updated", "date", "issued"})),
+                  clean_text(_text(entry, {"description", "summary", "content"}))) for entry in entries]
+    return method, items
+
+
+def parse_sitemap(content):
+    """('index', [sitemap urls]) or ('urlset', [Item]). A plain sitemap has no titles, so only news sitemaps yield usable items."""
+    root = safe_xml_root(content)
+    if _local(root.tag) == "sitemapindex":
+        return "index", [_text(child, {"loc"}) for child in root if _local(child.tag) == "sitemap"]
+    items = []
+    for url in (child for child in root if _local(child.tag) == "url"):
+        news = next((child for child in url if _local(child.tag) == "news"), None)
+        title = clean_text(_text(news, {"title"})) if news is not None else ""
+        published = parse_datetime(_text(news, {"publication_date"}) if news is not None else "") or parse_datetime(_text(url, {"lastmod"}))
+        items.append(Item(title, _text(url, {"loc"}), published))
+    return "urlset", items
+
+
+JSONLD_PATTERN = re.compile(r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', re.IGNORECASE | re.DOTALL)
+ARTICLE_TYPES = {"newsarticle", "article", "blogposting", "reportage", "analysisnewsarticle"}
+
+
+def _walk_jsonld(node, out):
+    if isinstance(node, list):
+        for child in node:
+            _walk_jsonld(child, out)
+    elif isinstance(node, dict):
+        kinds = node.get("@type")
+        kinds = [kinds] if isinstance(kinds, str) else (kinds or [])
+        if any(str(kind).lower() in ARTICLE_TYPES for kind in kinds):
+            out.append(Item(clean_text(node.get("headline") or node.get("name") or ""), str(node.get("url") or (node.get("mainEntityOfPage") if isinstance(node.get("mainEntityOfPage"), str) else "") or ""),
+                            parse_datetime(node.get("datePublished") or node.get("dateCreated"))))
+        for key in ("itemListElement", "@graph", "item", "mainEntity", "hasPart"):
+            if key in node:
+                _walk_jsonld(node[key], out)
+
+
+def parse_jsonld(page):
+    items = []
+    for block in JSONLD_PATTERN.findall(page):
+        try:
+            _walk_jsonld(json.loads(html_lib.unescape(block.strip())), items)
+        except ValueError:
+            continue
+    return items
+
+
+ANCHOR_PATTERN = re.compile(r"<a\b([^>]*)>(.*?)</a\s*>", re.IGNORECASE | re.DOTALL)
+TIME_PATTERN = re.compile(r'<time\b[^>]*datetime=["\']([^"\']+)["\']', re.IGNORECASE)
+MIN_LINK_TEXT = 20
+
+
+def parse_dated_links(page, base_url):
+    """Anchors with a readable title that sit next to a <time datetime> element (a dated list of news links)."""
+    items = []
+    for match in ANCHOR_PATTERN.finditer(page):
+        href = re.search(r'href=["\']([^"\']+)["\']', match.group(1))
+        title = clean_text(match.group(2))
+        if not href or len(title) < MIN_LINK_TEXT or href.group(1).startswith(("#", "mailto:", "javascript:")):
+            continue
+        window = page[max(0, match.start() - 400): match.end() + 400]
+        stamp = TIME_PATTERN.search(window)
+        if stamp:
+            items.append(Item(title, urllib.parse.urljoin(base_url, href.group(1)), parse_datetime(stamp.group(1))))
+    return items
+
+
+ALTERNATE_PATTERN = re.compile(r"<link\b[^>]*>", re.IGNORECASE)
+
+
+def alternate_feed_links(page, base_url):
+    """link rel=alternate type=application/rss+xml|atom+xml targets, in page order."""
+    found = []
+    for tag in ALTERNATE_PATTERN.findall(page):
+        if re.search(r'rel=["\']alternate["\']', tag, re.IGNORECASE) and re.search(r'type=["\']application/(rss|atom)\+xml["\']', tag, re.IGNORECASE):
+            href = re.search(r'href=["\']([^"\']+)["\']', tag)
+            if href:
+                found.append(urllib.parse.urljoin(base_url, html_lib.unescape(href.group(1))))
+    return list(dict.fromkeys(found))
+
+
+RSS_PAGE_HINT = re.compile(r'href=["\']([^"\']*(?:rss|feeds?)(?:[/.\-_][^"\']*)?)["\']', re.IGNORECASE)
+
+
+def official_rss_page_links(page, base_url):
+    """Links to the publisher's own RSS/feeds page (not the feeds themselves), e.g. /rss-subscription."""
+    links = [urllib.parse.urljoin(base_url, html_lib.unescape(href)) for href in RSS_PAGE_HINT.findall(page)]
+    return list(dict.fromkeys(link for link in links if not link.lower().endswith((".png", ".jpg", ".svg", ".css", ".js"))))[:2]
+
+
+# ------------------------------------------------------------------------------------------------ validation
+
+def validate_items(items, now=None, window_days=VALID_WINDOW_DAYS):
+    """(is_valid, item_count_in_window, reason). Every item needs title, link and date; one item must be recent."""
+    now = now or utc_now()
+    if not items:
+        return False, 0, "no items"
+    incomplete = [item for item in items if not (item.title and item.link and item.published)]
+    if incomplete:
+        return False, 0, f"{len(incomplete)} of {len(items)} items lack title, link or date"
+    recent = sum(1 for item in items if now - item.published <= timedelta(days=window_days))
+    return (recent >= 1), recent, "" if recent else f"no item in the last {window_days} days"
+
+
+# ------------------------------------------------------------------------------------------------ discovery
+
+def items_from_url(fetcher, url, method_hint=None):
+    """Fetch one candidate address and read it as a feed, news sitemap, JSON-LD list or dated links. Returns (method, items, response)."""
+    response = fetcher.get(url)
+    if response.status != 200:
+        return None, [], response
+    body = response.body
+    head = body[:600].lstrip().lower()
+    try:
+        if b"<rss" in head or b"<feed" in head or b"<rdf:rdf" in head or (head.startswith(b"<?xml") and b"<urlset" not in body[:3000] and b"<sitemapindex" not in body[:3000]):
+            method, items = parse_feed(body)
+            return method, items, response
+        if b"<urlset" in body[:3000] or b"<sitemapindex" in body[:3000]:
+            kind, items = parse_sitemap(body)
+            return (METHOD_SITEMAP, items, response) if kind == "urlset" else ("sitemap_index", items, response)
+    except (ET.ParseError, ValueError):
+        return None, [], response
+    page = body.decode("utf-8", errors="replace")
+    jsonld = parse_jsonld(page)
+    if jsonld:
+        return METHOD_JSONLD, jsonld, response
+    return METHOD_HTML, parse_dated_links(page, response.final_url or url), response
+
+
+def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, explicit_feed_url=None):
+    """Find a verified public feed for a publisher. `urls` are the page addresses to start from; the order is the preference.
+
+    Result precedence: a verified feed wins; otherwise "blocked" if the site refused us (401/403/429/timeout) on the way;
+    otherwise "excluded_policy" if robots.txt forbade every page we were asked to read or a feed the page itself advertises;
+    otherwise "no_extractable_feed".
+    """
+    now = now or utc_now()
+    started = fetcher.requests
+    state = {"blocked": None, "robots": None, "last": Response()}
+    path_of = lambda url: urllib.parse.urlparse(url).path or "/"
+
+    def spent():
+        return fetcher.requests - started
+
+    def found(outcome):
+        outcome.requests = spent()
+        return outcome
+
+    def robots_reason(url):
+        return f"robots.txt disallows {path_of(url)} for {USER_AGENT.split()[0]}"
+
+    def try_candidate(url, advertised):
+        """Read one candidate as a feed/sitemap. Only candidates the publisher itself points to count as a robots exclusion."""
+        if spent() >= max_requests:
+            return None
+        if not fetcher.allowed(url):
+            if advertised:
+                state["robots"] = state["robots"] or robots_reason(url)
+            return None
+        method, items, response = items_from_url(fetcher, url)
+        state["last"] = response
+        if method == "sitemap_index":
+            method = None
+            for child in items[:2]:
+                if spent() >= max_requests or not fetcher.allowed(child):
+                    break
+                child_method, child_items, response = items_from_url(fetcher, child)
+                if child_method == METHOD_SITEMAP:
+                    method, items = child_method, child_items
+                    break
+        if method is None:
+            return None
+        ok, recent, _ = validate_items(items, now)
+        return found(DiscoveryResult(STATUS_FOUND, url, method, recent, items, response.status, response.seconds)) if ok else None
+
+    pages = list(dict.fromkeys(urls))
+    pages_html, advertised, guessed = {}, [explicit_feed_url] if explicit_feed_url else [], []
+    disallowed_pages = 0
+    for page_url in pages:
+        origin = "{0.scheme}://{0.netloc}".format(urllib.parse.urlparse(page_url))
+        guessed += [origin + path for path in KNOWN_FEED_PATHS]
+        if not fetcher.allowed(page_url):
+            disallowed_pages += 1
+            state["robots"] = state["robots"] or robots_reason(page_url)
+            continue
+        if spent() >= max_requests:
+            break
+        response = fetcher.get(page_url)
+        state["last"] = response
+        if response.status in (401, 403, 429) or (response.status == 0 and response.error):
+            state["blocked"] = DiscoveryResult(STATUS_BLOCKED, http_code=response.status, seconds=response.seconds,
+                                               reason=f"{response.error or response.status} on {path_of(page_url)}")
+        elif response.status == 200:
+            pages_html[page_url] = response.body.decode("utf-8", errors="replace")
+            advertised += alternate_feed_links(pages_html[page_url], response.final_url or page_url)
+    all_pages_disallowed = bool(pages) and disallowed_pages == len(pages)
+    seen = set()
+    for url, is_advertised in [(u, True) for u in advertised] + [(u, False) for u in guessed]:
+        if url in seen or all_pages_disallowed:
+            continue
+        seen.add(url)
+        outcome = try_candidate(url, is_advertised)
+        if outcome:
+            return outcome
+    for page_url, page in pages_html.items():
+        for rss_page in official_rss_page_links(page, page_url):
+            if rss_page in seen or spent() >= max_requests or not fetcher.allowed(rss_page):
+                continue
+            seen.add(rss_page)
+            rss_response = fetcher.get(rss_page)
+            if rss_response.status == 200:
+                for feed_url in alternate_feed_links(rss_response.body.decode("utf-8", errors="replace"), rss_page)[:3]:
+                    outcome = try_candidate(feed_url, True)
+                    if outcome:
+                        return outcome
+    first = pages[0] if pages and not all_pages_disallowed else ""
+    sitemap_urls = []
+    if first:
+        origin = "{0.scheme}://{0.netloc}".format(urllib.parse.urlparse(first))
+        sitemap_urls = fetcher.sitemaps(first)[:2] + [origin + path for path in SITEMAP_PATHS]
+    for url in dict.fromkeys(sitemap_urls):
+        if url in seen:
+            continue
+        seen.add(url)
+        outcome = try_candidate(url, False)
+        if outcome:
+            return outcome
+    for page_url, page in pages_html.items():
+        for method, items in ((METHOD_JSONLD, parse_jsonld(page)), (METHOD_HTML, parse_dated_links(page, page_url))):
+            ok, recent, _ = validate_items(items, now)
+            if ok:
+                return found(DiscoveryResult(STATUS_FOUND, page_url, method, recent, items, 200, state["last"].seconds))
+    if state["blocked"] and not pages_html:
+        return found(state["blocked"])
+    if state["robots"]:
+        return found(DiscoveryResult(STATUS_ROBOTS, reason=state["robots"], http_code=state["last"].status))
+    return found(DiscoveryResult(STATUS_NO_FEED, http_code=state["last"].status, seconds=state["last"].seconds,
+                                 reason="no feed, news sitemap, JSON-LD or dated links found"))
