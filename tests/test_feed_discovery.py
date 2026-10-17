@@ -222,3 +222,54 @@ def test_the_preferred_url_is_tried_first_and_the_second_url_is_a_fallback():
     result = run(site, urls=("https://pub.example/airlines", "https://pub.example/"))
     assert result.status == fd.STATUS_FOUND
     assert site.urls.index("https://pub.example/airlines") < site.urls.index("https://pub.example/")
+
+
+# --- robots.txt wildcards (the standard library parser ignores them) -------------------------------------------------------
+
+def rules(*lines):
+    return fd.RobotsRules(lines)
+
+
+@pytest.mark.parametrize("lines, url, allowed", [
+    (["User-agent: *", "Disallow: */feed"], "https://s.example/feed", False),                    # PROS
+    (["User-agent: *", "Disallow: */feed"], "https://s.example/blog/feed", False),
+    (["User-agent: *", "Disallow: */feed"], "https://s.example/news", True),
+    (["User-agent: *", "Disallow: /*.rss"], "https://s.example/hub/aviation.rss", False),         # AP
+    (["User-agent: *", "Disallow: /*.rss"], "https://s.example/hub/aviation", True),
+    (["User-agent: *", "Disallow: */feed*"], "https://s.example/en/feed.xml", False),             # Pegasus
+    (["User-agent: *", "Disallow: /"], "https://s.example/anything", False),                      # WSJ, AvHerald, Yahoo feeds
+    (["User-agent: *", "Disallow:"], "https://s.example/anything", True),
+    (["User-agent: *", "Disallow: /*?"], "https://s.example/page?x=1", False),                    # Air France
+    (["User-agent: *", "Disallow: /*?"], "https://s.example/page", True),
+    (["User-agent: *", "Disallow: /news$"], "https://s.example/news", False),
+    (["User-agent: *", "Disallow: /news$"], "https://s.example/news/today", True),
+])
+def test_robots_wildcards(lines, url, allowed):
+    assert rules(*lines).can_fetch(fd.ROBOTS_TOKEN, url) is allowed
+
+
+def test_the_longest_matching_rule_wins_and_allow_wins_a_tie():
+    r = rules("User-agent: *", "Disallow: /news", "Allow: /news/public")
+    assert r.can_fetch(fd.ROBOTS_TOKEN, "https://s.example/news/public/a") and not r.can_fetch(fd.ROBOTS_TOKEN, "https://s.example/news/private")
+    assert rules("User-agent: *", "Disallow: /a", "Allow: /a").can_fetch(fd.ROBOTS_TOKEN, "https://s.example/a")
+
+
+def test_a_group_naming_this_bot_beats_the_generic_group():
+    r = rules("User-agent: *", "Disallow: /", "", "User-agent: aviation-briefing-app", "Disallow: /private")
+    assert r.can_fetch(fd.ROBOTS_TOKEN, "https://s.example/news") and not r.can_fetch(fd.ROBOTS_TOKEN, "https://s.example/private/x")
+    assert not r.can_fetch("someotherbot", "https://s.example/news")
+
+
+def test_other_bots_groups_do_not_apply_to_us():
+    assert rules("User-agent: GPTBot", "Disallow: /").can_fetch(fd.ROBOTS_TOKEN, "https://s.example/feed")
+
+
+def test_consecutive_user_agent_lines_share_one_group():
+    r = rules("User-agent: gptbot", "User-agent: *", "Disallow: /x")
+    assert not r.can_fetch(fd.ROBOTS_TOKEN, "https://s.example/x")
+
+
+def test_the_fetcher_uses_the_wildcard_rules():
+    site = Site({"https://pub.example/robots.txt": (200, "User-agent: *\nDisallow: */feed"), "https://pub.example/": (200, "<html></html>")})
+    fetcher = fetcher_for(site)
+    assert not fetcher.allowed("https://pub.example/feed") and fetcher.allowed("https://pub.example/news")

@@ -22,9 +22,9 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
-from urllib.robotparser import RobotFileParser
 
 USER_AGENT = "aviation-briefing-app (github.com/hasanozver2-lab/aviation-briefing-app)"
+ROBOTS_TOKEN = "aviation-briefing-app"
 MAX_REQUESTS_PER_DISCOVERY = 14
 SAME_HOST_GAP_SECONDS = 1.0
 VALID_WINDOW_DAYS = 90
@@ -89,6 +89,54 @@ def urllib_fetch(url, headers, timeout):
         return Response(0, b"", {}, url, time.monotonic() - started, type(exc).__name__)
 
 
+class RobotsRules:
+    """robots.txt per RFC 9309: user-agent groups, Allow/Disallow with * and $ wildcards, the longest matching rule wins
+    (Allow wins a tie). The standard library parser ignores wildcards, so "Disallow: */feed" would never match there."""
+
+    def __init__(self, lines=()):
+        self.groups = []                       # [(set of lower-case agent tokens, [(allow, pattern)])]
+        agents, rules, in_rules = set(), [], False
+        for raw in lines:
+            line = raw.split("#", 1)[0].strip()
+            if ":" not in line:
+                continue
+            field, value = (part.strip() for part in line.split(":", 1))
+            field = field.lower()
+            if field == "user-agent":
+                if in_rules:
+                    self.groups.append((agents, rules))
+                    agents, rules, in_rules = set(), [], False
+                agents.add(value.lower())
+            elif field in ("allow", "disallow"):
+                in_rules = True
+                if value:
+                    rules.append((field == "allow", value))
+        if agents:
+            self.groups.append((agents, rules))
+
+    def rules_for(self, token):
+        token = token.lower()
+        specific = [rules for agents, rules in self.groups if any(agent and agent in token for agent in agents if agent != "*")]
+        generic = [rules for agents, rules in self.groups if "*" in agents]
+        return [rule for group in (specific or generic) for rule in group]
+
+    @staticmethod
+    def _matches(pattern, target):
+        regex = "".join(".*" if char == "*" else re.escape(char) for char in pattern.rstrip("$"))
+        return re.match(regex + ("$" if pattern.endswith("$") else ""), target) is not None
+
+    def can_fetch(self, token, url):
+        parsed = urllib.parse.urlparse(url)
+        target = (parsed.path or "/") + (f"?{parsed.query}" if parsed.query else "")
+        best = None                            # (pattern length, allow)
+        for allow, pattern in self.rules_for(token):
+            if self._matches(pattern, target):
+                candidate = (len(pattern), allow)
+                if best is None or candidate[0] > best[0] or (candidate[0] == best[0] and allow):
+                    best = candidate
+        return True if best is None else best[1]
+
+
 class PoliteFetcher:
     """Sequential, throttled, robots-aware reader for ONE host at a time (callers run hosts in parallel, never one host twice)."""
 
@@ -127,21 +175,19 @@ class PoliteFetcher:
         origin = f"{parsed.scheme}://{parsed.netloc}"
         if origin not in self._robots:
             response = self.get(f"{origin}/robots.txt")
-            parser = RobotFileParser()
             sitemaps = []
             if response.status == 200:
                 lines = response.body.decode("utf-8", errors="replace").splitlines()
-                parser.parse(lines)
                 sitemaps = [line.split(":", 1)[1].strip() for line in lines if line.lower().startswith("sitemap:")]
-                self._robots[origin] = (parser, sitemaps, "read")
+                self._robots[origin] = (RobotsRules(lines), sitemaps, "read")
             else:
-                parser.parse([])      # 4xx: no restrictions (RFC 9309); unreachable: nothing to obey, noted in the report
-                self._robots[origin] = (parser, sitemaps, f"robots.txt {response.status or response.error}")
+                # 4xx: no restrictions (RFC 9309); unreachable: nothing to obey, noted in the report
+                self._robots[origin] = (RobotsRules(), sitemaps, f"robots.txt {response.status or response.error}")
         return self._robots[origin]
 
     def allowed(self, url):
         parser, _, _ = self.robots_for(url)
-        return parser.can_fetch(USER_AGENT, url)
+        return parser.can_fetch(ROBOTS_TOKEN, url)
 
     def robots_note(self, url):
         return self.robots_for(url)[2]
