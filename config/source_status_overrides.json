@@ -38,6 +38,10 @@
    "status": "disabled_blocked",
    "reason": "SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı",
    "no_retry": true
+  },
+  "Singapore Airlines Newsroom": {
+   "status": "no_extractable_feed",
+   "reason": "official newsroom address returns HTTP 404 (en_UK/au, us, sg variants); page and sitemap discovery found no feed, news sitemap, JSON-LD or dated list (rechecked 2026-10-17); needs the publisher's current address"
   }
  }
 }
