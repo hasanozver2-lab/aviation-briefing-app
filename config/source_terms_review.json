@@ -1,0 +1,861 @@
+{
+ "_doc": "Terms-of-use and robots.txt review of every catalog source, made on 2026-10-17 by model-assisted web research (read=true: the terms page was read in that session; read=false: the page could not be retrieved or the finding comes from memory or a search excerpt, so treat it as UNCONFIRMED and have it checked by a person). commercial_use_risk: high = terms restrict commercial use/redistribution or automated access; medium = unclear or unreadable; low = no restriction or open reuse. The risk only records; it never deactivates a source. A source is excluded (status excluded_policy) only where robots.txt disallows our User-Agent, or, for press/data (feed_only) and exchange sources, where the terms explicitly forbid automated reading (automated_reading_forbidden with a quote).",
+ "reviewed_on": "2026-10-17",
+ "sources": {
+  "AAIB UK": {
+   "terms_url": "https://www.gov.uk/help/terms-conditions",
+   "commercial_use_risk": "low",
+   "summary": "Most GOV.UK content is Crown copyright published under Open Government Licence; 'You can reproduce content published on GOV.UK under the OGL' with attribution (some content exempt).",
+   "robots": "Allowed (only /search/all*, /*/print disallowed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "ANA Group Press Releases": {
+   "terms_url": "https://www.ana.co.jp/en/jp/guide/terms/website/",
+   "commercial_use_risk": "high",
+   "summary": "'Downloading, printing or otherwise reproducing the ANA Website is permitted only for private use'; 'may not reproduce, alter... distribute' Content without permission; no copying/quoting on other sites.",
+   "robots": "Allowed (only /amc-elite/, /amc_e/, /be/ etc. disallowed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "ANAC Brazil": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (gov.br/anac page returned only a captcha challenge; no licence text read). Government material, likely open, but unconfirmed.",
+   "robots": "gov.br robots: User-agent * disallows only specific sections/forms and search RSS (/ebserh/*search_rss$); /anac feeds not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Accelya News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (terms-of-use redirected to w3.accelya.com which returned 404; robots redirected, not read).",
+   "robots": "unreachable (redirect to w3.accelya.com not read).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "AeroTime": {
+   "terms_url": "https://www.aerotime.aero/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "Forbids 'use any software or other automated means to access and gather information in the Site without express written permission'; may not 'copy, reproduce, republish... distribute' content; only personal non-commercial use.",
+   "robots": "Allowed for * (only /wp-admin/ and /search/* disallowed); AI bots such as GPTBot/CCBot blocked.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Air Canada News Releases": {
+   "terms_url": "https://www.aircanada.com/ca/en/aco/home/legal/terms-of-use.html",
+   "commercial_use_risk": "high",
+   "summary": "'Use of the Website for any other purpose, including any commercial use or purpose, is expressly prohibited.' Bans 'automated scripts, robots, crawls, screen scrapers'; no re-dissemination of content. RSS not addressed.",
+   "robots": "robots.txt returned 404 (none).",
+   "automated_reading_forbidden": true,
+   "quote": "automated scripts, robots, crawls, screen scrapers, web bots, deep-links, indexes, spiders",
+   "read": true
+  },
+  "Air France Press Releases": {
+   "terms_url": "https://corporate.airfrance.com/en/rss-subscription",
+   "commercial_use_risk": "medium",
+   "summary": "RSS page lists press-release feed with no reuse/copyright terms in the part read (first 100k chars of 323k); legal notice URL guess returned 403. Generic copyright only.",
+   "robots": "Does not name feeds, but \"Disallow: /*?\" blocks any URL with a query string; plain feed URLs not blocked.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Air France-KLM Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (legal-notes page 403 Cloudflare). Search excerpt, not read: all reproduction rights reserved; copying site requires prior written authorization.",
+   "robots": "Allowed for feed paths (only /core/, /profiles/ etc. disallowed in portion read).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Air India Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (site unreachable/Cloudflare challenge). From search excerpt, not re-read: terms reportedly bar robot/spider/scraper access without written permission.",
+   "robots": "Unreachable.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "AirDataNews": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "No terms-of-use page found (footer has only a Privacy Policy; /terms-of-use is 404). Silent about feeds and reuse.",
+   "robots": "Allowed: User-agent * has Allow: / (feed not blocked).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Airbus Press Releases": {
+   "terms_url": "https://www.airbus.com/en/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "Users shall not '(i) modify, reproduce, represent, adapt and/or translate all or any part of the Site and/or related content; (ii) extract all or any part of the Site and/or its content'. Other rights excluded.",
+   "robots": "Unreachable (robots.txt returned bot-protection NOINDEX page).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Alaska Airlines Newsroom": {
+   "terms_url": "https://news.alaskaair.com/multimedia-usage-agreement/",
+   "commercial_use_risk": "high",
+   "summary": "Multimedia Usage Agreement (applies to media downloads): \"truthful current editorial and truthful current news reporting purposes only\"; commercial use not allowed. Silent on RSS; general site terms not read.",
+   "robots": "Allowed: User-agent * blocks only /wp-content/uploads/wpforms/; feeds not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Amadeus Newsroom": {
+   "terms_url": "https://amadeus.com/en/policies/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "'You must not use the Site in any way for your own commercial gain'; license 'for your personal, non-commercial purposes and for no other purpose'; no copying beyond personal use. Page dated Oct 2018; silent on scraping.",
+   "robots": "Allowed (Disallow empty).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "American Airlines Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (aa.com legal pages 403 / JS-rendered, no text readable).",
+   "robots": "Allowed: User-agent * Allow: / with Crawl-delay: 10.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Associated Press Aviation": {
+   "terms_url": "",
+   "commercial_use_risk": "high",
+   "summary": "Terms page returned 403 (not read). From memory, not re-read: AP prohibits scraping and commercial reuse without licence; AP content is licensed. robots.txt blocks /*.rss and /api/v2/feed/.",
+   "robots": "Disallows feed paths: 'Disallow: /*.rss' and '/api/v2/feed/'.",
+   "automated_reading_forbidden": true,
+   "quote": "Disallow: /*.rss",
+   "read": false
+  },
+  "AvHerald": {
+   "terms_url": "https://avherald.com/",
+   "commercial_use_risk": "high",
+   "summary": "Footer: 'all rights reserved, reproduction, redistribution and AI learning/use prohibited.' No terms page found.",
+   "robots": "Disallows all paths for generic agents (User-agent: * Disallow: /); only named search bots allowed.",
+   "automated_reading_forbidden": true,
+   "quote": "User-agent: * Disallow: /",
+   "read": true
+  },
+  "Aviation Week": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (guessed Informa/AviationWeek terms URLs returned 404). Paywalled Informa publication; likely restrictive but unread.",
+   "robots": "No feed rules; User-agent * blocks only admin/search/core paths; feeds not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Aviation24": {
+   "terms_url": "https://www.aviation24.be/copyright-information/",
+   "commercial_use_risk": "medium",
+   "summary": "Only a copyright/attribution page (seen via search snippet; direct fetch 403): asks to credit and link when quoting articles. No formal ToS or feed/commercial clause found.",
+   "robots": "Allowed: User-agent * only blocks /wp-admin/; /feed not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "BEA News": {
+   "terms_url": "https://www.bea.aero/en/legal-notice/",
+   "commercial_use_risk": "high",
+   "summary": "Non-commercial reuse allowed with source/date; 'Les informations ne peuvent etre utilisees a des fins commerciales ou promotionnelles' without a licence; a product/service offered to third parties counts as commercial.",
+   "robots": "Reachable but no robots.txt content returned; no disallow observed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Bloomberg Aviation": {
+   "terms_url": "https://www.bloomberg.com/notices/tos/",
+   "commercial_use_risk": "high",
+   "summary": "'solely for your own noncommercial use'; no copying/redistribution; may not use any 'scraper,' 'robot,' 'bot,' 'spider' ... to access, acquire, copy, or monitor the Service.",
+   "robots": "Generic agents not blocked from feed paths in rules seen (disallows /account, /search, /press-releases, etc.).",
+   "automated_reading_forbidden": true,
+   "quote": "You shall not use or attempt to use any scraper, robot, bot, spider, data mining, computer code, or any other automate device",
+   "read": true
+  },
+  "Boeing News Releases": {
+   "terms_url": "https://www.boeing.com/terms-of-submission-and-privacy-policy/site-terms",
+   "commercial_use_risk": "high",
+   "summary": "'limited license to make personal use only'; excludes 'any resale or commercial use'; no 'data mining, robots, or similar data gathering'; materials only for 'personal, non-commercial, and informational use'.",
+   "robots": "boeing.mediaroom.com/robots.txt returned 404, so nothing disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Bombardier News": {
+   "terms_url": "https://bombardier.com/en/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "Site \"may be used by you only for personal, non-commercial purposes\"; materials may not be \"redistributed, broadcast, published, copied\" without prior written consent. Scraping not mentioned.",
+   "robots": "Allowed: generic UA blocks only core/profiles/README/admin-type paths, not feeds.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "CAAC News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "No terms page found/read; /en/ redirects to /English/. No copyright statement retrieved.",
+   "robots": "robots.txt lists specific bots (Sogou, Slurp, MSNBot, etc.) disallowed; generic * rule not seen in portion read.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "CAPA Centre for Aviation": {
+   "terms_url": "https://centreforaviation.com/about/terms-and-conditions",
+   "commercial_use_risk": "medium",
+   "summary": "Page read is the paid-customer licence contract (no copying/reselling Licensed Products; no AI use). Public-site terms (Informa) not read. RSS offered at rss.centreforaviation.com.",
+   "robots": "Allowed (User-agent: * with no disallow).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "CNBC Airlines": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (cnbc.com terms and robots.txt returned 403). From memory, not re-read: NBCUniversal terms are non-commercial/no-scraping; likely high, verify.",
+   "robots": "unreachable (403).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Cathay Pacific Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Newsroom page has no terms/copyright link or reuse wording (only privacy policy); /terms is 404. Silent about feeds.",
+   "robots": "Allowed: only disallows /subscribe/* and /unsubscribe.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "China Travel News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (site TLS certificate expired; robots and homepage failed).",
+   "robots": "unreachable (certificate expired).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Cirium Thought Cloud": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable: site returns a bot-protection (Incapsula) challenge page; terms URL guesses empty/404.",
+   "robots": "Unreachable (bot-protection challenge page instead of robots.txt).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Copa Holdings News Releases": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (ir.copaair.com returned 403 Access Denied, incl. robots.txt).",
+   "robots": "Unreachable (403).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "DGCA India": {
+   "terms_url": "https://www.dgca.gov.in/digigov-portal/jsp/dgca/footerLink/WebsitePolicy.jsp",
+   "commercial_use_risk": "low",
+   "summary": "Copyright policy: 'Material featured on this website may be reproduced free of charge' if accurate, not misleading, source acknowledged; third-party material excluded.",
+   "robots": "No robots.txt (404), so nothing disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Delta News Hub": {
+   "terms_url": "https://www.delta.com/us/en/legal/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "Delta.com terms: access only for \"personal use for non-commercial purposes\"; bars \"crawler, indexer, robot, spider, scraper\" and \"reproduce, reuse, republish\" w/o written permission. RSS not mentioned; news.delta.com own terms 404.",
+   "robots": "news.delta.com robots: no rss/feed rules; blocks only admin/search/core paths; feed allowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "EASA News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (guessed legal-notice URLs returned 404). EU agency; reuse policy likely permissive but from memory, not re-read, so unconfirmed.",
+   "robots": "No feed rules; blocks any URL containing \"?\" but /rss.xml style paths without query string are allowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Embraer News": {
+   "terms_url": "https://www.embraer.com/terms-of-use/en/",
+   "commercial_use_risk": "high",
+   "summary": "Sec 2: site content owned by provider; \"express prohibition to copy, reproduce, download or make any other type of use thereof\", \"for commercial purposes or not\". No mention of scraping or RSS.",
+   "robots": "Allowed: User-agent * only blocks /umbraco/; feeds not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Emirates Newsroom": {
+   "terms_url": "https://www.emirates.com/us/english/information/terms-and-conditions/",
+   "commercial_use_risk": "high",
+   "summary": "'You agree to use the Website only for personal, noncommercial use.' RSS/reuse not addressed; only the visible part of terms was read.",
+   "robots": "Allowed; feed/media-centre paths not disallowed (disallows booking, session pages).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Etihad Airways News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (etihad.com timed out / connection reset on every fetch).",
+   "robots": "Unreachable (connection failed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Eurocontrol News": {
+   "terms_url": "https://www.eurocontrol.int/info/disclaimers",
+   "commercial_use_risk": "medium",
+   "summary": "Disclaimers and privacy/website-terms pages read: no wording on reuse, commercial use or scraping; only \"(c) EUROCONTROL\". Silent about feeds.",
+   "robots": "Allowed: generic UA blocks only admin/search/core paths, not feeds.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "FAA Newsroom": {
+   "terms_url": "https://www.faa.gov/web_policies/disclaimer",
+   "commercial_use_risk": "low",
+   "summary": "US federal government site; web policies/disclaimer contain no reuse or commercial restriction (only government-system unauthorized-use notice). US government work, generally public domain (general knowledge, not stated on page).",
+   "robots": "Allowed (only internal Drupal/core paths disallowed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Financial Times Aviation": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (WebFetch blocked, help.ft.com terms 404 via curl). robots.txt says all use is subject to T&C and bans AI/ML use. Likely restrictive (from memory, not re-read).",
+   "robots": "Generic UA not blocked from feeds (disallows /search, /myft, /login etc.); AI/ML use expressly prohibited in comments.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "FlightGlobal": {
+   "terms_url": "https://www.promedia.co.uk/general-terms-conditions/",
+   "commercial_use_risk": "medium",
+   "summary": "Footer links only ProMedia general T&Cs (no website-content, RSS or scraping clauses found). No RSS terms. robots.txt has 'Content-signal: ai-train=no'.",
+   "robots": "Allowed for generic agents (only /wp-admin, /wp-json disallowed); many AI bots blocked; /rss not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Flightradar24": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (403 on /terms-and-conditions). Search excerpt only (not read): web service limited to human browser, personal non-commercial use; API for commercial. Blog feed not addressed.",
+   "robots": "Allowed: /blog/ not disallowed for generic agents (only /mobile/, /auth/, /simple etc.).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "GE Aerospace News": {
+   "terms_url": "https://www.geaerospace.com/terms",
+   "commercial_use_risk": "high",
+   "summary": "Material only for \"personal and non-commercial use\"; other use incl. \"distribution, transmission, publication\" prohibited; use for competitive purposes banned. Scraping not named.",
+   "robots": "Allowed: generic UA blocks only admin/search/core paths, not feeds.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "HKEX News": {
+   "terms_url": "https://www.hkex.com.hk/Global/Exchange/Terms-of-Use?sc_lang=en",
+   "commercial_use_risk": "high",
+   "summary": "Personal use only; no distributing/copying without written permission; no 'systematic retrieval to create collections, compilations, databases'; no 'programmatic, scripted or other mechanical means' access (site-wide).",
+   "robots": "robots.txt returned HTML 404 page (no rules).",
+   "automated_reading_forbidden": true,
+   "quote": "use any programmatic, scripted or other mechanical means to access this Website or any Information",
+   "read": true
+  },
+  "HavaHaber": {
+   "terms_url": "https://havahaber.com/kunye/",
+   "commercial_use_risk": "medium",
+   "summary": "No terms page found; Kunye and footer carry only 'Telif Hakki 2026, Tum Haklari Saklidir' (all rights reserved). Silent on feeds/reuse.",
+   "robots": "Allowed (User-agent: * Disallow: empty).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "IAG Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "No legal notice found (/en/legal-notice 404; footer links not located). Silent about feeds and reuse.",
+   "robots": "Allowed: User-agent * with empty Disallow.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "IATA Press Room": {
+   "terms_url": "https://www.iata.org/en/terms/",
+   "commercial_use_risk": "high",
+   "summary": "Content 'for your personal use only... not intended for commercial exploitation unless expressly agreed in writing'; 'wholesale reproduction... not permitted'; no use on other websites without consent. Offers RSS /api/rss/pressrelease.",
+   "robots": "Allowed (only /en/search, /episerver, /utils etc. disallowed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "ICAO Newsroom": {
+   "terms_url": "https://www.icao.int/terms-and-conditions",
+   "commercial_use_risk": "high",
+   "summary": "Materials for \"personal, non-commercial use, without any right to resell or redistribute\"; no derivative works. Copyright notice: no use/reproduction/transmission without written permission. Scraping not mentioned.",
+   "robots": "Allowed: generic UA blocks only admin/search/core paths, not feeds.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "IndiGo Press Releases": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (goindigo.in terms and robots.txt fetches timed out).",
+   "robots": "unreachable (timeout).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Japan Airlines Press Releases": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (press.jal.co.jp and robots.txt returned 403).",
+   "robots": "unreachable (403).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "JetBlue Investor News": {
+   "terms_url": "https://ir.jetblue.com/terms-of-use/default.aspx",
+   "commercial_use_risk": "high",
+   "summary": "Site use \"only for personal, non-commercial use\"; may not \"republish, distribute\" content; robots/spiders/page-scrapers need prior written consent (8.1.5). Digital Assets excepted.",
+   "robots": "Allowed: Allow: / with Crawl-delay: 10.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "KAP Public Disclosure": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (guessed terms URLs 404; robots.txt returned non-standard error). Public company disclosure platform; reuse terms unknown.",
+   "robots": "Unreachable (robots.txt returned an error page, HTTP 666).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "KLM Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Newsroom footer has no terms/legal link; it openly promotes an RSS feed (nieuws.klm.com/rss-feed/). klm.com terms timed out. Silent on feed reuse.",
+   "robots": "Allowed: only disallows query-string patterns (/*?q=*); feed not blocked.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "LATAM Airlines Press Room": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (latamairlines.com robots.txt 403; terms not fetched).",
+   "robots": "unreachable (403).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "LATAM Investor Releases": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (ir.latam.com pages returned 403 / 404 for terms and disclaimer URLs).",
+   "robots": "Reachable; no feed-path disallow seen (partially read).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "LSE RNS": {
+   "terms_url": "https://www.lseg.com/en/policies/website-disclaimer",
+   "commercial_use_risk": "high",
+   "summary": "LSEG website terms (lseg.com; londonstockexchange.com terms not located): no copying for \"commercial gain\"; bars \"any bot, script, automation software\" and bulk download; no AI tools. [Judgement: this bars automated collection of the site, so the source is excluded; the page read was lseg.com, not londonstockexchange.com.]",
+   "robots": "Allowed: generic UA blocks only /en-gb/, /lsecws/ and two update pages; /news not blocked.",
+   "automated_reading_forbidden": true,
+   "quote": "any bot, script, automation software",
+   "read": true
+  },
+  "Lufthansa Group Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (lufthansagroup.com legal notice/disclaimer returned 403). Newsroom page openly lists 'Newsroom RSS feed' and 'RSS-Feed Press releases', suggesting intended syndication, but no reuse terms were read.",
+   "robots": "Allowed (newsroom.lufthansagroup.com: * only disallows query-string ?q= searches).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "NTSB News": {
+   "terms_url": "https://www.ntsb.gov/about/Pages/Website-Policies.aspx",
+   "commercial_use_risk": "low",
+   "summary": "US government material \"may be freely copied and, at your discretion, credited to the NTSB\"; staff content public domain; third-party copyrighted items excluded.",
+   "robots": "Allowed: disallows only SharePoint system paths (/_layouts/, /Lists/, /Search/); not feeds.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Nikkei Asia": {
+   "terms_url": "https://info.asia.nikkei.com/rss",
+   "commercial_use_risk": "high",
+   "summary": "RSS terms: feeds 'solely for ... individuals to view headlines ... within newsreaders for their personal, noncommercial use. Republication, copying or redistribution by any means is expressly prohibited.' Main ToS returned 403.",
+   "robots": "Generic agents allowed (disallows /search, /api, /cms etc.); AI crawlers blocked.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "OAG Blog": {
+   "terms_url": "https://www.oag.com/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "6.3: \"personal, non-commercial use only, unless you obtain a license for commercial purposes\"; 7.1 bars bots/crawlers/scrapers \"without our explicit written consent\"; 6.4 bans republishing; 7.2 bans genAI training. RSS not mentioned.",
+   "robots": "No feed rules; User-agent * blocks only form/preview/CTA/sample paths; feeds not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "PROS News": {
+   "terms_url": "https://s28006.pcdn.co/wp-content/uploads/2020/07/Terms-of-Use.pdf",
+   "commercial_use_risk": "high",
+   "summary": "Terms of Use PDF was unreadable (compressed). robots.txt explicitly blocks feed URLs for all agents (\"Disallow: */feed\"); legal page refers to MSA/AUP for contractual use.",
+   "robots": "Disallows feed paths: Disallow: */feed under User-agent *.",
+   "automated_reading_forbidden": true,
+   "quote": "Disallow: */feed",
+   "read": false
+  },
+  "Pegasus Press Room": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "No terms-of-use or press-room usage terms found on the press-room page (only \"© 2026, All Rights Reserved\" and privacy). No RSS/syndication statement.",
+   "robots": "flypgs.com robots has User-agent * with \"Disallow: */feed*\" (feed-path URLs blocked; no explicit /rss rule).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "PhocusWire": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (403 on site and terms URLs).",
+   "robots": "Unreachable (403).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Qantas Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (timeouts/connection reset).",
+   "robots": "Unreachable: robots.txt connection failed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Qatar Airways Official Tumblr": {
+   "terms_url": "https://www.tumblr.com/policy/en/terms-of-service",
+   "commercial_use_risk": "medium",
+   "summary": "Tumblr ToS bans scraping and access 'other than through our currently available, published interfaces' (RSS is a published interface). Content is user/brand-owned; no brand-specific terms.",
+   "robots": "Unreachable: qatarairways.tumblr.com/robots.txt returned a 403 bot challenge; tumblr.com robots.txt does not disallow /rss.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Qatar Airways Press Releases": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (qatarairways.com timed out on robots.txt and legal pages).",
+   "robots": "Unreachable (timeout).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "RTX News": {
+   "terms_url": "https://www.rtx.com/terms-of-use",
+   "commercial_use_risk": "medium",
+   "summary": "May not 'reproduce or publicly display, perform or distribute or otherwise use the site and its contents for any public or commercial purpose', but RSS offered openly (/rss-feeds/news); conflict unresolved.",
+   "robots": "Allowed (User-agent: * Allow: /).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Reuters Aviation": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (fetch tool refused reuters.com). Reuters is known to restrict reuse/scraping, but not re-read; from memory, not re-read, likely high. Needs manual check/licence.",
+   "robots": "unreachable (fetch blocked).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Rolls-Royce Press Releases": {
+   "terms_url": "https://www.rolls-royce.com/site-services/legal-information.aspx",
+   "commercial_use_risk": "medium",
+   "summary": "Only generic copyright: pages 'may not be reproduced in whole or part without the prior written authorisation'. No explicit commercial-use or automated-access clause, none about feeds.",
+   "robots": "Allowed for generic agents (* disallows only .axd, some marine docs, /tools/ etc.); some old bots blocked.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Routes Online News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (403 on terms pages and homepage).",
+   "robots": "Allowed: generic UA blocks only /search/ and /advanced-search/.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Ryanair Newsroom": {
+   "terms_url": "https://www.ryanair.com/gb/en/corporate/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "Content may be used 'only as strictly required for permitted personal, non-commercial purposes'; 'screen scraping' via automated systems to extract data for commercial purposes 'is strictly prohibited'.",
+   "robots": "Allowed (corporate.ryanair.com disallows only /wp-admin/).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "SEC EDGAR 8-K Alaska Air Group": {
+   "terms_url": "https://www.sec.gov/privacy.htm",
+   "commercial_use_risk": "low",
+   "read": false,
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "summary": "SEC website policy (from memory, not re-read: sec.gov returned 403 to this project's User-Agent): information on sec.gov is public and may be copied or redistributed without permission.",
+   "robots": "not read (403)"
+  },
+  "SEC EDGAR 8-K American Airlines Group": {
+   "terms_url": "https://www.sec.gov/privacy.htm",
+   "commercial_use_risk": "low",
+   "read": false,
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "summary": "SEC website policy (from memory, not re-read: sec.gov returned 403 to this project's User-Agent): information on sec.gov is public and may be copied or redistributed without permission.",
+   "robots": "not read (403)"
+  },
+  "SEC EDGAR 8-K Delta Air Lines": {
+   "terms_url": "https://www.sec.gov/privacy.htm",
+   "commercial_use_risk": "low",
+   "read": false,
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "summary": "SEC website policy (from memory, not re-read: sec.gov returned 403 to this project's User-Agent): information on sec.gov is public and may be copied or redistributed without permission.",
+   "robots": "not read (403)"
+  },
+  "SEC EDGAR 8-K JetBlue Airways": {
+   "terms_url": "https://www.sec.gov/privacy.htm",
+   "commercial_use_risk": "low",
+   "read": false,
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "summary": "SEC website policy (from memory, not re-read: sec.gov returned 403 to this project's User-Agent): information on sec.gov is public and may be copied or redistributed without permission.",
+   "robots": "not read (403)"
+  },
+  "SEC EDGAR 8-K Southwest Airlines": {
+   "terms_url": "https://www.sec.gov/privacy.htm",
+   "commercial_use_risk": "low",
+   "read": false,
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "summary": "SEC website policy (from memory, not re-read: sec.gov returned 403 to this project's User-Agent): information on sec.gov is public and may be copied or redistributed without permission.",
+   "robots": "not read (403)"
+  },
+  "SEC EDGAR 8-K United Airlines Holdings": {
+   "terms_url": "https://www.sec.gov/privacy.htm",
+   "commercial_use_risk": "low",
+   "read": false,
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "summary": "SEC website policy (from memory, not re-read: sec.gov returned 403 to this project's User-Agent): information on sec.gov is public and may be copied or redistributed without permission.",
+   "robots": "not read (403)"
+  },
+  "SHGM News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "No terms-of-use, copyright or content-use statement found on web.shgm.gov.tr homepage; only a privacy PDF link and an RSS link (/tr/kurumsal/4000-rss). Government site, unconfirmed.",
+   "robots": "unreachable (robots.txt returned 404 page).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Sabre Insights": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable: site served a bot-challenge stub page; terms URLs returned empty/404.",
+   "robots": "Allowed (only /wp/wp-admin/ and /releases/ disallowed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Safran News": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (legal-notice URLs returned 403).",
+   "robots": "No feed rules; User-agent * blocks admin/search/form/core paths; feeds not disallowed.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Simple Flying": {
+   "terms_url": "https://www.valnetinc.com/en/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "Valnet terms: licence is \"personal, non-commercial use only\"; bans to \"scrape, automatically download, data-mine, extract\" content. RSS clause: use feed unmodified; Valnet may require you to stop.",
+   "robots": "Allowed: generic UA not blocked from /feed (only /admin/, /search/, /tldr/; GPTBot/ClaudeBot/CCBot fully blocked).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Singapore Airlines Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (guessed URLs 404; conditions-of-use page returned only scripts). Search excerpt only, not read: personal non-commercial copy only; no explicit scraping clause seen.",
+   "robots": "Allowed: feed paths not disallowed (Crawl-delay 9).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Southwest Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable: swamedia.com is JS-rendered, no legal page located. Corporate press-release newsroom, no stated reuse licence read.",
+   "robots": "Allowed (only /login and password-reset paths disallowed).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "T2RL News": {
+   "terms_url": "https://www.t2rl.com/terms-conditions/",
+   "commercial_use_risk": "medium",
+   "summary": "Terms read: only informational-use/liability wording (\"for informational purposes only\"); no wording on reuse, commercial use or scraping.",
+   "robots": "Allowed: only Crawl-Delay: 30; no disallows.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Textron Aviation Newsroom": {
+   "terms_url": "https://txtav.com/en/terms-of-use",
+   "commercial_use_risk": "high",
+   "summary": "'Any resale or commercial use of this Site or its contents ... any use of data mining, robots, or similar data gathering and extraction rules ... is prohibited'; redistribution for commercial purposes prohibited.",
+   "robots": "Allowed (no Disallow for feed paths; sitemaps only).",
+   "automated_reading_forbidden": true,
+   "quote": "any use of data mining, robots, or similar data gathering and extraction rules or any other form of hacking, interference, spamming, sabotage or manipulation is prohibited",
+   "read": true
+  },
+  "The Air Current": {
+   "terms_url": "https://theaircurrent.com/terms-of-service/",
+   "commercial_use_risk": "high",
+   "summary": "Bans 'systematic or automated data collection... scraping, data mining'; no reproduce/exploit 'for a commercial purpose, including media monitoring services for redistribution'; RSS only in an RSS reader.",
+   "robots": "Allowed ('User-agent: * Disallow:' empty).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "The Economist": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (WebFetch blocked, curl 403 Cloudflare). Likely restrictive (from memory, not re-read).",
+   "robots": "Partly read via curl: AI user-agents restricted except /pro and /syndication; generic UA section not seen.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "The New York Times": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (fetch tool refused nytimes.com). From memory, not re-read: NYT terms limit use to personal non-commercial and bar automated access; likely high, verify manually.",
+   "robots": "unreachable (fetch blocked).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "The Wall Street Journal": {
+   "terms_url": "https://www.dowjones.com/terms-of-use/",
+   "commercial_use_risk": "high",
+   "summary": "'you may not access or use the Content, including ... any Content made available through one of our RSS feeds, in any commercial product or service, without our express written consent.' Also bans scraping/AI agents.",
+   "robots": "Disallows all paths for generic agents (User-agent: * Disallow: /) and states automated collection is prohibited.",
+   "automated_reading_forbidden": true,
+   "quote": "you may not access or use the Content, including without limitation, any Content made available through one of our RSS feeds, in any commercial product or service, without our express written consent.",
+   "read": true
+  },
+  "The Washington Post": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (403 / Cloudflare challenge). Likely restrictive (from memory, not re-read).",
+   "robots": "Disallows /*_rss.xml for generic UA, but not /feed or /rss paths.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Tolga Özbek Havacılık": {
+   "terms_url": "https://tolgaozbek.com/",
+   "commercial_use_risk": "medium",
+   "summary": "No terms page found; footer only says 'Tüm Hakları Saklıdır' (all rights reserved). Silent on feeds/reuse. (Feed URL itself returned 406 to a plain script UA.)",
+   "robots": "Allowed (only /wp-admin/ disallowed for *).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Turkish Airlines Blog": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "Terms not retrievable (403 / timeout on legal notice).",
+   "robots": "Unreachable: robots.txt returned 403 Access Denied (Akamai).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "United Airlines Newsroom": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (united.com unreachable/timeout; newsroom.united.com robots unreachable). Related United sites (search excerpt, not read) say personal/noncommercial.",
+   "robots": "Unreachable.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Yahoo Finance (THY & Pegasus)": {
+   "terms_url": "https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html",
+   "commercial_use_risk": "high",
+   "summary": "2(e): \"may not access or reuse the Services... for any commercial purpose\"; 2(d)(ix) bars automated collection w/o permission; 2(o) RSS: \"only permitted to display the content that is provided in the feed\", credit+link.",
+   "robots": "finance.yahoo.com robots: User-agent * does not disallow /rss or feed paths (blocks only /m/, /p/, /quotes/* etc.); named AI bots are fully blocked.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Yahoo Finance Aviation": {
+   "terms_url": "https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html",
+   "commercial_use_risk": "high",
+   "summary": "s.2(e): 'may not access or reuse the Services... for any commercial purpose'; s.2(d)(9) bans collecting data 'using any automated means'; RSS (s.2(o)): only 'display the content provided in the feed, without modification'.",
+   "robots": "feeds.finance.yahoo.com robots.txt is 'User-agent: * Disallow: /' (all paths, including the feed).",
+   "automated_reading_forbidden": true,
+   "quote": "User-agent: * / Disallow: /  (feeds.finance.yahoo.com/robots.txt)",
+   "read": true
+  },
+  "ch-aviation": {
+   "terms_url": "https://www.ch-aviation.com/terms",
+   "commercial_use_risk": "high",
+   "summary": "Must not \"use any part of the materials on our site for commercial purposes\" without licence; no re-selling or making materials available on networks. Scraping not mentioned; footer links an RSS feed.",
+   "robots": "Unreachable: /robots.txt returned the HTML homepage (no robots file served).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "easyJet Media Centre": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "terms not retrievable (mediacentre.easyjet.com and robots.txt returned 403).",
+   "robots": "unreachable (403).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  }
+ }
+}

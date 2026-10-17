@@ -1,0 +1,32 @@
+name: Probe sources
+
+# Manual only. Reads every source in config/sources.csv from the runner (its network differs from a laptop's), discovers
+# and verifies public feeds, measures yield, and uploads the result as an artifact. It does NOT write briefing data, the
+# archive or the briefing-data branch, and it needs no secrets. Download the artifact and run scripts/apply_probe.py.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aerobrief-source-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Probe every source
+        run: python scripts/probe_sources.py --out probe-output/source_probe.json
+      - name: Keep the result
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-probe
+          path: probe-output/source_probe.json
+          retention-days: 30
