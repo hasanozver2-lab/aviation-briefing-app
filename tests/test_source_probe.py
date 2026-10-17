@@ -225,3 +225,22 @@ def test_a_quiet_legacy_rss_source_that_answered_is_working_but_a_silent_html_sc
     monkeypatch.setattr(fd, "PoliteFetcher", lambda **kw: REAL_FETCHER(fetch=site, sleep=lambda s: None, **{k: v for k, v in kw.items() if k != "fetch"}))
     record, _ = source_probe.probe_source(r, feed_sources.source_record(r), {r["name"]: {"name": r["name"], "url": r["url"], "fetch_mode": "html"}}, {}, NOW, legacy_fetch=lambda s, c: ([], ""))
     assert record["status"] == "no_extractable_feed"
+
+
+OVERRIDES = json.loads((PROJECT / "config" / "source_status_overrides.json").read_text(encoding="utf-8"))
+
+
+def test_a_decision_by_a_person_wins_over_the_probe_result():
+    rows, _, _ = source_probe.apply_probe([row()], probe_doc(), terms(), {}, NOW, overrides={"sources": {"Wire Example": {"status": "excluded_policy", "reason": "terms forbid it (https://x)"}}})
+    assert rows[0]["status"] == "excluded_policy" and rows[0]["active"] == "0" and rows[0]["reason"] == "terms forbid it (https://x)"
+
+
+def test_the_recorded_overrides_are_the_agreed_ones():
+    sources = OVERRIDES["sources"]
+    for name in ("Air Canada News Releases", "Textron Aviation Newsroom"):
+        assert sources[name]["status"] == "excluded_policy" and "http" in sources[name]["reason"] and "robots" in sources[name]["reason"].lower() or "automated" in sources[name]["reason"].lower()
+    sec = [name for name in sources if name.startswith("SEC EDGAR")]
+    assert len(sec) == 6
+    assert all(sources[name] == {"status": "disabled_blocked", "reason": "SEC iletişim e-postası gerektiriyor; henüz tanımlanmadı", "no_retry": True} for name in sec)
+    assert not any("@" in entry["reason"] for entry in sources.values()), "no e-mail address anywhere"
+    assert set(sources) <= {row["name"] for row in source_catalog.read_rows()}

@@ -217,11 +217,12 @@ def _near_misses(articles, groups):
 
 # --------------------------------------------------------------------------------------------------- applying a probe
 
-def apply_probe(rows, probe, terms_review, discovered, now=None):
+def apply_probe(rows, probe, terms_review, discovered, now=None, overrides=None):
     """Final statuses from a verified probe. Returns (rows, discovered, changes).
 
     Terms review: commercial_use_risk is recorded for every source. A source is excluded only where the terms explicitly forbid
     automated reading of the feed AND it is a press/data (feed_only) or exchange source; robots.txt exclusions come from the probe.
+    `overrides` ({name: {status, reason}}) are decisions made by a person and win over everything above.
     """
     now = now or utc_now()
     stamp = now.isoformat(timespec="seconds")
@@ -238,6 +239,9 @@ def apply_probe(rows, probe, terms_review, discovered, now=None):
         if review.get("automated_reading_forbidden") and (row["mode"] == "feed_only" or row["source_type"] == "exchange") and status != "excluded_policy":
             status = "excluded_policy"
             reason = f"terms forbid automated reading: \"{review['quote'][:200]}\" ({review['terms_url'] or 'robots.txt'})"
+        decided = (overrides or {}).get("sources", {}).get(row["name"])
+        if decided:
+            status, reason = decided["status"], decided["reason"]
         row["commercial_use_risk"] = review.get("commercial_use_risk", row.get("commercial_use_risk", ""))
         previous = row["status"]
         row["status"], row["reason"], row["active"] = status, reason, "1" if status == source_catalog.STATUS_ACTIVE else "0"

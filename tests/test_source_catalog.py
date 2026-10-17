@@ -76,11 +76,17 @@ def test_tiers_follow_the_source_types_unless_a_row_says_otherwise():
     assert vendors and all(row["tier"] == "4" for row in vendors), "tech vendors stay on the lowest tier"
 
 
-def test_feed_only_rows_are_the_press_and_data_group():
+FEED_ONLY_NAMES = {"Reuters Aviation", "Bloomberg Aviation", "Financial Times Aviation", "The New York Times", "The Washington Post", "The Wall Street Journal", "Associated Press Aviation",
+                   "The Economist", "Nikkei Asia", "The Air Current", "Aviation Week", "ch-aviation", "CAPA Centre for Aviation", "CNBC Airlines", "Cirium Thought Cloud", "OAG Blog", "AvHerald"}
+STANDARD_PRESS = {"FlightGlobal", "Simple Flying", "AeroTime", "Routes Online News", "PhocusWire", "China Travel News"}
+
+
+def test_feed_only_is_limited_to_paywalled_or_restrictive_publishers():
     rows = {row["name"]: row for row in source_catalog.read_rows()}
     for entry in EXPANSION["sources"]:
         assert rows[entry["name"]]["mode"] == entry["mode"]
-    assert all(rows[e["name"]]["mode"] == "feed_only" for e in EXPANSION["sources"] if e["group"] == "D")
+    assert {name for name, row in rows.items() if row["mode"] == "feed_only"} == FEED_ONLY_NAMES
+    assert all(rows[name]["mode"] == "full" for name in STANDARD_PRESS), "open commercial press runs in the standard mode"
 
 
 def test_languages_follow_the_agreed_rule():
