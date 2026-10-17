@@ -856,6 +856,60 @@
    "automated_reading_forbidden": false,
    "quote": "",
    "read": false
+  },
+  "PR Newswire Travel Sector": {
+   "terms_url": "https://www.prnewswire.com/general/terms-of-use.html",
+   "commercial_use_risk": "high",
+   "summary": "Personal, non-commercial use only; bans scraping, republishing and robots. The public RSS channels are offered by the service itself at /rss/; only title, link, time and a short summary are used, with a link back; no text is republished.",
+   "robots": "/rss/ feeds are allowed for * (read from robots.txt at probe time).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "PR Newswire Heavy Industry Sector": {
+   "terms_url": "https://www.prnewswire.com/general/terms-of-use.html",
+   "commercial_use_risk": "high",
+   "summary": "Personal, non-commercial use only; bans scraping, republishing and robots. The public RSS channels are offered by the service itself at /rss/; only title, link, time and a short summary are used, with a link back; no text is republished.",
+   "robots": "/rss/ feeds are allowed for * (read from robots.txt at probe time).",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "GlobeNewswire Transportation Feed": {
+   "commercial_use_risk": "high",
+   "summary": "Terms page returned 403 to the project's self-identifying agent and could not be read; commercial redistribution restrictions assumed.",
+   "robots": "robots.txt not readable from the probe network.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false,
+   "terms_url": "https://www.globenewswire.com/terms-of-use"
+  },
+  "Business Wire Feeds": {
+   "commercial_use_risk": "high",
+   "summary": "Terms page returned 403 to the project's self-identifying agent and could not be read; commercial redistribution restrictions assumed.",
+   "robots": "robots.txt not readable from the probe network.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false,
+   "terms_url": "https://www.businesswire.com/portal/site/home/terms-of-use/"
+  },
+  "KAP THYAO Disclosures": {
+   "terms_url": "https://www.kap.org.tr/en/",
+   "commercial_use_risk": "medium",
+   "summary": "No documented public RSS/API and no terms page found; the disclosure list is rendered by script. Nothing is requested.",
+   "robots": "robots.txt returned an error; not relied on.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "KAP PGSUS Disclosures": {
+   "terms_url": "https://www.kap.org.tr/en/",
+   "commercial_use_risk": "medium",
+   "summary": "No documented public RSS/API and no terms page found; the disclosure list is rendered by script. Nothing is requested.",
+   "robots": "robots.txt returned an error; not relied on.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
   }
  }
 }

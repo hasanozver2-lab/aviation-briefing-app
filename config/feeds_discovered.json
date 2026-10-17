@@ -132,6 +132,13 @@
     "method": "rss",
     "verified_at": "2026-10-17T08:55:26+00:00"
   },
+  "pr_newswire_heavy_industry_sector": {
+    "feed_url": "https://www.prnewswire.com/rss/heavy-industry-manufacturing-latest-news/heavy-industry-manufacturing-latest-news-list.rss",
+    "item_count_90d": 20,
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
+    "method": "rss",
+    "verified_at": "2026-10-17T09:16:34+00:00"
+  },
   "rolls_royce_press_releases": {
     "feed_url": "https://www.rolls-royce.com/rss",
     "item_count_90d": 0,

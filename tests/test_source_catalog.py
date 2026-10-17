@@ -41,7 +41,7 @@ def test_every_expansion_source_is_in_the_catalog_and_the_merge_is_idempotent():
     rows = source_catalog.read_rows()
     keys = {source_catalog.row_key(row) for row in rows}
     for entry in EXPANSION["sources"]:
-        key = f"sec/{entry['cik']}" if entry.get("cik") else source_catalog.registrable_key(entry["urls"][0])
+        key = f"sec/{entry['cik']}" if entry.get("cik") else entry.get("catalog_key") or source_catalog.registrable_key(entry["urls"][0])
         assert key in keys, entry["name"]
     merged, report = source_catalog.merge_expansion(rows, EXPANSION)
     assert report["added"] == [] and merged == rows
@@ -77,7 +77,9 @@ def test_tiers_follow_the_source_types_unless_a_row_says_otherwise():
 
 
 FEED_ONLY_NAMES = {"Reuters Aviation", "Bloomberg Aviation", "Financial Times Aviation", "The New York Times", "The Washington Post", "The Wall Street Journal", "Associated Press Aviation",
-                   "The Economist", "Nikkei Asia", "The Air Current", "Aviation Week", "ch-aviation", "CAPA Centre for Aviation", "CNBC Airlines", "Cirium Thought Cloud", "OAG Blog", "AvHerald"}
+                   "The Economist", "Nikkei Asia", "The Air Current", "Aviation Week", "ch-aviation", "CAPA Centre for Aviation", "CNBC Airlines", "Cirium Thought Cloud", "OAG Blog", "AvHerald",
+                   # wire services: terms restrict republishing, so only title, link and short summary are used
+                   "PR Newswire Travel Sector", "PR Newswire Heavy Industry Sector", "GlobeNewswire Transportation Feed", "Business Wire Feeds"}
 STANDARD_PRESS = {"FlightGlobal", "Simple Flying", "AeroTime", "Routes Online News", "PhocusWire", "China Travel News"}
 
 

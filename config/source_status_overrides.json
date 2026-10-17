@@ -42,6 +42,16 @@
   "Singapore Airlines Newsroom": {
    "status": "no_extractable_feed",
    "reason": "official newsroom address returns HTTP 404 (en_UK/au, us, sg variants); page and sitemap discovery found no feed, news sitemap, JSON-LD or dated list (rechecked 2026-10-17); needs the publisher's current address"
+  },
+  "KAP THYAO Disclosures": {
+   "status": "no_public_feed",
+   "reason": "KAP'ın belgelenmiş açık RSS/API'si ve okunabilir şartlar sayfası yok; duyuru listesi betikle üretiliyor, otomatik okuma denenmedi",
+   "no_retry": true
+  },
+  "KAP PGSUS Disclosures": {
+   "status": "no_public_feed",
+   "reason": "KAP'ın belgelenmiş açık RSS/API'si ve okunabilir şartlar sayfası yok; duyuru listesi betikle üretiliyor, otomatik okuma denenmedi",
+   "no_retry": true
   }
  }
 }
