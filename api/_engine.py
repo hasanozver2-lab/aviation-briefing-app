@@ -26,6 +26,7 @@ try:
     from . import market_data
     from . import entities
     from . import story_lifecycle
+    from . import language
     from .urls import canonicalize_url
 except ImportError:
     import source_registry
@@ -33,6 +34,7 @@ except ImportError:
     import market_data
     import entities
     import story_lifecycle
+    import language
     from urls import canonicalize_url
 
 # Windows cp1254 encoding fix
@@ -540,6 +542,7 @@ def _fetch_source_articles(source, cutoff, headers):
                 "link": link,
                 "description": description,
                 "source": article_source_name,
+                "language": language.article_language(source_name, f"{title} {description}"),
                 "category_hint": source["category_hint"],
                 "source_type": source.get("source_type", "trade_media"),
                 "official": bool(source.get("official", False)),
@@ -1021,7 +1024,8 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
 
     date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
     LookupError when no archive exists for it. Badges, score bands and ordering are recomputed on every
-    read; the archive-only low band is returned only with include_low.
+    read; the archive-only low band is returned only with include_low. A thin daily view for today is topped up with
+    the previous day's best stories (carried_from: yesterday, no badges).
     """
     mode = validate_mode(mode)
     if date is not None:
@@ -1050,9 +1054,13 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         if not include_low:
             snapshot["stories"] = [story for story in everything if story_lifecycle.is_listed(story)]
         snapshot["hidden_low_count"] = len(everything) - len(snapshot["stories"])
+        if mode == "daily" and date is None and snapshot["date"] == today:
+            previous_day = briefing_store.read_json(briefing_store.day_path(story_lifecycle.previous_day_key(today)))
+            story_lifecycle.backfill_from_previous_day(snapshot, previous_day if isinstance(previous_day, dict) else None, now, config)
         if mode == "hourly" and snapshot["date"] == today:
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode
+    snapshot["market"] = market_data.apply_display_settings(snapshot.get("market"))
     if store_unreadable:
         snapshot["status"] = "stale"
         snapshot["warning"] = "The live briefing data could not be read; the last committed snapshot is shown."

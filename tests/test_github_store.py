@@ -196,6 +196,7 @@ def test_missing_eia_key_skips_fuel_but_ecb_rates_continue(tmp_path, monkeypatch
     monkeypatch.setattr(market_data, "fetch_fred_series", lambda *a, **k: (_ for _ in ()).throw(OSError("FRED unreachable")))
     monkeypatch.setattr(market_data, "fetch_ecb_fx_series", lambda start, end: {"fx_usd_try": [(today - timedelta(days=1), 40.0), (today, 41.0)]})
 
+    monkeypatch.setattr(market_data, "display_fx", lambda: True)
     panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", eia_api_key="", end_date=today)
 
     assert panel["skipped"] == ["EIA"] and panel["errors"] == ["FRED: OSError"]

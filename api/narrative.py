@@ -14,6 +14,11 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from . import language
+except ImportError:
+    import language
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 NARRATIVE_CONFIG_PATH = BASE_DIR / "config" / "narrative.json"
@@ -36,6 +41,9 @@ Rules:
 - Use ONLY facts present in the provided items. Never invent figures, names, fleets or operators.
 - Copy numbers exactly as written and keep comparative figures together (for example airport A versus airport B).
 - Do not attribute anything to a carrier that the item does not name. The analysis is global; do not single out any one airline.
+- Every item has target_language: "en" (English) or "tr" (Turkish). Write headline, lead, detailed_analysis, data_points, strategic_impact, the details of market_exposure and why_it_matters in that language, whatever language the source item is in.
+- Numbers, dates, names, aircraft types, airport and airline codes come from the item and are never changed, converted, rounded or re-spelled by the translation. market_exposure impact stays one of the English labels listed below.
+- For "tr", write natural Turkish as an aviation professional would (havayolu, uçuş, hat, filo, sefer, yolcu); avoid word-for-word English calques. Established industry terms may stay as they are (ASK, RPK, doluluk oranı, yield, slot, codeshare, MRO, SAF).
 - Return pure JSON: {"stories": [ ... ]} with exactly one object per input item, using the item's story_id unchanged.
 Each object has: story_id, headline (one concise factual headline), lead (one or two sentences), detailed_analysis (3 to 5 short bullet strings), data_points (array of concrete figures quoted from the item; empty when there are none), strategic_impact (one or two sentences on capacity, demand, revenue, cost, competition or operations), market_exposure (array of {carrier, impact, details} for named carriers, airports or manufacturers only; impact is one of Positive, Negative, Neutral, Competitive Headwind), why_it_matters (one consequence-focused sentence)."""
 
@@ -50,6 +58,7 @@ def build_request_items(stories, description_limit):
             "event_type": story.get("event_type"),
             "description": str(story.get("source_description", ""))[:description_limit],
             "publishers": story.get("source_count", 1),
+            "target_language": language.story_language(story),
         }
         for story in stories
     ]
@@ -141,6 +150,11 @@ def _retry_after(error):
         return None
 
 
+def needs_language_rewrite(story):
+    """A finished narrative whose language differs from the story's target language."""
+    return story.get("narrative_status") == NARRATIVE_DONE and (story.get("narrative_language") or "en") != language.story_language(story)
+
+
 def fill_pending(stories, api_key, description_limit, config=None, post=None, sleep=time.sleep, now=None):
     """Generate narratives for stories that have none (or whose facts changed). Returns a report.
 
@@ -149,8 +163,13 @@ def fill_pending(stories, api_key, description_limit, config=None, post=None, sl
     config = config or load_narrative_config()
     post = post or (lambda items: post_to_gemini(items, api_key, config))
     now_iso = (now or datetime.now(timezone.utc)).isoformat(timespec="seconds")
-    pending = sorted((s for s in stories if s.get("narrative_status") != NARRATIVE_DONE), key=lambda s: (-float(s.get("relevance_score", 0)), s["story_id"]))
-    report = {"calls": 0, "narrated": 0, "pending": len(pending), "error": ""}
+    # Stories without a narrative come first; then those whose stored narrative is in the wrong language (narratives written
+    # before languages existed are English). A mismatched story keeps showing its old narrative until the new one arrives.
+    pending = sorted(
+        (s for s in stories if s.get("narrative_status") != NARRATIVE_DONE or needs_language_rewrite(s)),
+        key=lambda s: (s.get("narrative_status") == NARRATIVE_DONE, -float(s.get("relevance_score", 0)), s["story_id"]),
+    )
+    report = {"calls": 0, "narrated": 0, "rewritten": 0, "pending": sum(1 for s in pending if s.get("narrative_status") != NARRATIVE_DONE), "error": ""}
     if not pending:
         return report
     if not api_key:
@@ -173,9 +192,11 @@ def fill_pending(stories, api_key, description_limit, config=None, post=None, sl
         for story in batch:
             fields = parsed.get(story["story_id"])
             if fields:
+                was_rewrite = story.get("narrative_status") == NARRATIVE_DONE
                 story.update(fields)
                 story["narrative_status"] = NARRATIVE_DONE
                 story["narrative_generated_at"] = now_iso
-                report["narrated"] += 1
+                story["narrative_language"] = language.story_language(story)
+                report["rewritten" if was_rewrite else "narrated"] += 1
     report["pending"] = sum(1 for s in stories if s.get("narrative_status") != NARRATIVE_DONE)
     return report

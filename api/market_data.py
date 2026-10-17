@@ -215,6 +215,27 @@ def _fuel_source(series_config, provider):
     return provider_label(provider) if provider else series_config["source"]
 
 
+def display_fx():
+    return bool(load_market_config().get("market", {}).get("display_fx", False))
+
+
+def is_fx_series(series_id):
+    return str(series_id).startswith("fx_usd_")
+
+
+def apply_display_settings(market):
+    """Read-time view of a stored market panel: without display_fx, no fx_usd_* items and no fx events.
+
+    Archives written before the switch (or with it on) still hold FX rows; they are hidden here, not rewritten.
+    """
+    if not isinstance(market, dict) or display_fx():
+        return market
+    visible = dict(market)
+    visible["items"] = [item for item in market.get("items", []) if not is_fx_series(item.get("series_id"))]
+    visible["events"] = [event for event in market.get("events", []) if event.get("event_type") != "fx_currency"]
+    return visible
+
+
 def provider_label(provider):
     return load_market_config()["providers"][provider]
 
@@ -241,7 +262,7 @@ def market_series_definitions(provider_by_series=None):
     for currency in FX_CURRENCIES:
         definitions[f"fx_usd_{currency.lower()}"] = {
             "name": f"USD karşısında {currency}",
-            "unit": f"{currency}/USD",
+            "unit": f"{currency} per USD",
             "source": "European Central Bank",
             "frequency": "business_daily",
         }
@@ -680,8 +701,9 @@ def build_market_panel(path, provider_by_series=None):
     if crack_spread:
         indicators["jet_fuel_brent_crack_spread"] = crack_spread
     items = []
+    show_fx = display_fx()
     for series_id, indicator in indicators.items():
-        if not indicator:
+        if not indicator or (is_fx_series(series_id) and not show_fx):
             continue
         definition = definitions.get(series_id, {})
         item = dict(indicator)
@@ -759,5 +781,6 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
     if has_gap and panel["status"] == "ok":
         panel["status"] = "partial"
     fuel_source = provider_label(fuel_provider) if fuel_provider else "EIA"
-    panel["events"] = write_threshold_events(target, indicators, gemini_api_key, fuel_source) if indicators else []
+    events = write_threshold_events(target, indicators, gemini_api_key, fuel_source) if indicators else []
+    panel["events"] = events if display_fx() else [event for event in events if event["event_type"] != "fx_currency"]
     return panel

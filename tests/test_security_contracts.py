@@ -333,6 +333,7 @@ def test_ecb_weekend_value_keeps_its_last_valid_business_date(tmp_path, monkeypa
         "utc_now",
         lambda: datetime(2026, 10, 11, tzinfo=timezone.utc),
     )
+    monkeypatch.setattr(market_data, "display_fx", lambda: True)
 
     panel, _ = market_data.build_market_panel(database)
     eur = next(item for item in panel["items"] if item["series_id"] == "fx_usd_eur")
