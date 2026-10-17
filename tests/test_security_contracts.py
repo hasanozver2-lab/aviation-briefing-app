@@ -209,6 +209,7 @@ def test_one_unavailable_source_does_not_block_other_feed_results(monkeypatch):
         return FakeResponse()
 
     monkeypatch.setattr(_engine, "get_rss_sources", lambda _max_hours: sources)
+    monkeypatch.setattr(_engine, "_read_catalog_feeds", lambda *args, **kwargs: [])
     monkeypatch.setattr(_engine.urllib.request, "urlopen", fake_urlopen)
 
     articles = _engine.fetch_rss_items()

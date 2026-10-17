@@ -12,6 +12,7 @@ import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+import re
 from pathlib import Path
 
 try:
@@ -44,6 +45,7 @@ Rules:
 - Every item has target_language: "en" (English) or "tr" (Turkish). Write headline, lead, detailed_analysis, data_points, strategic_impact, the details of market_exposure and why_it_matters in that language, whatever language the source item is in.
 - Numbers, dates, names, aircraft types, airport and airline codes come from the item and are never changed, converted, rounded or re-spelled by the translation. market_exposure impact stays one of the English labels listed below.
 - For "tr", write natural Turkish as an aviation professional would (havayolu, uçuş, hat, filo, sefer, yolcu); avoid word-for-word English calques. Established industry terms may stay as they are (ASK, RPK, doluluk oranı, yield, slot, codeshare, MRO, SAF).
+- An item with basis "headline_only" comes from a press headline feed: only its title and a short summary exist. Write only what they state, in your own words. Do not add any number, date, percentage, count, price, ranking or other figure that is not literally in the title or summary, and never estimate one. data_points holds only figures that appear literally in the title or summary, otherwise [].
 - Return pure JSON: {"stories": [ ... ]} with exactly one object per input item, using the item's story_id unchanged.
 Each object has: story_id, headline (one concise factual headline), lead (one or two sentences), detailed_analysis (3 to 5 short bullet strings), data_points (array of concrete figures quoted from the item; empty when there are none), strategic_impact (one or two sentences on capacity, demand, revenue, cost, competition or operations), market_exposure (array of {carrier, impact, details} for named carriers, airports or manufacturers only; impact is one of Positive, Negative, Neutral, Competitive Headwind), why_it_matters (one consequence-focused sentence)."""
 
@@ -59,6 +61,7 @@ def build_request_items(stories, description_limit):
             "description": str(story.get("source_description", ""))[:description_limit],
             "publishers": story.get("source_count", 1),
             "target_language": language.story_language(story),
+            "basis": story.get("basis", ""),
         }
         for story in stories
     ]
@@ -150,6 +153,56 @@ def _retry_after(error):
         return None
 
 
+BASIS_HEADLINE_ONLY = "headline_only"
+NUMBER_PATTERN = re.compile(r"\d+(?:[.,]\d+)*")
+SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+
+
+def _digits(token):
+    return re.sub(r"[.,]", "", token)
+
+
+def grounded_numbers(source_text):
+    """Every number written in the source, with separators removed (1,200 and 1.200 and 1200 are the same figure)."""
+    return {_digits(token) for token in NUMBER_PATTERN.findall(str(source_text))}
+
+
+def has_ungrounded_number(text, known):
+    return any(_digits(token) not in known for token in NUMBER_PATTERN.findall(str(text)))
+
+
+def _keep_grounded_sentences(text, known):
+    kept = [sentence for sentence in SENTENCE_SPLIT.split(str(text).strip()) if sentence and not has_ungrounded_number(sentence, known)]
+    return " ".join(kept)
+
+
+def sanitize_headline_only(fields, source_text):
+    """Remove every figure the model was not given. Returns (fields, number_of_removed_pieces).
+
+    A headline-only narrative rests on a title and a short summary; a number that is in neither is invented, so the
+    sentence, bullet, data point or exposure detail that carries it is dropped (the headline falls back to the title).
+    """
+    known = grounded_numbers(source_text)
+    removed = 0
+    clean = dict(fields)
+    for key in ("lead", "why_it_matters", "strategic_impact"):
+        kept = _keep_grounded_sentences(clean.get(key, ""), known)
+        removed += kept != clean.get(key, "")
+        clean[key] = kept
+    for key in ("detailed_analysis", "data_points"):
+        kept = [item for item in clean.get(key, []) if not has_ungrounded_number(item, known)]
+        removed += len(clean.get(key, [])) - len(kept)
+        clean[key] = kept
+    exposures = []
+    for exposure in clean.get("market_exposure", []):
+        if has_ungrounded_number(exposure.get("details", ""), known):
+            removed += 1
+            exposure = {**exposure, "details": ""}
+        exposures.append(exposure)
+    clean["market_exposure"] = exposures
+    return clean, removed
+
+
 def needs_language_rewrite(story):
     """A finished narrative whose language differs from the story's target language."""
     return story.get("narrative_status") == NARRATIVE_DONE and (story.get("narrative_language") or "en") != language.story_language(story)
@@ -191,12 +244,22 @@ def fill_pending(stories, api_key, description_limit, config=None, post=None, sl
             break
         for story in batch:
             fields = parsed.get(story["story_id"])
+            if fields and story.get("basis") == BASIS_HEADLINE_ONLY:
+                title = (story.get("original_source") or {}).get("title") or story.get("headline", "")
+                fields, removed = sanitize_headline_only(fields, f"{title} {story.get('source_description', '')}")
+                report["numbers_removed"] = report.get("numbers_removed", 0) + removed
+                fields["lead"] = fields["lead"] or title
+                if has_ungrounded_number(fields["headline"], grounded_numbers(title)):
+                    fields["headline"] = title
+                    report["numbers_removed"] += 1
             if fields:
                 was_rewrite = story.get("narrative_status") == NARRATIVE_DONE
                 story.update(fields)
                 story["narrative_status"] = NARRATIVE_DONE
                 story["narrative_generated_at"] = now_iso
                 story["narrative_language"] = language.story_language(story)
+                if story.get("basis") == BASIS_HEADLINE_ONLY:
+                    story["source_description"] = ""      # the publisher's summary is used once and not kept
                 report["rewritten" if was_rewrite else "narrated"] += 1
     report["pending"] = sum(1 for s in stories if s.get("narrative_status") != NARRATIVE_DONE)
     return report

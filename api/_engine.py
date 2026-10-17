@@ -27,6 +27,9 @@ try:
     from . import entities
     from . import story_lifecycle
     from . import language
+    from . import feed_discovery
+    from . import feed_sources
+    from . import source_catalog
     from .urls import canonicalize_url
 except ImportError:
     import source_registry
@@ -35,6 +38,9 @@ except ImportError:
     import entities
     import story_lifecycle
     import language
+    import feed_discovery
+    import feed_sources
+    import source_catalog
     from urls import canonicalize_url
 
 # Windows cp1254 encoding fix
@@ -393,8 +399,15 @@ def get_builtin_source_records(max_hours=48):
 
 
 def get_rss_sources(max_hours=48):
-    """Return only the active feeds, decorated with source-governance metadata."""
-    return source_registry.load_active_sources(get_builtin_source_records(max_hours))
+    """Return only the active feeds, decorated with source-governance metadata and the catalog's timeout and mode."""
+    sources = source_registry.load_active_sources(get_builtin_source_records(max_hours))
+    catalog = {row["name"]: row for row in source_catalog.read_rows()}
+    for source in sources:
+        row = catalog.get(source.get("name"))
+        if row:
+            source["timeout_s"] = int(row["timeout_s"])
+            source["mode"] = row["mode"]
+    return sources
 
 def clean_html(raw_html):
     """HTML etiketlerini temizler."""
@@ -488,7 +501,8 @@ def _fetch_source_articles(source, cutoff, headers):
     source_name = source.get("name", "Unknown source")
     is_html_source = source.get("fetch_mode") == "html"
     is_paid_source = source.get("license_status") == "paid" or source.get("license_required", False)
-    timeout = HTML_FETCH_TIMEOUT_SECONDS if is_html_source else RSS_FETCH_TIMEOUT_SECONDS
+    timeout = source.get("timeout_s") or (HTML_FETCH_TIMEOUT_SECONDS if is_html_source else RSS_FETCH_TIMEOUT_SECONDS)
+    feed_only = source.get("mode") == feed_sources.MODE_FEED_ONLY
 
     try:
         if is_paid_source and is_html_source:
@@ -540,7 +554,9 @@ def _fetch_source_articles(source, cutoff, headers):
             if not is_html_source and " - " in title:
                 title, article_source_name = (part.strip() for part in title.rsplit(" - ", 1))
 
-            articles.append({
+            if feed_only:
+                description = description[:feed_sources.FEED_ONLY_SUMMARY_CHARS]
+            article = {
                 "title": title,
                 "link": link,
                 "description": description,
@@ -560,25 +576,73 @@ def _fetch_source_articles(source, cutoff, headers):
                 "topics": classify_topics(f"{title} {description}"),
                 "pub_date": pub_str,
                 "timestamp": pub_ts,
-            })
+            }
+            if feed_only:
+                article["basis"] = feed_sources.BASIS_HEADLINE_ONLY
+            articles.append(article)
         return articles, ""
     except Exception as exc:
         return [], describe_fetch_error(exc)
 
 
-def fetch_rss_items(max_hours=48):
-    """Fetch recent airline-relevant entries without serial source delays."""
+def _read_catalog_feeds(cutoff, report, entity_index_factory=None):
+    """Catalog sources read through their discovered feeds: hosts in parallel, the sources of one host strictly in turn."""
+    rows = source_catalog.read_rows()
+    handled = {source["name"] for source in get_builtin_source_records()}
+    sources = feed_sources.catalog_feed_sources(rows, handled)
+    for row in rows:
+        if row["name"] not in handled and row["status"] != source_catalog.STATUS_ACTIVE:
+            report[row["name"]] = {"status": row["status"], "error": row["reason"], "articles": 0}
+    if not sources:
+        return []
+    discovered = feed_sources.load_discovered()
+    now = utc_now()
+    groups = feed_sources.group_by_host(sources)
+
+    def read_host(host_sources):
+        fetcher = feed_discovery.PoliteFetcher()
+        collected = []
+        for source in host_sources:
+            fetcher.timeout = source["timeout_s"]
+            try:
+                items, source_report = feed_sources.read_source(source, discovered, fetcher, now, cutoff)
+            except Exception as exc:      # one source must never take the run down
+                items, source_report = [], {"status": "error", "error": describe_fetch_error(exc), "articles": 0}
+            collected.append((source, items, source_report))
+        return collected
+
+    articles = []
+    with ThreadPoolExecutor(max_workers=min(SOURCE_FETCH_WORKERS, len(groups)), thread_name_prefix="briefing-feed-host") as executor:
+        results = [result for host_result in executor.map(read_host, groups.values()) for result in host_result]
+    needs_filter = [(source, items) for source, items, _ in results if source["aviation_filter"]]
+    index = entity_index_factory() if (entity_index_factory and any(items for _, items in needs_filter)) else None
+    for source, items, source_report in results:
+        if source["aviation_filter"] and items:
+            items, dropped = feed_sources.filter_for_aviation(items, index)
+            source_report["filtered_out"] = dropped
+            source_report["articles"] = len(items)
+        report[source["name"]] = source_report
+        if source_report["status"] != "active" or source_report.get("error"):
+            print(f"[{source['name']}] Kaynak atlandı ({source_report['status']}: {source_report['error']}).")
+        articles.extend(items)
+    return articles
+
+
+def fetch_rss_items(max_hours=48, report=None):
+    """Fetch recent airline-relevant entries without serial source delays.
+
+    `report`, when given, is filled with one entry per source: status, error, articles (and articles_24h at the end).
+    """
+    report = report if report is not None else {}
     cutoff = utc_now() - timedelta(hours=max_hours)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     }
     sources = get_rss_sources(max_hours)
-    if not sources:
-        return []
 
     articles = []
-    worker_count = min(SOURCE_FETCH_WORKERS, len(sources))
+    worker_count = max(1, min(SOURCE_FETCH_WORKERS, len(sources)))
     with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix="briefing-feed") as executor:
         futures = {
             executor.submit(_fetch_source_articles, source, cutoff, headers): source
@@ -591,9 +655,11 @@ def fetch_rss_items(max_hours=48):
             except Exception as exc:
                 source_articles, error_name = [], describe_fetch_error(exc)
             articles.extend(source_articles)
+            report[source.get("name", "Unknown source")] = {"status": "active", "error": error_name, "articles": len(source_articles)}
             if error_name:
                 print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
 
+    articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv))
     articles.sort(key=lambda article: article.get("timestamp", 0), reverse=True)
     seen_links = set()
     unique_articles = []
@@ -603,6 +669,10 @@ def fetch_rss_items(max_hours=48):
             continue
         seen_links.add(canonical_link)
         unique_articles.append(article)
+    day_ago = (utc_now() - timedelta(hours=24)).timestamp()
+    for article in unique_articles:
+        entry = report.setdefault(article["source"], {"status": "active", "error": "", "articles": 0})
+        entry["articles_24h"] = entry.get("articles_24h", 0) + (1 if article.get("timestamp", 0) >= day_ago else 0)
     return unique_articles
 
 def build_compact_articles(articles, description_limit=None):
@@ -897,7 +967,8 @@ def build_candidate_story(article, index=1):
         "section": section,
         "headline": str(article.get("title", "Untitled aviation update")),
         "published_at": str(article.get("pub_date", "")),
-        "lead": str(article.get("description", ""))[:400],
+        # A headline-only source's summary is used once to write the model's own summary; it is never published as the lead.
+        "lead": "" if article.get("basis") else str(article.get("description", ""))[:400],
         "source_description": str(article.get("description", "")),
         "detailed_analysis": [],
         "data_points": [],
@@ -922,6 +993,7 @@ def build_candidate_story(article, index=1):
         },
         "related_news": [],
         "narrative_status": "pending",
+        **({"basis": article["basis"]} if article.get("basis") else {}),
     }
 
 
@@ -954,7 +1026,8 @@ def collect_run(market_database=None):
     entities.sync_entities(local_market_database)
     # Commentary on market events stays template-based: it keeps the run's LLM budget for story narratives.
     market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="", fred_api_key=_env_value("FRED_API_KEY"))
-    articles = fetch_rss_items(max_hours=48)
+    source_report = {}
+    articles = fetch_rss_items(max_hours=48, report=source_report)
     if not articles:
         raise RuntimeError("No articles could be collected from any source")
     market_data.record_article_events(local_market_database, articles)
@@ -966,7 +1039,7 @@ def collect_run(market_database=None):
     selected = story_lifecycle.select_stories(candidates, relevance_config["selection"], relevance_config.get("commentary"))
     source_registry.record_source_statistics(articles, {"stories": selected})
     print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold")
-    return {"stories": selected, "market": market_panel, "articles": len(articles), "candidates": len(candidates)}
+    return {"stories": selected, "market": market_panel, "articles": len(articles), "candidates": len(candidates), "source_report": source_report}
 
 
 def _write_local_briefing_cache(briefing, mode):
@@ -1053,6 +1126,9 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         # Current exclusion lists apply at read time; nothing is removed from the archive file itself.
         snapshot["excluded_count"] = story_lifecycle.drop_excluded(snapshot)
         snapshot = story_lifecycle.present_stories(snapshot, now, config)
+        for story in snapshot["stories"]:
+            if story.get("basis") == feed_sources.BASIS_HEADLINE_ONLY:
+                story["source_description"] = ""
         everything = snapshot["stories"]
         if not include_low:
             snapshot["stories"] = [story for story in everything if story_lifecycle.is_listed(story)]

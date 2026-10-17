@@ -321,27 +321,34 @@ def validate_items(items, now=None, window_days=VALID_WINDOW_DAYS):
 
 # ------------------------------------------------------------------------------------------------ discovery
 
-def items_from_url(fetcher, url, method_hint=None):
-    """Fetch one candidate address and read it as a feed, news sitemap, JSON-LD list or dated links. Returns (method, items, response)."""
-    response = fetcher.get(url)
-    if response.status != 200:
-        return None, [], response
-    body = response.body
+def classify_body(body, url):
+    """Read a fetched body as a feed, news sitemap, JSON-LD list or dated links. Returns (method, items)."""
     head = body[:600].lstrip().lower()
     try:
         if b"<rss" in head or b"<feed" in head or b"<rdf:rdf" in head or (head.startswith(b"<?xml") and b"<urlset" not in body[:3000] and b"<sitemapindex" not in body[:3000]):
-            method, items = parse_feed(body)
-            return method, items, response
+            return parse_feed(body)
         if b"<urlset" in body[:3000] or b"<sitemapindex" in body[:3000]:
             kind, items = parse_sitemap(body)
-            return (METHOD_SITEMAP, items, response) if kind == "urlset" else ("sitemap_index", items, response)
+            return (METHOD_SITEMAP, items) if kind == "urlset" else ("sitemap_index", items)
     except (ET.ParseError, ValueError):
-        return None, [], response
+        return None, []
     page = body.decode("utf-8", errors="replace")
     jsonld = parse_jsonld(page)
     if jsonld:
-        return METHOD_JSONLD, jsonld, response
-    return METHOD_HTML, parse_dated_links(page, response.final_url or url), response
+        return METHOD_JSONLD, jsonld
+    return METHOD_HTML, parse_dated_links(page, url)
+
+
+def items_from_url(fetcher, url):
+    """Fetch one candidate address and read it. Returns (method, items, response); method is None when it is unreadable."""
+    response = fetcher.get(url)
+    if response.status != 200:
+        return None, [], response
+    method, items = classify_body(response.body, response.final_url or url)
+    return method, items, response
+
+
+FEED_METHODS = (METHOD_RSS, METHOD_ATOM, METHOD_SITEMAP)
 
 
 def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, explicit_feed_url=None):
@@ -408,6 +415,12 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
             state["blocked"] = DiscoveryResult(STATUS_BLOCKED, http_code=response.status, seconds=response.seconds,
                                                reason=f"{response.error or response.status} on {path_of(page_url)}")
         elif response.status == 200:
+            method, items = classify_body(response.body, response.final_url or page_url)
+            if method in FEED_METHODS:                       # the address we were given is itself a feed (e.g. SEC EDGAR Atom)
+                ok, recent, _ = validate_items(items, now)
+                if ok:
+                    return found(DiscoveryResult(STATUS_FOUND, page_url, method, recent, items, response.status, response.seconds))
+                continue
             pages_html[page_url] = response.body.decode("utf-8", errors="replace")
             advertised += alternate_feed_links(pages_html[page_url], response.final_url or page_url)
     all_pages_disallowed = bool(pages) and disallowed_pages == len(pages)
