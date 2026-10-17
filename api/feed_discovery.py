@@ -24,6 +24,11 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
+try:
+    from .newsroom_cards import parse_cards
+except ImportError:
+    from newsroom_cards import parse_cards
+
 USER_AGENT = "Mozilla/5.0 (compatible; aviation-briefing-app/1.0; +https://github.com/hasanozver2-lab/aviation-briefing-app)"
 ROBOTS_TOKEN = "aviation-briefing-app"      # the product token robots.txt groups are matched against
 MAX_REQUESTS_PER_DISCOVERY = 14
@@ -320,6 +325,9 @@ MIN_LINK_TEXT = 20
 
 def parse_dated_links(page, base_url):
     """Anchors with a readable title that sit next to a <time datetime> element (a dated list of news links)."""
+    cards = parse_cards(page, base_url)
+    if cards:
+        return [Item(title, link, published) for title, link, published in cards]
     items = []
     for match in ANCHOR_PATTERN.finditer(page):
         href = re.search(r'href=["\']([^"\']+)["\']', match.group(1))

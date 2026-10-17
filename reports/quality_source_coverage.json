@@ -1,0 +1,241 @@
+{
+  "checked_at": "2026-10-17T10:12:17+00:00",
+  "window_days": 7,
+  "note": "7-day diagnostic window, not a change to the pipeline's 48-hour collection window. Scores and thresholds unchanged.",
+  "sources": [
+    {
+      "name": "IATA Press Room",
+      "source_type": "regulator",
+      "mode": "full",
+      "official": true,
+      "aviation_filter": false,
+      "feed_url": "https://www.iata.org/api/rss/pressrelease",
+      "status": "active",
+      "error": "",
+      "read_90d": 23,
+      "items_7d": 3,
+      "raw_48h": 0,
+      "latest_published_at": "2026-10-14T06:00:00+00:00",
+      "aviation_7d_before_limit": 3,
+      "aviation_48h": 0,
+      "examples": [
+        {
+          "title": "Corporate Demand Could Support Up to 1.9 Million Tonnes of SAF by 2030",
+          "url": "https://www.iata.org/en/pressroom/2026-releases/10-14-corporate-demand-could-support-up-to-1-9-million-tonnes-of-saf-by-2030/"
+        },
+        {
+          "title": "IATA and World Sustainable Hospitality Alliance to Collaborate on Sustainable Hotel Procurement",
+          "url": "https://www.iata.org/en/pressroom/2026-releases/10-14-iata-and-world-sustainable-hospitality-alliance-to-collaborate-on-sustainable-hotel-procurement/"
+        },
+        {
+          "title": "ICAO Joins Supporting Alliance for CORSIA EEU Supply",
+          "url": "https://www.iata.org/en/pressroom/2026-releases/10-13-icao-joins-supporting-alliance-for-corsia-eeu-supply/"
+        }
+      ],
+      "aviation_passed": 3,
+      "above_min_score": 2,
+      "listed": 2
+    },
+    {
+      "name": "ICAO Newsroom",
+      "source_type": "regulator",
+      "mode": "full",
+      "official": true,
+      "aviation_filter": false,
+      "feed_url": "https://www.icao.int/news",
+      "status": "active",
+      "error": "",
+      "read_90d": 10,
+      "items_7d": 3,
+      "raw_48h": 0,
+      "latest_published_at": "2026-10-15T00:00:00+00:00",
+      "aviation_7d_before_limit": 3,
+      "aviation_48h": 0,
+      "examples": [
+        {
+          "title": "ICAO Council condemns attacks on civilian airports, aircraft and aviation infrastructure in Saudi…",
+          "url": "https://www.icao.int/news/icao-council-condemns-attacks-civilian-airports-aircraft-and-aviation-infrastructure-saudi"
+        },
+        {
+          "title": "Strengthened commitment to CORSIA essential to successful decarbonization of civil aviation",
+          "url": "https://www.icao.int/news/strengthened-commitment-corsia-essential-successful-decarbonization-civil-aviation"
+        },
+        {
+          "title": "Governments and industry work to improve air travel for persons with disabilities",
+          "url": "https://www.icao.int/news/governments-and-industry-work-improve-air-travel-persons-disabilities"
+        }
+      ],
+      "aviation_passed": 3,
+      "above_min_score": 0,
+      "listed": 0
+    },
+    {
+      "name": "ACI World News",
+      "source_type": "regulator",
+      "mode": "feed_only",
+      "official": true,
+      "aviation_filter": false,
+      "feed_url": "https://aci.aero/feed/",
+      "status": "active",
+      "error": "",
+      "read_90d": 8,
+      "items_7d": 0,
+      "raw_48h": 0,
+      "latest_published_at": "2026-09-29T04:30:15+00:00",
+      "aviation_7d_before_limit": 0,
+      "aviation_48h": 0,
+      "examples": [],
+      "aviation_passed": 0,
+      "above_min_score": 0,
+      "listed": 0
+    },
+    {
+      "name": "The New York Times",
+      "source_type": "wire_headline",
+      "mode": "feed_only",
+      "official": false,
+      "aviation_filter": true,
+      "feed_url": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "status": "active",
+      "error": "",
+      "read_90d": 49,
+      "items_7d": 49,
+      "raw_48h": 33,
+      "latest_published_at": "2026-10-17T09:02:11+00:00",
+      "aviation_7d_before_limit": 1,
+      "aviation_48h": 1,
+      "examples": [
+        {
+          "title": "Lufthansa’s Final A346 Flight Marks the End of an Aviation Love Story",
+          "url": "https://www.nytimes.com/2026/10/16/travel/lufthansa-a340-600-airbus-retires.html"
+        }
+      ],
+      "aviation_passed": 1,
+      "above_min_score": 0,
+      "listed": 0
+    },
+    {
+      "name": "BBC News Business",
+      "source_type": "wire_headline",
+      "mode": "feed_only",
+      "official": false,
+      "aviation_filter": true,
+      "feed_url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+      "status": "active",
+      "error": "",
+      "read_90d": 48,
+      "items_7d": 34,
+      "raw_48h": 15,
+      "latest_published_at": "2026-10-17T06:18:16+00:00",
+      "aviation_7d_before_limit": 1,
+      "aviation_48h": 0,
+      "examples": [
+        {
+          "title": "Drop-off charges at UK airports to be reviewed after sharp increase",
+          "url": "https://www.bbc.co.uk/news/articles/cwp8gynk13rro?at_medium=RSS&at_campaign=rss"
+        }
+      ],
+      "aviation_passed": 1,
+      "above_min_score": 0,
+      "listed": 0
+    }
+  ],
+  "clusters": [],
+  "evaluated_stories": [
+    {
+      "headline": "Corporate Demand Could Support Up to 1.9 Million Tonnes of SAF by 2030",
+      "event_type": "sustainability_saf",
+      "score": 39.2,
+      "sources": [
+        "IATA Press Room"
+      ],
+      "listed": false
+    },
+    {
+      "headline": "IATA and World Sustainable Hospitality Alliance to Collaborate on Sustainable Hotel Procurement",
+      "event_type": "partnerships_mna",
+      "score": 48.2,
+      "sources": [
+        "IATA Press Room"
+      ],
+      "listed": true
+    },
+    {
+      "headline": "ICAO Joins Supporting Alliance for CORSIA EEU Supply",
+      "event_type": "partnerships_mna",
+      "score": 48.2,
+      "sources": [
+        "IATA Press Room"
+      ],
+      "listed": true
+    },
+    {
+      "headline": "ICAO Council condemns attacks on civilian airports, aircraft and aviation infrastructure in Saudi…",
+      "event_type": null,
+      "score": 23.5,
+      "sources": [
+        "ICAO Newsroom"
+      ],
+      "listed": false
+    },
+    {
+      "headline": "Strengthened commitment to CORSIA essential to successful decarbonization of civil aviation",
+      "event_type": "sustainability_saf",
+      "score": 39.2,
+      "sources": [
+        "ICAO Newsroom"
+      ],
+      "listed": false
+    },
+    {
+      "headline": "Governments and industry work to improve air travel for persons with disabilities",
+      "event_type": "community_csr",
+      "score": 21.2,
+      "sources": [
+        "ICAO Newsroom"
+      ],
+      "listed": false
+    },
+    {
+      "headline": "Lufthansa’s Final A346 Flight Marks the End of an Aviation Love Story",
+      "event_type": null,
+      "score": 35.0,
+      "sources": [
+        "The New York Times"
+      ],
+      "listed": false
+    },
+    {
+      "headline": "Drop-off charges at UK airports to be reviewed after sharp increase",
+      "event_type": null,
+      "score": 15.0,
+      "sources": [
+        "BBC News Business"
+      ],
+      "listed": false
+    }
+  ],
+  "alerts": {
+    "status": "not_configured",
+    "last_ok_at": "",
+    "articles_24h": 0
+  },
+  "direct_access": {
+    "Reuters Aviation": {
+      "status": "excluded_policy",
+      "reason": "robots.txt disallows /business/aerospace-defense/ for aviation-briefing-app"
+    },
+    "Bloomberg Aviation": {
+      "status": "excluded_policy",
+      "reason": "terms forbid automated reading: \"You shall not use or attempt to use any scraper, robot, bot, spider, data mining, computer code, or any other automate device\" (https://www.bloomberg.com/notices/tos/)"
+    },
+    "CNBC Airlines": {
+      "status": "no_public_feed",
+      "reason": "no public RSS/Atom feed found on the publisher's site; no feed, news sitemap, JSON-LD or dated links found"
+    },
+    "Eurocontrol News": {
+      "status": "no_extractable_feed",
+      "reason": "no feed, news sitemap, JSON-LD or dated links found"
+    }
+  }
+}

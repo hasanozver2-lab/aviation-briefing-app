@@ -1,5 +1,11 @@
 # AeroBrief — HANDOFF
 
+## Quality-source update — 2026-10-17 (feature/quality-source-coverage)
+
+Local branch, not merged/deployed: IATA official RSS, ICAO date-scoped newsroom cards and NYT Business RSS restored; ACI World and BBC Business added. Catalog: 104 rows / 37 active. General business feeds apply their 25-item cap after aviation filtering. Details and actual 7-day/48-hour yield: reports/quality_source_coverage.md and .json. Test result: 751 passed.
+
+Reuters/Bloomberg direct ingestion remains closed. The Google Alerts reader exists but ALERT_FEEDS is absent locally and from GitHub secrets; live status is not_configured. Publisher names in code do not imply working coverage. New feed access does not grant commercial reuse rights; terms records retain high commercial-use risk. Scoring is unchanged; most sample items remain below min_score or outside the current 48-hour window. Runner/production verification awaits merge authorization.
+
 Son güncelleme: 2026-10-16 (Adım 1: kalıcı kimlikli varlık katmanı + seed)
 
 ## Doğruluk kaynakları (git'te metin dosyaları)

@@ -631,6 +631,7 @@ def _read_catalog_feeds(cutoff, report, entity_index_factory=None, recovered=Non
     for source, items, source_report in results:
         if source["aviation_filter"] and items:
             items, dropped = feed_sources.filter_for_aviation(items, index)
+            items = items[:feed_sources.MAX_ITEMS_PER_SOURCE]
             source_report["filtered_out"] = dropped
             source_report["articles"] = len(items)
         report[source["name"]] = source_report

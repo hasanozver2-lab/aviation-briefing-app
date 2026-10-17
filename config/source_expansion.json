@@ -1,6 +1,8 @@
 {
  "_doc": "Sources to add to config/sources.csv (scripts/build_catalog.py merges them). A source whose registrable domain already has a row updates that row instead of adding one; urls beyond the first are extra discovery candidates. Feeds are never written here: they are discovered and stored in config/feeds_discovered.json.",
  "sources": [
+  {"group":"B","name":"ACI World News","urls":["https://aci.aero/","https://aci.aero/feed/"],"source_type":"regulator","region":"Global","language":"en","mode":"feed_only"},
+  {"group":"D","name":"BBC News Business","urls":["https://www.bbc.com/news/business","https://feeds.bbci.co.uk/news/business/rss.xml"],"source_type":"wire_headline","region":"Global","language":"en","mode":"feed_only"},
   {
    "group": "A",
    "name": "Delta News Hub",
@@ -255,7 +257,8 @@
    "group": "B",
    "name": "ICAO Newsroom",
    "urls": [
-    "https://www.icao.int/Newsroom/"
+    "https://www.icao.int/Newsroom/",
+    "https://www.icao.int/news"
    ],
    "source_type": "regulator",
    "region": "Global",
@@ -266,7 +269,8 @@
    "group": "B",
    "name": "IATA Press Room",
    "urls": [
-    "https://www.iata.org/en/pressroom/"
+    "https://www.iata.org/en/pressroom/",
+    "https://www.iata.org/api/rss/pressrelease"
    ],
    "source_type": "regulator",
    "region": "Global",
@@ -589,7 +593,8 @@
    "group": "D",
    "name": "The New York Times",
    "urls": [
-    "https://www.nytimes.com/"
+    "https://www.nytimes.com/",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml"
    ],
    "source_type": "wire_headline",
    "region": "Global",

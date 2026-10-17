@@ -2,6 +2,24 @@
  "_doc": "Terms-of-use and robots.txt review of every catalog source, made on 2026-10-17 by model-assisted web research (read=true: the terms page was read in that session; read=false: the page could not be retrieved or the finding comes from memory or a search excerpt, so treat it as UNCONFIRMED and have it checked by a person). commercial_use_risk: high = terms restrict commercial use/redistribution or automated access; medium = unclear or unreadable; low = no restriction or open reuse. The risk only records; it never deactivates a source. A source is excluded (status excluded_policy) only where robots.txt disallows our User-Agent, or, for press/data (feed_only) and exchange sources, where the terms explicitly forbid automated reading (automated_reading_forbidden with a quote).",
  "reviewed_on": "2026-10-17",
  "sources": {
+  "ACI World News": {
+   "terms_url": "https://aci.aero/terms-and-conditions-of-use/",
+   "commercial_use_risk": "high",
+   "summary": "Read 2026-10-17. Public RSS is available. Terms reserve intellectual property rights and grant no general reuse licence. Headline/short-feed-summary pilot only; commercial redistribution requires review.",
+   "robots": "Project User-Agent allowed at /feed/ on 2026-10-17.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "BBC News Business": {
+   "terms_url": "https://downloads.bbc.co.uk/usingthebbc/bbc_terms_of_use_19September2022english.pdf",
+   "commercial_use_risk": "high",
+   "summary": "Official archived terms, section 15, read 2026-10-17: RSS sharing requires attribution; business RSS use requires permission, potentially a fee. Current interactive terms page did not expose readable terms. No commercial permission inferred; recheck latest terms before launch.",
+   "robots": "Project User-Agent allowed at feeds.bbci.co.uk/news/business/rss.xml on 2026-10-17.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
   "AAIB UK": {
    "terms_url": "https://www.gov.uk/help/terms-conditions",
    "commercial_use_risk": "low",
@@ -768,13 +786,13 @@
    "read": false
   },
   "The New York Times": {
-   "terms_url": "",
-   "commercial_use_risk": "medium",
-   "summary": "terms not retrievable (fetch tool refused nytimes.com). From memory, not re-read: NYT terms limit use to personal non-commercial and bar automated access; likely high, verify manually.",
-   "robots": "unreachable (fetch blocked).",
+   "terms_url": "https://www.nytimes.com/rss",
+   "commercial_use_risk": "high",
+   "summary": "RSS-specific conditions read 2026-10-17: personal news readers and non-commercial blogs with attribution; commercial use requires prior written permission. Business feed is accessible. Pilot feed_only use does not establish a commercial licence.",
+   "robots": "Project User-Agent allowed at rss.nytimes.com/services/xml/rss/nyt/Business.xml on 2026-10-17.",
    "automated_reading_forbidden": false,
    "quote": "",
-   "read": false
+   "read": true
   },
   "The Wall Street Journal": {
    "terms_url": "https://www.dowjones.com/terms-of-use/",

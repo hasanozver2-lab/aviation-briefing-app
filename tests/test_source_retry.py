@@ -194,6 +194,7 @@ def test_a_retry_that_blows_up_never_fails_the_run(tmp_path, monkeypatch):
 
 
 def test_the_collection_reads_a_recovered_catalog_source_from_its_retry_address(monkeypatch):
+    monkeypatch.setattr(_engine, "utc_now", lambda: NOW)
     rows = [row("Recovered Wire", url="https://wire.example/", notes=json.dumps({"discovery_urls": ["https://wire.example/"]}))]
     monkeypatch.setattr(source_catalog, "read_rows", lambda path=None: rows)
     monkeypatch.setattr(feed_sources, "load_discovered", lambda path=None: {})

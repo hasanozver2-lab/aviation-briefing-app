@@ -157,7 +157,12 @@ def read_source(source, discovered, fetcher, now, cutoff, relogger=print):
     report.update(http=result.http_code, method=result.method)
     wanted = source["edgar_items"]
     articles = []
-    for item in sorted((i for i in result.items if i.published and i.published >= cutoff), key=lambda i: i.published, reverse=True)[:MAX_ITEMS_PER_SOURCE]:
+    recent_items = sorted((i for i in result.items if i.published and cutoff <= i.published <= now), key=lambda i: i.published, reverse=True)
+    # General feeds can put many unrelated headlines before the first aviation item.
+    # Their quota is applied by the caller AFTER the aviation filter.
+    if not source["aviation_filter"]:
+        recent_items = recent_items[:MAX_ITEMS_PER_SOURCE]
+    for item in recent_items:
         if source["cik"] and not edgar_items_wanted(item.summary, wanted):
             continue
         articles.append(article_from_item(item, source))

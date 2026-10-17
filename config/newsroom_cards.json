@@ -1,0 +1,8 @@
+{
+  "www.icao.int": {
+    "container_class": "card-contents",
+    "title_class": "card-title",
+    "date_class": "card-date",
+    "date_format": "%d/%m/%y"
+  }
+}
