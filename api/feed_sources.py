@@ -140,9 +140,11 @@ def read_source(source, discovered, fetcher, now, cutoff, relogger=print):
     result = None
     if entry:
         method_items = fd.items_from_url(fetcher, entry["feed_url"])
-        items = method_items[1]
-        ok, _, _ = fd.validate_items(items, now) if items else (False, 0, "")
-        if ok and (allowed_methods(source) is None or method_items[0] in allowed_methods(source)):
+        # The address was verified strictly when it was stored; reading is lenient: one malformed item must not drop the source
+        # (the weekly retry and the probe already accept a page with at least one complete, recent item).
+        items = [item for item in method_items[1] if item.title and item.link and item.published]
+        recent = any(now - item.published <= timedelta(days=fd.VALID_WINDOW_DAYS) for item in items)
+        if recent and method_items[0] and (allowed_methods(source) is None or method_items[0] in allowed_methods(source)):
             result = fd.DiscoveryResult(fd.STATUS_FOUND, entry["feed_url"], method_items[0], items=items, http_code=method_items[2].status)
         else:
             relogger(f"[{source['name']}] stored feed address stopped working ({method_items[2].error or method_items[2].status}); discovering again for this run.")
