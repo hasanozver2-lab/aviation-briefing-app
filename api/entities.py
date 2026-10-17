@@ -10,6 +10,7 @@ import csv
 import json
 import re
 import sqlite3
+from functools import lru_cache
 from pathlib import Path
 
 try:
@@ -461,10 +462,35 @@ def sync_entities(database, directory=None, sections_config=None):
 
 # --- matching -----------------------------------------------------------------
 
+FLIGHT_NUMBER_RULES_PATH = Path(__file__).resolve().parent.parent / "config" / "flight_number_rules.json"
+
+
+@lru_cache(maxsize=1)
+def _flight_number_rules():
+    rules = _load_json(FLIGHT_NUMBER_RULES_PATH)
+    designators = {item.upper() for item in rules["aircraft_designators"]}
+    words = "|".join(re.escape(word) for word in sorted(rules["context_words"], key=len, reverse=True))
+    return designators, re.compile(rf"(?<!\w)(?:{words})(?!\w)", re.IGNORECASE)
+
+
+class _FlightNumberPattern:
+    """CODE + 1-4 digits ("TK 1983", "AS350"): a flight number only when the token is not an aircraft designator and the text
+    mentions an airline context (flight, passenger, airline, airport, ...). Quacks like a compiled regex for _Entity.spans."""
+
+    def __init__(self, code):
+        self.regex = re.compile(rf"(?<!\w){re.escape(code)}\s?{NOT_A_YEAR}\d{{1,4}}(?!\w)")
+
+    def finditer(self, text):
+        designators, context = _flight_number_rules()
+        if not context.search(text):
+            return iter(())
+        return (match for match in self.regex.finditer(text) if match.group(0).replace(" ", "").upper() not in designators)
+
+
 def _carrier_code_patterns(code):
     escaped = re.escape(code)
     return [
-        re.compile(rf"(?<!\w){escaped}\s?{NOT_A_YEAR}\d{{1,4}}(?!\w)"),
+        _FlightNumberPattern(code),
         re.compile(rf"(?<!\w){escaped}(?:'s)?\s+{FLIGHT_CONTEXT_WORDS}(?!\w)"),
         re.compile(rf"(?<!\w){escaped}'s(?!\w)"),
     ]

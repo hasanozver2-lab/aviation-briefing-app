@@ -193,7 +193,8 @@
         "divert*",
         "flights diverted",
         "cancellations"
-      ]
+      ],
+      "exclude_when_rule": "military_strike"
     },
     "fleet_orders": {
       "weight": 0.7,
@@ -477,6 +478,60 @@
       "regulation_policy",
       "sustainability_saf",
       "workforce_hr"
+    ]
+  },
+  "safety_context": {
+    "_doc": "safety_incident (weight 0.95) is meant for passenger-airline events. After entity annotation an article typed safety_incident keeps the type only with an airline context: a matched carrier or airline group (flight numbers count, see config/flight_number_rules.json) or airline/passenger words; an airport alone is enough unless it is general aviation. Otherwise the type is dropped (the story stays in the list, untyped, by the normal score). No weight or threshold changes.",
+    "applies_to": [
+      "safety_incident"
+    ],
+    "general_aviation_terms": [
+      "cessna",
+      "piper",
+      "beechcraft",
+      "private jet*",
+      "private plane*",
+      "light aircraft",
+      "helicopter*",
+      "glider*",
+      "sailplane*",
+      "microlight*",
+      "ultralight*",
+      "flex-wing",
+      "paraglid*",
+      "paramotor*",
+      "autogyro*",
+      "gyrocopter*",
+      "hot-air balloon*",
+      "general aviation",
+      "specialised operations",
+      "business jet*",
+      "özel jet*",
+      "özel uçak*"
+    ],
+    "strong_context_terms": [
+      "airline*",
+      "airliner*",
+      "airways",
+      "passenger*",
+      "scheduled",
+      "flight number",
+      "freighter*",
+      "cargo jet*",
+      "cargo plane*",
+      "havayolu*",
+      "yolcu*"
+    ],
+    "weak_context_terms": [
+      "airport*",
+      "havalimanı*"
+    ],
+    "strong_context_entities": [
+      "carriers",
+      "groups"
+    ],
+    "weak_context_entities": [
+      "airports"
     ]
   }
 }

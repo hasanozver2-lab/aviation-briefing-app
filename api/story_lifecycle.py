@@ -213,13 +213,24 @@ def cluster_representatives(articles):
     return representatives
 
 
+def military_strike_matches(text, selection):
+    """A strike with a military context and no labour context (selection.military_strike)."""
+    rule = selection.get("military_strike")
+    if not rule:
+        return False
+    prepared = text_match.prepare(text)
+    return (text_match.TermSet(rule["requires"]).any(prepared) and text_match.TermSet(rule["context"]).any(prepared)
+            and not text_match.TermSet(rule["unless"]).any(prepared))
+
+
 def is_military_story(story, selection):
     """Defence/military items that do not involve any airline or civil aviation context are out of scope."""
     exclude_terms = selection.get("exclude_terms")
     if not exclude_terms:
         return False
     title = story.get("headline", "")
-    if not text_match.TermSet(exclude_terms).any(title) or text_match.TermSet(selection.get("keep_terms", [])).any(title):
+    is_defence_item = text_match.TermSet(exclude_terms).any(title) or military_strike_matches(title, selection)
+    if not is_defence_item or text_match.TermSet(selection.get("keep_terms", [])).any(title):
         return False
     entities = story.get("entities") or {}
     return not (entities.get("carriers") or entities.get("groups"))
