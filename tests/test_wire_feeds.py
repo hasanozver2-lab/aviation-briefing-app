@@ -79,11 +79,11 @@ def test_the_aviation_filter_drops_unrelated_wire_releases_and_keeps_airline_one
     ("Alaska Air Group declares quarterly dividend", "airline_financials"),
     ("Boeing announces $2 billion share repurchase program", "capital_markets"),
 ])
-def test_investor_announcements_use_existing_types_without_a_new_taxonomy_type(title, expected):
+def test_earnings_dividend_and_buyback_announcements_use_their_existing_types(title, expected):
     result = market_data.classify_event_type(title, "")
     assert result and result["event_type"] == expected
-    assert "investor_disclosure" not in market_data.load_taxonomy_config()["event_types"]
 
 
-def test_a_debt_offering_has_no_type_yet_which_is_why_a_new_type_is_only_proposed():
-    assert market_data.classify_event_type("JetBlue prices $500 million senior notes offering", "") is None
+def test_a_debt_offering_has_the_investor_disclosure_type_since_the_taxonomy_approval():
+    result = market_data.classify_event_type("JetBlue prices $500 million senior notes offering", "")
+    assert result["event_type"] == "investor_disclosure"

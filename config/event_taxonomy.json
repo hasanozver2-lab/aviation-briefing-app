@@ -464,6 +464,22 @@
         "atandı",
         "atama*"
       ]
+    },
+    "investor_disclosure": {
+      "weight": 0.45,
+      "terms": [
+        "debt offering",
+        "notes offering",
+        "senior notes",
+        "convertible*",
+        "credit facility",
+        "revolving credit",
+        "term loan",
+        "bond offering",
+        "bond issue",
+        "tahvil ihrac*",
+        "borçlanma aracı*"
+      ]
     }
   },
   "_eligibility": "A type applies when one of its terms is in the TITLE, or at least min_description_hits distinct terms are in the description. A single hit in a long description is usually boilerplate ('personal guidance' in a foundation blurb).",
@@ -533,5 +549,6 @@
     "weak_context_entities": [
       "airports"
     ]
-  }
+  },
+  "_investor_disclosure": "Debt and financing announcements (debt/notes offering, convertible, credit facility). Same weight as capital_markets (0.45), approved 2026-10-17. Earnings, guidance and dividends stay airline_financials; buybacks stay capital_markets."
 }
