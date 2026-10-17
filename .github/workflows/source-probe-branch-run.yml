@@ -4,7 +4,7 @@ name: Probe sources (temporary branch run)
 # Same guarantees: read-only token, no secrets, no briefing data, no pushes.
 on:
   push:
-    branches: [fix/probe-window]
+    branches: [feature/wire-feeds]
     paths: [".github/workflows/source-probe-branch-run.yml"]
 
 permissions:
