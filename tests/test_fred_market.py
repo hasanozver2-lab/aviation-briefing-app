@@ -1,5 +1,5 @@
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
@@ -79,7 +79,8 @@ def test_when_fred_is_down_too_the_pipeline_still_returns_a_panel(tmp_path, call
     assert panel["fuel_provider"] is None and "FRED" in panel["missing_data_note"] and panel["errors"] == ["FRED: ConnectionResetError"]
 
 
-def test_as_of_is_the_real_observation_date_and_carried_forward_says_how_old(tmp_path, calls):
+def test_as_of_is_the_real_observation_date_and_carried_forward_says_how_old(tmp_path, calls, monkeypatch):
+    monkeypatch.setattr(market_data, "utc_now", lambda: datetime(TODAY.year, TODAY.month, TODAY.day, 12, tzinfo=timezone.utc))   # age is measured against "now"
     panel = refresh(tmp_path)
     brent = item(panel, "brent_spot")
     assert brent["as_of"] == (TODAY - timedelta(days=2)).isoformat()
