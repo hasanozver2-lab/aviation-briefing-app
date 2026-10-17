@@ -1046,7 +1046,7 @@
    "source_type": "exchange",
    "region": "Turkey",
    "language": "tr",
-   "mode": "feed_only"
+   "mode": "full"
   },
   {
    "group": "G",
@@ -1058,7 +1058,7 @@
    "source_type": "exchange",
    "region": "Turkey",
    "language": "tr",
-   "mode": "feed_only"
+   "mode": "full"
   }
  ]
 }

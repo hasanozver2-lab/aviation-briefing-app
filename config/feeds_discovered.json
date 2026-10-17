@@ -2,169 +2,176 @@
   "aaib_uk": {
     "feed_url": "https://www.gov.uk/government/organisations/air-accidents-investigation-branch.atom",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "atom",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "accelya_news": {
     "feed_url": "https://www.accelya.com/feed",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "aerotime": {
     "feed_url": "https://www.aerotime.aero/feed",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "air_france_press_releases": {
     "feed_url": "https://corporate.airfrance.com/en/rss-subscription",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "airbus_press_releases": {
     "feed_url": "https://www.airbus.com/rss.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "airdatanews": {
     "feed_url": "https://www.airdatanews.com/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "alaska_airlines_newsroom": {
     "feed_url": "https://news.alaskaair.com/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "anac_brazil": {
     "feed_url": "https://www.gov.br/atom.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "atom",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "aviation24": {
     "feed_url": "https://www.aviation24.be/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "bea_news": {
     "feed_url": "https://www.bea.aero/en/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "html",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "bombardier_news": {
     "feed_url": "https://bombardier.com/rss.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "cathay_pacific_newsroom": {
     "feed_url": "https://news.cathaypacific.com/feed",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "delta_news_hub": {
     "feed_url": "https://news.delta.com/rss.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "easa_news": {
     "feed_url": "https://www.easa.europa.eu/en/newsroom-and-events/news/feed.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "faa_newsroom": {
     "feed_url": "https://www.faa.gov/rss.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "flightradar24": {
     "feed_url": "https://www.flightradar24.com/blog/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "ge_aerospace_news": {
     "feed_url": "https://www.geaerospace.com/rss.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "havahaber": {
     "feed_url": "https://havahaber.com/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "klm_newsroom": {
     "feed_url": "https://nieuws.klm.com/feed/en",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
+  },
+  "pr_newswire_heavy_industry_sector": {
+    "feed_url": "https://www.prnewswire.com/rss/heavy-industry-manufacturing-latest-news/heavy-industry-manufacturing-latest-news-list.rss",
+    "item_count_90d": 20,
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
+    "method": "rss",
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "rolls_royce_press_releases": {
     "feed_url": "https://www.rolls-royce.com/rss",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "ryanair_newsroom": {
     "feed_url": "https://corporate.ryanair.com/rss.xml",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "html",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "simple_flying": {
     "feed_url": "https://simpleflying.com/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "the_air_current": {
     "feed_url": "https://theaircurrent.com/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   },
   "tolga_zbek_havac_l_k": {
     "feed_url": "https://tolgaozbek.com/feed/",
     "item_count_90d": 0,
-    "last_ok_at": "2026-10-17T08:17:15+00:00",
+    "last_ok_at": "2026-10-17T09:16:34+00:00",
     "method": "rss",
-    "verified_at": "2026-10-17T08:17:15+00:00"
+    "verified_at": "2026-10-17T09:16:34+00:00"
   }
 }
