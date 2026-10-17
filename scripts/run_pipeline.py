@@ -22,6 +22,7 @@ from api import _engine
 from api import briefing_store
 from api import narrative
 from api import source_catalog
+from api import source_retry
 from api import story_lifecycle
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
@@ -34,10 +35,10 @@ def timestamp(now=None):
     return (now or datetime.now(timezone.utc)).isoformat(timespec="seconds")
 
 
-def collect():
-    """Return (collected, error_message); exactly one of them is empty."""
+def collect(recovered=None):
+    """Return (collected, error_message); exactly one of them is empty. `recovered`: sources the weekly retry brought back."""
     try:
-        return _engine.collect_run(), ""
+        return (_engine.collect_run(recovered=recovered) if recovered else _engine.collect_run()), ""
     except Exception as exc:
         message = f"{type(exc).__name__}: {exc}"[:500]
         print(f"Collection failed: {message}", file=sys.stderr)
@@ -49,7 +50,7 @@ def day_payload(collected, now):
     return {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
 
 
-def source_health(source_report, existing_status, now):
+def source_health(source_report, existing_status, now, retry=None):
     """Per source: last status, last successful read and articles in the last 24 hours. Unresolved sources only show up here."""
     report = dict(source_report or {})
     for row in source_catalog.read_rows():
@@ -64,6 +65,18 @@ def source_health(source_report, existing_status, now):
             "articles_24h": entry.get("articles_24h", 0),
             "error": entry.get("error", ""),
         }
+        prior = previous.get(name, {})
+        for key in ("last_retry_at", "retry_feed", "recovered_at", "retry_note"):
+            if key in prior:
+                health[name][key] = prior[key]
+        attempt = (retry or {}).get(name)
+        if attempt:
+            health[name]["last_retry_at"] = attempt["at"]
+            if attempt["valid"]:
+                health[name].update(retry_feed={"feed_url": attempt["feed_url"], "method": attempt["method"]}, recovered_at=attempt["at"])
+                health[name].pop("retry_note", None)
+            else:
+                health[name]["retry_note"] = attempt["reason"]
     return health
 
 
@@ -72,7 +85,7 @@ def source_summary(health):
     return {"sources": len(health), "reading_ok": ok, "unresolved": len(health) - ok}
 
 
-def status_payload(collection_error, narrative_report, now, collected=None, existing_status=None):
+def status_payload(collection_error, narrative_report, now, collected=None, existing_status=None, retry=None):
     payload = {
         "status": STATUS_STALE if collection_error else STATUS_OK,
         "errors": {"collect": collection_error} if collection_error else {},
@@ -82,7 +95,7 @@ def status_payload(collection_error, narrative_report, now, collected=None, exis
         "last_attempt_at": timestamp(now),
     }
     if collected is not None:
-        health = source_health(collected.get("source_report"), existing_status, now)
+        health = source_health(collected.get("source_report"), existing_status, now, retry)
         payload.update(sources=health, source_summary=source_summary(health))
     elif existing_status and "sources" in existing_status:
         payload.update(sources=existing_status["sources"], source_summary=existing_status.get("source_summary", {}))
@@ -122,7 +135,7 @@ def make_reader(out_dir):
     return read_local
 
 
-def plan_files(collected, collection_error, read, now, api_key, narrate=narrative.fill_pending):
+def plan_files(collected, collection_error, read, now, api_key, narrate=narrative.fill_pending, retry=None):
     """Decide which files must be written for this run (possibly none). Returns (files, narrative_report)."""
     config = story_lifecycle.load_badges_config()
     today = story_lifecycle.day_key(now, config)
@@ -152,18 +165,36 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
         files[day_path] = day
         files[briefing_store.latest_path()] = day
     existing_status = read(briefing_store.status_path())
-    new_status = status_payload(collection_error, report, now, collected, existing_status)
+    new_status = status_payload(collection_error, report, now, collected, existing_status, retry)
     if status_changed(existing_status, new_status):
         files[briefing_store.status_path()] = new_status
     return files, report
 
 
+OVERRIDES_PATH = PROJECT_DIR / "config" / "source_status_overrides.json"
+
+
+def weekly_retry(read, now):
+    """Retry the sources that are disabled_blocked (once per source per week, one request each). Returns (results, recovered).
+    Whatever goes wrong here is logged and ignored: a retry never fails the run."""
+    try:
+        previous_status = read(briefing_store.status_path())
+        overrides = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8")) if OVERRIDES_PATH.is_file() else {}
+        results = source_retry.retry_blocked(source_catalog.read_rows(), previous_status, overrides, now)
+        return results, source_retry.recovered_sources(previous_status, results)
+    except Exception as exc:
+        print(f"Weekly source retry skipped: {type(exc).__name__}: {exc}"[:300], file=sys.stderr)
+        return {}, {}
+
+
 def run(out_dir=None, now=None, api_key=None, narrate=narrative.fill_pending):
     now = now or datetime.now(timezone.utc)
     api_key = _engine.GEMINI_API_KEY if api_key is None else api_key
-    collected, collection_error = collect()
+    reader = make_reader(out_dir)
+    retry, recovered = weekly_retry(reader, now)
+    collected, collection_error = collect(recovered)
     try:
-        files, report = plan_files(collected, collection_error, make_reader(out_dir), now, api_key, narrate)
+        files, report = plan_files(collected, collection_error, reader, now, api_key, narrate, retry)
         print(f"Narratives: calls={report['calls']} narrated={report['narrated']} pending={report['pending']}"
               + (f" (LLM unavailable: {report['error']}; will retry next run)" if report["error"] else ""))
         if not files:

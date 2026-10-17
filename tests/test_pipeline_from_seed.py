@@ -34,7 +34,7 @@ def isolated_pipeline(tmp_path, monkeypatch):
     monkeypatch.setattr(_engine, "CACHE_FILE_DAILY", tmp_path / "briefing_cache_daily.json")
     monkeypatch.setattr(_engine, "CACHE_FILE_HOURLY", tmp_path / "briefing_cache_hourly.json")
     monkeypatch.setattr(_engine, "GEMINI_API_KEY", "")
-    monkeypatch.setattr(_engine, "fetch_rss_items", lambda max_hours=48, report=None: [dict(article) for article in ARTICLES])
+    monkeypatch.setattr(_engine, "fetch_rss_items", lambda max_hours=48, report=None, recovered=None: [dict(article) for article in ARTICLES])
     monkeypatch.setattr(market_data, "refresh_market_data", lambda *args, **kwargs: {"indicators": []})
     assert not registry_db.exists() and not market_db.exists()
     return registry_db, market_db

@@ -585,17 +585,25 @@ def _fetch_source_articles(source, cutoff, headers):
         return [], describe_fetch_error(exc)
 
 
-def _read_catalog_feeds(cutoff, report, entity_index_factory=None):
+def _read_catalog_feeds(cutoff, report, entity_index_factory=None, recovered=None):
     """Catalog sources read through their discovered feeds: hosts in parallel, the sources of one host strictly in turn."""
     rows = source_catalog.read_rows()
     handled = {source["name"] for source in get_builtin_source_records()}
+    recovered = recovered or {}
     sources = feed_sources.catalog_feed_sources(rows, handled)
+    discovered = feed_sources.load_discovered()
     for row in rows:
-        if row["name"] not in handled and row["status"] != source_catalog.STATUS_ACTIVE:
+        if row["name"] in handled or row["status"] == source_catalog.STATUS_ACTIVE:
+            continue
+        if row["name"] in recovered:      # blocked in the catalog, but this week's retry (status.json) found valid content again
+            record = feed_sources.source_record(row)
+            record["status"] = source_catalog.STATUS_ACTIVE
+            sources.append(record)
+            discovered[record["slug"]] = {"feed_url": recovered[row["name"]]["feed_url"], "method": recovered[row["name"]]["method"]}
+        else:
             report[row["name"]] = {"status": row["status"], "error": row["reason"], "articles": 0}
     if not sources:
         return []
-    discovered = feed_sources.load_discovered()
     now = utc_now()
     groups = feed_sources.group_by_host(sources)
 
@@ -628,7 +636,7 @@ def _read_catalog_feeds(cutoff, report, entity_index_factory=None):
     return articles
 
 
-def fetch_rss_items(max_hours=48, report=None):
+def fetch_rss_items(max_hours=48, report=None, recovered=None):
     """Fetch recent airline-relevant entries without serial source delays.
 
     `report`, when given, is filled with one entry per source: status, error, articles (and articles_24h at the end).
@@ -639,6 +647,13 @@ def fetch_rss_items(max_hours=48, report=None):
     # are read one after the other, different hosts in parallel.
     headers = {"User-Agent": feed_discovery.USER_AGENT, "Accept": "application/rss+xml, application/atom+xml, application/xml;q=0.9, text/html;q=0.8, */*;q=0.5"}
     sources = get_rss_sources(max_hours)
+    if recovered:
+        known = {source.get("name") for source in sources}
+        catalog = {row["name"]: row for row in source_catalog.read_rows()}
+        for source in get_builtin_source_records(max_hours):
+            if source["name"] in recovered and source["name"] not in known and source["name"] in catalog:
+                source["timeout_s"], source["mode"] = int(catalog[source["name"]]["timeout_s"]), catalog[source["name"]]["mode"]
+                sources.append(source)
     hosts = {}
     for source in sources:
         hosts.setdefault(source_catalog.registrable_key(source.get("url", "")), []).append(source)
@@ -669,7 +684,7 @@ def fetch_rss_items(max_hours=48, report=None):
                 if error_name:
                     print(f"[{source.get('name', 'Unknown source')}] Kaynak atlandı ({error_name}).")
 
-    articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv))
+    articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv, recovered=recovered))
     articles.sort(key=lambda article: article.get("timestamp", 0), reverse=True)
     seen_links = set()
     unique_articles = []
@@ -1023,7 +1038,7 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
     return build_briefing_payload(mode, stories, status=status, warning=warning)
 
 
-def collect_run(market_database=None):
+def collect_run(market_database=None, recovered=None):
     """One collection pass shared by every mode: sources, market panel, entities, scores, selection.
 
     Raises only when data collection itself failed. No LLM is involved; the LLM step comes later and
@@ -1037,7 +1052,7 @@ def collect_run(market_database=None):
     # Commentary on market events stays template-based: it keeps the run's LLM budget for story narratives.
     market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="", fred_api_key=_env_value("FRED_API_KEY"))
     source_report = {}
-    articles = fetch_rss_items(max_hours=48, report=source_report)
+    articles = fetch_rss_items(max_hours=48, report=source_report, recovered=recovered)
     if not articles:
         raise RuntimeError("No articles could be collected from any source")
     market_data.record_article_events(local_market_database, articles)
