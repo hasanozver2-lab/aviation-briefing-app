@@ -184,8 +184,8 @@ def measure(articles, records, relevance_config=None):
         distinct = {m["source"] for m in members}
         if len(distinct) > 1:
             clusters.append({"story_id": story["story_id"], "headline": story["headline"], "score": story["relevance_score"], "listed": bool(listed),
-                             "sources": [{"name": m["source"], "type": m["source_type"], "title": m["title"], "link": m["link"]} for m in sorted(members, key=lambda m: m["source"])],
-                             "mixed_official_and_press": bool({m["source_type"] for m in members} & OFFICIAL_TYPES and {m["source_type"] for m in members} & PRESS_TYPES)})
+                             "sources": [{"name": m["source"], "type": by_name[m["source"]]["source_type"], "title": m["title"], "link": m["link"]} for m in sorted(members, key=lambda m: m["source"])],
+                             "mixed_official_and_press": bool({by_name[m["source"]]["source_type"] for m in members} & OFFICIAL_TYPES and {by_name[m["source"]]["source_type"] for m in members} & PRESS_TYPES)})
     clusters.sort(key=lambda c: (-len({s["name"] for s in c["sources"]}), -c["score"]))
     near = _near_misses(kept, groups)
     return records, clusters[:40], near
