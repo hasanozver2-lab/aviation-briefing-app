@@ -18,6 +18,7 @@ SOURCES_CSV_PATH = BASE_DIR / "config" / "sources.csv"
 SOURCES_CSV_COLUMNS = (
     "name", "url", "feed_url", "feed_type", "region", "tier",
     "license_status", "language", "active", "notes",
+    "source_type", "official", "mode", "timeout_s", "status", "reason", "commercial_use_risk",
 )
 
 TIER_BY_SOURCE_TYPE = {
@@ -60,6 +61,10 @@ def database_path(value=None):
         return DEFAULT_DATABASE_PATH
     configured = Path(configured_path)
     return configured if configured.is_absolute() else BASE_DIR / configured
+
+
+def load_source_types():
+    return json.loads((BASE_DIR / "config" / "source_types.json").read_text(encoding="utf-8"))
 
 
 def load_registry_config():
@@ -185,6 +190,19 @@ def load_sources_csv(csv_path=None, config=None):
             raise ValueError(f"{label}: active must be 0 or 1")
         if row["license_status"] == "paid" and row["active"] == "1":
             raise ValueError(f"{label}: paid sources cannot be active without a licence")
+        source_types = load_source_types()
+        if row["source_type"] not in source_types["types"]:
+            raise ValueError(f"{label}: invalid source_type {row['source_type']!r}")
+        if row["status"] not in source_types["statuses"]:
+            raise ValueError(f"{label}: invalid status {row['status']!r}")
+        if row["mode"] not in source_types["modes"]:
+            raise ValueError(f"{label}: invalid mode {row['mode']!r}")
+        if row["commercial_use_risk"] not in {"", *source_types["commercial_use_risks"]}:
+            raise ValueError(f"{label}: invalid commercial_use_risk {row['commercial_use_risk']!r}")
+        if row["official"] not in {"true", "false"} or not row["timeout_s"].isdigit():
+            raise ValueError(f"{label}: official must be true/false and timeout_s a whole number")
+        if (row["status"] == "active") != (row["active"] == "1"):
+            raise ValueError(f"{label}: active must be 1 exactly when status is 'active'")
         try:
             json.loads(row["notes"] or "{}")
         except json.JSONDecodeError as exc:
@@ -222,7 +240,7 @@ def export_sources_csv(source_records, csv_path=None):
         writer.writeheader()
         for source in source_records:
             record = source_to_registry_record(source, config)
-            writer.writerow({column: record[column] for column in SOURCES_CSV_COLUMNS})
+            writer.writerow({column: record.get(column, "") for column in SOURCES_CSV_COLUMNS})
     return path
 
 

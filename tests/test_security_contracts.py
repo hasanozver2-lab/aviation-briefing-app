@@ -241,27 +241,24 @@ def test_source_registry_migrates_current_sources_with_configured_tier_weights(t
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'source_stats'"
         ).fetchone()
 
-    assert count == 39
+    assert count == len(_engine.get_builtin_source_records())
     assert lufthansa == (1, 1.0, "public")
     assert flightglobal == (2, 0.8)
     assert source_stats_exists is not None
 
 
-def test_paid_publishers_are_registered_but_never_active(tmp_path):
-    database = tmp_path / "source_registry.sqlite3"
-    source_registry.migrate_sources(_engine.get_builtin_source_records(), database)
-    with sqlite3.connect(database) as connection:
-        rows = connection.execute(
-            "SELECT name, tier, license_status, active FROM sources WHERE name IN (?, ?, ?) ORDER BY name",
-            ("Bloomberg Aviation", "Financial Times Aviation", "Reuters Aviation"),
-        ).fetchall()
+def test_licensed_api_feeds_from_the_environment_are_never_active(monkeypatch):
+    monkeypatch.setenv("REUTERS_AVIATION_RSS_URL", "https://licensed.example/reuters.rss")
+    licensed = [source for source in _engine.get_builtin_source_records() if source.get("license_required")]
+    assert [source["name"] for source in licensed] == ["Reuters Aviation"] and licensed[0]["active"] is False
+    assert "Reuters Aviation" not in {source["name"] for source in _engine.get_rss_sources()}
 
-    assert rows == [
-        ("Bloomberg Aviation", 3, "paid", 0),
-        ("Financial Times Aviation", 3, "paid", 0),
-        ("Reuters Aviation", 3, "paid", 0),
-    ]
-    assert not {source["name"] for source in _engine.get_rss_sources()} & {row[0] for row in rows}
+
+def test_the_press_names_are_public_feed_only_catalog_rows_not_licensed_placeholders():
+    from api import source_catalog
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    for name in ("Reuters Aviation", "Financial Times Aviation", "Bloomberg Aviation"):
+        assert rows[name]["license_status"] == "public" and rows[name]["mode"] == "feed_only" and rows[name]["source_type"] == "wire_headline"
 
 
 def test_configured_paid_publishers_cannot_be_enabled(monkeypatch):

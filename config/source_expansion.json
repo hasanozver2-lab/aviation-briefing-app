@@ -1,0 +1,988 @@
+{
+ "_doc": "Sources to add to config/sources.csv (scripts/build_catalog.py merges them). A source whose registrable domain already has a row updates that row instead of adding one; urls beyond the first are extra discovery candidates. Feeds are never written here: they are discovered and stored in config/feeds_discovered.json.",
+ "sources": [
+  {
+   "group": "A",
+   "name": "Delta News Hub",
+   "urls": [
+    "https://news.delta.com/"
+   ],
+   "source_type": "airline_ir",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "Delta Air Lines",
+   "airline_code": "DL"
+  },
+  {
+   "group": "A",
+   "name": "United Airlines Newsroom",
+   "urls": [
+    "https://www.united.com/en/us/newsroom"
+   ],
+   "source_type": "airline_ir",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "United Airlines",
+   "airline_code": "UA"
+  },
+  {
+   "group": "A",
+   "name": "American Airlines Newsroom",
+   "urls": [
+    "https://news.aa.com/"
+   ],
+   "source_type": "airline_ir",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "American Airlines",
+   "airline_code": "AA"
+  },
+  {
+   "group": "A",
+   "name": "Southwest Newsroom",
+   "urls": [
+    "https://www.swamedia.com/"
+   ],
+   "source_type": "airline_ir",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "Southwest Airlines",
+   "airline_code": "WN"
+  },
+  {
+   "group": "A",
+   "name": "Lufthansa Group Newsroom",
+   "urls": [
+    "https://www.lufthansagroup.com/en/newsroom.html"
+   ],
+   "source_type": "airline_ir",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "airline": "Lufthansa Group",
+   "airline_code": "LH"
+  },
+  {
+   "group": "A",
+   "name": "IAG Newsroom",
+   "urls": [
+    "https://www.iairgroup.com/en/newsroom"
+   ],
+   "source_type": "airline_ir",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "airline": "International Airlines Group",
+   "airline_code": "IB"
+  },
+  {
+   "group": "A",
+   "name": "Air France-KLM Newsroom",
+   "urls": [
+    "https://www.airfranceklm.com/en/newsroom"
+   ],
+   "source_type": "airline_ir",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "airline": "Air France-KLM",
+   "airline_code": "AF"
+  },
+  {
+   "group": "A",
+   "name": "Emirates Newsroom",
+   "urls": [
+    "https://www.emirates.com/media-centre/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Middle East",
+   "language": "en",
+   "mode": "full",
+   "airline": "Emirates",
+   "airline_code": "EK"
+  },
+  {
+   "group": "A",
+   "name": "Qatar Airways Press Releases",
+   "urls": [
+    "https://www.qatarairways.com/en/press-releases.html"
+   ],
+   "source_type": "airline_ir",
+   "region": "Middle East",
+   "language": "en",
+   "mode": "full",
+   "airline": "Qatar Airways",
+   "airline_code": "QR"
+  },
+  {
+   "group": "A",
+   "name": "Etihad Airways News",
+   "urls": [
+    "https://www.etihad.com/en/news"
+   ],
+   "source_type": "airline_ir",
+   "region": "Middle East",
+   "language": "en",
+   "mode": "full",
+   "airline": "Etihad Airways",
+   "airline_code": "EY"
+  },
+  {
+   "group": "A",
+   "name": "Singapore Airlines Newsroom",
+   "urls": [
+    "https://www.singaporeair.com/en_UK/us/media-centre/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full",
+   "airline": "Singapore Airlines",
+   "airline_code": "SQ"
+  },
+  {
+   "group": "A",
+   "name": "Cathay Pacific Newsroom",
+   "urls": [
+    "https://news.cathaypacific.com/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full",
+   "airline": "Cathay Pacific",
+   "airline_code": "CX"
+  },
+  {
+   "group": "A",
+   "name": "ANA Group Press Releases",
+   "urls": [
+    "https://www.ana.co.jp/group/en/pr/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full",
+   "airline": "ANA",
+   "airline_code": "NH",
+   "timeout_s": 10
+  },
+  {
+   "group": "A",
+   "name": "Japan Airlines Press Releases",
+   "urls": [
+    "https://press.jal.co.jp/en/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full",
+   "airline": "Japan Airlines",
+   "airline_code": "JL"
+  },
+  {
+   "group": "A",
+   "name": "LATAM Airlines Press Room",
+   "urls": [
+    "https://www.latamairlines.com/us/en/experience/press-room"
+   ],
+   "source_type": "airline_ir",
+   "region": "Latin America",
+   "language": "en",
+   "mode": "full",
+   "airline": "LATAM Airlines",
+   "airline_code": "LA"
+  },
+  {
+   "group": "A",
+   "name": "Ryanair Newsroom",
+   "urls": [
+    "https://corporate.ryanair.com/news/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "airline": "Ryanair",
+   "airline_code": "FR"
+  },
+  {
+   "group": "A",
+   "name": "easyJet Media Centre",
+   "urls": [
+    "https://mediacentre.easyjet.com/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "airline": "easyJet",
+   "airline_code": "U2"
+  },
+  {
+   "group": "A",
+   "name": "Turkish Airlines Blog",
+   "urls": [
+    "https://press.turkishairlines.com/en/",
+    "https://blog.turkishairlines.com/en/feed/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Turkey",
+   "language": "en",
+   "mode": "full",
+   "airline": "Turkish Airlines",
+   "airline_code": "TK"
+  },
+  {
+   "group": "A",
+   "name": "Pegasus Press Room",
+   "urls": [
+    "https://www.flypgs.com/en/about-pegasus/news",
+    "https://www.flypgs.com/en/press-room"
+   ],
+   "source_type": "airline_ir",
+   "region": "Turkey",
+   "language": "en",
+   "mode": "full",
+   "airline": "Pegasus Airlines",
+   "airline_code": "PC"
+  },
+  {
+   "group": "B",
+   "name": "ICAO Newsroom",
+   "urls": [
+    "https://www.icao.int/Newsroom/"
+   ],
+   "source_type": "regulator",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "IATA Press Room",
+   "urls": [
+    "https://www.iata.org/en/pressroom/"
+   ],
+   "source_type": "regulator",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "FAA Newsroom",
+   "urls": [
+    "https://www.faa.gov/newsroom"
+   ],
+   "source_type": "regulator",
+   "region": "North America",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "EASA News",
+   "urls": [
+    "https://www.easa.europa.eu/en/newsroom-and-events/news"
+   ],
+   "source_type": "regulator",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "Eurocontrol News",
+   "urls": [
+    "https://www.eurocontrol.int/news"
+   ],
+   "source_type": "regulator",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "CAAC News",
+   "urls": [
+    "http://www.caac.gov.cn/en/"
+   ],
+   "source_type": "regulator",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "DGCA India",
+   "urls": [
+    "https://www.dgca.gov.in/"
+   ],
+   "source_type": "regulator",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "ANAC Brazil",
+   "urls": [
+    "https://www.gov.br/anac/en"
+   ],
+   "source_type": "regulator",
+   "region": "Latin America",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "NTSB News",
+   "urls": [
+    "https://www.ntsb.gov/news/Pages/default.aspx"
+   ],
+   "source_type": "regulator",
+   "region": "North America",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "AAIB UK",
+   "urls": [
+    "https://www.gov.uk/government/organisations/air-accidents-investigation-branch"
+   ],
+   "source_type": "regulator",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "BEA News",
+   "urls": [
+    "https://www.bea.aero/en/"
+   ],
+   "source_type": "regulator",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "B",
+   "name": "SHGM News",
+   "urls": [
+    "https://web.shgm.gov.tr/"
+   ],
+   "source_type": "regulator",
+   "region": "Turkey",
+   "language": "tr",
+   "mode": "full"
+  },
+  {
+   "group": "C",
+   "name": "SEC EDGAR 8-K American Airlines Group",
+   "urls": [
+    "https://www.sec.gov/"
+   ],
+   "source_type": "exchange",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "American Airlines Group",
+   "airline_code": "AA",
+   "cik": "0000006201",
+   "edgar_items": [
+    "2.02",
+    "7.01",
+    "8.01"
+   ],
+   "discovery_urls": [
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000006201&type=8-K&dateb=&owner=include&count=40&output=atom"
+   ]
+  },
+  {
+   "group": "C",
+   "name": "SEC EDGAR 8-K United Airlines Holdings",
+   "urls": [
+    "https://www.sec.gov/"
+   ],
+   "source_type": "exchange",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "United Airlines Holdings",
+   "airline_code": "UA",
+   "cik": "0000100517",
+   "edgar_items": [
+    "2.02",
+    "7.01",
+    "8.01"
+   ],
+   "discovery_urls": [
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000100517&type=8-K&dateb=&owner=include&count=40&output=atom"
+   ]
+  },
+  {
+   "group": "C",
+   "name": "SEC EDGAR 8-K Delta Air Lines",
+   "urls": [
+    "https://www.sec.gov/"
+   ],
+   "source_type": "exchange",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "Delta Air Lines",
+   "airline_code": "DL",
+   "cik": "0000027904",
+   "edgar_items": [
+    "2.02",
+    "7.01",
+    "8.01"
+   ],
+   "discovery_urls": [
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000027904&type=8-K&dateb=&owner=include&count=40&output=atom"
+   ]
+  },
+  {
+   "group": "C",
+   "name": "SEC EDGAR 8-K Southwest Airlines",
+   "urls": [
+    "https://www.sec.gov/"
+   ],
+   "source_type": "exchange",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "Southwest Airlines",
+   "airline_code": "WN",
+   "cik": "0000092380",
+   "edgar_items": [
+    "2.02",
+    "7.01",
+    "8.01"
+   ],
+   "discovery_urls": [
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000092380&type=8-K&dateb=&owner=include&count=40&output=atom"
+   ]
+  },
+  {
+   "group": "C",
+   "name": "SEC EDGAR 8-K JetBlue Airways",
+   "urls": [
+    "https://www.sec.gov/"
+   ],
+   "source_type": "exchange",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "JetBlue Airways",
+   "airline_code": "B6",
+   "cik": "0001158463",
+   "edgar_items": [
+    "2.02",
+    "7.01",
+    "8.01"
+   ],
+   "discovery_urls": [
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001158463&type=8-K&dateb=&owner=include&count=40&output=atom"
+   ]
+  },
+  {
+   "group": "C",
+   "name": "SEC EDGAR 8-K Alaska Air Group",
+   "urls": [
+    "https://www.sec.gov/"
+   ],
+   "source_type": "exchange",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "airline": "Alaska Air Group",
+   "airline_code": "AS",
+   "cik": "0000766421",
+   "edgar_items": [
+    "2.02",
+    "7.01",
+    "8.01"
+   ],
+   "discovery_urls": [
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000766421&type=8-K&dateb=&owner=include&count=40&output=atom"
+   ]
+  },
+  {
+   "group": "C",
+   "name": "LSE RNS",
+   "urls": [
+    "https://www.londonstockexchange.com/news"
+   ],
+   "source_type": "exchange",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "C",
+   "name": "HKEX News",
+   "urls": [
+    "https://www.hkexnews.hk/"
+   ],
+   "source_type": "exchange",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "C",
+   "name": "KAP Public Disclosure",
+   "urls": [
+    "https://www.kap.org.tr/en/"
+   ],
+   "source_type": "exchange",
+   "region": "Turkey",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "D",
+   "name": "Reuters Aviation",
+   "urls": [
+    "https://www.reuters.com/business/aerospace-defense/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "Bloomberg Aviation",
+   "urls": [
+    "https://www.bloomberg.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "Financial Times Aviation",
+   "urls": [
+    "https://www.ft.com/airlines",
+    "https://www.ft.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "The New York Times",
+   "urls": [
+    "https://www.nytimes.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "The Washington Post",
+   "urls": [
+    "https://www.washingtonpost.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "The Wall Street Journal",
+   "urls": [
+    "https://www.wsj.com/business/airlines",
+    "https://www.wsj.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "Associated Press Aviation",
+   "urls": [
+    "https://apnews.com/hub/aviation"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "CNBC Airlines",
+   "urls": [
+    "https://www.cnbc.com/airlines/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "The Economist",
+   "urls": [
+    "https://www.economist.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "Nikkei Asia",
+   "urls": [
+    "https://asia.nikkei.com/"
+   ],
+   "source_type": "wire_headline",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "The Air Current",
+   "urls": [
+    "https://theaircurrent.com/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 2
+  },
+  {
+   "group": "D",
+   "name": "Aviation Week",
+   "urls": [
+    "https://aviationweek.com/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 2
+  },
+  {
+   "group": "D",
+   "name": "FlightGlobal",
+   "urls": [
+    "https://www.flightglobal.com/",
+    "https://www.flightglobal.com/rss"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 2
+  },
+  {
+   "group": "D",
+   "name": "ch-aviation",
+   "urls": [
+    "https://www.ch-aviation.com/news"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 2
+  },
+  {
+   "group": "D",
+   "name": "CAPA Centre for Aviation",
+   "urls": [
+    "https://centreforaviation.com/news"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 2
+  },
+  {
+   "group": "D",
+   "name": "Cirium Thought Cloud",
+   "urls": [
+    "https://www.cirium.com/thoughtcloud/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 3
+  },
+  {
+   "group": "D",
+   "name": "OAG Blog",
+   "urls": [
+    "https://www.oag.com/blog"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 3
+  },
+  {
+   "group": "D",
+   "name": "Simple Flying",
+   "urls": [
+    "https://simpleflying.com/",
+    "https://simpleflying.com/feed/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 4
+  },
+  {
+   "group": "D",
+   "name": "AeroTime",
+   "urls": [
+    "https://www.aerotime.aero/",
+    "https://www.aerotime.aero/feed"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 4
+  },
+  {
+   "group": "D",
+   "name": "Routes Online News",
+   "urls": [
+    "https://www.routesonline.com/news/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 3
+  },
+  {
+   "group": "D",
+   "name": "AvHerald",
+   "urls": [
+    "https://avherald.com/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 3
+  },
+  {
+   "group": "D",
+   "name": "PhocusWire",
+   "urls": [
+    "https://www.phocuswire.com/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 3,
+   "aviation_filter": true
+  },
+  {
+   "group": "D",
+   "name": "China Travel News",
+   "urls": [
+    "https://www.chinatravelnews.com/"
+   ],
+   "source_type": "trade",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 4,
+   "aviation_filter": true
+  },
+  {
+   "group": "E",
+   "name": "PROS News",
+   "urls": [
+    "https://pros.com/about/news/"
+   ],
+   "source_type": "tech_vendor",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "E",
+   "name": "Amadeus Newsroom",
+   "urls": [
+    "https://amadeus.com/en/newsroom"
+   ],
+   "source_type": "tech_vendor",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "E",
+   "name": "Sabre Insights",
+   "urls": [
+    "https://www.sabre.com/insights/"
+   ],
+   "source_type": "tech_vendor",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "E",
+   "name": "Accelya News",
+   "urls": [
+    "https://www.accelya.com/news"
+   ],
+   "source_type": "tech_vendor",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "E",
+   "name": "T2RL News",
+   "urls": [
+    "https://www.t2rl.com/"
+   ],
+   "source_type": "tech_vendor",
+   "region": "Global",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "F",
+   "name": "Airbus Press Releases",
+   "urls": [
+    "https://www.airbus.com/en/newsroom/press-releases"
+   ],
+   "source_type": "oem",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "F",
+   "name": "Boeing News Releases",
+   "urls": [
+    "https://boeing.mediaroom.com/news-releases-statements"
+   ],
+   "source_type": "oem",
+   "region": "North America",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "F",
+   "name": "Embraer News",
+   "urls": [
+    "https://www.embraer.com/global/en/news"
+   ],
+   "source_type": "oem",
+   "region": "Latin America",
+   "language": "en",
+   "mode": "full"
+  },
+  {
+   "group": "F",
+   "name": "GE Aerospace News",
+   "urls": [
+    "https://www.geaerospace.com/news"
+   ],
+   "source_type": "oem",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "F",
+   "name": "RTX News",
+   "urls": [
+    "https://www.rtx.com/news"
+   ],
+   "source_type": "oem",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "F",
+   "name": "Rolls-Royce Press Releases",
+   "urls": [
+    "https://www.rolls-royce.com/media/press-releases.aspx"
+   ],
+   "source_type": "oem",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "F",
+   "name": "Safran News",
+   "urls": [
+    "https://www.safran-group.com/news"
+   ],
+   "source_type": "oem",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "F",
+   "name": "Bombardier News",
+   "urls": [
+    "https://bombardier.com/en/media/news"
+   ],
+   "source_type": "oem",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  },
+  {
+   "group": "F",
+   "name": "Textron Aviation Newsroom",
+   "urls": [
+    "https://txtav.com/en/newsroom"
+   ],
+   "source_type": "oem",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true
+  }
+ ]
+}

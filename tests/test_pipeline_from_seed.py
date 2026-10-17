@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from api import _engine, briefing_store, market_data, source_registry
+from api import _engine, source_catalog, briefing_store, market_data, source_registry
 
 
 ARTICLES = [
@@ -46,8 +46,9 @@ def test_pipeline_builds_registry_and_entities_from_the_seed_alone(isolated_pipe
     collected = _engine.collect_run(market_database=market_db)
 
     with sqlite3.connect(registry_db) as connection:
-        assert connection.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 39
-        assert connection.execute("SELECT COUNT(*) FROM sources WHERE active = 1").fetchone()[0] == 36
+        rows = source_catalog.read_rows()
+        assert connection.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == len(rows)
+        assert connection.execute("SELECT COUNT(*) FROM sources WHERE active = 1").fetchone()[0] == sum(1 for row in rows if row["status"] == "active")
     with sqlite3.connect(market_db) as connection:
         assert connection.execute("SELECT COUNT(*) FROM carriers").fetchone()[0] > 100
         assert connection.execute("SELECT COUNT(*) FROM airports").fetchone()[0] > 100

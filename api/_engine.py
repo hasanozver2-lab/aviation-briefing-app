@@ -359,11 +359,6 @@ def get_builtin_source_records(max_hours=48):
         _source_record("Flightradar24", "https://www.flightradar24.com/blog/feed/", "Route news"),
         # 4. Other areas (Market & Industry)
         _source_record("Yahoo Finance Aviation", "https://feeds.finance.yahoo.com/rss/2.0/headline?s=LHA.DE,AF.PA,IAG.L,AAL,DAL,BA,AIR.PA", "Other areas", "mainstream"),
-        # Licensed publishers stay visible in governance, but are deliberately
-        # inactive until a separate commercial licence authorizes ingestion.
-        _source_record("Reuters Aviation", "https://www.reuters.com/", "Other areas", "mainstream", license_required=True, active=False, region="Global", tier=3),
-        _source_record("Financial Times Aviation", "https://www.ft.com/companies/airlines", "Other areas", "mainstream", license_required=True, active=False, region="Global", tier=3),
-        _source_record("Bloomberg Aviation", "https://www.bloomberg.com/industries/transportation", "Other areas", "mainstream", license_required=True, active=False, region="Global", tier=3),
         # 5. Verified official airline newsroom / social feeds
         _source_record("Lufthansa Group Newsroom", "https://newsroom.lufthansagroup.com/feed/en", "European and other global airlines", "airline_newsroom", airline="Lufthansa Group", airline_code="LH"),
         _source_record("Delta News Hub", "https://news.delta.com/rss.xml", "European and other global airlines", "airline_newsroom", airline="Delta Air Lines", airline_code="DL"),
