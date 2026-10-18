@@ -97,6 +97,16 @@ def test_languages_follow_the_agreed_rule():
     assert rows["SHGM News"]["language"] == "tr" and rows["KAP Public Disclosure"]["language"] == "en"
 
 
+def test_commercial_airplane_oem_feeds_are_active_and_verified():
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
+
+    assert rows["Airbus Press Releases"]["status"] == "active"
+    assert rows["Boeing News Releases"]["status"] == "active"
+    assert discovered["boeing_news_releases"]["feed_url"].endswith("category=786")
+    assert discovered["boeing_news_releases"]["method"] == "rss"
+
+
 def test_the_six_sec_rows_carry_a_cik_and_the_agreed_items():
     sec = [row for row in source_catalog.read_rows() if json.loads(row["notes"]).get("cik")]
     assert len(sec) == 6 and all(json.loads(row["notes"])["edgar_items"] == ["2.02", "7.01", "8.01"] for row in sec)
