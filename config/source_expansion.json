@@ -682,6 +682,19 @@
   },
   {
    "group": "D",
+   "name": "The Aviation Hub",
+   "urls": [
+    "https://theaviationhub.co.uk/",
+    "https://theaviationhub.co.uk/feed/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
+   "tier": 4
+  },
+  {
+   "group": "D",
    "name": "Aviation Week",
    "urls": [
     "https://aviationweek.com/"

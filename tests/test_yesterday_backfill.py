@@ -72,6 +72,29 @@ def test_no_backfill_when_today_already_has_enough(serve):
     assert headlines(result, True) == [] and result["yesterday_count"] == 0
 
 
+def test_old_publications_in_todays_archive_are_hidden_then_backfilled_as_yesterday(serve):
+    delayed = story("Delayed feed item", 95)
+    delayed["published_at_iso"] = story_lifecycle.to_iso(NOW - timedelta(days=1))
+    delayed["first_seen_at"] = story_lifecycle.to_iso(NOW - timedelta(hours=1))
+    delayed["last_updated_at"] = delayed["first_seen_at"]
+    today = day(TODAY, story("Today only", 70), delayed)
+    yesterday = day(YESTERDAY, *[story(f"Old {index}", 80 - index) for index in range(10)])
+    serve(today, yesterday)
+
+    result = _engine.get_ready_briefing("daily")
+
+    assert "Delayed feed item" not in [item["headline"] for item in result["stories"]]
+    assert headlines(result, False) == ["Today only"]
+    assert len(headlines(result, True)) == MINIMUM - 1
+    assert result["older_archive_count"] == 1
+
+
+def test_current_day_filter_uses_the_istanbul_calendar():
+    at_local_midnight = story("Istanbul midnight", 70)
+    at_local_midnight["published_at_iso"] = "2026-10-15T21:30:00+00:00"  # 00:30 on 16 October in Istanbul
+    assert story_lifecycle.published_on_day(at_local_midnight, TODAY, story_lifecycle.load_badges_config())
+
+
 def test_a_story_already_shown_today_is_not_repeated_from_yesterday(serve):
     repeat = story("Same story", 80)
     serve(day(TODAY, repeat), day(YESTERDAY, repeat, story("Different", 60)))

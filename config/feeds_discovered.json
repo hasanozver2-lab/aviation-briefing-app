@@ -179,6 +179,13 @@
     "method": "rss",
     "verified_at": "2026-10-17T09:42:37+00:00"
   },
+  "the_aviation_hub": {
+    "feed_url": "https://theaviationhub.co.uk/feed/",
+    "item_count_90d": 10,
+    "last_ok_at": "2026-10-17T14:30:00+00:00",
+    "method": "rss",
+    "verified_at": "2026-10-17T14:30:00+00:00"
+  },
   "tolga_zbek_havac_l_k": {
     "feed_url": "https://tolgaozbek.com/feed/",
     "item_count_90d": 0,
