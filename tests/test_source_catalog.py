@@ -107,23 +107,40 @@ def test_commercial_airplane_oem_feeds_are_active_and_verified():
     assert discovered["boeing_news_releases"]["method"] == "rss"
 
 
-def test_phase_one_global_sources_are_verified_but_not_ingested_without_activation_approval():
+def test_approved_trade_sources_are_active_while_the_broad_transport_feed_stays_a_candidate():
     rows = {row["name"]: row for row in source_catalog.read_rows()}
     discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
-    expected = {
+    active = {
         "AirlineGeeks": "rss",
         "Australian Aviation": "rss",
-        "UK Department for Transport": "atom",
     }
 
-    for name, method in expected.items():
+    for name, method in active.items():
         row = rows[name]
-        assert row["status"] == "candidate_verified" and row["active"] == "0"
+        assert row["status"] == "active" and row["active"] == "1"
         assert discovered[source_catalog.source_slug(name)]["method"] == method
+
+    transport = rows["UK Department for Transport"]
+    assert transport["status"] == "candidate_verified" and transport["active"] == "0"
+    assert discovered["uk_department_for_transport"]["method"] == "atom"
 
     assert rows["AirlineGeeks"]["tier"] == "4"
     assert rows["Australian Aviation"]["tier"] == "2"
     assert json.loads(rows["UK Department for Transport"]["notes"])["aviation_filter"] is True
+
+
+def test_newly_verified_priority_sources_are_active_with_their_public_adapter():
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
+    expected = {
+        "American Airlines Newsroom": "json_api",
+        "Eurocontrol News": "html",
+        "FlightGlobal": "rss",
+        "Routes Online News": "rss",
+    }
+    for name, method in expected.items():
+        assert rows[name]["status"] == "active" and rows[name]["active"] == "1"
+        assert discovered[source_catalog.source_slug(name)]["method"] == method
 
 
 def test_ntsb_official_feed_is_not_read_against_robots_policy():

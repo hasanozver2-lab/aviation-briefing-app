@@ -33,7 +33,8 @@
    "group": "A",
    "name": "American Airlines Newsroom",
    "urls": [
-    "https://news.aa.com/"
+    "https://news.aa.com/",
+    "https://news.aa.com/feed/PressRelease.svc/GetPressReleaseList?LanguageId=1&pageSize=50&pageNumber=0&tagList=&includeTags=true&year=-1&excludeSelection=1&bodyType=0&pressReleaseDateFilter=1&categoryId=00000000-0000-0000-0000-000000000000"
    ],
    "source_type": "airline_ir",
    "region": "North America",
@@ -303,6 +304,7 @@
    "group": "B",
    "name": "Eurocontrol News",
    "urls": [
+    "https://www.eurocontrol.int/newsroom",
     "https://www.eurocontrol.int/news"
    ],
    "source_type": "regulator",

@@ -63,6 +63,19 @@ def test_only_active_catalog_rows_not_already_read_by_the_legacy_loop_are_used()
     assert [item["name"] for item in chosen] == ["Active One"]
 
 
+def test_a_verified_json_api_adapter_takes_priority_over_a_legacy_html_reader(monkeypatch):
+    api_row = row("American Airlines Newsroom", source_type="airline_ir", official="true", mode="full")
+    discovered = {"american_airlines_newsroom": {"feed_url": "https://news.aa.com/feed/api", "method": fd.METHOD_JSON_API}}
+    assert feed_sources.catalog_preferred_names([api_row], discovered) == {"American Airlines Newsroom"}
+
+    legacy = [{"name": "American Airlines Newsroom", "url": "https://news.aa.com/news/"}]
+    monkeypatch.setattr(_engine.source_registry, "load_active_sources", lambda sources: legacy)
+    monkeypatch.setattr(_engine, "get_builtin_source_records", lambda max_hours=48: legacy)
+    monkeypatch.setattr(source_catalog, "read_rows", lambda path=None: [api_row])
+    monkeypatch.setattr(feed_sources, "load_discovered", lambda path=None: discovered)
+    assert _engine.get_rss_sources() == []
+
+
 def test_sources_are_grouped_by_host_so_one_host_is_never_read_twice_at_once():
     a, b = source(), source()
     b["name"], b["discovery_urls"] = "Other Wire", ["https://other.example/"]

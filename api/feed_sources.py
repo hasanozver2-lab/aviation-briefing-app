@@ -31,6 +31,7 @@ MAX_ITEMS_PER_SOURCE = 25
 FEED_ONLY_SUMMARY_CHARS = 300      # a feed summary is short by nature; this keeps it that way
 ENTITY_KINDS_FOR_FILTER = ("carriers", "groups", "aircraft")
 EDGAR_ITEM_PATTERN = re.compile(r"Item\s+(\d+\.\d+)", re.IGNORECASE)
+CATALOG_PREFERRED_METHODS = {fd.METHOD_JSON_API}
 
 
 def load_discovered(path=None):
@@ -66,6 +67,16 @@ def source_record(row):
 def catalog_feed_sources(rows, handled_names):
     """Active catalog rows that the legacy fetch loop does not already read."""
     return [source_record(row) for row in rows if row["status"] == source_catalog.STATUS_ACTIVE and row["name"] not in handled_names]
+
+
+def catalog_preferred_names(rows, discovered):
+    """Active sources whose verified adapter cannot be read by the legacy RSS/HTML loop."""
+    return {
+        row["name"]
+        for row in rows
+        if row["status"] == source_catalog.STATUS_ACTIVE
+        and discovered.get(source_catalog.source_slug(row["name"]), {}).get("method") in CATALOG_PREFERRED_METHODS
+    }
 
 
 def load_aviation_filter():

@@ -30,7 +30,7 @@ except ImportError:
 PROBE_TIMEOUT_SECONDS = 10
 PROBE_WORKERS = 8
 RECENT_DAYS = 7
-FEED_METHODS = (fd.METHOD_RSS, fd.METHOD_ATOM, fd.METHOD_SITEMAP, fd.METHOD_JSONLD, fd.METHOD_HTML)
+FEED_METHODS = (fd.METHOD_RSS, fd.METHOD_ATOM, fd.METHOD_SITEMAP, fd.METHOD_JSONLD, fd.METHOD_HTML, fd.METHOD_JSON_API)
 LEGACY_METHOD = "legacy_scraper"
 OFFICIAL_TYPES = {"airline_ir", "regulator", "exchange", "oem"}
 PRESS_TYPES = {"wire_headline", "trade"}

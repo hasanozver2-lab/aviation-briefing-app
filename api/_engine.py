@@ -405,7 +405,10 @@ def get_builtin_source_records(max_hours=48):
 def get_rss_sources(max_hours=48):
     """Return only the active feeds, decorated with source-governance metadata and the catalog's timeout and mode."""
     sources = source_registry.load_active_sources(get_builtin_source_records(max_hours))
-    catalog = {row["name"]: row for row in source_catalog.read_rows()}
+    rows = source_catalog.read_rows()
+    preferred = feed_sources.catalog_preferred_names(rows, feed_sources.load_discovered())
+    sources = [source for source in sources if source.get("name") not in preferred]
+    catalog = {row["name"]: row for row in rows}
     for source in sources:
         row = catalog.get(source.get("name"))
         if row:
@@ -592,10 +595,11 @@ def _fetch_source_articles(source, cutoff, headers):
 def _read_catalog_feeds(cutoff, report, entity_index_factory=None, recovered=None):
     """Catalog sources read through their discovered feeds: hosts in parallel, the sources of one host strictly in turn."""
     rows = source_catalog.read_rows()
-    handled = {source["name"] for source in get_builtin_source_records()} | {alert_feeds.SOURCE_NAME}    # alerts have their own reader
+    discovered = feed_sources.load_discovered()
+    preferred = feed_sources.catalog_preferred_names(rows, discovered)
+    handled = ({source["name"] for source in get_builtin_source_records()} - preferred) | {alert_feeds.SOURCE_NAME}    # alerts have their own reader
     recovered = recovered or {}
     sources = feed_sources.catalog_feed_sources(rows, handled)
-    discovered = feed_sources.load_discovered()
     for row in rows:
         if row["name"] in handled or row["status"] == source_catalog.STATUS_ACTIVE:
             continue

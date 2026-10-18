@@ -1,28 +1,91 @@
-# Global source expansion — phase 1
+# Global priority-source expansion
 
 Checked: 2026-10-18  
-Branch: `feature/global-source-expansion`
+Branch: feature/global-source-expansion
 
 ## Outcome
 
-The catalog contains 108 sources. Boeing Commercial Airplanes is the only newly activated source in this phase; its official RSS was explicitly requested and approved earlier. Three further sources have technically valid public feeds but remain `candidate_verified` (`active=0`) pending a separate activation decision. The pipeline ignores them while they are in this state. NASA Aeronautics was removed by product-scope decision: AeroBrief is focused on airline and airport developments.
+The catalog contains 108 sources: 45 active, one verified candidate, 30 temporarily blocked, 13 excluded by policy, 11 without an extractable feed and eight without a public feed.
 
-| Source | Region | Type / tier | Method | Items in 7d | Aviation-pass / listed in probe | Decision |
-|---|---|---:|---:|---:|---:|---|
-| AirlineGeeks | Global | trade / 4 | RSS | 10 | 10 / 1 | Verified candidate, inactive |
-| Australian Aviation | Asia-Pacific | trade / 2 | RSS | 10 | 10 / 0 | Verified candidate, inactive |
-| UK Department for Transport | Europe | regulator / 1 | Atom | 20 | 2 / 1 | Verified candidate, inactive; broad transport feed uses the aviation filter |
-| NTSB News | North America | regulator / 1 | Official RSS exists | 0 | 0 / 0 | Excluded: robots.txt disallows `/_layouts/feed.aspx`; no feed request is made |
+This pass activated six additional public sources:
 
-The read-only probe saw 40 feed items across the three retained candidates in its seven-day window. Two would have produced a story above the current score threshold. Scores, thresholds and taxonomy were not changed.
+| Source | Type / tier | Adapter | Real 7-day items | Probe result |
+|---|---:|---:|---:|---|
+| American Airlines Newsroom | official airline / 1 | public Q4 JSON API | 4 | 2 above list threshold |
+| EUROCONTROL Newsroom | regulator / 1 | dated HTML cards | 2 | 1 above list threshold |
+| FlightGlobal | trade / 2 | RSS | 10 | 1 above list threshold |
+| Routes Online | trade / 3 | RSS | 19 | 4 above list threshold |
+| AirlineGeeks | trade / 4 | RSS | 10 | 1 above list threshold |
+| Australian Aviation | trade / 2 | RSS | 10 | 0 above list threshold |
 
-## Source-policy notes
+The production collection path, after rebuilding SQLite from config/sources.csv, returned 206 articles in the seven-day diagnostic window. All six sources above returned articles through the same code path used by the pipeline. Thresholds and relevance weights were not changed.
 
-- Only publisher-provided public RSS/Atom endpoints were tested. No login, cookie, proxy, paywall bypass or article-page scraping was used.
-- Reuters, Bloomberg, FT, OAG and other licensed publishers remain inactive unless a licensed API/RSS endpoint or written automated-use permission is supplied.
-- GOV.UK terms are recorded as low risk because its public-information reuse terms were read. AirlineGeeks and Australian Aviation stay medium risk because a readable reuse/automation terms page was not found; the feed addresses are public, but that does not itself decide commercial-use permission.
-- `config/feeds_discovered.json` records the verified endpoints so they can be enabled without rediscovery after approval. `status=candidate_verified` prevents collection until then.
+UK Department for Transport remains candidate_verified and inactive. Its broad Atom feed is technically valid, but a real run admitted a shipping-fleet item through the generic aviation filter. It must not be activated until it has an aviation-only filter.
 
-## Coverage after activation (projected)
+## Requested source matrix
 
-Current active total, including Boeing: 39. Approving all three verified candidates would make 42 active sources and improve Asia-Pacific from one to two active sources. Africa would still have no active regional source; the next phase should add a dedicated adapter only for official airline and airport pages whose terms and robots policy permit automated reading, then measure real seven-day yield before activation.
+Active means the pipeline can collect public metadata now. Covered by brand feeds means the requested group page is unavailable but active first-party brand feeds cover part of it. Other states remain explicit; the pipeline never counts an empty or blocked source as working.
+
+### Airline IR / press
+
+| State | Sources |
+|---|---|
+| Active | Delta, American Airlines, Lufthansa Group, Emirates, Qatar Airways (official Tumblr feed), Cathay Pacific, Ryanair, easyJet, Pegasus |
+| Covered by brand feeds | Air France-KLM group page is blocked; Air France and KLM first-party feeds are active |
+| Blocked / no extractable public feed | United, Southwest, IAG, Etihad, Singapore Airlines, ANA, JAL, LATAM, Turkish Airlines press |
+
+### Regulators / institutions
+
+| State | Sources |
+|---|---|
+| Active | ICAO, IATA, FAA, EASA, EUROCONTROL, ANAC Brazil, AAIB UK, BEA France |
+| No extractable public feed | CAAC, DGCA India, SHGM |
+| Excluded by robots policy | NTSB official RSS path |
+
+### Exchanges / material disclosure
+
+| State | Sources |
+|---|---|
+| Blocked pending required configuration | SEC EDGAR requires a truthful contact address in the User-Agent; none is configured |
+| Excluded by terms | LSE RNS, HKEX |
+| No documented public feed/API | KAP |
+
+### Major press / wire services
+
+| State | Sources |
+|---|---|
+| Active | The New York Times Business RSS |
+| Excluded by terms or robots | Reuters, Bloomberg, Wall Street Journal, Associated Press |
+| Blocked / no public feed | Financial Times, Washington Post, CNBC Airlines, The Economist, Nikkei Asia |
+
+The separate FT and WSJ root/category URLs are represented as discovery URLs under one publisher row, not duplicate sources.
+
+### Trade press / data
+
+| State | Sources |
+|---|---|
+| Active | The Air Current, FlightGlobal, Simple Flying, AeroTime, Routes Online |
+| No public feed | Aviation Week, ch-aviation, CAPA, Cirium |
+| Excluded by terms or robots | OAG, AvHerald |
+
+### RM / network / pricing technology
+
+| State | Sources |
+|---|---|
+| Active | Accelya |
+| No extractable public feed / blocked | PROS, Amadeus, Sabre, T2RL, PhocusWire, China Travel News |
+
+### OEM newsroom / IR
+
+| State | Sources |
+|---|---|
+| Active | Airbus, Boeing Commercial Airplanes, GE Aerospace, Rolls-Royce, Bombardier |
+| No extractable public feed / blocked | Embraer, RTX, Safran |
+| Excluded by terms | Textron Aviation |
+
+## Policy boundary
+
+- No login, cookie, proxy, browser impersonation, paywall bypass or article-page republication is used.
+- Reuters, Bloomberg, FT, WSJ, AP, OAG and other restricted publishers stay inactive until a licensed feed/API or written automated-use permission is supplied.
+- Source activation does not bypass relevance selection: a collected item appears in the briefing only if deterministic aviation filters and the configured score threshold accept it.
+- Every unavailable source remains in config/sources.csv with its reason so failures are visible and retryable where appropriate.
