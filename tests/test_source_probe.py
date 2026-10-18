@@ -132,6 +132,20 @@ def test_a_probed_feed_is_stored_with_its_method_time_and_activates_the_row():
     assert changes[0][:3] == ("Wire Example", "no_extractable_feed", "active")
 
 
+def test_a_verified_candidate_cannot_be_activated_without_an_explicit_override():
+    candidate = row(status="candidate_verified", reason="activation pending explicit approval")
+    rows, discovered, changes = source_probe.apply_probe([candidate], probe_doc(), terms(), {}, NOW)
+    assert rows[0]["status"] == "candidate_verified" and rows[0]["active"] == "0"
+    assert rows[0]["reason"] == "activation pending explicit approval"
+    assert discovered["wire_example"]["feed_url"] == "https://wire.example/feed"
+    assert changes == []
+
+    approved = {"sources": {"Wire Example": {"status": "active", "reason": "approved"}}}
+    rows, _, changes = source_probe.apply_probe([candidate], probe_doc(), terms(), {}, NOW, overrides=approved)
+    assert rows[0]["status"] == "active" and rows[0]["active"] == "1"
+    assert changes[0][:3] == ("Wire Example", "candidate_verified", "active")
+
+
 def test_high_commercial_risk_never_deactivates_a_source():
     rows, _, _ = source_probe.apply_probe([row()], probe_doc(), terms(commercial_use_risk="high"), {}, NOW)
     assert rows[0]["status"] == "active"
