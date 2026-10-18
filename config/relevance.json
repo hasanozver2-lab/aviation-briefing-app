@@ -96,6 +96,65 @@
           "hava sahası*"
         ],
         "exclude_commentary": true,
+        "ground_traffic": {
+          "_doc": "Exclude road and traffic incidents that mention an airport only as a nearby landmark. A road term or road-number pattern and an incident term must both match. Direct aircraft, runway, taxiway, apron or airside involvement keeps the story.",
+          "road_terms": [
+            "motorway*",
+            "highway*",
+            "freeway*",
+            "expressway*",
+            "turnpike*",
+            "road*",
+            "street*",
+            "otoyol*",
+            "karayol*",
+            "cadde*",
+            "sokak*",
+            "TEM",
+            "E-5",
+            "D-100"
+          ],
+          "road_route_patterns": [
+            "(?<!\\w)(?:M\\d{1,3}|A\\d{1,4}|I-?\\d{1,3}|US-?\\d{1,3}|E-?\\d{1,3}|D-?\\d{2,4})(?!\\w)"
+          ],
+          "incident_terms": [
+            "collision*",
+            "accident*",
+            "crash*",
+            "pile-up*",
+            "traffic jam*",
+            "congestion*",
+            "closed",
+            "closure*",
+            "shut",
+            "blocked",
+            "killed",
+            "injured",
+            "kaza*",
+            "çarpış*",
+            "trafik sıkış*",
+            "kapalı",
+            "kapatıl*",
+            "ulaşıma kapatıl*",
+            "yaralı*",
+            "hayatını kaybet*"
+          ],
+          "aviation_keep_terms": [
+            "aircraft*",
+            "airplane*",
+            "aeroplane*",
+            "plane*",
+            "jet*",
+            "runway*",
+            "taxiway*",
+            "apron*",
+            "airside*",
+            "uçak*",
+            "pist*",
+            "taksi yol*",
+            "hava taraf*"
+          ]
+        },
         "archive_min_score": 35,
         "max_low_per_run": 12,
         "military_strike": {

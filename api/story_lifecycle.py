@@ -256,10 +256,38 @@ def is_military_story(story, selection):
     return not (entities.get("carriers") or entities.get("groups"))
 
 
+def _story_filter_text(story):
+    """Source-written text used by deterministic read-time exclusions."""
+    parts = [story.get("headline", ""), story.get("source_description", "")]
+    parts.append((story.get("original_source") or {}).get("title", ""))
+    parts.extend(source.get("title", "") for source in story.get("sources", []) if isinstance(source, dict))
+    return " ".join(str(part) for part in parts if part)
+
+
+def is_ground_traffic_story(story, selection):
+    """Road incidents merely located near an airport are outside the aviation brief."""
+    rule = selection.get("ground_traffic") or {}
+    if not rule:
+        return False
+
+    text = _story_filter_text(story)
+    has_road_term = text_match.TermSet(rule.get("road_terms", [])).any(text)
+    has_road_route = any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in rule.get("road_route_patterns", []))
+    has_incident = text_match.TermSet(rule.get("incident_terms", [])).any(text)
+    if not (has_incident and (has_road_term or has_road_route)):
+        return False
+
+    entities = story.get("entities") or {}
+    has_aircraft = bool(entities.get("aircraft") or entities.get("aircraft_types"))
+    has_direct_aviation_context = text_match.TermSet(rule.get("aviation_keep_terms", [])).any(text)
+    return not (has_aircraft or has_direct_aviation_context)
+
+
 def is_excluded(story, relevance):
-    """Defence items and investment commentary under the CURRENT lists in config/relevance.json."""
-    return is_military_story(story, relevance["selection"]) or bool(
-        relevance["selection"].get("exclude_commentary") and is_finance_commentary(story, relevance.get("commentary"))
+    """Current deterministic exclusions from config/relevance.json."""
+    selection = relevance["selection"]
+    return is_military_story(story, selection) or is_ground_traffic_story(story, selection) or bool(
+        selection.get("exclude_commentary") and is_finance_commentary(story, relevance.get("commentary"))
     )
 
 
@@ -285,6 +313,7 @@ def select_stories(stories, selection, commentary=None):
     eligible = [
         story for story in stories
         if (float(story.get("relevance_score", 0)) >= archive_minimum or story.get("context_demoted_from")) and not is_military_story(story, selection)
+        and not is_ground_traffic_story(story, selection)
         and not (selection.get("exclude_commentary") and is_finance_commentary(story, commentary))
     ]
     eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))

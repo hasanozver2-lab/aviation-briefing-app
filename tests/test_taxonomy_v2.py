@@ -149,6 +149,42 @@ def test_trusted_company_results_and_civil_defence_mentions_survive_the_filter(s
     assert len(_engine.get_ready_briefing("daily")["stories"]) == 2
 
 
+@pytest.mark.parametrize("title", [
+    "M56 Shut Near Manchester Airport Following Serious Collision",
+    "Highway collision near Dallas Fort Worth Airport leaves two injured",
+    "İstanbul Havalimanı yakınındaki TEM otoyolunda araç kazası",
+])
+def test_road_incidents_near_airports_are_excluded(title):
+    item = stored(title, "safety_incident", 65)
+    assert story_lifecycle.is_ground_traffic_story(item, RELEVANCE["selection"])
+    assert story_lifecycle.is_excluded(item, RELEVANCE)
+
+
+@pytest.mark.parametrize("title", [
+    "Manchester Airport passenger traffic reaches a record high",
+    "Air traffic control outage delays flights at Manchester Airport",
+    "Aircraft crashes onto M56 near Manchester Airport",
+    "Runway closed after airport vehicle collision on the airside apron",
+])
+def test_aviation_traffic_and_direct_aircraft_events_survive_road_filter(title):
+    item = stored(title, "safety_incident", 65)
+    assert not story_lifecycle.is_ground_traffic_story(item, RELEVANCE["selection"])
+
+
+def test_road_filter_applies_to_selection_and_read_time_without_deleting_archive(serve):
+    road = stored("M56 Shut Near Manchester Airport Following Serious Collision", "safety_incident", 68.8)
+    aviation = stored("Airline opens new route to Tokyo", "route_network_change", 57.5)
+    assert [story["headline"] for story in story_lifecycle.select_stories(
+        [copy.deepcopy(road), copy.deepcopy(aviation)], RELEVANCE["selection"], RELEVANCE["commentary"]
+    )] == [aviation["headline"]]
+
+    archived = serve(day_with(road, aviation))
+    result = _engine.get_ready_briefing("daily", include_low=True)
+    assert [story["headline"] for story in result["stories"]] == [aviation["headline"]]
+    assert result["excluded_count"] == 1
+    assert len(archived["stories"]) == 2
+
+
 def test_excluded_stories_do_not_count_as_hidden_low(serve):
     serve(day_with(stored("Boeing stock tumbles", "capital_markets", 37, tier=3), stored("Airline adds new route", "route_network_change", 37)))
     result = _engine.get_ready_briefing("daily")
