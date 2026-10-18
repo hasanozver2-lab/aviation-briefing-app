@@ -522,39 +522,6 @@ def hourly_view(day, now, config=None):
     return view
 
 
-def backfill_from_previous_day(day, previous_day, now, config=None, relevance=None):
-    """Top up a thin daily view with yesterday's best listed stories; returns how many were added.
-
-    The added copies carry carried_from="yesterday" and no badges, so they can never read as Breaking or New.
-    Stories already shown today (same id or same original article) are skipped. The archive files are untouched.
-    """
-    config = config or load_badges_config()
-    minimum = int(config.get("daily_min_stories", 0))
-    shown = day.get("stories", [])
-    missing = minimum - sum(1 for story in shown if is_listed(story))
-    day["yesterday_count"] = 0
-    if missing <= 0 or not previous_day or not previous_day.get("stories"):
-        return 0
-    previous = copy.deepcopy(previous_day)
-    drop_excluded(previous, relevance)
-    present_stories(previous, now, config)
-    taken_ids = {story.get("story_id") for story in shown}
-    taken_urls = set().union(*(_story_urls(story) for story in shown)) if shown else set()
-    candidates = [
-        story for story in previous["stories"]
-        if is_listed(story) and story.get("story_id") not in taken_ids
-        and not (_story_urls(story) & taken_urls)
-    ]
-    candidates.sort(key=lambda story: (-float(story.get("relevance_score", 0)), story.get("story_id", "")))
-    chosen = candidates[:missing]
-    for story in chosen:
-        story["badges"] = []
-        story["carried_from"] = "yesterday"
-    day["stories"] = shown + chosen
-    day["yesterday_count"] = len(chosen)
-    return len(chosen)
-
-
 def fingerprint(day):
     """Hash of everything that matters; ignores run times, badges, ordering and market commentary."""
     if not day:

@@ -70,10 +70,10 @@ def test_there_is_one_page_without_tabs_or_modes():
     assert 'BRIEFING_URL = "/api/briefing"' in html, "the page asks for the default (daily, today) view and sends no mode"
 
 
-def test_yesterdays_stories_come_from_the_api_and_sit_at_the_bottom_unbadged():
+def test_the_single_page_never_renders_previous_day_backfill():
     html = page()
-    assert 'carried_from === YESTERDAY' in html and "Yesterday ·" in html
-    assert "!isYesterday(s) && !known.has" in html, "carried-over stories never raise the new-stories pill"
+    assert "Yesterday ·" not in html
+    assert "carried_from" not in html
 
 
 def test_labels_and_levels_come_from_the_server():
