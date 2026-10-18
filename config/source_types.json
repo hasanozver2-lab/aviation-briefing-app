@@ -16,7 +16,7 @@
     "trade_media": "trade",
     "mainstream": "wire_headline"
   },
-  "statuses": ["active", "disabled_blocked", "no_extractable_feed", "no_public_feed", "excluded_policy"],
+  "statuses": ["active", "candidate_verified", "disabled_blocked", "no_extractable_feed", "no_public_feed", "excluded_policy"],
   "commercial_use_risks": ["low", "medium", "high"],
   "modes": ["full", "feed_only"]
 }

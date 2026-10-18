@@ -3,7 +3,7 @@ import sqlite3
 
 import pytest
 
-from api import _engine, source_registry
+from api import _engine, feed_sources, source_catalog, source_registry
 
 
 def read_csv_rows():
@@ -40,7 +40,7 @@ def test_every_code_defined_source_is_in_the_csv_and_the_rest_are_catalog_rows()
     assert code_keys <= csv_keys, "a source defined in code is missing from config/sources.csv"
     code_names = {name for name, _ in code_keys}
     extra = [row for row in csv_rows if row["name"] not in code_names]
-    assert extra and all(row["status"] in {"active", "no_extractable_feed", "no_public_feed", "disabled_blocked", "excluded_policy"} for row in extra)
+    assert extra and all(row["status"] in {"active", "candidate_verified", "no_extractable_feed", "no_public_feed", "disabled_blocked", "excluded_policy"} for row in extra)
 
 
 def test_csv_sync_is_idempotent(tmp_path):
@@ -68,6 +68,15 @@ def test_csv_active_flag_controls_ingestion(tmp_path):
 
     assert "Simple Flying" not in active_names
     assert "Delta News Hub" in active_names
+
+
+def test_active_csv_only_source_reaches_the_catalog_feed_reader():
+    handled = {source["name"] for source in _engine.get_builtin_source_records()}
+    catalog_sources = feed_sources.catalog_feed_sources(source_catalog.read_rows(), handled)
+
+    boeing = next(source for source in catalog_sources if source["name"] == "Boeing News Releases")
+    assert boeing["status"] == "active"
+    assert boeing["slug"] == "boeing_news_releases"
 
 
 def test_paid_source_cannot_be_activated_through_the_csv(tmp_path):

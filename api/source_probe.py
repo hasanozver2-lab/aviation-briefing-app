@@ -30,7 +30,7 @@ except ImportError:
 PROBE_TIMEOUT_SECONDS = 10
 PROBE_WORKERS = 8
 RECENT_DAYS = 7
-FEED_METHODS = (fd.METHOD_RSS, fd.METHOD_ATOM, fd.METHOD_SITEMAP, fd.METHOD_JSONLD, fd.METHOD_HTML)
+FEED_METHODS = (fd.METHOD_RSS, fd.METHOD_ATOM, fd.METHOD_SITEMAP, fd.METHOD_JSONLD, fd.METHOD_HTML, fd.METHOD_JSON_API)
 LEGACY_METHOD = "legacy_scraper"
 OFFICIAL_TYPES = {"airline_ir", "regulator", "exchange", "oem"}
 PRESS_TYPES = {"wire_headline", "trade"}
@@ -260,11 +260,15 @@ def apply_probe(rows, probe, terms_review, discovered, now=None, overrides=None)
         decided = (overrides or {}).get("sources", {}).get(row["name"])
         if decided:
             status, reason = decided["status"], decided["reason"]
+        elif row["status"] == source_catalog.STATUS_CANDIDATE_VERIFIED and status == source_catalog.STATUS_ACTIVE:
+            status = source_catalog.STATUS_CANDIDATE_VERIFIED
+            reason = row["reason"] or "verified feed; activation pending explicit approval"
         row["commercial_use_risk"] = review.get("commercial_use_risk", row.get("commercial_use_risk", ""))
         previous = row["status"]
         row["status"], row["reason"], row["active"] = status, reason, "1" if status == source_catalog.STATUS_ACTIVE else "0"
         slug = source_catalog.source_slug(row["name"])
-        if status == source_catalog.STATUS_ACTIVE and record["method"] in FEED_METHODS and not (row["mode"] == "feed_only" and record["method"] not in fd.FEED_ONLY_METHODS):
+        verified_feed = record["method"] in FEED_METHODS and not (row["mode"] == "feed_only" and record["method"] not in fd.FEED_ONLY_METHODS)
+        if status in {source_catalog.STATUS_ACTIVE, source_catalog.STATUS_CANDIDATE_VERIFIED} and verified_feed:
             row["timeout_s"] = str(max(int(row["timeout_s"]), PROBE_TIMEOUT_SECONDS))
             row["feed_url"] = record["feed_url"]
             kept = discovered.get(slug, {})

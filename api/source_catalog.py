@@ -19,6 +19,7 @@ BASE_COLUMNS = ("name", "url", "feed_url", "feed_type", "region", "tier", "licen
 CATALOG_COLUMNS = ("source_type", "official", "mode", "timeout_s", "status", "reason", "commercial_use_risk")
 ALL_COLUMNS = BASE_COLUMNS + CATALOG_COLUMNS
 STATUS_ACTIVE = "active"
+STATUS_CANDIDATE_VERIFIED = "candidate_verified"
 DEFAULT_TIMEOUT_SECONDS = 3
 FEED_TIMEOUT_SECONDS = 10      # RSS/Atom rows keep the 10 s the pipeline always used; the 3 s default is for HTML pages
 

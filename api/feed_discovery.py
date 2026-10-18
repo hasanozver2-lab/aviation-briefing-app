@@ -37,7 +37,7 @@ VALID_WINDOW_DAYS = 90
 MAX_BODY_BYTES = 3_000_000
 KNOWN_FEED_PATHS = ("/feed", "/feed/", "/rss", "/rss.xml", "/atom.xml")
 SITEMAP_PATHS = ("/news-sitemap.xml", "/sitemap.xml")
-METHOD_RSS, METHOD_ATOM, METHOD_SITEMAP, METHOD_JSONLD, METHOD_HTML = "rss", "atom", "sitemap", "jsonld", "html"
+METHOD_RSS, METHOD_ATOM, METHOD_SITEMAP, METHOD_JSONLD, METHOD_HTML, METHOD_JSON_API = "rss", "atom", "sitemap", "jsonld", "html", "json_api"
 NEWS_SITEMAP_NS = "http://www.google.com/schemas/sitemap-news/0.9"
 
 STATUS_FOUND = "found"
@@ -318,6 +318,33 @@ def parse_jsonld(page):
     return items
 
 
+def parse_public_json_api(content, base_url):
+    """Read explicitly configured publisher APIs that expose public newsroom metadata."""
+    try:
+        payload = json.loads(content.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return []
+    rows = payload.get("GetPressReleaseListResult") if isinstance(payload, dict) else None
+    if not isinstance(rows, list):
+        return []
+    items = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        stamp = row.get("PressReleaseDate") or ""
+        try:
+            published = datetime.strptime(stamp, "%m/%d/%Y %H:%M:%S").replace(tzinfo=timezone.utc)
+        except ValueError:
+            published = parse_datetime(stamp)
+        items.append(Item(
+            clean_text(row.get("Headline") or ""),
+            urllib.parse.urljoin(base_url, row.get("LinkToDetailPage") or row.get("LinkToUrl") or ""),
+            published,
+            clean_text(row.get("ShortDescription") or row.get("ShortBody") or ""),
+        ))
+    return items
+
+
 ANCHOR_PATTERN = re.compile(r"<a\b([^>]*)>(.*?)</a\s*>", re.IGNORECASE | re.DOTALL)
 TIME_PATTERN = re.compile(r'<time\b[^>]*datetime=["\']([^"\']+)["\']', re.IGNORECASE)
 MIN_LINK_TEXT = 20
@@ -383,6 +410,10 @@ def validate_items(items, now=None, window_days=VALID_WINDOW_DAYS):
 def classify_body(body, url):
     """Read a fetched body as a feed, news sitemap, JSON-LD list or dated links. Returns (method, items)."""
     head = body[:600].lstrip().lower()
+    if head.startswith((b"{", b"[")):
+        json_items = parse_public_json_api(body, url)
+        if json_items:
+            return METHOD_JSON_API, json_items
     try:
         if b"<rss" in head or b"<feed" in head or b"<rdf:rdf" in head or (head.startswith(b"<?xml") and b"<urlset" not in body[:3000] and b"<sitemapindex" not in body[:3000]):
             return parse_feed(body)
@@ -408,6 +439,7 @@ def items_from_url(fetcher, url):
 
 
 FEED_METHODS = (METHOD_RSS, METHOD_ATOM, METHOD_SITEMAP)
+DIRECT_STRUCTURED_METHODS = FEED_METHODS + (METHOD_JSON_API,)
 
 
 FEED_ONLY_METHODS = (METHOD_RSS, METHOD_ATOM)      # press/data sources: only the publisher's own public RSS/Atom feed, never a sitemap or page scrape
@@ -479,7 +511,7 @@ def discover(fetcher, urls, now=None, max_requests=MAX_REQUESTS_PER_DISCOVERY, e
                                                reason=f"{response.error or response.status} on {path_of(page_url)}")
         elif response.status == 200:
             method, items = classify_body(response.body, response.final_url or page_url)
-            if method in FEED_METHODS:                       # the address we were given is itself a feed (e.g. SEC EDGAR Atom)
+            if method in DIRECT_STRUCTURED_METHODS:          # the address itself is a feed/API (e.g. SEC Atom or a public newsroom API)
                 ok, recent, _ = validate_items(items, now)
                 if ok and method_ok(method):
                     return found(DiscoveryResult(STATUS_FOUND, page_url, method, recent, items, response.status, response.seconds))

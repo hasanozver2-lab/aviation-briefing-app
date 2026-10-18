@@ -1,6 +1,14 @@
 {
  "_doc": "Statuses decided by a person that the probe must not overwrite. Applied by scripts/apply_probe.py after the probe result and the terms review. no_retry: the weekly retry of disabled_blocked sources skips the source (retrying cannot succeed until something is configured).",
  "sources": {
+  "AirlineGeeks": {
+   "status": "active",
+   "reason": "Public RSS activation approved 2026-10-18"
+  },
+  "Australian Aviation": {
+   "status": "active",
+   "reason": "Public RSS activation approved 2026-10-18"
+  },
   "Air Canada News Releases": {
    "status": "excluded_policy",
    "reason": "Terms forbid automated access: \"Use of the Website for any other purpose, including any commercial use or purpose, is expressly prohibited\"; bans \"automated scripts, robots, crawls, screen scrapers, web bots, deep-links, indexes, spiders\" (https://www.aircanada.com/ca/en/aco/home/legal/terms-of-use.html)"

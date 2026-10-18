@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from api import feed_discovery as fd
+from api import newsroom_cards
 
 NOW = datetime(2026, 10, 17, 12, 0, tzinfo=timezone.utc)
 RECENT = (NOW - timedelta(days=2)).strftime("%a, %d %b %Y %H:%M:%S +0000")
@@ -204,6 +205,26 @@ def test_json_ld_news_articles_are_used_when_there_is_no_feed():
     site = Site({"https://pub.example/": (200, JSONLD_PAGE)})
     result = run(site)
     assert result.method == "jsonld" and result.items[0].title == "Regulator fines carrier over delays"
+
+
+def test_a_configured_public_q4_newsroom_api_is_read_without_fetching_articles():
+    api_url = "https://pub.example/feed/PressRelease.svc/GetPressReleaseList?LanguageId=1"
+    body = b'{"GetPressReleaseListResult":[{"Headline":"Airline adds Tokyo route","LinkToDetailPage":"/news/route","PressReleaseDate":"10/16/2026 09:00:00","ShortDescription":"Daily service"}]}'
+    site = Site({api_url: (200, body)})
+    result = run(site, urls=(api_url,))
+    assert result.method == fd.METHOD_JSON_API
+    assert result.items[0].link == "https://pub.example/news/route"
+    assert result.items[0].summary == "Daily service"
+    assert site.urls == ["https://pub.example/robots.txt", api_url]
+
+
+def test_configured_newsroom_cards_can_keep_title_date_and_link_in_separate_fields(monkeypatch, tmp_path):
+    config = tmp_path / "cards.json"
+    config.write_text('{"pub.example":{"container_class":"news-card","title_class":"headline","date_class":"date","link_class":"footer","date_format":"%d %B %Y"}}', encoding="utf-8")
+    monkeypatch.setattr(newsroom_cards, "CONFIG_PATH", config)
+    page = '<div class="news-card"><div class="date">16 October 2026</div><div class="headline"><h3>Airline adds Tokyo route</h3></div><div class="footer"><a href="/news/route">Learn more</a></div></div>'
+    items = fd.parse_dated_links(page, "https://pub.example/newsroom")
+    assert [(item.title, item.link) for item in items] == [("Airline adds Tokyo route", "https://pub.example/news/route")]
 
 
 DATED_PAGE = f'<html><body><article><time datetime="{ISO_RECENT}">today</time><a href="/news/1">Carrier announces winter schedule changes</a></article></body></html>'

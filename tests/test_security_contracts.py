@@ -130,7 +130,7 @@ def test_html_source_keeps_article_title_and_source_metadata_separate():
 
 
 def test_major_airline_source_registry_is_present():
-    sources = {source["name"]: source for source in _engine.get_rss_sources()}
+    sources = {source["name"]: source for source in _engine.get_builtin_source_records()}
     expected = {
         "American Airlines Newsroom": "AA",
         "United Airlines Newsroom": "UA",

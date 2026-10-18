@@ -405,7 +405,10 @@ def get_builtin_source_records(max_hours=48):
 def get_rss_sources(max_hours=48):
     """Return only the active feeds, decorated with source-governance metadata and the catalog's timeout and mode."""
     sources = source_registry.load_active_sources(get_builtin_source_records(max_hours))
-    catalog = {row["name"]: row for row in source_catalog.read_rows()}
+    rows = source_catalog.read_rows()
+    preferred = feed_sources.catalog_preferred_names(rows, feed_sources.load_discovered())
+    sources = [source for source in sources if source.get("name") not in preferred]
+    catalog = {row["name"]: row for row in rows}
     for source in sources:
         row = catalog.get(source.get("name"))
         if row:
@@ -592,10 +595,11 @@ def _fetch_source_articles(source, cutoff, headers):
 def _read_catalog_feeds(cutoff, report, entity_index_factory=None, recovered=None):
     """Catalog sources read through their discovered feeds: hosts in parallel, the sources of one host strictly in turn."""
     rows = source_catalog.read_rows()
-    handled = {source["name"] for source in get_builtin_source_records()} | {alert_feeds.SOURCE_NAME}    # alerts have their own reader
+    discovered = feed_sources.load_discovered()
+    preferred = feed_sources.catalog_preferred_names(rows, discovered)
+    handled = ({source["name"] for source in get_builtin_source_records()} - preferred) | {alert_feeds.SOURCE_NAME}    # alerts have their own reader
     recovered = recovered or {}
     sources = feed_sources.catalog_feed_sources(rows, handled)
-    discovered = feed_sources.load_discovered()
     for row in rows:
         if row["name"] in handled or row["status"] == source_catalog.STATUS_ACTIVE:
             continue
@@ -1136,8 +1140,7 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
     date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
     LookupError when no archive exists for it. Badges, score bands and ordering are recomputed on every
     read; the archive-only low band is returned only with include_low. The default daily view contains only stories
-    published in Istanbul's current calendar day, then is topped up with the previous day's best stories when thin
-    (carried_from: yesterday, no badges). The archive files themselves are never pruned.
+    published in Istanbul's current calendar day. Historical archive files themselves are never pruned.
     """
     mode = validate_mode(mode)
     if date is not None:
@@ -1172,9 +1175,7 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         if not include_low:
             snapshot["stories"] = [story for story in everything if story_lifecycle.is_listed(story)]
         snapshot["hidden_low_count"] = len(everything) - len(snapshot["stories"])
-        if mode == "daily" and date is None and snapshot["date"] == today:
-            previous_day = briefing_store.read_json(briefing_store.day_path(story_lifecycle.previous_day_key(today)))
-            story_lifecycle.backfill_from_previous_day(snapshot, previous_day if isinstance(previous_day, dict) else None, now, config)
+        snapshot["yesterday_count"] = 0
         if mode == "hourly" and snapshot["date"] == today:
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode

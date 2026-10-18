@@ -97,6 +97,58 @@ def test_languages_follow_the_agreed_rule():
     assert rows["SHGM News"]["language"] == "tr" and rows["KAP Public Disclosure"]["language"] == "en"
 
 
+def test_commercial_airplane_oem_feeds_are_active_and_verified():
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
+
+    assert rows["Airbus Press Releases"]["status"] == "active"
+    assert rows["Boeing News Releases"]["status"] == "active"
+    assert discovered["boeing_news_releases"]["feed_url"].endswith("category=786")
+    assert discovered["boeing_news_releases"]["method"] == "rss"
+
+
+def test_approved_trade_sources_are_active_while_the_broad_transport_feed_stays_a_candidate():
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
+    active = {
+        "AirlineGeeks": "rss",
+        "Australian Aviation": "rss",
+    }
+
+    for name, method in active.items():
+        row = rows[name]
+        assert row["status"] == "active" and row["active"] == "1"
+        assert discovered[source_catalog.source_slug(name)]["method"] == method
+
+    transport = rows["UK Department for Transport"]
+    assert transport["status"] == "candidate_verified" and transport["active"] == "0"
+    assert discovered["uk_department_for_transport"]["method"] == "atom"
+
+    assert rows["AirlineGeeks"]["tier"] == "4"
+    assert rows["Australian Aviation"]["tier"] == "2"
+    assert json.loads(rows["UK Department for Transport"]["notes"])["aviation_filter"] is True
+
+
+def test_newly_verified_priority_sources_are_active_with_their_public_adapter():
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
+    expected = {
+        "American Airlines Newsroom": "json_api",
+        "Eurocontrol News": "html",
+        "FlightGlobal": "rss",
+        "Routes Online News": "rss",
+    }
+    for name, method in expected.items():
+        assert rows[name]["status"] == "active" and rows[name]["active"] == "1"
+        assert discovered[source_catalog.source_slug(name)]["method"] == method
+
+
+def test_ntsb_official_feed_is_not_read_against_robots_policy():
+    row = {row["name"]: row for row in source_catalog.read_rows()}["NTSB News"]
+    assert row["status"] == "excluded_policy" and row["active"] == "0"
+    assert row["feed_url"] == "" and "robots.txt disallows" in row["reason"]
+
+
 def test_the_six_sec_rows_carry_a_cik_and_the_agreed_items():
     sec = [row for row in source_catalog.read_rows() if json.loads(row["notes"]).get("cik")]
     assert len(sec) == 6 and all(json.loads(row["notes"])["edgar_items"] == ["2.02", "7.01", "8.01"] for row in sec)

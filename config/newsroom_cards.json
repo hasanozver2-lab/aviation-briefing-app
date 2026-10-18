@@ -4,5 +4,21 @@
     "title_class": "card-title",
     "date_class": "card-date",
     "date_format": "%d/%m/%y"
-  }
+  },
+  "www.eurocontrol.int": [
+    {
+      "container_class": "node--news",
+      "title_class": "field--promo-title",
+      "date_class": "field--publication-date",
+      "link_class": "card-footer",
+      "date_format": "%d %B %Y"
+    },
+    {
+      "container_class": "ec-c--newsroom-card",
+      "title_class": "field--title",
+      "date_class": "field--date",
+      "link_class": "card-footer",
+      "date_format": "%d %B %Y"
+    }
+  ]
 }

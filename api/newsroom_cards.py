@@ -25,8 +25,10 @@ class CardParser(HTMLParser):
                 return
             self.parts, self.link = {"title": [], "date": []}, ""
         field = next((name for name in self.parts if self.rule[name + "_class"] in classes), "")
+        if self.rule.get("link_class") in classes:
+            field = "link"
         inherited = field or (self.stack[-1][1] if self.stack else "")
-        if tag == "a" and inherited == "title" and not self.link:
+        if tag == "a" and inherited in {"title", "link"} and not self.link:
             self.link = urljoin(self.url, attrs.get("href", ""))
         if tag not in VOID_TAGS:
             self.stack.append((tag, inherited))
@@ -37,7 +39,7 @@ class CardParser(HTMLParser):
             self.handle_endtag(tag)
 
     def handle_data(self, text):
-        if self.stack and self.stack[-1][1]:
+        if self.stack and self.stack[-1][1] in self.parts:
             self.parts[self.stack[-1][1]].append(text)
 
     def handle_endtag(self, tag):
@@ -60,9 +62,13 @@ class CardParser(HTMLParser):
 
 def parse_cards(page, url):
     rules = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
-    rule = rules.get(urlparse(url).hostname)
-    if not rule:
+    host_rules = rules.get(urlparse(url).hostname)
+    if not host_rules:
         return []
-    parser = CardParser(url, rule)
-    parser.feed(page)
-    return list(dict.fromkeys(parser.items))
+    host_rules = host_rules if isinstance(host_rules, list) else [host_rules]
+    items = []
+    for rule in host_rules:
+        parser = CardParser(url, rule)
+        parser.feed(page)
+        items.extend(parser.items)
+    return list(dict.fromkeys(items))
