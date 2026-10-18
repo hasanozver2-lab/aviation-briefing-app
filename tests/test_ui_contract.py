@@ -184,5 +184,5 @@ def test_the_market_strip_is_fuel_only_and_hides_when_empty():
 def test_headline_only_stories_say_so_and_the_new_source_types_have_labels():
     html = page()
     assert 's.basis === "headline_only"' in html and "Based on the publisher's headline and short summary only" in html
-    for source_type in ("regulator", "exchange", "oem", "research", "trade", "tech_vendor", "wire_headline"):
+    for source_type in ("regulator", "exchange", "oem", "trade", "tech_vendor", "wire_headline"):
         assert f"{source_type}:" in html.split("const SOURCE_TYPES")[1].split("};")[0]

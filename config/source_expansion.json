@@ -1109,19 +1109,6 @@
   },
   {
    "group": "I",
-   "name": "NASA Aeronautics",
-   "urls": [
-    "https://www.nasa.gov/aeronautics/",
-    "https://www.nasa.gov/aeronautics/feed/"
-   ],
-   "source_type": "research",
-   "region": "North America",
-   "language": "en",
-   "mode": "full",
-   "timeout_s": 10
-  },
-  {
-   "group": "I",
    "name": "UK Department for Transport",
    "urls": [
     "https://www.gov.uk/government/organisations/department-for-transport",

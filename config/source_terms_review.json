@@ -956,15 +956,6 @@
    "quote": "",
    "read": false
   },
-  "NASA Aeronautics": {
-   "terms_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
-   "commercial_use_risk": "low",
-   "summary": "NASA states that its content is generally not subject to US copyright and may be used factually without implied endorsement; logos, identifiers and third-party material remain excluded.",
-   "robots": "Project User-Agent allowed at /aeronautics/feed/ on 2026-10-18.",
-   "automated_reading_forbidden": false,
-   "quote": "",
-   "read": true
-  },
   "UK Department for Transport": {
    "terms_url": "https://www.gov.uk/help/terms-conditions",
    "commercial_use_risk": "low",

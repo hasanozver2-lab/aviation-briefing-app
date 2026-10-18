@@ -5,7 +5,6 @@
     "regulator": {"tier": 1, "official": true, "aviation_filter": false, "label": "Regulator"},
     "exchange": {"tier": 1, "official": true, "aviation_filter": true, "label": "Exchange filing"},
     "oem": {"tier": 1, "official": true, "aviation_filter": false, "label": "Manufacturer"},
-    "research": {"tier": 1, "official": true, "aviation_filter": false, "label": "Official research"},
     "trade": {"tier": 2, "official": false, "aviation_filter": false, "label": "Aviation media"},
     "tech_vendor": {"tier": 4, "official": false, "aviation_filter": true, "label": "Industry vendor"},
     "wire_headline": {"tier": 3, "official": false, "aviation_filter": true, "label": "Press headline"}

@@ -113,7 +113,6 @@ def test_phase_one_global_sources_are_verified_but_not_ingested_without_activati
     expected = {
         "AirlineGeeks": "rss",
         "Australian Aviation": "rss",
-        "NASA Aeronautics": "rss",
         "UK Department for Transport": "atom",
     }
 
@@ -124,7 +123,6 @@ def test_phase_one_global_sources_are_verified_but_not_ingested_without_activati
 
     assert rows["AirlineGeeks"]["tier"] == "4"
     assert rows["Australian Aviation"]["tier"] == "2"
-    assert rows["NASA Aeronautics"]["source_type"] == "research"
     assert json.loads(rows["UK Department for Transport"]["notes"])["aviation_filter"] is True
 
 
