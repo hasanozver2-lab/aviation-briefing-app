@@ -555,11 +555,33 @@ def _apply_incoming(target, story, now_iso, config):
     return True
 
 
-def build_day(existing_day, previous_day, briefings, now, config=None):
+MORNING_RESET_HOUR_LOCAL = 8
+SCAN_INTERVAL_HOURS = 3
+
+
+def is_morning_deep_window(now, config=None):
+    """Whether `now` falls in the 08:00 Europe/Istanbul morning deep-scan slot (08:00–10:59 local)."""
+    config = config or load_badges_config()
+    local_now = now.astimezone(local_timezone(config))
+    reset_hour = int(config.get("morning_deep_reset_hour_local", MORNING_RESET_HOUR_LOCAL))
+    return reset_hour <= local_now.hour < reset_hour + SCAN_INTERVAL_HOURS
+
+
+def should_run_morning_reset(now, existing_day, config=None):
+    """True during the 08:00 local window when today's archive has not yet had its 08:00 full refresh."""
+    if not is_morning_deep_window(now, config):
+        return False
+    if not existing_day:
+        return True
+    return not bool(existing_day.get("morning_reset_at"))
+
+
+def build_day(existing_day, previous_day, briefings, now, config=None, morning_reset=False):
     """Merge this run's stories into today's archive file.
 
-    Nothing already stored is ever removed; a story seen yesterday keeps its first_seen_at.
-    Returns the new day payload, or the existing one when no briefing succeeded.
+    At the 08:00 morning deep scan (`morning_reset=True` or `briefing["morning_deep_scan"]=True`),
+    today's daily breaking news list is refreshed from scratch using the deep scan results (while keeping
+    strategic reports). In subsequent 3-hour runs, existing stories stay and incoming stories are added.
     """
     config = config or load_badges_config()
     ordered = [briefings[mode] for mode in ("daily", "hourly") if mode in briefings]
@@ -569,11 +591,23 @@ def build_day(existing_day, previous_day, briefings, now, config=None):
     now_iso = to_iso(now)
     today = day_key(now, config)
 
-    stored = [copy.deepcopy(story) for story in (existing_day or {}).get("stories", []) if story.get("story_id")]
+    do_morning_reset = bool(
+        (morning_reset or any(isinstance(b, dict) and b.get("morning_deep_scan") for b in ordered))
+        and not (existing_day or {}).get("morning_reset_at")
+    )
+    if do_morning_reset:
+        stored = [
+            copy.deepcopy(story)
+            for story in (existing_day or {}).get("stories", [])
+            if story.get("story_id") and is_strategic_report(story)
+        ]
+    else:
+        stored = [copy.deepcopy(story) for story in (existing_day or {}).get("stories", []) if story.get("story_id")]
+
     previous = [story for story in (previous_day or {}).get("stories", []) if story.get("story_id")]
     for story in _dedupe_incoming([s for briefing in ordered for s in briefing.get("stories", [])], threshold):
         target = _consolidate(stored, story, threshold)
-        if target is None:
+        if target is None and not do_morning_reset:
             carried = find_match(story, previous, threshold)
             if carried is not None:
                 target = copy.deepcopy(carried)   # same story as yesterday: keep its history
@@ -589,8 +623,12 @@ def build_day(existing_day, previous_day, briefings, now, config=None):
         if is_strategic_report(prev_story) and find_match(prev_story, stored, threshold) is None:
             stored.append(copy.deepcopy(prev_story))
 
-    head = {key: value for key, value in ordered[0].items() if key not in HEAD_KEYS_TO_DROP}
+    head = {key: value for key, value in ordered[0].items() if key not in HEAD_KEYS_TO_DROP and key != "morning_deep_scan"}
     day = {**head, "date": today, "timezone": config["timezone"], "stories": stored}
+    if do_morning_reset:
+        day["morning_reset_at"] = now_iso
+    elif existing_day and existing_day.get("morning_reset_at"):
+        day["morning_reset_at"] = existing_day["morning_reset_at"]
     present_stories(day, now, config)   # stored order and badges reflect the moment of writing
     return day
 

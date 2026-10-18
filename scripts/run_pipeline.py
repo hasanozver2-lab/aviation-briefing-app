@@ -1,8 +1,8 @@
 """Run the briefing pipeline once and publish it as a dated archive in ONE commit.
 
-One hourly run does: collect (no LLM) -> score, select and merge into today's archive file
-(briefings/YYYY-MM-DD.json, Europe/Istanbul day) -> narratives for stories that have none (one
-batched, retried LLM call at most twice) -> publish. Daily and hourly are views of the same archive.
+Runs every 3 hours: at 08:00 Europe/Istanbul performs a deep search and refreshes today's daily stories
+from scratch; subsequent 3-hour runs append newly discovered stories into today's archive file
+(briefings/YYYY-MM-DD.json, Europe/Istanbul day) -> narratives for stories that have none -> publish.
 
 Failure semantics: only a real collection failure (or a publish failure) fails the run and writes
 status "stale". An LLM failure just leaves narrative_status="pending" for the next run.
@@ -47,7 +47,10 @@ def collect(recovered=None):
 
 def day_payload(collected, now):
     head = _engine.build_briefing_payload("daily", [], status="ok")
-    return {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
+    payload = {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
+    if collected.get("morning_deep_scan") or story_lifecycle.is_morning_deep_window(now):
+        payload["morning_deep_scan"] = True
+    return payload
 
 
 def source_health(source_report, existing_status, now, retry=None):

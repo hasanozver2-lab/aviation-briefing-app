@@ -707,6 +707,7 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
         utc_now(),
         cutoff,
         classify_topics_fn=classify_topics,
+        deep_scan=story_lifecycle.is_morning_deep_window(utc_now()),
     )
     if benchmark_report:
         report[benchmark_search.SOURCE_NAME] = benchmark_report
@@ -1084,12 +1085,13 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
     return build_briefing_payload(mode, stories, status=status, warning=warning)
 
 
-def collect_run(market_database=None, recovered=None):
+def collect_run(market_database=None, recovered=None, deep_scan=None):
     """One collection pass shared by every mode: sources, market panel, entities, scores, selection.
 
     Raises only when data collection itself failed. No LLM is involved; the LLM step comes later and
     may fail without affecting anything returned here.
     """
+    is_deep = story_lifecycle.is_morning_deep_window(utc_now()) if deep_scan is None else bool(deep_scan)
     local_market_database = market_data.database_path(market_database)
     # The CSV files in config/ are the source of truth; SQLite is rebuilt from them on every run.
     source_registry.sync_sources_from_csv()
@@ -1110,8 +1112,15 @@ def collect_run(market_database=None, recovered=None):
     relevance_config = story_lifecycle.load_relevance_config()
     selected = story_lifecycle.select_stories(candidates, relevance_config["selection"], relevance_config.get("commentary"))
     source_registry.record_source_statistics(articles, {"stories": selected})
-    print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold")
-    return {"stories": selected, "market": market_panel, "articles": len(articles), "candidates": len(candidates), "source_report": source_report}
+    print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold (deep_scan={is_deep})")
+    return {
+        "stories": selected,
+        "market": market_panel,
+        "articles": len(articles),
+        "candidates": len(candidates),
+        "source_report": source_report,
+        "morning_deep_scan": is_deep,
+    }
 
 
 def _write_local_briefing_cache(briefing, mode):

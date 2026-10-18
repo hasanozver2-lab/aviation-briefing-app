@@ -1,13 +1,13 @@
 name: Publish aviation briefings
 
 # A run collects, scores and archives the day's stories and commits the result to the "briefing-data"
-# branch in a single commit (none when nothing changed). GitHub delays and drops scheduled runs under
-# load (observed: gaps of 3-5 hours for an hourly cron), so the schedule asks four times an hour at odd
-# minutes; the concurrency group below keeps runs from overlapping.
+# branch in a single commit (none when nothing changed). Runs every 3 hours aligned with 08:00
+# Europe/Istanbul (05:00 UTC) for the morning full refresh, followed by 3-hour incremental updates;
+# the concurrency group below keeps runs from overlapping.
 # Nothing is ever committed to main, and pushes to briefing-data do not deploy (see vercel.json).
 on:
   schedule:
-    - cron: "7,22,37,52 * * * *"
+    - cron: "0 2,5,8,11,14,17,20,23 * * *"
   workflow_dispatch:
 
 # The narrowest permission that lets the job push the data branch with GITHUB_TOKEN.

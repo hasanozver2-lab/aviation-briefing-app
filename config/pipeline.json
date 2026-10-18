@@ -1,3 +1,5 @@
 {
-  "llm_description_max_chars": 800
+  "llm_description_max_chars": 800,
+  "scan_interval_hours": 3,
+  "morning_deep_reset_hour_local": 8
 }

@@ -261,3 +261,81 @@ def test_strategic_reports_are_classified_and_separated_from_daily_breaking_news
     selected_ids = {s["story_id"] for s in selected}
     assert selected_ids == {"daily-0", "daily-1", "report-0", "report-1"}
 
+
+def test_morning_deep_reset_at_08_local_and_subsequent_3h_appends():
+    from api import story_lifecycle
+
+    # 02:00 UTC = 05:00 Istanbul (pre-08:00 early run)
+    t_05_local = datetime(2026, 10, 18, 2, 0, tzinfo=timezone.utc)
+    # 05:00 UTC = 08:00 Istanbul (morning deep reset window)
+    t_08_local = datetime(2026, 10, 18, 5, 0, tzinfo=timezone.utc)
+    # 08:00 UTC = 11:00 Istanbul (subsequent 3-hour run)
+    t_11_local = datetime(2026, 10, 18, 8, 0, tzinfo=timezone.utc)
+
+    assert story_lifecycle.is_morning_deep_window(t_05_local) is False
+    assert story_lifecycle.is_morning_deep_window(t_08_local) is True
+    assert story_lifecycle.is_morning_deep_window(t_11_local) is False
+
+    early_story = {
+        "story_id": "early-1",
+        "headline": "Overnight Regional Carrier Schedule Change",
+        "relevance_score": 55.0,
+        "published_at_iso": "2026-10-18T01:30:00Z",
+        "sources": [{"name": "Reuters", "url": "https://www.reuters.com/early-1", "title": "Early"}],
+        "original_source": {"url": "https://www.reuters.com/early-1", "source_name": "Reuters"},
+    }
+    strategic_report = {
+        "story_id": "report-boeing",
+        "headline": "Boeing Commercial Market Outlook 2026-2045",
+        "relevance_score": 82.0,
+        "is_strategic_report": True,
+        "published_at_iso": "2026-10-18T01:00:00Z",
+        "sources": [{"name": "Boeing", "url": "https://www.boeing.com/commercial/market/commercial-market-outlook", "title": "Boeing CMO"}],
+        "original_source": {"url": "https://www.boeing.com/commercial/market/commercial-market-outlook", "source_name": "Boeing"},
+    }
+    day_05 = story_lifecycle.build_day(
+        None,
+        None,
+        {"daily": {"mode": "daily", "stories": [early_story, strategic_report]}},
+        t_05_local,
+    )
+    assert {s["story_id"] for s in day_05["stories"]} == {"early-1", "report-boeing"}
+    assert "morning_reset_at" not in day_05
+
+    # At 08:00 Istanbul, morning_deep_scan=True refreshes daily stories from scratch while preserving strategic reports
+    morning_story = {
+        "story_id": "morning-1",
+        "headline": "Lufthansa Group Posts Record Q3 Operating Profit",
+        "relevance_score": 78.0,
+        "published_at_iso": "2026-10-18T04:45:00Z",
+        "sources": [{"name": "Reuters", "url": "https://www.reuters.com/morning-1", "title": "Lufthansa Q3"}],
+        "original_source": {"url": "https://www.reuters.com/morning-1", "source_name": "Reuters"},
+    }
+    day_08 = story_lifecycle.build_day(
+        day_05,
+        None,
+        {"daily": {"mode": "daily", "morning_deep_scan": True, "stories": [morning_story]}},
+        t_08_local,
+    )
+    assert {s["story_id"] for s in day_08["stories"]} == {"morning-1", "report-boeing"}
+    assert day_08.get("morning_reset_at") == story_lifecycle.to_iso(t_08_local)
+
+    # At 11:00 Istanbul (next 3-hour scan), new stories are appended onto the 08:00 stories
+    midday_story = {
+        "story_id": "midday-1",
+        "headline": "Turkish Airlines Expands Asian Widebody Frequencies",
+        "relevance_score": 74.0,
+        "published_at_iso": "2026-10-18T07:30:00Z",
+        "sources": [{"name": "Turkish Airlines", "url": "https://www.turkishairlines.com/midday-1", "title": "THY Asia"}],
+        "original_source": {"url": "https://www.turkishairlines.com/midday-1", "source_name": "Turkish Airlines"},
+    }
+    day_11 = story_lifecycle.build_day(
+        day_08,
+        None,
+        {"daily": {"mode": "daily", "morning_deep_scan": False, "stories": [midday_story]}},
+        t_11_local,
+    )
+    assert {s["story_id"] for s in day_11["stories"]} == {"morning-1", "midday-1", "report-boeing"}
+    assert day_11.get("morning_reset_at") == story_lifecycle.to_iso(t_08_local)
+
+

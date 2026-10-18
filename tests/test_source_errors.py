@@ -18,5 +18,5 @@ def test_other_failures_keep_their_type_name():
 
 def test_the_workflow_asks_more_than_once_an_hour_and_never_overlaps():
     text = WORKFLOW.read_text(encoding="utf-8")
-    assert 'cron: "7,22,37,52 * * * *"' in text
+    assert 'cron: "0 2,5,8,11,14,17,20,23 * * *"' in text
     assert "group: aerobrief-publish" in text and "cancel-in-progress: false" in text

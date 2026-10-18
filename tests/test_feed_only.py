@@ -179,6 +179,7 @@ def test_sec_edgar_items_are_filtered_to_the_agreed_item_numbers():
 
 def test_the_pipeline_reads_catalog_feeds_and_reports_every_source(monkeypatch):
     rows = [row("Wire Example"), row("Blocked Wire", status="disabled_blocked", active="0", reason="403 on /"), row("Legacy Feed")]
+    monkeypatch.setattr(_engine, "utc_now", lambda: NOW)
     monkeypatch.setattr(source_catalog, "read_rows", lambda path=None: rows)
     monkeypatch.setattr(feed_sources, "load_discovered", lambda path=None: DISCOVERED)
     monkeypatch.setattr(_engine, "get_builtin_source_records", lambda max_hours=48: [{"name": "Legacy Feed", "url": "https://legacy.example/"}])

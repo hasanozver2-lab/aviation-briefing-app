@@ -569,6 +569,25 @@ GOOGLE_NEWS_QUERIES = (
     ),
 )
 
+DEEP_MORNING_QUERIES = (
+    (
+        "deep_airline_results",
+        "(airline OR airlines OR airways) (earnings OR revenue OR profit OR yield OR RASK OR CASK OR guidance OR capacity) when:2d",
+    ),
+    (
+        "deep_fleet_aog",
+        "(airbus OR boeing OR embraer OR \"Pratt & Whitney\" OR CFM OR Rolls-Royce) (delivery OR order OR AOG OR GTF OR LEAP OR fleet OR \"wet lease\") when:2d",
+    ),
+    (
+        "deep_network_hubs",
+        "(airline OR airport OR slot OR bilateral OR codeshare OR \"fifth freedom\") (route OR hub OR frequency OR launch OR suspend) when:2d",
+    ),
+    (
+        "deep_turkey_region",
+        "(\"Turkish Airlines\" OR THY OR Pegasus OR SunExpress OR AJet OR \"Istanbul Airport\" OR IGA) (flight OR route OR fleet OR passenger OR cargo) when:3d",
+    ),
+)
+
 
 def _clean_html_text(raw):
     if not raw:
@@ -577,14 +596,15 @@ def _clean_html_text(raw):
     return " ".join(unescape(text).split()).strip()
 
 
-def build_search_prompt(now, cutoff, seed_articles=None):
+def build_search_prompt(now, cutoff, seed_articles=None, deep_scan=False):
     today_str = now.strftime("%Y-%m-%d")
     cutoff_str = cutoff.strftime("%Y-%m-%d")
     seed_block = ""
+    max_seeds = 20 if deep_scan else 16
     if seed_articles:
         lines = [
             f"{idx}. [{item.get('source', '')}] {item.get('title', '')}"
-            for idx, item in enumerate(seed_articles[:16])
+            for idx, item in enumerate(seed_articles[:max_seeds])
         ]
         seed_block = (
             "\nTASK 1 — CROSS-SOURCE CONTEXT ENRICHMENT FOR DISCOVERED HEADLINES:\n"
@@ -755,7 +775,7 @@ def _build_article(title, url, description, publisher, published_at, now, classi
     return article
 
 
-def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=urllib.request.urlopen):
+def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=urllib.request.urlopen, max_items=MAX_ITEMS_PER_QUERY):
     url = GOOGLE_NEWS_RSS_URL.format(query=urllib.parse.quote(query))
     request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; aviation-briefing-app)"})
     ctx = ssl.create_default_context()
@@ -763,7 +783,7 @@ def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=
         xml_bytes = response.read()
     root = ET.fromstring(xml_bytes)
     articles = []
-    for item in root.findall("./channel/item")[:MAX_ITEMS_PER_QUERY]:
+    for item in root.findall("./channel/item")[:max_items]:
         raw_title = (item.findtext("title") or "").strip()
         link = (item.findtext("link") or "").strip()
         pub_date_raw = (item.findtext("pubDate") or "").strip()
@@ -807,18 +827,27 @@ def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=
     return articles
 
 
-def collect_google_news_rss(now, cutoff, classify_topics_fn=None, opener=urllib.request.urlopen):
+def collect_google_news_rss(now, cutoff, classify_topics_fn=None, opener=urllib.request.urlopen, deep_scan=False):
     collected = []
+    queries = GOOGLE_NEWS_QUERIES + DEEP_MORNING_QUERIES if deep_scan else GOOGLE_NEWS_QUERIES
+    per_query_limit = 12 if deep_scan else MAX_ITEMS_PER_QUERY
 
     def _run_one(entry):
         _, query = entry
         try:
-            return fetch_google_news_query(query, now, cutoff, classify_topics_fn=classify_topics_fn, opener=opener)
+            return fetch_google_news_query(
+                query,
+                now,
+                cutoff,
+                classify_topics_fn=classify_topics_fn,
+                opener=opener,
+                max_items=per_query_limit,
+            )
         except Exception:
             return []
 
-    with ThreadPoolExecutor(max_workers=min(8, len(GOOGLE_NEWS_QUERIES)), thread_name_prefix="benchmark-rss") as pool:
-        for batch in pool.map(_run_one, GOOGLE_NEWS_QUERIES):
+    with ThreadPoolExecutor(max_workers=min(8, len(queries)), thread_name_prefix="benchmark-rss") as pool:
+        for batch in pool.map(_run_one, queries):
             collected.extend(batch)
     return collected
 
@@ -911,8 +940,8 @@ def corroborate_one_article(article, classify_topics_fn=None, opener=urllib.requ
     return True
 
 
-def corroborate_thin_articles(articles, classify_topics_fn=None, opener=urllib.request.urlopen):
-    thin = [article for article in articles if len(str(article.get("description") or "")) < 60][:24]
+def corroborate_thin_articles(articles, classify_topics_fn=None, opener=urllib.request.urlopen, max_articles=24):
+    thin = [article for article in articles if len(str(article.get("description") or "")) < 60][:max_articles]
     if not thin:
         return 0
 
@@ -1211,8 +1240,8 @@ def collect_strategic_publications(now, cutoff, classify_topics_fn=None, opener=
     return articles
 
 
-def post_search_query(api_key, now, cutoff, seed_articles=None, timeout=REQUEST_TIMEOUT_SECONDS):
-    prompt_text = build_search_prompt(now, cutoff, seed_articles=seed_articles)
+def post_search_query(api_key, now, cutoff, seed_articles=None, timeout=REQUEST_TIMEOUT_SECONDS, deep_scan=False):
+    prompt_text = build_search_prompt(now, cutoff, seed_articles=seed_articles, deep_scan=deep_scan)
     ctx = ssl.create_default_context()
     last_error = None
     for model_name in (GEMINI_SEARCH_MODEL, *GEMINI_FALLBACK_MODELS):
@@ -1334,7 +1363,7 @@ def parse_search_response(response, now, cutoff, classify_topics_fn=None):
     return articles
 
 
-def collect(api_key, now, cutoff, post=None, classify_topics_fn=None, include_rss=None):
+def collect(api_key, now, cutoff, post=None, classify_topics_fn=None, include_rss=None, deep_scan=False):
     """Collect recent benchmark, wire, and blocked official airline/OEM reports via Google News RSS + Gemini Search Grounding.
 
     Never raises: returns (articles, report_dict).
@@ -1349,16 +1378,21 @@ def collect(api_key, now, cutoff, post=None, classify_topics_fn=None, include_rs
     if use_rss:
         try:
             rss_articles.extend(collect_strategic_publications(now, cutoff, classify_topics_fn=classify_topics_fn))
-            rss_articles.extend(collect_google_news_rss(now, cutoff, classify_topics_fn=classify_topics_fn))
-            corroborate_thin_articles(rss_articles, classify_topics_fn=classify_topics_fn)
+            rss_articles.extend(collect_google_news_rss(now, cutoff, classify_topics_fn=classify_topics_fn, deep_scan=deep_scan))
+            corroborate_thin_articles(
+                rss_articles,
+                classify_topics_fn=classify_topics_fn,
+                max_articles=36 if deep_scan else 24,
+            )
         except Exception as exc:
             errors.append(type(exc).__name__)
 
-    thin_seeds = [article for article in rss_articles if len(str(article.get("description") or "")) < 60][:12]
+    seed_limit = 20 if deep_scan else 12
+    thin_seeds = [article for article in rss_articles if len(str(article.get("description") or "")) < 60][:seed_limit]
     grounded_articles = []
 
     if api_key or post is not None:
-        sender = post or (lambda: post_search_query(api_key, now, cutoff, seed_articles=thin_seeds))
+        sender = post or (lambda: post_search_query(api_key, now, cutoff, seed_articles=thin_seeds, deep_scan=deep_scan))
         try:
             response = sender()
             apply_search_enrichment(response, thin_seeds, classify_topics_fn=classify_topics_fn)
