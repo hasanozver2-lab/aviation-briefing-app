@@ -107,6 +107,33 @@ def test_commercial_airplane_oem_feeds_are_active_and_verified():
     assert discovered["boeing_news_releases"]["method"] == "rss"
 
 
+def test_phase_one_global_sources_are_verified_but_not_ingested_without_activation_approval():
+    rows = {row["name"]: row for row in source_catalog.read_rows()}
+    discovered = json.loads((source_catalog.BASE_DIR / "config" / "feeds_discovered.json").read_text(encoding="utf-8"))
+    expected = {
+        "AirlineGeeks": "rss",
+        "Australian Aviation": "rss",
+        "NASA Aeronautics": "rss",
+        "UK Department for Transport": "atom",
+    }
+
+    for name, method in expected.items():
+        row = rows[name]
+        assert row["status"] == "candidate_verified" and row["active"] == "0"
+        assert discovered[source_catalog.source_slug(name)]["method"] == method
+
+    assert rows["AirlineGeeks"]["tier"] == "4"
+    assert rows["Australian Aviation"]["tier"] == "2"
+    assert rows["NASA Aeronautics"]["source_type"] == "research"
+    assert json.loads(rows["UK Department for Transport"]["notes"])["aviation_filter"] is True
+
+
+def test_ntsb_official_feed_is_not_read_against_robots_policy():
+    row = {row["name"]: row for row in source_catalog.read_rows()}["NTSB News"]
+    assert row["status"] == "excluded_policy" and row["active"] == "0"
+    assert row["feed_url"] == "" and "robots.txt disallows" in row["reason"]
+
+
 def test_the_six_sec_rows_carry_a_cik_and_the_agreed_items():
     sec = [row for row in source_catalog.read_rows() if json.loads(row["notes"]).get("cik")]
     assert len(sec) == 6 and all(json.loads(row["notes"])["edgar_items"] == ["2.02", "7.01", "8.01"] for row in sec)

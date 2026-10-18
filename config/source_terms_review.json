@@ -1,6 +1,6 @@
 {
- "_doc": "Terms-of-use and robots.txt review of every catalog source, made on 2026-10-17 by model-assisted web research (read=true: the terms page was read in that session; read=false: the page could not be retrieved or the finding comes from memory or a search excerpt, so treat it as UNCONFIRMED and have it checked by a person). commercial_use_risk: high = terms restrict commercial use/redistribution or automated access; medium = unclear or unreadable; low = no restriction or open reuse. The risk only records; it never deactivates a source. A source is excluded (status excluded_policy) only where robots.txt disallows our User-Agent, or, for press/data (feed_only) and exchange sources, where the terms explicitly forbid automated reading (automated_reading_forbidden with a quote).",
- "reviewed_on": "2026-10-17",
+ "_doc": "Terms-of-use and robots.txt review of every catalog source, updated on 2026-10-18 by model-assisted web research (read=true: the terms page was read in that session; read=false: the page could not be retrieved or the finding comes from memory or a search excerpt, so treat it as UNCONFIRMED and have it checked by a person). commercial_use_risk: high = terms restrict commercial use/redistribution or automated access; medium = unclear or unreadable; low = no restriction or open reuse. The risk only records; it never deactivates a source. A source is excluded (status excluded_policy) only where robots.txt disallows our User-Agent, or, for press/data (feed_only) and exchange sources, where the terms explicitly forbid automated reading (automated_reading_forbidden with a quote).",
+ "reviewed_on": "2026-10-18",
  "sources": {
   "ACI World News": {
    "terms_url": "https://aci.aero/terms-and-conditions-of-use/",
@@ -937,6 +937,42 @@
    "automated_reading_forbidden": false,
    "quote": "",
    "read": false
+  },
+  "AirlineGeeks": {
+   "terms_url": "https://airlinegeeks.com/",
+   "commercial_use_risk": "medium",
+   "summary": "A public RSS endpoint was verified on 2026-10-18. No readable reuse or automation terms page was found in the review, so activation remains a separate approval decision.",
+   "robots": "Project User-Agent allowed at /feed/ on 2026-10-18.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "Australian Aviation": {
+   "terms_url": "https://australianaviation.com.au/",
+   "commercial_use_risk": "medium",
+   "summary": "A public RSS endpoint was verified on 2026-10-18. No readable reuse or automation terms page was found in the review; only feed metadata would be collected.",
+   "robots": "Project User-Agent allowed at /feed/ on 2026-10-18.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
+  },
+  "NASA Aeronautics": {
+   "terms_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+   "commercial_use_risk": "low",
+   "summary": "NASA states that its content is generally not subject to US copyright and may be used factually without implied endorsement; logos, identifiers and third-party material remain excluded.",
+   "robots": "Project User-Agent allowed at /aeronautics/feed/ on 2026-10-18.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "UK Department for Transport": {
+   "terms_url": "https://www.gov.uk/help/terms-conditions",
+   "commercial_use_risk": "low",
+   "summary": "Most GOV.UK content and feeds are available under the Open Government Licence, including commercial reuse with attribution; third-party and exempt material is excluded.",
+   "robots": "Project User-Agent allowed at the organisation Atom feed on 2026-10-18.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
   },
   "Google Alerts (wire headlines)": {
    "terms_url": "https://policies.google.com/terms",

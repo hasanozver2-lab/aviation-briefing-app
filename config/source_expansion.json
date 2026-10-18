@@ -347,7 +347,8 @@
    "group": "B",
    "name": "NTSB News",
    "urls": [
-    "https://www.ntsb.gov/news/Pages/default.aspx"
+    "https://www.ntsb.gov/news/Pages/default.aspx",
+    "https://www.ntsb.gov/Pages/rss.aspx"
    ],
    "source_type": "regulator",
    "region": "North America",
@@ -1077,6 +1078,61 @@
    "region": "Turkey",
    "language": "tr",
    "mode": "full"
+  },
+  {
+   "group": "I",
+   "name": "AirlineGeeks",
+   "urls": [
+    "https://airlinegeeks.com/",
+    "https://airlinegeeks.com/feed/"
+   ],
+   "source_type": "trade",
+   "region": "Global",
+   "language": "en",
+   "mode": "full",
+   "tier": 4,
+   "timeout_s": 10
+  },
+  {
+   "group": "I",
+   "name": "Australian Aviation",
+   "urls": [
+    "https://australianaviation.com.au/",
+    "https://australianaviation.com.au/feed/"
+   ],
+   "source_type": "trade",
+   "region": "Asia-Pacific",
+   "language": "en",
+   "mode": "full",
+   "tier": 2,
+   "timeout_s": 10
+  },
+  {
+   "group": "I",
+   "name": "NASA Aeronautics",
+   "urls": [
+    "https://www.nasa.gov/aeronautics/",
+    "https://www.nasa.gov/aeronautics/feed/"
+   ],
+   "source_type": "research",
+   "region": "North America",
+   "language": "en",
+   "mode": "full",
+   "timeout_s": 10
+  },
+  {
+   "group": "I",
+   "name": "UK Department for Transport",
+   "urls": [
+    "https://www.gov.uk/government/organisations/department-for-transport",
+    "https://www.gov.uk/government/organisations/department-for-transport.atom"
+   ],
+   "source_type": "regulator",
+   "region": "Europe",
+   "language": "en",
+   "mode": "full",
+   "aviation_filter": true,
+   "timeout_s": 10
   },
   {
    "group": "H",

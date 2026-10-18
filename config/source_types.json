@@ -5,6 +5,7 @@
     "regulator": {"tier": 1, "official": true, "aviation_filter": false, "label": "Regulator"},
     "exchange": {"tier": 1, "official": true, "aviation_filter": true, "label": "Exchange filing"},
     "oem": {"tier": 1, "official": true, "aviation_filter": false, "label": "Manufacturer"},
+    "research": {"tier": 1, "official": true, "aviation_filter": false, "label": "Official research"},
     "trade": {"tier": 2, "official": false, "aviation_filter": false, "label": "Aviation media"},
     "tech_vendor": {"tier": 4, "official": false, "aviation_filter": true, "label": "Industry vendor"},
     "wire_headline": {"tier": 3, "official": false, "aviation_filter": true, "label": "Press headline"}
@@ -16,7 +17,7 @@
     "trade_media": "trade",
     "mainstream": "wire_headline"
   },
-  "statuses": ["active", "disabled_blocked", "no_extractable_feed", "no_public_feed", "excluded_policy"],
+  "statuses": ["active", "candidate_verified", "disabled_blocked", "no_extractable_feed", "no_public_feed", "excluded_policy"],
   "commercial_use_risks": ["low", "medium", "high"],
   "modes": ["full", "feed_only"]
 }

@@ -40,7 +40,7 @@ def test_every_code_defined_source_is_in_the_csv_and_the_rest_are_catalog_rows()
     assert code_keys <= csv_keys, "a source defined in code is missing from config/sources.csv"
     code_names = {name for name, _ in code_keys}
     extra = [row for row in csv_rows if row["name"] not in code_names]
-    assert extra and all(row["status"] in {"active", "no_extractable_feed", "no_public_feed", "disabled_blocked", "excluded_policy"} for row in extra)
+    assert extra and all(row["status"] in {"active", "candidate_verified", "no_extractable_feed", "no_public_feed", "disabled_blocked", "excluded_policy"} for row in extra)
 
 
 def test_csv_sync_is_idempotent(tmp_path):

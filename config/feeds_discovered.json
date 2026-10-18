@@ -5,6 +5,10 @@
   "aci_world_news": {"feed_url":"https://aci.aero/feed/","item_count_90d":8,"last_ok_at":"2026-10-17T10:05:06+00:00","method":"rss","verified_at":"2026-10-17T10:05:06+00:00"},
   "bbc_news_business": {"feed_url":"https://feeds.bbci.co.uk/news/business/rss.xml","item_count_90d":48,"last_ok_at":"2026-10-17T10:05:06+00:00","method":"rss","verified_at":"2026-10-17T10:05:06+00:00"},
   "boeing_news_releases": {"feed_url":"https://boeing.mediaroom.com/news-releases-statements?pagetemplate=rss&category=786","item_count_90d":5,"last_ok_at":"2026-10-18T07:02:16+00:00","method":"rss","verified_at":"2026-10-18T07:02:16+00:00"},
+  "airlinegeeks": {"feed_url":"https://airlinegeeks.com/feed/","item_count_90d":10,"last_ok_at":"2026-10-18T07:32:53+00:00","method":"rss","verified_at":"2026-10-18T07:32:53+00:00"},
+  "australian_aviation": {"feed_url":"https://australianaviation.com.au/feed/","item_count_90d":10,"last_ok_at":"2026-10-18T07:32:53+00:00","method":"rss","verified_at":"2026-10-18T07:32:53+00:00"},
+  "nasa_aeronautics": {"feed_url":"https://www.nasa.gov/aeronautics/feed/","item_count_90d":10,"last_ok_at":"2026-10-18T07:32:53+00:00","method":"rss","verified_at":"2026-10-18T07:32:53+00:00"},
+  "uk_department_for_transport": {"feed_url":"https://www.gov.uk/government/organisations/department-for-transport.atom","item_count_90d":20,"last_ok_at":"2026-10-18T07:32:53+00:00","method":"atom","verified_at":"2026-10-18T07:32:53+00:00"},
   "aaib_uk": {
     "feed_url": "https://www.gov.uk/government/organisations/air-accidents-investigation-branch.atom",
     "item_count_90d": 0,
