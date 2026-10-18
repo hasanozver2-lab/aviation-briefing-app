@@ -88,6 +88,26 @@ def previous_day_key(date_text):
     return (date.fromisoformat(date_text) - timedelta(days=1)).isoformat()
 
 
+def published_on_day(story, date_text, config):
+    """Whether a story belongs to a local archive day by publication time.
+
+    A source date is authoritative. First-seen time is only a fallback for the
+    rare legacy record without one; this keeps a delayed feed item from appearing
+    as new merely because the pipeline first encountered it today.
+    """
+    published = parse_iso(story.get("published_at_iso"))
+    first_seen = parse_iso(story.get("first_seen_at"))
+    moment = published or first_seen
+    return bool(moment and day_key(moment, config) == date_text)
+
+
+def drop_not_published_on_day(day, date_text, config):
+    """Apply the current-day view without changing an archive file on disk."""
+    stories = day.get("stories", [])
+    day["stories"] = [story for story in stories if published_on_day(story, date_text, config)]
+    return len(stories) - len(day["stories"])
+
+
 def validate_date(value):
     """YYYY-MM-DD for a real calendar day, else ValueError."""
     if not isinstance(value, str) or not DATE_PATTERN.match(value):

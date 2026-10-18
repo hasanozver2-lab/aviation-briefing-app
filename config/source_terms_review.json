@@ -534,12 +534,12 @@
    "read": true
   },
   "OAG Blog": {
-   "terms_url": "https://www.oag.com/terms-of-use",
+   "terms_url": "https://www.oag.com/terms-of-use-for-websites-and-services",
    "commercial_use_risk": "high",
-   "summary": "6.3: \"personal, non-commercial use only, unless you obtain a license for commercial purposes\"; 7.1 bars bots/crawlers/scrapers \"without our explicit written consent\"; 6.4 bans republishing; 7.2 bans genAI training. RSS not mentioned.",
+   "summary": "Website terms read 2026-10-17: 6.3 limits content to personal, non-commercial use without a licence; 7.1 bars bots/crawlers/scrapers without written consent; 7.4 bars copying, distribution and reuse. No automated collection is permitted.",
    "robots": "No feed rules; User-agent * blocks only form/preview/CTA/sample paths; feeds not disallowed.",
-   "automated_reading_forbidden": false,
-   "quote": "",
+   "automated_reading_forbidden": true,
+   "quote": "You may not use any automated tools, included but not limited to bots, crawlers, spiders, or scraper to access, extract, copy, or collect data from Our Website without our explicit written consent.",
    "read": true
   },
   "PROS News": {
@@ -775,6 +775,15 @@
    "automated_reading_forbidden": false,
    "quote": "",
    "read": true
+  },
+  "The Aviation Hub": {
+   "terms_url": "",
+   "commercial_use_risk": "medium",
+   "summary": "No publisher terms page was discoverable in a public site search on 2026-10-17. The source is limited to its public RSS fields (headline, link, date and short summary); commercial reuse requires a human terms review before launch.",
+   "robots": "Project User-Agent allowed at /feed/ on 2026-10-17.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
   },
   "The Economist": {
    "terms_url": "",

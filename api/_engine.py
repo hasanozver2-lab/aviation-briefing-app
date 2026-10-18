@@ -1135,8 +1135,9 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
 
     date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
     LookupError when no archive exists for it. Badges, score bands and ordering are recomputed on every
-    read; the archive-only low band is returned only with include_low. A thin daily view for today is topped up with
-    the previous day's best stories (carried_from: yesterday, no badges).
+    read; the archive-only low band is returned only with include_low. The default daily view contains only stories
+    published in Istanbul's current calendar day, then is topped up with the previous day's best stories when thin
+    (carried_from: yesterday, no badges). The archive files themselves are never pruned.
     """
     mode = validate_mode(mode)
     if date is not None:
@@ -1161,6 +1162,9 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         # Current exclusion lists apply at read time; nothing is removed from the archive file itself.
         snapshot["excluded_count"] = story_lifecycle.drop_excluded(snapshot)
         snapshot = story_lifecycle.present_stories(snapshot, now, config)
+        snapshot["older_archive_count"] = 0
+        if mode == "daily" and date is None and snapshot["date"] == today:
+            snapshot["older_archive_count"] = story_lifecycle.drop_not_published_on_day(snapshot, today, config)
         for story in snapshot["stories"]:
             if story.get("basis") == feed_sources.BASIS_HEADLINE_ONLY:
                 story["source_description"] = ""
