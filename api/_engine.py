@@ -30,6 +30,7 @@ try:
     from . import feed_discovery
     from . import feed_sources
     from . import alert_feeds
+    from . import benchmark_search
     from . import safety_context
     from . import source_catalog
     from .urls import canonicalize_url
@@ -43,6 +44,7 @@ except ImportError:
     import feed_discovery
     import feed_sources
     import alert_feeds
+    import benchmark_search
     import safety_context
     import source_catalog
     from urls import canonicalize_url
@@ -71,6 +73,7 @@ SOURCE_TYPES = {
     "airline_ir",
     "airline_newsroom",
     "official_social",
+    "regulator",
 }
 SECTION_ORDER = [
     "Turkey / THY and Turkish aviation",
@@ -151,18 +154,21 @@ AIRLINE_RELEVANCE_TERMS = (
     "bagaj", "delay", "gecikme", "cancellation", "iptal", "diversion",
     "safety", "emniyet", "security", "güvenlik", "a320", "a321", "a330",
     "a350", "a380", "737", "747", "767", "777", "787", "e190", "embraer",
-    "airbus", "boeing",
+    "airbus", "boeing", "ancillary", "unbundling", "ffp", "megahubs",
+    "otp", "mct", "cask", "rask", "aog", "wet-lease", "acmi", "gtf",
+    "a321xlr", "cirium", "oag", "capa", "ideaworks", "ch-aviation",
+    "eurocontrol", "aci world",
 )
 
 TOPIC_TERMS = {
-    "airline_operations": ("flight", "uçuş", "schedule", "tarife", "delay", "gecikme", "cancellation", "iptal", "crew", "pilot", "bakım", "maintenance"),
-    "route_network": ("route", "rota", "destination", "uçuş ağı", "hub", "slot", "codeshare", "alliance", "ittifak"),
-    "fleet": ("fleet", "filo", "aircraft", "uçak", "a320", "a321", "a330", "a350", "a380", "737", "747", "767", "777", "787", "e190", "airbus", "boeing", "embraer"),
+    "airline_operations": ("flight", "uçuş", "schedule", "tarife", "delay", "gecikme", "cancellation", "iptal", "crew", "pilot", "bakım", "maintenance", "otp", "aog", "utilization"),
+    "route_network": ("route", "rota", "destination", "uçuş ağı", "hub", "slot", "codeshare", "alliance", "ittifak", "megahubs", "mct", "connecting bank", "hub-bypass"),
+    "fleet": ("fleet", "filo", "aircraft", "uçak", "a320", "a321", "a321xlr", "a330", "a350", "a380", "737", "747", "767", "777", "787", "e190", "airbus", "boeing", "embraer", "gtf", "leap", "wet-lease", "acmi"),
     "orders_deliveries": ("order", "sipariş", "delivery", "teslimat", "backlog", "purchase", "satın"),
-    "finance_investor": ("earnings", "revenue", "gelir", "profit", "kâr", "loss", "zarar", "investor", "yatırımcı", "results", "sonuç", "dividend", "temettü"),
-    "regulation_safety": ("faa", "easa", "iata", "icao", "safety", "emniyet", "security", "güvenlik", "regulation", "düzenleme", "incident", "kaza"),
-    "airports_airspace": ("airport", "havalimanı", "airspace", "hava sahası", "runway", "pist", "terminal", "atc", "air traffic"),
-    "fuel_sustainability": ("jet fuel", "jet yakıt", "saf", "sustainable aviation", "sürdürülebilir", "emissions", "karbon"),
+    "finance_investor": ("earnings", "revenue", "gelir", "profit", "kâr", "loss", "zarar", "investor", "yatırımcı", "results", "sonuç", "dividend", "temettü", "ancillary", "unbundling", "ffp", "frequent-flier", "frequent flyer", "loyalty", "cask", "rask"),
+    "regulation_safety": ("faa", "easa", "iata", "icao", "safety", "emniyet", "security", "güvenlik", "regulation", "düzenleme", "incident", "kaza", "eurocontrol"),
+    "airports_airspace": ("airport", "havalimanı", "airspace", "hava sahası", "runway", "pist", "terminal", "atc", "air traffic", "aci world"),
+    "fuel_sustainability": ("jet fuel", "jet yakıt", "saf", "sustainable aviation", "sürdürülebilir", "emissions", "karbon", "crack spread"),
     "labor": ("pilot", "crew", "çalışan", "işçi", "union", "sendika", "strike", "grev", "job", "istihdam"),
     "partnerships_ma": ("partnership", "ortaklık", "codeshare", "alliance", "merger", "birleşme", "acquisition", "satın alma", "stake", "hisse"),
 }
@@ -696,6 +702,15 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
     articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv, recovered=recovered))
     alert_articles, report[alert_feeds.SOURCE_NAME] = alert_feeds.collect(_env_value(alert_feeds.ENV_NAME), utc_now(), cutoff, entity_index_factory=entities.EntityIndex.from_csv)
     articles.extend(alert_articles)
+    benchmark_articles, benchmark_report = benchmark_search.collect(
+        _env_value("GEMINI_API_KEY") or GEMINI_API_KEY,
+        utc_now(),
+        cutoff,
+        classify_topics_fn=classify_topics,
+    )
+    if benchmark_report:
+        report[benchmark_search.SOURCE_NAME] = benchmark_report
+    articles.extend(benchmark_articles)
     articles.sort(key=lambda article: article.get("timestamp", 0), reverse=True)
     seen_links = set()
     unique_articles = []
@@ -707,7 +722,14 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
         unique_articles.append(article)
     day_ago = (utc_now() - timedelta(hours=24)).timestamp()
     for article in unique_articles:
-        entry = report.setdefault(alert_feeds.SOURCE_NAME if article.get("via_alert") else article["source"], {"status": "active", "error": "", "articles": 0})
+        report_key = (
+            alert_feeds.SOURCE_NAME
+            if article.get("via_alert")
+            else benchmark_search.SOURCE_NAME
+            if article.get("via_benchmark_search")
+            else article["source"]
+        )
+        entry = report.setdefault(report_key, {"status": "active", "error": "", "articles": 0})
         entry["articles_24h"] = entry.get("articles_24h", 0) + (1 if article.get("timestamp", 0) >= day_ago else 0)
     return unique_articles
 
@@ -742,6 +764,7 @@ def deterministic_fields(article):
         "entities": article.get("entities") or entities.empty_entities(),
         "region_section": article.get("region_section", ""),
         "secondary_tags": article.get("secondary_tags") or [],
+        "is_strategic_report": story_lifecycle.is_strategic_report(article),
     }
 
 
@@ -842,36 +865,47 @@ Ensure stories are grouped by the 4 required sections in order. Select 6 to 10 o
         }
     }
 
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "x-goog-api-key": GEMINI_API_KEY,
-        }
-    )
-    
     ctx = ssl.create_default_context()
 
     try:
-        with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            content = data["candidates"][0]["content"]["parts"][0]["text"]
-            briefing = json.loads(content)
-            article_metadata = {
-                canonicalize_url(article.get("link")): article
-                for article in articles
-                if canonicalize_url(article.get("link"))
-            }
-            normalized = normalize_generated_briefing(briefing, mode, article_metadata)
-            if not normalized["stories"] and articles:
-                return fallback_briefing(
-                    articles,
-                    mode,
-                    "AI output did not reference the approved source items; source headlines are shown instead.",
-                )
-            return normalized
+        data = None
+        last_err = None
+        for model_name in ("gemini-3.5-flash", "gemini-3-flash-preview", "gemini-2.5-pro"):
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": GEMINI_API_KEY,
+                },
+            )
+            try:
+                with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    break
+            except urllib.error.HTTPError as exc:
+                last_err = exc
+                if exc.code == 429:
+                    continue
+                raise
+        if data is None and last_err is not None:
+            raise last_err
+        content = data["candidates"][0]["content"]["parts"][0]["text"]
+        briefing = json.loads(content)
+        article_metadata = {
+            canonicalize_url(article.get("link")): article
+            for article in articles
+            if canonicalize_url(article.get("link"))
+        }
+        normalized = normalize_generated_briefing(briefing, mode, article_metadata)
+        if not normalized["stories"] and articles:
+            return fallback_briefing(
+                articles,
+                mode,
+                "AI output did not reference the approved source items; source headlines are shown instead.",
+            )
+        return normalized
     except Exception as e:
         print(f"Gemini API hatası ({e}); yalnız kaynak özetleri gösterilecek.")
         return fallback_briefing(

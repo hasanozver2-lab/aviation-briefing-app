@@ -88,6 +88,13 @@ def _shares_carrier_and_variant(left, right, config):
     return bool(carriers and variants)
 
 
+def _shares_multiple_carriers_same_event(left, right, config):
+    if not left.get("event_type") or left.get("event_type") != right.get("event_type"):
+        return False
+    carriers = _ids(left, ("carriers", "groups"), config) & _ids(right, ("carriers", "groups"), config)
+    return len(carriers) >= 2
+
+
 def _shares_distinctive_signals(left, right, config):
     shared = signals(left, config) & signals(right, config)
     has_number = any(item.isdigit() for item in shared)
@@ -104,6 +111,8 @@ def same_story(left, right, config):
     if is_roundup(left, config) or is_roundup(right, config):
         return False
     if compatible_types(left, right) and _shares_carrier_and_variant(left, right, config):
+        return True
+    if _shares_multiple_carriers_same_event(left, right, config):
         return True
     if compatible_types(left, right) and _shares_distinctive_signals(left, right, config):
         return True

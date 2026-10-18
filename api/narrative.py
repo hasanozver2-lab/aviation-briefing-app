@@ -106,18 +106,29 @@ def parse_narratives(response, expected_ids):
 
 
 def post_to_gemini(items, api_key, config):
-    """One HTTP request; raises urllib errors untouched so the caller can decide to retry."""
+    """One HTTP request; falls back across configured models on HTTP 429 before raising for retry."""
     payload = {
         "contents": [{"parts": [{"text": SYSTEM_PROMPT}, {"text": "ITEMS:\n" + json.dumps(items, ensure_ascii=False)}]}],
         "generationConfig": {"temperature": config["temperature"], "responseMimeType": "application/json"},
     }
-    request = urllib.request.Request(
-        GEMINI_URL.format(model=config["model"]),
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
-    )
-    with urllib.request.urlopen(request, context=ssl.create_default_context(), timeout=config["request_timeout_seconds"]) as response:
-        return json.loads(response.read().decode("utf-8"))
+    fallbacks = config.get("fallback_models") or ["gemini-3-flash-preview", "gemini-2.5-pro"]
+    models = [config["model"]] + [m for m in fallbacks if m != config["model"]]
+    last_error = None
+    for model_name in models:
+        request = urllib.request.Request(
+            GEMINI_URL.format(model=model_name),
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
+        )
+        try:
+            with urllib.request.urlopen(request, context=ssl.create_default_context(), timeout=config["request_timeout_seconds"]) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code in {404, 429, 500, 503}:
+                continue
+            raise
+    raise last_error
 
 
 def retry_delay(attempt, retry_config, retry_after=None):

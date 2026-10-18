@@ -1,310 +1,2487 @@
 {
   "mode": "daily",
-  "date_str": "14 October 2026",
-  "time_str": "13:32 UTC",
-  "heading": "Aviation Briefing | 14 October 2026",
+  "source_policy": "airline-only-v6",
+  "date_str": "18 October 2026",
+  "time_str": "15:21 UTC",
+  "heading": "Aviation Briefing | 18 October 2026",
   "intro_sentence": "Below is a summary of the most important verified aviation developments from the last 48 hours.",
+  "status": "ok",
+  "warning": "",
+  "generated_at": "2026-10-18T15:21:42.696413+00:00",
+  "market": {
+    "status": "ok",
+    "items": [
+      {
+        "as_of": "2026-10-14",
+        "value": 126.55,
+        "changes": {
+          "daily_pct": 0.612179996819841,
+          "weekly_pct": 0.4365079365079343,
+          "monthly_pct": 4.3711340206185545
+        },
+        "low_52_weeks": 59.93,
+        "high_52_weeks": 138.21,
+        "position_52_weeks_pct": 85.10475217169137,
+        "sparkline": [
+          {
+            "date": "2026-09-03",
+            "value": 100.52
+          },
+          {
+            "date": "2026-09-04",
+            "value": 102.24
+          },
+          {
+            "date": "2026-09-07",
+            "value": 104.47
+          },
+          {
+            "date": "2026-09-08",
+            "value": 106.12
+          },
+          {
+            "date": "2026-09-09",
+            "value": 109.51
+          },
+          {
+            "date": "2026-09-10",
+            "value": 120.98
+          },
+          {
+            "date": "2026-09-11",
+            "value": 118.06
+          },
+          {
+            "date": "2026-09-14",
+            "value": 121.25
+          },
+          {
+            "date": "2026-09-15",
+            "value": 130.8
+          },
+          {
+            "date": "2026-09-16",
+            "value": 127.84
+          },
+          {
+            "date": "2026-09-17",
+            "value": 121.18
+          },
+          {
+            "date": "2026-09-18",
+            "value": 119.66
+          },
+          {
+            "date": "2026-09-21",
+            "value": 116.15
+          },
+          {
+            "date": "2026-09-22",
+            "value": 114.89
+          },
+          {
+            "date": "2026-09-23",
+            "value": 117.45
+          },
+          {
+            "date": "2026-09-24",
+            "value": 120.92
+          },
+          {
+            "date": "2026-09-25",
+            "value": 116.01
+          },
+          {
+            "date": "2026-09-28",
+            "value": 119.97
+          },
+          {
+            "date": "2026-09-29",
+            "value": 113.96
+          },
+          {
+            "date": "2026-09-30",
+            "value": 115.91
+          },
+          {
+            "date": "2026-10-01",
+            "value": 114.82
+          },
+          {
+            "date": "2026-10-02",
+            "value": 135.51
+          },
+          {
+            "date": "2026-10-05",
+            "value": 125.51
+          },
+          {
+            "date": "2026-10-06",
+            "value": 125.44
+          },
+          {
+            "date": "2026-10-07",
+            "value": 126.0
+          },
+          {
+            "date": "2026-10-08",
+            "value": 130.18
+          },
+          {
+            "date": "2026-10-09",
+            "value": 130.03
+          },
+          {
+            "date": "2026-10-12",
+            "value": 129.95
+          },
+          {
+            "date": "2026-10-13",
+            "value": 125.78
+          },
+          {
+            "date": "2026-10-14",
+            "value": 126.55
+          }
+        ],
+        "series_id": "brent_spot",
+        "name": "Brent spot fiyatı",
+        "unit": "USD/varil",
+        "source": "FRED (EIA)",
+        "carried_forward": true,
+        "age_days": 4
+      },
+      {
+        "as_of": "2026-10-14",
+        "value": 4.562,
+        "changes": {
+          "daily_pct": -1.3408304498269765,
+          "weekly_pct": 4.0602189781021885,
+          "monthly_pct": 1.6488413547237042
+        },
+        "low_52_weeks": 1.821,
+        "high_52_weeks": 4.705,
+        "position_52_weeks_pct": 95.04160887656033,
+        "sparkline": [
+          {
+            "date": "2026-09-02",
+            "value": 4.118
+          },
+          {
+            "date": "2026-09-03",
+            "value": 4.063
+          },
+          {
+            "date": "2026-09-04",
+            "value": 4.017
+          },
+          {
+            "date": "2026-09-08",
+            "value": 4.126
+          },
+          {
+            "date": "2026-09-09",
+            "value": 4.341
+          },
+          {
+            "date": "2026-09-10",
+            "value": 4.682
+          },
+          {
+            "date": "2026-09-11",
+            "value": 4.521
+          },
+          {
+            "date": "2026-09-14",
+            "value": 4.488
+          },
+          {
+            "date": "2026-09-15",
+            "value": 4.705
+          },
+          {
+            "date": "2026-09-16",
+            "value": 4.68
+          },
+          {
+            "date": "2026-09-17",
+            "value": 4.514
+          },
+          {
+            "date": "2026-09-18",
+            "value": 4.532
+          },
+          {
+            "date": "2026-09-21",
+            "value": 4.397
+          },
+          {
+            "date": "2026-09-22",
+            "value": 4.354
+          },
+          {
+            "date": "2026-09-23",
+            "value": 4.35
+          },
+          {
+            "date": "2026-09-24",
+            "value": 4.291
+          },
+          {
+            "date": "2026-09-25",
+            "value": 4.365
+          },
+          {
+            "date": "2026-09-28",
+            "value": 4.343
+          },
+          {
+            "date": "2026-09-29",
+            "value": 4.399
+          },
+          {
+            "date": "2026-09-30",
+            "value": 4.677
+          },
+          {
+            "date": "2026-10-01",
+            "value": 4.355
+          },
+          {
+            "date": "2026-10-02",
+            "value": 4.307
+          },
+          {
+            "date": "2026-10-05",
+            "value": 4.35
+          },
+          {
+            "date": "2026-10-06",
+            "value": 4.342
+          },
+          {
+            "date": "2026-10-07",
+            "value": 4.384
+          },
+          {
+            "date": "2026-10-08",
+            "value": 4.588
+          },
+          {
+            "date": "2026-10-09",
+            "value": 4.36
+          },
+          {
+            "date": "2026-10-12",
+            "value": 4.374
+          },
+          {
+            "date": "2026-10-13",
+            "value": 4.624
+          },
+          {
+            "date": "2026-10-14",
+            "value": 4.562
+          }
+        ],
+        "series_id": "us_gulf_coast_jet_fuel",
+        "name": "ABD Körfez Kıyısı jet yakıtı",
+        "unit": "USD/galon",
+        "source": "FRED (EIA)",
+        "carried_forward": true,
+        "age_days": 4
+      },
+      {
+        "as_of": "2026-10-14",
+        "value": 65.05400000000002,
+        "changes": {
+          "daily_pct": -4.930730110481062,
+          "weekly_pct": 11.915083952656207,
+          "monthly_pct": -3.2596734378252874
+        },
+        "low_52_weeks": 14.969999999999992,
+        "high_52_weeks": 80.52399999999997,
+        "position_52_weeks_pct": 76.40113494218514,
+        "sparkline": [
+          {
+            "date": "2026-09-02",
+            "value": 75.36600000000001
+          },
+          {
+            "date": "2026-09-03",
+            "value": 70.12599999999999
+          },
+          {
+            "date": "2026-09-04",
+            "value": 66.47400000000003
+          },
+          {
+            "date": "2026-09-08",
+            "value": 67.172
+          },
+          {
+            "date": "2026-09-09",
+            "value": 72.812
+          },
+          {
+            "date": "2026-09-10",
+            "value": 75.664
+          },
+          {
+            "date": "2026-09-11",
+            "value": 71.822
+          },
+          {
+            "date": "2026-09-14",
+            "value": 67.24600000000001
+          },
+          {
+            "date": "2026-09-15",
+            "value": 66.81
+          },
+          {
+            "date": "2026-09-16",
+            "value": 68.72
+          },
+          {
+            "date": "2026-09-17",
+            "value": 68.40800000000002
+          },
+          {
+            "date": "2026-09-18",
+            "value": 70.684
+          },
+          {
+            "date": "2026-09-21",
+            "value": 68.524
+          },
+          {
+            "date": "2026-09-22",
+            "value": 67.978
+          },
+          {
+            "date": "2026-09-23",
+            "value": 65.24999999999999
+          },
+          {
+            "date": "2026-09-24",
+            "value": 59.30200000000001
+          },
+          {
+            "date": "2026-09-25",
+            "value": 67.32000000000001
+          },
+          {
+            "date": "2026-09-28",
+            "value": 62.43600000000001
+          },
+          {
+            "date": "2026-09-29",
+            "value": 70.79800000000002
+          },
+          {
+            "date": "2026-09-30",
+            "value": 80.52399999999997
+          },
+          {
+            "date": "2026-10-01",
+            "value": 68.09000000000003
+          },
+          {
+            "date": "2026-10-02",
+            "value": 45.384000000000015
+          },
+          {
+            "date": "2026-10-05",
+            "value": 57.18999999999998
+          },
+          {
+            "date": "2026-10-06",
+            "value": 56.92399999999998
+          },
+          {
+            "date": "2026-10-07",
+            "value": 58.128000000000014
+          },
+          {
+            "date": "2026-10-08",
+            "value": 62.51599999999999
+          },
+          {
+            "date": "2026-10-09",
+            "value": 53.09
+          },
+          {
+            "date": "2026-10-12",
+            "value": 53.75800000000001
+          },
+          {
+            "date": "2026-10-13",
+            "value": 68.428
+          },
+          {
+            "date": "2026-10-14",
+            "value": 65.05400000000002
+          }
+        ],
+        "name": "ABD Körfez Kıyısı jet yakıtı - Brent marjı",
+        "unit": "USD/varil",
+        "source": "FRED (EIA); jet yakıtı USD/galon değeri 42 ile USD/varile çevrilmiştir.",
+        "mean_90_days": 64.99187301587303,
+        "standard_deviation_90_days": 6.706787756864016,
+        "deviation_from_mean_standard_deviations": 0.009263299567428126,
+        "series_id": "jet_fuel_brent_crack_spread",
+        "carried_forward": true,
+        "age_days": 4
+      }
+    ],
+    "iata_monitor": {
+      "name": "IATA Jet Fuel Price Monitor",
+      "url": "https://www.iata.org/en/publications/economics/fuel-monitor/",
+      "access": "external_link_only"
+    },
+    "note": "IATA Jet Fuel Price Monitor yalnızca kaynak bağlantısı olarak gösterilir; Platts verisi çekilmez, saklanmaz veya yeniden yayınlanmaz.",
+    "errors": [],
+    "skipped": [
+      "EIA"
+    ],
+    "fuel_provider": "fred",
+    "events": []
+  },
+  "last_pipeline_run_at": "2026-10-18T15:21:17+00:00",
+  "date": "2026-10-18",
+  "timezone": "Europe/Istanbul",
   "stories": [
     {
-      "id": "istanbul-airport-global-connectivity",
-      "section": "Turkey / THY and Turkish aviation",
-      "headline": "Istanbul Airport Ranks #1 Globally in Connectivity, Bolstering THY's Hub Strategy",
-      "lead": "Istanbul Airport (IGA) has been recognized by OAG Megahubs 2026 as the world's most connected airport, a significant achievement that reinforces its strategic importance as a global transfer hub and directly benefits Turkish Airlines' network expansion.",
+      "id": "story-6a1a9ac74a07",
+      "section": "Other areas",
+      "headline": "IdeaWorksCompany Releases 2026 Yearbook of Ancillary Revenue Covering 63 Airlines",
+      "published_at": "18 Oct 14:41",
+      "lead": "IdeaWorksCompany has published the 110-page 2026 SeatMaps.com Yearbook of Ancillary Revenue, analyzing airline non-ticket activities and financial results from 2025. Sponsored by SeatMaps.com, the 19th annual edition provides baseline industry benchmarking data across global carriers.",
+      "source_description": "The 2026 SeatMaps.com Yearbook of Ancillary Revenue by IdeaWorksCompany examines ancillary revenue activities and results for 63 airlines in 2025. Now in its 19th year, the Yearbook continues to serve as the leading source of industry research on airline ancillary revenue. Key findings from the 2026 Yearbook include: The 110-page 2026 SeatMaps.com Yearbook of Ancillary Revenue by IdeaWorksCompany is provided free of charge through the sponsorship of SeatMaps.com . Version 1.1 is now available with corrections for the Emirates and Volaris one-page listings as of September 16, 2026.",
       "detailed_analysis": [
-        "IGA's top ranking in global connectivity enhances its appeal as a transfer point, directly supporting Turkish Airlines' (THY) strategy to leverage Istanbul as a bridge between continents.",
-        "This recognition validates the substantial infrastructure investments made at IGA, including the upcoming fourth runway, which will further increase capacity and operational efficiency.",
-        "For THY, superior connectivity translates into higher potential for transfer passenger traffic, boosting load factors and revenue on long-haul routes.",
-        "The CEO's comments on CNN International highlight the airport's role in regional development and its capacity for future growth, aligning with THY's long-term fleet and network plans.",
-        "Increased connectivity strengthens Istanbul's competitive position against other major European and Middle Eastern hubs, potentially diverting traffic.",
-        "The achievement underscores Turkey's ambition to be a leading aviation power, with IGA and THY as its primary drivers."
+        "The 2026 Yearbook evaluates ancillary revenue performance and strategies across 63 airlines based on 2025 financial results.",
+        "Now in its 19th year, the report spans 110 pages and is distributed free of charge through sponsorship by SeatMaps.com.",
+        "Version 1.1 of the report incorporates specific corrections for the one-page listings of Emirates and Volaris as of September 16, 2026."
       ],
-      "data_points": [],
-      "strategic_impact": "This top ranking significantly enhances Istanbul Airport's brand and operational attractiveness, directly benefiting Turkish Airlines by solidifying its hub-and-spoke model, increasing transfer revenue potential, and strengthening its competitive stance against other global mega-hubs.",
+      "data_points": [
+        "63 airlines",
+        "2025",
+        "19th year",
+        "110-page",
+        "2026",
+        "Version 1.1",
+        "September 16, 2026"
+      ],
+      "strategic_impact": "Tracking ancillary revenue results across 63 carriers allows airlines to benchmark non-ticket revenue strategies and product unbundling tactics across global markets.",
       "market_exposure": [
         {
-          "carrier": "Turkish Airlines (THY)",
-          "impact": "Highly Positive",
-          "details": "Directly benefits from enhanced hub connectivity, increased transfer traffic, and strengthened competitive position against other global carriers."
+          "carrier": "Emirates",
+          "impact": "Neutral",
+          "details": "Version 1.1 includes updated listing corrections as of September 16, 2026."
         },
         {
-          "carrier": "Istanbul Airport (IGA)",
-          "impact": "Highly Positive",
-          "details": "Achieves global recognition, validating infrastructure investments and attracting more airlines and passengers."
-        },
-        {
-          "carrier": "European & Middle Eastern Hubs",
-          "impact": "Competitive Headwind",
-          "details": "Increased pressure on transfer traffic as Istanbul's appeal grows."
+          "carrier": "Volaris",
+          "impact": "Neutral",
+          "details": "Version 1.1 includes updated listing corrections as of September 16, 2026."
         }
       ],
-      "thy_impact_assessment": "Highly positive. This ranking directly supports THY's core strategy of leveraging Istanbul as a global transfer hub. It is expected to boost transfer passenger demand, improve load factors, and enhance revenue streams, particularly on long-haul routes. It also strengthens THY's brand as a globally connected airline.",
-      "why_it_matters": "This recognition solidifies Istanbul's position as a critical global aviation hub, driving increased transfer traffic and revenue opportunities for Turkish Airlines and intensifying competition for other major international airports.",
-      "original_source": {
-        "title": "İstanbul Havalimanı küresel bağlantı gücünde 1 numara: CEO Bilgen CNN’de açıkladı",
-        "source_name": "Tolga Özbek Havacılık",
-        "url": "https://tolgaozbek.com/haberler/havalimanlari/istanbul-havalimani-kuresel-baglanti-gucunde-1-numara-ceo-bilgen-cnnde-acikladi/"
+      "event_type": "airline_financials",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000099",
+            "slug": "emirates",
+            "iata": "EK",
+            "name": "Emirates",
+            "region": "Middle East & Gulf",
+            "group_entity_id": "",
+            "tier": 1
+          },
+          {
+            "entity_id": "carrier:000134",
+            "slug": "volaris",
+            "iata": "Y4",
+            "name": "Volaris",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 2
+          }
+        ],
+        "airports": [],
+        "aircraft": []
       },
-      "related_news": []
+      "region_section": "Middle East & Gulf",
+      "secondary_tags": [
+        "Americas"
+      ],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Standardized ancillary revenue data helps airlines evaluate competitive pricing models and optimize non-ticket income streams.",
+      "original_source": {
+        "title": "2026 SeatMaps.com Yearbook of Ancillary Revenue by IdeaWorksCompany – Report",
+        "source_name": "IdeaWorksCompany",
+        "url": "https://ideaworkscompany.com/2026-seatmaps-com-yearbook-of-ancillary-revenue-by-ideaworkscompany-report/",
+        "source_type": "trade_media",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "finance_investor"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-6a1a9ac74a07",
+      "relevance_score": 75.8,
+      "score_components": {
+        "event_type": 0.85,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "IdeaWorksCompany",
+          "url": "https://ideaworkscompany.com/2026-seatmaps-com-yearbook-of-ancillary-revenue-by-ideaworkscompany-report/",
+          "title": "2026 SeatMaps.com Yearbook of Ancillary Revenue by IdeaWorksCompany – Report",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:41:03+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:40:39+00:00",
+      "last_updated_at": "2026-10-18T14:40:39+00:00",
+      "update_reasons": [],
+      "badges": [
+        "breaking",
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:40:39+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
     },
     {
-      "id": "sabiha-gokcen-zero-waste-award",
-      "section": "Turkey / THY and Turkish aviation",
-      "headline": "Sabiha Gökçen Airport Receives GIGI Award for Zero Waste Project",
-      "lead": "Istanbul Sabiha Gökçen International Airport (ISG) has been honored with an Image and Social Responsibility award at the GIGI Awards 2026 for its 'Zero Waste Project' implemented during Zero Waste Week, highlighting its commitment to sustainability.",
+      "id": "story-f2ca90e4e368",
+      "section": "Other areas",
+      "headline": "United Airlines Focuses on Premium Experience and Loyalty to Drive Retention",
+      "published_at": "18 Oct 14:41",
+      "lead": "An 18-page report by IdeaWorksCompany highlights United Airlines' strategy centered on premium customer proposition, loyalty programs, co-branded credit cards, and ancillary revenue. Authored by Jay Sorensen, the report examines initiatives introduced throughout 2025 and 2026.",
+      "source_description": "United Airlines is rapidly reshaping its customer proposition around premium experiences, loyalty, co-branded cards and ancillary revenue, according to a new 18-page IdeaWorksCompany report, “United is Winning the Race for Brand-Loyal Consumers.” Written by airline revenue and loyalty expert Jay Sorensen, the report examines United’s expanding portfolio of products and strategies introduced during 2025 and 2026. United’s lounge network, with 50+ locations, is another critical component of its brand-loyal strategy. The report estimates its network serves about 70,000 daily guests. That’s more than 25 million guests per year, which is equal to the annual passenger traffic of JetBlue. The report also examines United’s “Base” fares for the Premium Plus and Polaris cabins, which removes certain benefits, such as Polaris lounge access and advance seat assignments, for a lower fare.",
       "detailed_analysis": [
-        "The award enhances ISG's brand image and reputation as an environmentally conscious airport, which can appeal to a growing segment of eco-aware travelers and corporate partners.",
-        "While primarily a PR achievement, sustainability initiatives can lead to operational cost savings in waste management over the long term.",
-        "This recognition contributes to the overall positive perception of Turkish aviation infrastructure, complementing the global connectivity achievements of Istanbul Airport.",
-        "For airlines operating out of ISG, such as Pegasus Airlines and AnadoluJet (THY's subsidiary), a positive airport image can indirectly contribute to passenger preference and loyalty.",
-        "The project demonstrates a commitment to ESG (Environmental, Social, and Governance) principles, which are increasingly important for investor relations and regulatory compliance."
+        "United's lounge network comprises 50+ locations and is estimated to serve about 70,000 daily guests.",
+        "The carrier's annual lounge traffic exceeds 25 million guests per year, matching the total annual passenger traffic of JetBlue.",
+        "The report examines United's introduction of Base fares within its Premium Plus and Polaris cabins.",
+        "Strategic focus centers on expanding co-branded credit card integration, loyalty engagement, and premium service offerings."
       ],
-      "data_points": [],
-      "strategic_impact": "This award primarily boosts Sabiha Gökçen Airport's brand reputation and aligns with global sustainability trends, potentially attracting environmentally conscious passengers and demonstrating a commitment to responsible operations, with indirect benefits for airlines operating there.",
+      "data_points": [
+        "18-page",
+        "2025",
+        "2026",
+        "50+ locations",
+        "70,000 daily guests",
+        "25 million guests per year"
+      ],
+      "strategic_impact": "Investing in premium lounges and cabin unbundling enables legacy carriers to capture higher yields, drive loyalty engagement, and grow co-branded credit card revenues.",
       "market_exposure": [
         {
-          "carrier": "Istanbul Sabiha Gökçen Airport (ISG)",
+          "carrier": "United Airlines",
           "impact": "Positive",
-          "details": "Enhances brand image, reputation, and appeal to sustainability-focused stakeholders."
+          "details": "Expanding premium experiences, loyalty cards, and lounge network serving over 25 million annual guests."
         },
         {
-          "carrier": "Pegasus Airlines",
-          "impact": "Indirect Positive",
-          "details": "Benefits from the improved image of its primary hub, potentially attracting more passengers."
-        },
-        {
-          "carrier": "AnadoluJet (THY Subsidiary)",
-          "impact": "Indirect Positive",
-          "details": "Benefits from the improved image of one of its operational bases."
+          "carrier": "JetBlue",
+          "impact": "Neutral",
+          "details": "Annual passenger traffic of 25 million guests cited as a comparative traffic volume benchmark."
         }
       ],
-      "thy_impact_assessment": "Weak direct impact. While AnadoluJet operates from ISG, the award's primary benefit is to the airport's brand and sustainability efforts. Any impact on THY's overall revenue or operations is indirect and marginal, primarily through a generally improved perception of Turkish aviation infrastructure.",
-      "why_it_matters": "This award highlights the growing importance of sustainability in aviation, enhancing an airport's brand and potentially influencing passenger choice and operational efficiencies.",
-      "original_source": {
-        "title": "Sabiha Gökçen’in Sıfır Atık Projesi’ne GIGI Awards’tan ödül",
-        "source_name": "Tolga Özbek Havacılık",
-        "url": "https://tolgaozbek.com/haberler/havalimanlari/sabiha-gokcenin-sifir-atik-projesine-gigi-awardstan-odul/"
+      "event_type": "airline_financials",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000116",
+            "slug": "united-airlines",
+            "iata": "UA",
+            "name": "United Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          },
+          {
+            "entity_id": "carrier:000118",
+            "slug": "jetblue",
+            "iata": "B6",
+            "name": "JetBlue",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
       },
-      "related_news": []
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Strengthening loyalty ecosystems and premium lounge footprints helps legacy airlines secure high-yielding business travelers and maximize credit card revenues.",
+      "original_source": {
+        "title": "IdeaWorksCompany: United is Winning the Race for Brand-Loyal Consumers – Report",
+        "source_name": "IdeaWorksCompany",
+        "url": "https://ideaworkscompany.com/united-is-winning-the-race-for-brand-loyal-consumers-report/",
+        "source_type": "trade_media",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "finance_investor"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-f2ca90e4e368",
+      "relevance_score": 75.8,
+      "score_components": {
+        "event_type": 0.85,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "IdeaWorksCompany",
+          "url": "https://ideaworkscompany.com/united-is-winning-the-race-for-brand-loyal-consumers-report/",
+          "title": "IdeaWorksCompany: United is Winning the Race for Brand-Loyal Consumers – Report",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:41:03+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:40:39+00:00",
+      "last_updated_at": "2026-10-18T14:40:39+00:00",
+      "update_reasons": [],
+      "badges": [
+        "breaking",
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:40:39+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
     },
     {
-      "id": "southwest-assigned-seating",
+      "id": "story-3430dd4e7d1d",
       "section": "European and other global airlines",
-      "headline": "Southwest Airlines Implements Assigned Seating, Marking Historic Operational Shift",
-      "lead": "Southwest Airlines has introduced assigned seating, a monumental change to its long-standing open-seating policy, signaling a strategic shift aimed at improving operational efficiency, customer experience, and potentially ancillary revenue streams.",
+      "headline": "American Airlines Passengers Evacuate After Emergency Landing",
+      "published_at": "18 Oct 12:42",
+      "lead": "An American Airlines flight made an emergency landing due to cabin haze, leading to passenger evacuation onto the runway.",
+      "source_description": "Some passengers jumped from the wing after oxygen masks deployed shortly after takeoff.",
       "detailed_analysis": [
-        "The transition to assigned seating aims to streamline boarding processes, potentially reducing turnaround times and improving on-time performance.",
-        "This change addresses customer feedback regarding the stress and uncertainty associated with open seating, potentially enhancing passenger satisfaction and loyalty.",
-        "It opens avenues for new ancillary revenue opportunities, such as preferred seat selection fees, aligning Southwest more closely with industry norms.",
-        "The move represents a significant cultural shift for Southwest, known for its unique operational model, and could impact its brand identity and competitive differentiation.",
-        "Competitors will observe the impact on Southwest's operational costs, customer satisfaction, and revenue, potentially influencing their own strategies.",
-        "Initial implementation challenges related to passenger adaptation and system integration are anticipated, requiring robust communication and operational adjustments."
+        "An American Airlines flight experienced cabin haze.",
+        "This incident necessitated an emergency landing.",
+        "Oxygen masks deployed shortly after takeoff.",
+        "Passengers evacuated onto the runway, with some jumping from the wing."
       ],
       "data_points": [],
-      "strategic_impact": "This historic operational change for Southwest Airlines aims to enhance customer experience and operational efficiency while opening new ancillary revenue streams. It represents a significant strategic pivot that could redefine its competitive positioning and influence industry practices.",
+      "strategic_impact": "This incident could lead to operational disruptions and potential reputational damage for the carrier, impacting passenger confidence.",
       "market_exposure": [
         {
-          "carrier": "Southwest Airlines",
-          "impact": "Transformative",
-          "details": "Undergoes a fundamental operational and customer experience shift, with potential for improved efficiency, revenue, and customer satisfaction, but also brand identity challenges."
-        },
-        {
-          "carrier": "US Low-Cost Carriers",
-          "impact": "Observational",
-          "details": "Will monitor Southwest's success and challenges, potentially influencing their own service model adjustments."
-        },
-        {
-          "carrier": "Airline Industry",
-          "impact": "Influential",
-          "details": "A major shift by a prominent LCC could set new trends or validate existing practices regarding customer experience and ancillary revenue."
+          "carrier": "American Airlines",
+          "impact": "Negative",
+          "details": "Emergency landing and passenger evacuation due to cabin haze."
         }
       ],
-      "thy_impact_assessment": "Weak direct impact. Southwest's operational model change is specific to the North American market and its unique history. There is no direct impact on THY's operations, revenue, or competitive landscape, though THY may observe industry trends in customer experience.",
-      "why_it_matters": "This fundamental shift by a major airline could redefine its competitive strategy, impact customer experience, and influence ancillary revenue models across the industry.",
+      "event_type": "safety_incident",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000114",
+            "slug": "american-airlines",
+            "iata": "AA",
+            "name": "American Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Safety incidents can lead to increased scrutiny, operational delays, and potential financial implications for the affected airline.",
       "original_source": {
-        "title": "Southwest Airlines' Assigned Seating: How The Biggest Change In Its History Is Playing Out",
+        "title": "American Airlines Passengers Evacuate Onto Runway After Cabin Haze Forces Emergency Landing",
         "source_name": "Simple Flying",
-        "url": "https://simpleflying.com/southwest-airlines-assigned-seating-biggest-change-history-playing-out/"
+        "url": "https://simpleflying.com/american-airlines-passengers-evacuate-st-louis-runway-odor-emergency-landing/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
       },
-      "related_news": []
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-3430dd4e7d1d",
+      "relevance_score": 68.8,
+      "score_components": {
+        "event_type": 0.95,
+        "source_reliability": 0.4,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Simple Flying",
+          "url": "https://simpleflying.com/american-airlines-passengers-evacuate-st-louis-runway-odor-emergency-landing/",
+          "title": "American Airlines Passengers Evacuate Onto Runway After Cabin Haze Forces Emergency Landing",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T12:42:21+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T13:21:19+00:00",
+      "last_updated_at": "2026-10-18T13:21:19+00:00",
+      "update_reasons": [],
+      "badges": [
+        "breaking",
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T13:21:19+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
     },
     {
-      "id": "airbaltic-pilots-air-niugini",
+      "id": "story-473d4ece6572",
       "section": "European and other global airlines",
-      "headline": "airBaltic Leases A220 Pilots to Air Niugini Amid Financial Restructuring",
-      "lead": "airBaltic is deploying thirty of its Airbus A220 pilots to Air Niugini under a 12-month agreement, a move that suggests operational flexibility for the Latvian carrier amidst its financial restructuring and supports the Papua New Guinea airline's fleet expansion.",
+      "headline": "Eurocontrol Revises 2026 European Traffic Forecast Downward",
+      "published_at": "18 Oct 14:47",
+      "lead": "European flight volumes returned to 2019 levels in 2025, but the 2026 outlook has been adjusted following geopolitical escalations in the Middle East.",
+      "source_description": "In Europe, 2025 closed 4% above 2024 , reaching 100% of 2019 traffic levels with an average of 30,263 daily flights , returning to pre-pandemic volumes at 11.05 million flights. The October 2025 forecast proved to be slightly below the actual 2025 outturn, mainly due to stronger‑than‑expected traffic growth in southern and eastern Europe, as well as robust beyond‑ECAC flows. For 2026, traffic had been expected to grow at rates close to those of 2025 , supported by a stronger economic outlook and positive expectations from aircraft operators - particularly low‑cost carriers. However, following the escalation of the Middle East crisis at the end of February, our forecast has been revised downward. Traffic in the ECAC area is now expected to reach around 11.3 million flights for the year , corresponding to +2.7% growth compared with 2025 (±1.8pp) . This revision reflects increased geopolitical uncertainty, weaker demand assumptions, and operational disruptions, all of which are partly offset by still‑solid underlying traffic momentum. Over the period 2026-2032, average annual growth is expected to reach around +2.1%, resulting in approximately 12.8 million flights a year by 2032. This",
       "detailed_analysis": [
-        "For airBaltic, this pilot leasing arrangement likely provides a revenue stream and optimizes pilot utilization during its financial restructuring phase, potentially reducing overhead costs.",
-        "It indicates airBaltic's ability to manage its workforce strategically, potentially avoiding layoffs while maintaining a skilled pilot pool for future growth.",
-        "Air Niugini benefits from immediate access to experienced A220 pilots, crucial for supporting its growing Airbus fleet and expanding its network without the long lead time of training new crews.",
-        "The agreement highlights a growing trend of airlines leveraging pilot resources across different carriers, especially for common aircraft types like the A220.",
-        "This could signal a temporary surplus of pilots for airBaltic or a strategic decision to generate revenue from its human capital.",
-        "The arrangement supports Air Niugini's capacity growth and route development, particularly within its regional and international network."
+        "2025 traffic reached 11.05 million flights, representing 100% of 2019 levels and a 4% increase over 2024.",
+        "Growth in 2025 was driven by stronger-than-expected traffic in southern and eastern Europe alongside robust beyond-ECAC flows.",
+        "The 2026 forecast has been revised downward to approximately 11.3 million flights for the year.",
+        "Initial 2026 growth expectations were supported by a stronger economic outlook and positive sentiment from low-cost carriers before the February crisis escalation."
       ],
       "data_points": [
-        "30 pilots",
-        "12-month agreement"
+        "4%",
+        "100%",
+        "30,263",
+        "11.05 million",
+        "11.3 million"
       ],
-      "strategic_impact": "This pilot leasing agreement offers airBaltic a revenue stream and workforce optimization during restructuring, while enabling Air Niugini to rapidly scale its A220 operations. It underscores the increasing flexibility in global aviation labor markets and fleet commonality benefits.",
-      "market_exposure": [
+      "strategic_impact": "Geopolitical instability is tempering recovery momentum, forcing a recalibration of capacity plans for the 2026 period.",
+      "market_exposure": [],
+      "event_type": "macro_demand",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Regulation & Airspace",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The downward revision signals a shift from post-pandemic recovery to crisis-managed growth patterns across the European network.",
+      "original_source": {
+        "title": "EUROCONTROL Forecast Update 2026-2032 - Spring",
+        "source_name": "Eurocontrol",
+        "url": "https://www.eurocontrol.int/publication/eurocontrol-forecast-2026-2032",
+        "source_type": "regulator",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "route_network",
+          "regulation_safety"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Europe",
+        "tier": 1,
+        "reliability_weight": 1.0
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-473d4ece6572",
+      "relevance_score": 72.8,
+      "score_components": {
+        "event_type": 0.75,
+        "source_reliability": 1.0,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
         {
-          "carrier": "airBaltic",
-          "impact": "Positive (Operational/Financial)",
-          "details": "Generates revenue, optimizes pilot utilization during restructuring, and maintains workforce readiness."
-        },
-        {
-          "carrier": "Air Niugini",
-          "impact": "Positive (Operational/Capacity)",
-          "details": "Gains immediate access to experienced A220 pilots, facilitating fleet and network expansion."
-        },
-        {
-          "carrier": "Airbus (A220 program)",
-          "impact": "Indirect Positive",
-          "details": "Demonstrates the A220's growing presence and commonality, making pilot transfers easier."
+          "name": "Eurocontrol",
+          "url": "https://www.eurocontrol.int/publication/eurocontrol-forecast-2026-2032",
+          "title": "EUROCONTROL Forecast Update 2026-2032 - Spring",
+          "language": "en"
         }
       ],
-      "thy_impact_assessment": "Weak direct impact. This is a specific operational and financial arrangement between two distinct carriers in different regions. There is no direct impact on THY's operations, revenue, or competitive position, though it illustrates a model for pilot resource management.",
-      "why_it_matters": "This agreement highlights innovative pilot resource management strategies and the increasing operational flexibility enabled by common aircraft types, impacting airline cost structures and capacity deployment.",
-      "original_source": {
-        "title": "airBaltic sends A220 pilots to Air Niugini amid financial restructuring",
-        "source_name": "AirDataNews",
-        "url": "https://www.airdatanews.com/air-baltic-sends-a220-pilots-to-air-niugini-amid-financial-restructuring/"
-      },
-      "related_news": []
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:47:21+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:47:06+00:00",
+      "last_updated_at": "2026-10-18T14:47:06+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:54:14+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
     },
     {
-      "id": "japan-airlines-embraer-e2-order",
-      "section": "Route news",
-      "headline": "Japan Airlines Orders Up to 26 Embraer E190-E2 Jets for Regional Fleet Modernization",
-      "lead": "Japan Airlines (JAL) has placed a firm order for 16 Embraer E190-E2 jets, with options for an additional 10, to modernize its regional fleet operated by J-Air, following rival ANA's similar move and signaling a strategic focus on regional network optimization.",
+      "id": "story-6a24187746a1",
+      "section": "European and other global airlines",
+      "headline": "Middle East Crisis Impacts European Network Traffic and Hub Recovery",
+      "published_at": "18 Oct 14:47",
+      "lead": "Week 41 saw a slight decline in daily flights, while the ongoing Middle East crisis continues to create a significant disparity in recovery rates between Gulf and European carriers.",
+      "source_description": "The network averaged 33,491 daily flights (including overflights) in Week 41, representing a 2.7% decrease compared to Week 40 and remaining unchanged from the same week in 2025. Year-to-date traffic (excluding overflights) between Europe and the Middle East remains 14% below 2025 levels, representing a 20% decline from pre-crisis levels (Jan-Feb 2026) when flights were averaging 9% above 2025. The 3 major Gulf hub carriers (Emirates, Etihad and Qatar) are recovering faster than most of the European airline groups, back up to 23% below pre-crisis levels vs circa 82% below for European carriers. Israeli carriers on the other hand are operating 56% above pre-crisis flight levels. Among the 10 busiest carriers, capacity fell 1.2% week-on-week on average. Wizz Air Group was the only one to grow (+2%), while SAS Group saw the largest drop (-5%). Across the 10 busiest States, flight volumes decreased by 2.3% week-on-week on average, with none recording growth. Greece saw the steepest decline (-10%). Network arrival and departure punctuality were 74.1% and 69.8%, worse than in the equivalent week of 2025. En-route ATFM delays decreased by 11% compared to the previous week, with a daily av",
       "detailed_analysis": [
-        "The order for E190-E2s indicates JAL's commitment to modernizing its regional fleet, improving fuel efficiency, and reducing operational costs compared to older regional jets.",
-        "This move enhances J-Air's capacity and capability to serve regional routes, potentially opening new destinations or increasing frequencies on existing ones.",
-        "Following ANA's earlier E2 order, this intensifies competition in the Japanese domestic and regional market, as both major carriers upgrade their regional offerings.",
-        "Deliveries starting in fiscal 2029 suggest a long-term fleet strategy focused on sustainable growth and environmental performance.",
-        "The E2's improved passenger comfort and operational economics are expected to boost demand and revenue on regional routes.",
-        "This order strengthens Embraer's position in the crucial Asian market, particularly against competitors in the regional jet segment."
+        "Network traffic averaged 33,491 daily flights in Week 41, a 2.7% decrease compared to Week 40.",
+        "Year-to-date traffic between Europe and the Middle East remains 14% below 2025 levels and 20% below pre-crisis levels of early 2026.",
+        "Gulf hub carriers (Emirates, Etihad, and Qatar) are recovering faster, sitting 23% below pre-crisis levels compared to circa 82% below for European groups.",
+        "Israeli carriers are operating 56% above pre-crisis flight levels, while Wizz Air Group was the only top 10 carrier to grow capacity week-on-week."
       ],
       "data_points": [
-        "16 firm orders",
-        "10 options",
-        "deliveries starting in fiscal 2029"
+        "33,491",
+        "2.7%",
+        "14%",
+        "20%",
+        "9%",
+        "23%",
+        "82%",
+        "56%",
+        "1.2%"
       ],
-      "strategic_impact": "JAL's significant Embraer E2 order signals a strategic investment in regional fleet modernization, aiming for improved operational efficiency, enhanced passenger experience, and strengthened competitive positioning in the Japanese domestic market against rival ANA.",
+      "strategic_impact": "Divergent recovery paths between regions and carrier types are reshaping competitive dynamics on routes connecting Europe and the Middle East.",
       "market_exposure": [
         {
-          "carrier": "Japan Airlines (JAL)",
-          "impact": "Positive (Fleet/Network)",
-          "details": "Modernizes regional fleet, improves efficiency, and enhances competitive stance in domestic market."
+          "carrier": "Emirates",
+          "impact": "Positive",
+          "details": "Recovering faster than European airline groups, currently 23% below pre-crisis levels."
         },
         {
-          "carrier": "J-Air (JAL Subsidiary)",
-          "impact": "Positive (Fleet/Capacity)",
-          "details": "Receives new, efficient aircraft to expand and optimize regional operations."
+          "carrier": "Etihad",
+          "impact": "Positive",
+          "details": "Recovering faster than European airline groups, currently 23% below pre-crisis levels."
         },
         {
-          "carrier": "All Nippon Airways (ANA)",
-          "impact": "Competitive Pressure",
-          "details": "Faces renewed competition in the regional market as JAL matches its E2 fleet modernization."
+          "carrier": "Qatar",
+          "impact": "Positive",
+          "details": "Recovering faster than European airline groups, currently 23% below pre-crisis levels."
         },
         {
-          "carrier": "Embraer",
-          "impact": "Positive (Sales)",
-          "details": "Secures a significant order from a major Asian carrier, strengthening its market presence."
+          "carrier": "Wizz Air Group",
+          "impact": "Positive",
+          "details": "Only carrier among the 10 busiest to grow capacity week-on-week."
         }
       ],
-      "thy_impact_assessment": "Weak direct impact. This fleet decision is specific to the Japanese domestic and regional market. While THY operates long-haul routes to Japan, this regional fleet upgrade does not directly impact THY's competitive landscape, revenue, or operations.",
-      "why_it_matters": "This major regional jet order highlights a strategic focus on fleet modernization and domestic market competition, influencing regional connectivity and aircraft manufacturer market share.",
-      "original_source": {
-        "title": "Japan Airlines orders up to 26 Embraer E190-E2 jets, following rival ANA",
-        "source_name": "AirDataNews",
-        "url": "https://www.airdatanews.com/japan-airlines-orders-up-to-26-embraer-e190-e2-jets-following-rival-ana/"
+      "event_type": "macro_demand",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
       },
-      "related_news": []
+      "region_section": "Regulation & Airspace",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The stark contrast in recovery percentages suggests a structural shift in market share on Euro-ME corridors during the current crisis.",
+      "original_source": {
+        "title": "EUROCONTROL European Aviation Overview",
+        "source_name": "Eurocontrol",
+        "url": "https://www.eurocontrol.int/publication/eurocontrol-european-aviation-overview-2026-week-41",
+        "source_type": "regulator",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "regulation_safety",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Europe",
+        "tier": 1,
+        "reliability_weight": 1.0
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-6a24187746a1",
+      "relevance_score": 72.8,
+      "score_components": {
+        "event_type": 0.75,
+        "source_reliability": 1.0,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Eurocontrol",
+          "url": "https://www.eurocontrol.int/publication/eurocontrol-european-aviation-overview-2026-week-41",
+          "title": "EUROCONTROL European Aviation Overview",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:47:21+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:47:06+00:00",
+      "last_updated_at": "2026-10-18T14:47:06+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:54:14+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
     },
     {
-      "id": "qantas-route-cancellations",
-      "section": "Route news",
-      "headline": "Qantas Ceases Flights to Five Destinations, Signaling Network Rationalization",
-      "lead": "Qantas has confirmed the cancellation of all flights to five destinations, with services ceasing in 2025 or 2026, indicating a strategic network rationalization aimed at optimizing profitability and capacity deployment across its remaining routes.",
+      "id": "story-9fb6dd653852",
+      "section": "European and other global airlines",
+      "headline": "Airbus Forecasts Demand for 42,060 New Aircraft by 2045",
+      "published_at": "18 Oct 14:51",
+      "lead": "Long-term aviation growth remains resilient, with global passenger traffic expected to more than double over the next two decades.",
+      "source_description": "Explore the Airbus Global Market Forecast 2026-2045. Discover aviation trends, demand for 42,060 new aircraft and passenger traffic growth. Over the next 20 years, Airbus anticipates a global demand for 42,060 new aircraft . This will not only cater to growth but also drive the replacement of older fleets with flexible, highly efficient new-generation aircraft. Long-term air travel expansion remains anchored in population and GDP growth. The Airbus GMF forecasts passenger traffic to grow 3.9% annually , supported by global GDP growth of 2.6%. By 2045, air traffic will more than double and reach about 10 billion passengers per year. The middle class demographic, which is the most likely to fly, will increase by 1.4 billion people by 2045, representing a 34% rise. To accommodate projected traffic growth and replace retiring aircraft, the world's passenger fleet is expected to nearly double, growing from 23,310 aircraft at the end of 2025 to 45,550 aircraft by the end of 2045 . Over this period, a total of 42,060 new aircraft will be required . This demand is segmented into:",
       "detailed_analysis": [
-        "The cancellations suggest a strategic decision by Qantas to exit underperforming routes or reallocate capacity to more profitable segments of its network.",
-        "This move could be driven by factors such as low demand, intense competition, high operational costs, or a shift in overall network strategy.",
-        "Capacity will likely be redeployed to strengthen core routes or expand into new, more lucrative markets, potentially improving overall revenue per ASK.",
-        "Passengers previously served by these routes will need to seek alternative carriers, potentially benefiting competitors on those specific segments.",
-        "The phased withdrawal (2025 or 2026) allows for an orderly transition and minimizes immediate disruption, while reflecting long-term network planning.",
-        "This rationalization is part of an ongoing effort by airlines to maintain financial health and adapt to evolving market conditions post-pandemic."
+        "Global demand is projected at 42,060 new aircraft through 2045 to support growth and fleet replacement.",
+        "Passenger traffic is forecast to grow at an annual rate of 3.9%, supported by a projected 2.6% global GDP growth.",
+        "The global middle class is expected to expand by 1.4 billion people, representing a 34% rise by 2045.",
+        "Annual passenger numbers are anticipated to reach approximately 10 billion by the end of the forecast period."
       ],
       "data_points": [
-        "5 destinations",
-        "2025 or 2026"
+        "42,060",
+        "3.9%",
+        "2.6%",
+        "10 billion",
+        "1.4 billion",
+        "34%"
       ],
-      "strategic_impact": "Qantas's decision to cut five destinations reflects a strategic network rationalization, aiming to enhance profitability by reallocating capacity to stronger routes and improving overall operational efficiency, while impacting passenger options in affected markets.",
+      "strategic_impact": "Fleet planning must account for a doubling of traffic, emphasizing the need for high-efficiency, new-generation aircraft to manage capacity and environmental goals.",
+      "market_exposure": [
+        {
+          "carrier": "Airbus",
+          "impact": "Positive",
+          "details": "Anticipates global demand for 42,060 new aircraft to cater to growth and fleet replacement."
+        }
+      ],
+      "event_type": "macro_demand",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000006",
+            "slug": "discover-airlines",
+            "iata": "4Y",
+            "name": "Discover Airlines",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 4
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [
+        "Manufacturers & Supply Chain"
+      ],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The correlation between middle-class expansion and air travel demand underpins the long-term necessity for significant capital investment in fleet renewal.",
+      "original_source": {
+        "title": "Airbus Global Market Forecast 2026-2045",
+        "source_name": "Airbus",
+        "url": "https://www.airbus.com/en/products-services/commercial-aircraft/market/global-market-forecast",
+        "source_type": "airline_newsroom",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "fleet",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Europe",
+        "tier": 1,
+        "reliability_weight": 0.95
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-9fb6dd653852",
+      "relevance_score": 72.0,
+      "score_components": {
+        "event_type": 0.75,
+        "source_reliability": 0.95,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Airbus",
+          "url": "https://www.airbus.com/en/products-services/commercial-aircraft/market/global-market-forecast",
+          "title": "Airbus Global Market Forecast 2026-2045",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:51:56+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:51:42+00:00",
+      "last_updated_at": "2026-10-18T14:51:42+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:54:14+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
+    },
+    {
+      "id": "story-a23bff053879",
+      "section": "European and other global airlines",
+      "headline": "Boeing Commercial Market Outlook Projects Global Fleet Growth to 2045",
+      "published_at": "18 Oct 14:47",
+      "lead": "Boeing forecasts that the global commercial aircraft fleet will grow nearly 80% to over 50,000 airplanes by 2045. Airlines and cargo operators will require nearly 44,000 new aircraft over the next 20 years to support air travel and cargo expansion.",
+      "source_description": "The global commercial airplanes fleet is expected to grow nearly 80% to more than 50,000 airplanes by 2045 as airlines and cargo operators add capacity. Globally, operators are forecasted to need nearly 44,000 new airplanes to support sustained air travel demand and air cargo expansion over the next 20 years. The global single-aisle fleet will nearly double to more than 36,000 jets, serving core short-haul networks and operating more than half of all global capacity. More than 8,000 widebody airplanes will be in service in 2045, enabling long-haul passenger routes, enhanced passenger experience and critical air cargo capacity. Air cargo traffic growth and the need for new-technology freighters to renew the fleet will drive demand for more than 2,900 production and converted freighters. Passenger traffic is expected to grow 4% annually, resulting in a doubling of global air traffic between 2026 and 2045.",
+      "detailed_analysis": [
+        "The global commercial airplane fleet is projected to expand nearly 80% to more than 50,000 airplanes by 2045.",
+        "Operators will need nearly 44,000 new airplanes over the next 20 years to support passenger demand and cargo growth.",
+        "The single-aisle fleet will nearly double to over 36,000 jets, serving short-haul routes and operating more than half of global capacity.",
+        "More than 8,000 widebody airplanes will be in service by 2045 to enable long-haul passenger routes and freighter capacity.",
+        "Demand for fleet renewal and air cargo expansion will require more than 2,900 production and converted freighters."
+      ],
+      "data_points": [
+        "2026 - 2045",
+        "nearly 80%",
+        "more than 50,000",
+        "2045",
+        "nearly 44,000",
+        "20 years",
+        "nearly double",
+        "more than 36,000",
+        "half",
+        "more than 8,000",
+        "more than 2,900"
+      ],
+      "strategic_impact": "Substantial fleet expansion over two decades will drive intense aircraft manufacturing demand, ongoing fleet renewal, and long-term capacity expansion across single-aisle and widebody networks.",
+      "market_exposure": [
+        {
+          "carrier": "Boeing",
+          "impact": "Positive",
+          "details": "Boeing projects strong global aircraft demand totaling nearly 44,000 new airplane deliveries over the 20-year forecast period."
+        }
+      ],
+      "event_type": "macro_demand",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Manufacturers & Supply Chain",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The anticipated fleet growth to more than 50,000 aircraft highlights the scale of future capital investments, infrastructure needs, and supply chain commitments required across global commercial aviation.",
+      "original_source": {
+        "title": "Boeing Commercial Market Outlook 2026 - 2045",
+        "source_name": "Boeing",
+        "url": "https://www.boeing.com/commercial/market/commercial-market-outlook",
+        "source_type": "airline_newsroom",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "route_network",
+          "fleet",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "North America",
+        "tier": 1,
+        "reliability_weight": 0.95
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-a23bff053879",
+      "relevance_score": 72.0,
+      "score_components": {
+        "event_type": 0.75,
+        "source_reliability": 0.95,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Boeing",
+          "url": "https://www.boeing.com/commercial/market/commercial-market-outlook",
+          "title": "Boeing Commercial Market Outlook 2026 - 2045",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:47:21+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:47:06+00:00",
+      "last_updated_at": "2026-10-18T14:47:06+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:47:06+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
+    },
+    {
+      "id": "story-86e684107d82",
+      "section": "European and other global airlines",
+      "headline": "Southwest, United Shake Up Their Frequent-Flier Programs",
+      "published_at": "18 Oct 07:17",
+      "lead": "Southwest Airlines and United Airlines are implementing changes to their frequent-flier programs.",
+      "source_description": "",
+      "detailed_analysis": [
+        "Southwest Airlines is adjusting its frequent-flier program.",
+        "United Airlines is adjusting its frequent-flier program.",
+        "The changes involve their respective loyalty schemes."
+      ],
+      "data_points": [],
+      "strategic_impact": "These adjustments could influence customer loyalty and competitive positioning within the airline industry.",
+      "market_exposure": [
+        {
+          "carrier": "Southwest",
+          "impact": "Neutral",
+          "details": "Adjustments to frequent-flier program."
+        },
+        {
+          "carrier": "United",
+          "impact": "Neutral",
+          "details": "Adjustments to frequent-flier program."
+        }
+      ],
+      "event_type": "airline_financials",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000117",
+            "slug": "southwest-airlines",
+            "iata": "WN",
+            "name": "Southwest Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Changes to frequent-flier programs can significantly alter passenger behavior and loyalty, impacting future revenue streams.",
+      "original_source": {
+        "title": "Southwest, United Shake Up Their Frequent-Flier Programs",
+        "source_name": "The Wall Street Journal",
+        "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOV2ZodzFFM2RJNW5Gb2w2eHo2alFOY1hZMl9sc2ZuclNlcThJYjlSNlZhVEpPYW05WUFQVE5BOTZHUkJNM2llbGgwc2E5Zk5LbDZ0Wkg4dnV3M1N6N3Uwa0QwUktzVHd0QVk0UHZRLVlOTlJYMTJnV2tOc3Z6TGNCVXVkTjI2UWUwblNrOUJJbGZOTk1OM2k3M3BDa1BaM1M2LVln?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-86e684107d82",
+      "relevance_score": 71.8,
+      "score_components": {
+        "event_type": 0.85,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "The Wall Street Journal",
+          "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOV2ZodzFFM2RJNW5Gb2w2eHo2alFOY1hZMl9sc2ZuclNlcThJYjlSNlZhVEpPYW05WUFQVE5BOTZHUkJNM2llbGgwc2E5Zk5LbDZ0Wkg4dnV3M1N6N3Uwa0QwUktzVHd0QVk0UHZRLVlOTlJYMTJnV2tOc3Z6TGNCVXVkTjI2UWUwblNrOUJJbGZOTk1OM2k3M3BDa1BaM1M2LVln?oc=5",
+          "title": "Southwest, United Shake Up Their Frequent-Flier Programs",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T07:17:20+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:08:11+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-25c0e24f3e18",
+      "section": "Route news",
+      "headline": "London Heathrow Retains Top Spot in OAG Megahubs 2025 Connectivity Rankings",
+      "published_at": "18 Oct 14:41",
+      "lead": "London Heathrow retained its title as the world's most connected airport for the third consecutive year in the OAG Megahubs 2025 ranking. Meanwhile, Istanbul Airport and Frankfurt registered substantial connectivity gains, while Tokyo Haneda experienced a decline.",
+      "source_description": "London Heathrow (LHR) retains its title as the world’s most connected airport for the third consecutive year , offering over 59,000 possible connections to 226 destinations* on the busiest day**. Istanbul Airport (IST) has seen one of the greatest increases, surging from 8 th position last year to 2 nd place in this year’s ranking, due to a 25% year-on-year increase in potential connections on the busiest day of the year. Frankfurt (FRA) has seen a significant shift in rankings, climbing from 10 th position last year to 4 th , driven by a 21% increase in potential connections year-on-year. Tokyo Haneda (HND) has dropped down in this year’s rankings from 3 rd in 2024 to 9 th in 2025, reflecting a 10% decline in connections. Atlanta Hartsfield-Jackson (ATL) – the world’s largest airport by seat capacity – re-enters the Top 10 this year rising from 11 th place last year to 8 th position in 2025. ATL has added eight (8) more destinations and seen a corresponding 14% increase in potential connections. Chicago O’Hare (ORD) also makes gains, climbing two (2) spots to 7th, due to a 17% growth in connections and an expanded network of 15 additional destinations.",
+      "detailed_analysis": [
+        "London Heathrow (LHR) offers over 59,000 possible connections to 226 destinations on its busiest day to hold 1st place for the third consecutive year.",
+        "Istanbul Airport (IST) climbed from 8th position last year to 2nd place following a 25% year-on-year increase in potential connections on its busiest day.",
+        "Frankfurt (FRA) rose from 10th position last year to 4th place, supported by a 21% year-on-year increase in potential connections.",
+        "Tokyo Haneda (HND) fell from 3rd place in 2024 to 9th place in 2025, reflecting a 10% decline in connections."
+      ],
+      "data_points": [
+        "third consecutive year",
+        "59,000 possible connections",
+        "226 destinations",
+        "8th position",
+        "2nd place",
+        "25%",
+        "10th position",
+        "4th",
+        "21%",
+        "3rd in 2024",
+        "9th in 2025",
+        "10%"
+      ],
+      "strategic_impact": "Surging connection capability at major European and Turkish hubs reshapes international transfer flows and intensifies hub-to-hub competition for passenger connections.",
+      "market_exposure": [
+        {
+          "carrier": "London Heathrow (LHR)",
+          "impact": "Positive",
+          "details": "Retained 1st place globally for the third consecutive year with over 59,000 possible connections to 226 destinations."
+        },
+        {
+          "carrier": "Istanbul Airport (IST)",
+          "impact": "Positive",
+          "details": "Advanced from 8th position to 2nd place due to a 25% year-on-year increase in potential connections."
+        },
+        {
+          "carrier": "Frankfurt (FRA)",
+          "impact": "Positive",
+          "details": "Climbed from 10th position to 4th place driven by a 21% year-on-year connectivity increase."
+        },
+        {
+          "carrier": "Tokyo Haneda (HND)",
+          "impact": "Negative",
+          "details": "Dropped from 3rd place in 2024 to 9th place in 2025 following a 10% connection decline."
+        },
+        {
+          "carrier": "Atlanta Hartsfield-Jackson (ATL)",
+          "impact": "Neutral",
+          "details": "Highlighted in the rankings as the world's largest airport by seat capacity."
+        }
+      ],
+      "event_type": "macro_demand",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [
+          {
+            "entity_id": "airport:000043",
+            "slug": "london-heathrow",
+            "iata": "LHR",
+            "name": "London Heathrow",
+            "country": "United Kingdom",
+            "tier": 1
+          },
+          {
+            "entity_id": "airport:000044",
+            "slug": "istanbul-airport",
+            "iata": "IST",
+            "name": "Istanbul Airport",
+            "country": "Türkiye",
+            "tier": 1
+          },
+          {
+            "entity_id": "airport:000048",
+            "slug": "frankfurt-airport",
+            "iata": "FRA",
+            "name": "Frankfurt Airport",
+            "country": "Germany",
+            "tier": 1
+          },
+          {
+            "entity_id": "airport:000092",
+            "slug": "tokyo-haneda",
+            "iata": "HND",
+            "name": "Tokyo Haneda",
+            "country": "Japan",
+            "tier": 1
+          },
+          {
+            "entity_id": "airport:000001",
+            "slug": "hartsfield-jackson-atlanta-international",
+            "iata": "ATL",
+            "name": "Hartsfield-Jackson Atlanta International",
+            "country": "United States",
+            "tier": 1
+          },
+          {
+            "entity_id": "airport:000004",
+            "slug": "chicago-o-hare-international",
+            "iata": "ORD",
+            "name": "Chicago O'Hare International",
+            "country": "United States",
+            "tier": 1
+          }
+        ],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [
+        "Asia-Pacific",
+        "Americas"
+      ],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Airport connection density directly dictates airline network transfer efficiency and international hub market share.",
+      "original_source": {
+        "title": "OAG Megahubs 2025 | Most Connected Airports in the World",
+        "source_name": "OAG",
+        "url": "https://www.oag.com/megahubs-airports-2025",
+        "source_type": "trade_media",
+        "official": true,
+        "airline": "",
+        "topics": [
+          "route_network",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-25c0e24f3e18",
+      "relevance_score": 71.2,
+      "score_components": {
+        "event_type": 0.75,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "OAG",
+          "url": "https://www.oag.com/megahubs-airports-2025",
+          "title": "OAG Megahubs 2025 | Most Connected Airports in the World",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:41:03+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T14:40:39+00:00",
+      "last_updated_at": "2026-10-18T14:40:39+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T14:40:39+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": true
+    },
+    {
+      "id": "story-8258686aef2f",
+      "section": "European and other global airlines",
+      "headline": "Virgin Atlantic Launches New 14-Hour Nonstop Heathrow Route",
+      "published_at": "18 Oct 13:00",
+      "lead": "Virgin Atlantic has commenced a new 14-hour nonstop route from Heathrow today.",
+      "source_description": "The seasonal route will run until late March.",
+      "detailed_analysis": [
+        "The new service is a nonstop route.",
+        "It operates from Heathrow.",
+        "The flight duration is 14 hours.",
+        "This is a seasonal route.",
+        "The service will run until late March."
+      ],
+      "data_points": [
+        "14-Hour",
+        "late March"
+      ],
+      "strategic_impact": "This new seasonal route expands Virgin Atlantic's network capacity and offers new travel options, potentially increasing demand on the specific corridor.",
+      "market_exposure": [
+        {
+          "carrier": "Virgin Atlantic",
+          "impact": "Positive",
+          "details": "Launching a new 14-hour nonstop route from Heathrow."
+        },
+        {
+          "carrier": "Heathrow",
+          "impact": "Positive",
+          "details": "Gaining a new nonstop route."
+        }
+      ],
+      "event_type": "route_network_change",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [
+          {
+            "entity_id": "airport:000043",
+            "slug": "london-heathrow",
+            "iata": "LHR",
+            "name": "London Heathrow",
+            "country": "United Kingdom",
+            "tier": 1
+          }
+        ],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "This new seasonal service expands Virgin Atlantic's network and offers passengers a direct long-haul option from Heathrow for the upcoming season.",
+      "original_source": {
+        "title": "Virgin Atlantic Launches New 14-Hour Nonstop Heathrow Route Today: See Map Now",
+        "source_name": "Simple Flying",
+        "url": "https://simpleflying.com/virgin-launches-new-14-hour-route-today/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "route_network"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-8258686aef2f",
+      "relevance_score": 65.5,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.4,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.5
+      },
+      "sources": [
+        {
+          "name": "Simple Flying",
+          "url": "https://simpleflying.com/virgin-launches-new-14-hour-route-today/",
+          "title": "Virgin Atlantic Launches New 14-Hour Nonstop Heathrow Route Today: See Map Now",
+          "language": "en"
+        },
+        {
+          "name": "Aviation24",
+          "url": "https://www.aviation24.be/airlines/virgin-atlantic/architect-convicted-after-drunken-assault-on-virgin-atlantic-cabin-crew/",
+          "title": "Architect convicted after drunken assault on Virgin Atlantic cabin crew",
+          "language": "en"
+        }
+      ],
+      "source_count": 2,
+      "published_at_iso": "2026-10-18T13:00:17+00:00",
+      "language": "en",
+      "narrative_generated_at": "2026-10-18T14:21:16+00:00",
+      "narrative_language": "en",
+      "first_seen_at": "2026-10-18T13:21:19+00:00",
+      "last_updated_at": "2026-10-18T14:21:16+00:00",
+      "previous_score": 57.5,
+      "update_reasons": [
+        "score_change",
+        "new_source"
+      ],
+      "badges": [
+        "new",
+        "updated"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-1e31412f4e2c",
+      "section": "European and other global airlines",
+      "headline": "United, Air Canada Plan to Add Routes Amid Trade Tensions",
+      "published_at": "16 Oct 19:16",
+      "lead": "United Airlines and Air Canada are planning to add new routes between Canada and the U.S. as part of their Transborder Joint Business agreement.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The carriers intend to expand connectivity between Canada and the U.S. starting in the Summer 2027 season.",
+        "The expansion is being pursued under the existing Transborder Joint Business framework.",
+        "The plan to increase options for travelers comes despite noted trade tensions."
+      ],
+      "data_points": [
+        "Summer 2027"
+      ],
+      "strategic_impact": "The move aims to strengthen the joint business partnership and increase capacity in the competitive North American transborder market.",
+      "market_exposure": [
+        {
+          "carrier": "United",
+          "impact": "Positive",
+          "details": "Planned network expansion and growth of the transborder joint business."
+        },
+        {
+          "carrier": "Air Canada",
+          "impact": "Positive",
+          "details": "Increased connectivity and capacity between Canada and the U.S."
+        }
+      ],
+      "event_type": "route_network_change",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000128",
+            "slug": "air-canada",
+            "iata": "AC",
+            "name": "Air Canada",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Expanding joint business routes allows partner airlines to optimize schedules and capture a larger share of high-demand transborder traffic.",
+      "original_source": {
+        "title": "United, Air Canada Plan to Add Routes Amid Trade Tensions",
+        "source_name": "Bloomberg",
+        "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPWFVpYmgyaFlGQTVqdzZKZzNsQUd4eUNoNHJtNUxBcm5ya1BtN2RmRUliOGkxcFBjZlBXM3pGN1lHQmYtX1BvQ2pxUXM3RGRINGlwaXhhQ2VTTXRGeXlVWWhnNHVfdVo5OG5NQzd3NnJILTZlZ0VtVWd6azJSRnJFS21PQW1TSWYwQnlneDV3UkdmY1BweVlyQVcwTlNNRFFydXA0TjhOd3BEcHZCQnlvTWtqMVc?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "route_network"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-1e31412f4e2c",
+      "relevance_score": 65.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Bloomberg",
+          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPWFVpYmgyaFlGQTVqdzZKZzNsQUd4eUNoNHJtNUxBcm5ya1BtN2RmRUliOGkxcFBjZlBXM3pGN1lHQmYtX1BvQ2pxUXM3RGRINGlwaXhhQ2VTTXRGeXlVWWhnNHVfdVo5OG5NQzd3NnJILTZlZ0VtVWd6azJSRnJFS21PQW1TSWYwQnlneDV3UkdmY1BweVlyQVcwTlNNRFFydXA0TjhOd3BEcHZCQnlvTWtqMVc?oc=5",
+          "title": "United, Air Canada Plan to Add Routes Amid Trade Tensions",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:31:14+00:00",
+      "last_updated_at": "2026-10-18T09:31:14+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:40:59+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-95280471d71e",
+      "section": "European and other global airlines",
+      "headline": "Lufthansa to transfer up to eight A350s to TAP Air Portugal post-2030.",
+      "published_at": "16 Oct 22:49",
+      "lead": "Lufthansa plans to transfer a maximum of eight Airbus A350 aircraft to TAP Air Portugal after the year 2030.",
+      "source_description": "ch-aviation",
+      "detailed_analysis": [
+        "Lufthansa will transfer A350 aircraft.",
+        "The number of aircraft transferred will be up to eight.",
+        "The transfer will occur after 2030.",
+        "The recipient airline is TAP Air Portugal."
+      ],
+      "data_points": [
+        "eight",
+        "A350s",
+        "2030"
+      ],
+      "strategic_impact": "This future fleet transfer will impact the long-term capacity and fleet planning for both Lufthansa and TAP Air Portugal, potentially affecting their respective long-haul operations and network strategies.",
+      "market_exposure": [
+        {
+          "carrier": "Lufthansa",
+          "impact": "Neutral",
+          "details": "Future transfer of up to eight A350s to TAP after 2030."
+        },
+        {
+          "carrier": "TAP",
+          "impact": "Positive",
+          "details": "Will receive up to eight A350s from Lufthansa after 2030, enhancing long-haul fleet."
+        }
+      ],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000001",
+            "slug": "lufthansa",
+            "iata": "LH",
+            "name": "Lufthansa",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 1
+          },
+          {
+            "entity_id": "carrier:000036",
+            "slug": "tap-air-portugal",
+            "iata": "TP",
+            "name": "TAP Air Portugal",
+            "region": "Europe",
+            "group_entity_id": "",
+            "tier": 2
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Long-term fleet transfers can significantly reshape an airline's operational capabilities and market presence in the future.",
+      "original_source": {
+        "title": "Lufthansa to transfer up to eight A350s to TAP after 2030",
+        "source_name": "ch-aviation",
+        "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNWkFsOFZsSXFKYUNJeVRseklNTjF0NmJ0TmJrOE8wQUh1NUg3SW5hQmxiRFFaSFVMOEU3YmVORzRqcnBYczl3a3B1MnFZXzIwQzBhbTZrM0lMVlBsVVF4b20zUEVsbWxkaVFEaFR2SWlRaTJURldzX1JTX1VXZnpBQUlaTHdSV1FkNVh2bm02MjVfM2RPNWNtNVVKSWRTUQ?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "fleet"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-95280471d71e",
+      "relevance_score": 65.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "ch-aviation",
+          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNWkFsOFZsSXFKYUNJeVRseklNTjF0NmJ0TmJrOE8wQUh1NUg3SW5hQmxiRFFaSFVMOEU3YmVORzRqcnBYczl3a3B1MnFZXzIwQzBhbTZrM0lMVlBsVVF4b20zUEVsbWxkaVFEaFR2SWlRaTJURldzX1JTX1VXZnpBQUlaTHdSV1FkNVh2bm02MjVfM2RPNWNtNVVKSWRTUQ?oc=5",
+          "title": "Lufthansa to transfer up to eight A350s to TAP after 2030",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-c52865d489f1",
+      "section": "European and other global airlines",
+      "headline": "Air Canada and United Airlines Announce Six New Transborder Routes",
+      "published_at": "16 Oct 18:42",
+      "lead": "Air Canada and United Airlines have detailed plans to add six new routes to their joint Canada-U.S. network for the 2027 summer season.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The expansion includes the addition of six specific transborder routes scheduled for 2027.",
+        "The carriers are seeking to enhance their partnership and provide more direct options for passengers.",
+        "This growth is part of a broader strategy to expand the Canada-U.S. network footprint."
+      ],
+      "data_points": [
+        "Six (6)",
+        "2027"
+      ],
+      "strategic_impact": "The addition of six routes significantly increases the joint venture's capacity and competitive positioning in the transborder sector.",
+      "market_exposure": [
+        {
+          "carrier": "Air Canada",
+          "impact": "Positive",
+          "details": "Expansion of the transborder network with six new routes."
+        },
+        {
+          "carrier": "United Airlines",
+          "impact": "Positive",
+          "details": "Increased capacity and network reach through the joint partnership."
+        }
+      ],
+      "event_type": "route_network_change",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000128",
+            "slug": "air-canada",
+            "iata": "AC",
+            "name": "Air Canada",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          },
+          {
+            "entity_id": "carrier:000116",
+            "slug": "united-airlines",
+            "iata": "UA",
+            "name": "United Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The introduction of six new routes demonstrates a long-term commitment to scaling the joint venture and improving passenger connectivity across North America.",
+      "original_source": {
+        "title": "Air Canada, United Airlines to expand Canada-US network with new summer routes",
+        "source_name": "Reuters",
+        "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUWhVSVRMY0h0ckpudkJjbGc1WFgzVDFGUjljZVk0MVpQZDBzNDZYcVBLXzZobFEtQlRzNktKbWJNRU9qZ1RRdGRQMzNqcXpLWkxTdUtlWEQ3UlhHSzRNdVNwcFlPSGVQZWdzNm9xZlhBSURoS3p2RFVfc1NDV3lkYTU2QThRamtxclNxbENaTEpka0I2MVlyUmtHeUdrczV4RXJxRGFiZkhiV3BZMUJldGNNdlUwMEMtRm9r?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "route_network"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-c52865d489f1",
+      "relevance_score": 65.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Reuters",
+          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUWhVSVRMY0h0ckpudkJjbGc1WFgzVDFGUjljZVk0MVpQZDBzNDZYcVBLXzZobFEtQlRzNktKbWJNRU9qZ1RRdGRQMzNqcXpLWkxTdUtlWEQ3UlhHSzRNdVNwcFlPSGVQZWdzNm9xZlhBSURoS3p2RFVfc1NDV3lkYTU2QThRamtxclNxbENaTEpka0I2MVlyUmtHeUdrczV4RXJxRGFiZkhiV3BZMUJldGNNdlUwMEMtRm9r?oc=5",
+          "title": "Air Canada, United Airlines to expand Canada-US network with new summer routes",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:40:59+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-d43cb360f275",
+      "section": "European and other global airlines",
+      "headline": "Southwest Airlines has not yet decided on its long-haul fleet choice.",
+      "published_at": "16 Oct 08:26",
+      "lead": "Southwest Airlines indicates it has not finalized its decision regarding a long-haul fleet.",
+      "source_description": "Aviation Week",
+      "detailed_analysis": [
+        "Southwest Airlines is considering a long-haul fleet.",
+        "The airline has not yet made a choice."
+      ],
+      "data_points": [],
+      "strategic_impact": "The ongoing deliberation on a long-haul fleet choice suggests potential future capacity expansion into new markets, which could significantly alter Southwest's operational model and competitive landscape.",
+      "market_exposure": [
+        {
+          "carrier": "Southwest",
+          "impact": "Neutral",
+          "details": "Still evaluating options for a long-haul fleet."
+        }
+      ],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000117",
+            "slug": "southwest-airlines",
+            "iata": "WN",
+            "name": "Southwest Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "A decision on a long-haul fleet could mark a significant strategic shift for the airline, opening new market opportunities.",
+      "original_source": {
+        "title": "Southwest ‘Not There Yet’ on Long-Haul Fleet Choice",
+        "source_name": "Aviation Week",
+        "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNU212ak1sVGtSS1VVRFJHdlFqZ1NnZDhDOFBiUDlYczVYTUtiS1BnSFRpSVdNU0drUThab05GRFMtUGl2UFVFSlJLbGZCV0R5X2kySHluV2JobWp5OF9LRjdQa3BjN0lsUENfVUs2enRtaHluTzJJNEVJWVhuVlVSLTlxT2xqcmtRWDRNVHpOeHlYTEk0eVBxdV9YSl81THRLMy03Yw?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "fleet"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-d43cb360f275",
+      "relevance_score": 65.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Aviation Week",
+          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNU212ak1sVGtSS1VVRFJHdlFqZ1NnZDhDOFBiUDlYczVYTUtiS1BnSFRpSVdNU0drUThab05GRFMtUGl2UFVFSlJLbGZCV0R5X2kySHluV2JobWp5OF9LRjdQa3BjN0lsUENfVUs2enRtaHluTzJJNEVJWVhuVlVSLTlxT2xqcmtRWDRNVHpOeHlYTEk0eVBxdV9YSl81THRLMy03Yw?oc=5",
+          "title": "Southwest ‘Not There Yet’ on Long-Haul Fleet Choice",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-8bfc7ceba2b9",
+      "section": "European and other global airlines",
+      "headline": "Lufthansa Exploring Sale of Software Assets",
+      "published_at": "16 Oct 13:56",
+      "lead": "Lufthansa is reportedly exploring the sale of its software assets.",
+      "source_description": "",
+      "detailed_analysis": [
+        "Lufthansa is exploring the sale of software assets.",
+        "The potential deal is valued at €1bn."
+      ],
+      "data_points": [
+        "€1bn"
+      ],
+      "strategic_impact": "A potential sale of software assets could impact Lufthansa's revenue and strategic focus on core aviation operations.",
+      "market_exposure": [
+        {
+          "carrier": "Lufthansa",
+          "impact": "Neutral",
+          "details": "Exploring sale of non-core software assets."
+        }
+      ],
+      "event_type": "partnerships_mna",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000001",
+            "slug": "lufthansa",
+            "iata": "LH",
+            "name": "Lufthansa",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "This move could streamline Lufthansa's operations and generate significant capital, potentially for reinvestment in its core airline business.",
+      "original_source": {
+        "title": "Lufthansa exploring sale of software assets in €1bn deal",
+        "source_name": "Financial Times",
+        "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOUFRINC1iemlHeVZpMTZSNVYyME04Y0JuaThpMGtUazViUTNHNDNqRVNwUVY0UkxQY1V1WVJaRjlNSWhNSTFBRjktLVh2ZExmWGgzU1JxZy1RUlVkaXZkTmVvSFVzVTFhd2pGNllHSkp3cW84MzdsV1N0ZEZYY3VsM2g0Y1I?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-8bfc7ceba2b9",
+      "relevance_score": 62.8,
+      "score_components": {
+        "event_type": 0.65,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Financial Times",
+          "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOUFRINC1iemlHeVZpMTZSNVYyME04Y0JuaThpMGtUazViUTNHNDNqRVNwUVY0UkxQY1V1WVJaRjlNSWhNSTFBRjktLVh2ZExmWGgzU1JxZy1RUlVkaXZkTmVvSFVzVTFhd2pGNllHSkp3cW84MzdsV1N0ZEZYY3VsM2g0Y1I?oc=5",
+          "title": "Lufthansa exploring sale of software assets in €1bn deal",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:13:24+00:00",
+      "previous_score": 38.0,
+      "update_reasons": [
+        "score_change"
+      ],
+      "badges": [],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:13:24+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-563be0a43b81",
+      "section": "European and other global airlines",
+      "headline": "KLM Royal Dutch Airlines wet leases A319 aircraft capacity.",
+      "published_at": "16 Oct 21:46",
+      "lead": "KLM Royal Dutch Airlines is utilizing wet lease agreements to acquire additional Airbus A319 capacity.",
+      "source_description": "ch-aviation",
+      "detailed_analysis": [
+        "KLM Royal Dutch Airlines is wet leasing aircraft.",
+        "The aircraft type is A319.",
+        "This is to acquire additional capacity."
+      ],
+      "data_points": [
+        "A319"
+      ],
+      "strategic_impact": "Wet leasing A319 capacity allows KLM to flexibly address short-term capacity needs or operational disruptions without long-term fleet commitments, impacting operational costs and scheduling.",
+      "market_exposure": [
+        {
+          "carrier": "KLM Royal Dutch Airlines",
+          "impact": "Neutral",
+          "details": "Wet leasing A319 capacity to supplement operations."
+        }
+      ],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000016",
+            "slug": "klm",
+            "iata": "KL",
+            "name": "KLM",
+            "region": "Europe",
+            "group_entity_id": "group:000003",
+            "tier": 2
+          }
+        ],
+        "airports": [],
+        "aircraft": [
+          {
+            "entity_id": "aircraft:000005",
+            "slug": "a319",
+            "code": "A319",
+            "family": "A320 family",
+            "manufacturer": "Airbus"
+          }
+        ]
+      },
+      "region_section": "Europe",
+      "secondary_tags": [
+        "Manufacturers & Supply Chain"
+      ],
+      "thy_impact_assessment": "",
+      "why_it_matters": "Wet leasing provides a flexible solution for airlines to manage capacity fluctuations and maintain operational schedules.",
+      "original_source": {
+        "title": "KLM Royal Dutch Airlines wet leases in A319 capacity",
+        "source_name": "ch-aviation",
+        "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNbUpYU3dEdEpJdVNJbkRsTHFIZUd5VmN4OTNuakFIc3BfWlU0bW81VGJfQUpyMWhoT0VxeGxoZ1pGaGZ2dE85OFVIbnhlOHIwUTRsUU9QVUZkUWVXNmxFX2RNWEJzaFQwVjFnQUNFdGNxNThzUGQwWnNfalNSLVdEWmRHM0gtWG13b19CaEtIRnpVSUlBUlhZ?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-563be0a43b81",
+      "relevance_score": 59.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.7,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "ch-aviation",
+          "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNbUpYU3dEdEpJdVNJbkRsTHFIZUd5VmN4OTNuakFIc3BfWlU0bW81VGJfQUpyMWhoT0VxeGxoZ1pGaGZ2dE85OFVIbnhlOHIwUTRsUU9QVUZkUWVXNmxFX2RNWEJzaFQwVjFnQUNFdGNxNThzUGQwWnNfalNSLVdEWmRHM0gtWG13b19CaEtIRnpVSUlBUlhZ?oc=5",
+          "title": "KLM Royal Dutch Airlines wet leases in A319 capacity",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-cd3a35d4a291",
+      "section": "European and other global airlines",
+      "headline": "Vietnam Airlines Seeks 25 Airbus Jets to Revive Low Cost Carrier",
+      "published_at": "16 Oct 09:26",
+      "lead": "Vietnam Airlines is reportedly seeking to acquire 25 Airbus aircraft. This initiative is aimed at supporting the revival of its low-cost carrier operations.",
+      "source_description": "",
+      "detailed_analysis": [
+        "Vietnam Airlines is in the process of looking for new aircraft.",
+        "The airline is targeting 25 jets for this acquisition.",
+        "The specific aircraft manufacturer mentioned is Airbus.",
+        "The primary objective of this fleet expansion is to revive a low-cost carrier."
+      ],
+      "data_points": [
+        "25"
+      ],
+      "strategic_impact": "This potential fleet expansion could significantly increase capacity for the low-cost segment, impacting competitive dynamics and operational scale for Vietnam Airlines.",
+      "market_exposure": [
+        {
+          "carrier": "Vietnam Airlines",
+          "impact": "Positive",
+          "details": "Seeking 25 Airbus jets to revive low-cost carrier."
+        },
+        {
+          "carrier": "Airbus",
+          "impact": "Positive",
+          "details": "Potential order for 25 jets from Vietnam Airlines."
+        }
+      ],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000083",
+            "slug": "vietnam-airlines",
+            "iata": "VN",
+            "name": "Vietnam Airlines",
+            "region": "Asia-Pacific",
+            "group_entity_id": "",
+            "tier": 2
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Asia-Pacific",
+      "secondary_tags": [
+        "Manufacturers & Supply Chain"
+      ],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The acquisition of these aircraft is crucial for Vietnam Airlines' strategy to re-establish and grow its low-cost operations.",
+      "original_source": {
+        "title": "Vietnam Airlines Seeks 25 Airbus Jets to Revive Low Cost Carrier",
+        "source_name": "Bloomberg",
+        "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPZ25ISDRWTFZoUHh4aEI4REoxbWdmNFFaTmdzZURBVnB0bWlYTzByY0h2RloyYUVNYXBRWWJtbWZxb1RicmJRNEVaYzdJejZDM0lYd201WlZiVHc4Q0JJRXZhN0d3ZF9RNFFIdHJMb2IzMWhOamloUE9WbGo4d3NPbVJpZVJJSllPcW05d1NnTklrQ0tLQmpaQVR6dlJNTTlLb3RhYWpxQTQwZm1xMFZRd2NHRklKUQ?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "fleet"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-cd3a35d4a291",
+      "relevance_score": 59.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.7,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Bloomberg",
+          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPZ25ISDRWTFZoUHh4aEI4REoxbWdmNFFaTmdzZURBVnB0bWlYTzByY0h2RloyYUVNYXBRWWJtbWZxb1RicmJRNEVaYzdJejZDM0lYd201WlZiVHc4Q0JJRXZhN0d3ZF9RNFFIdHJMb2IzMWhOamloUE9WbGo4d3NPbVJpZVJJSllPcW05d1NnTklrQ0tLQmpaQVR6dlJNTTlLb3RhYWpxQTQwZm1xMFZRd2NHRklKUQ?oc=5",
+          "title": "Vietnam Airlines Seeks 25 Airbus Jets to Revive Low Cost Carrier",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:06:28+00:00",
+      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-1589514bcc01",
+      "section": "European and other global airlines",
+      "headline": "SWISS and Lufthansa to Retire Airbus A340 Fleets",
+      "published_at": "18 Oct 09:18",
+      "lead": "SWISS and Lufthansa are retiring their Airbus A340 fleets, marking the end of a 23-year era for four-engine long-haul operations within the group.",
+      "source_description": "",
+      "detailed_analysis": [
+        "SWISS and Lufthansa are retiring their Airbus A340 fleets.",
+        "This concludes a 23-year period of four-engine long-haul flying.",
+        "The retirement affects both carriers within the group."
+      ],
+      "data_points": [
+        "23-year"
+      ],
+      "strategic_impact": "This fleet retirement impacts long-haul capacity and operational costs, shifting towards more fuel-efficient twin-engine aircraft.",
+      "market_exposure": [
+        {
+          "carrier": "SWISS",
+          "impact": "Neutral",
+          "details": "Retiring Airbus A340 fleet."
+        },
+        {
+          "carrier": "Lufthansa",
+          "impact": "Neutral",
+          "details": "Retiring Airbus A340 fleet."
+        },
+        {
+          "carrier": "Airbus",
+          "impact": "Neutral",
+          "details": "A340 fleet retirement by SWISS and Lufthansa."
+        }
+      ],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000002",
+            "slug": "swiss",
+            "iata": "LX",
+            "name": "SWISS International Air Lines",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 2
+          },
+          {
+            "entity_id": "carrier:000001",
+            "slug": "lufthansa",
+            "iata": "LH",
+            "name": "Lufthansa",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": [
+          {
+            "entity_id": "aircraft:000017",
+            "slug": "a340",
+            "code": "A340",
+            "family": "A340",
+            "manufacturer": "Airbus"
+          }
+        ]
+      },
+      "region_section": "Europe",
+      "secondary_tags": [
+        "Manufacturers & Supply Chain"
+      ],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The phase-out of four-engine aircraft signals a broader industry trend towards modern, more economical twin-engine long-haul operations.",
+      "original_source": {
+        "title": "SWISS A340 Retirement: What the End of Four Engines Means",
+        "source_name": "The Aviation Hub",
+        "url": "https://theaviationhub.co.uk/swiss-airbus-a340-retirement-analysis/?utm_source=rss&utm_medium=rss&utm_campaign=swiss-airbus-a340-retirement-analysis",
+        "source_type": "trade",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-1589514bcc01",
+      "relevance_score": 57.5,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.4,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "The Aviation Hub",
+          "url": "https://theaviationhub.co.uk/swiss-airbus-a340-retirement-analysis/?utm_source=rss&utm_medium=rss&utm_campaign=swiss-airbus-a340-retirement-analysis",
+          "title": "SWISS A340 Retirement: What the End of Four Engines Means",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T09:18:29+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:21:17+00:00",
+      "last_updated_at": "2026-10-18T09:21:17+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:21:17+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
+    },
+    {
+      "id": "story-4cc7c463b6cc",
+      "section": "European and other global airlines",
+      "headline": "Qantas to Discontinue Nonstop Perth-London Flight in 2026",
+      "published_at": "18 Oct 09:15",
+      "lead": "Qantas is discontinuing its nonstop Perth-London flight in 2026, affecting one of the world's longest non-stop routes.",
+      "source_description": "A closer look at why Qantas made adjustment to one of the world's longest non-stop flights",
+      "detailed_analysis": [
+        "Qantas will cease its nonstop Perth-London flight.",
+        "The discontinuation is scheduled for 2026.",
+        "This route is recognized as one of the world's longest non-stop flights.",
+        "The airline made adjustments to this service."
+      ],
+      "data_points": [
+        "2026"
+      ],
+      "strategic_impact": "This route network change will impact Qantas's long-haul capacity and competitive positioning on the Australia-Europe corridor, potentially affecting demand and revenue.",
       "market_exposure": [
         {
           "carrier": "Qantas",
-          "impact": "Positive (Efficiency/Profitability)",
-          "details": "Optimizes network, reduces exposure to unprofitable routes, and reallocates capacity to higher-yield markets."
-        },
-        {
-          "carrier": "Competitor Airlines",
-          "impact": "Opportunity",
-          "details": "May gain market share on routes where Qantas has withdrawn, or benefit from redeployed capacity on other routes."
-        },
-        {
-          "carrier": "Affected Destinations",
-          "impact": "Negative",
-          "details": "Loss of direct connectivity, potentially impacting tourism and business travel."
+          "impact": "Competitive Headwind",
+          "details": "Discontinuing nonstop Perth-London flight in 2026."
         }
       ],
-      "thy_impact_assessment": "Weak direct impact. Qantas's route cancellations are specific to its network, primarily impacting the Australian market and its direct international connections. There is no direct impact on THY's competitive landscape, revenue, or operations, as THY does not directly compete on these specific routes.",
-      "why_it_matters": "Airline route cancellations signal strategic network adjustments, impacting market capacity, competitive dynamics, and connectivity for affected destinations.",
+      "event_type": "route_network_change",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000047",
+            "slug": "qantas",
+            "iata": "QF",
+            "name": "Qantas",
+            "region": "Asia-Pacific",
+            "group_entity_id": "group:000006",
+            "tier": 2
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Asia-Pacific",
+      "secondary_tags": [],
+      "thy_impact_assessment": "",
+      "why_it_matters": "The adjustment to this ultra-long-haul route highlights the evolving operational and commercial considerations for such services.",
       "original_source": {
-        "title": "Qantas Cancels All Flights To 5 Destinations: See Full List Now",
+        "title": "Why Qantas Quietly Killed Its Nonstop Perth-London Flight In 2026",
         "source_name": "Simple Flying",
-        "url": "https://simpleflying.com/qantas-cancels-all-flights-to-5-destinations/"
+        "url": "https://simpleflying.com/why-did-qantas-quietly-kill-its-nonstop-perth-london-flight-in-2026/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
       },
-      "related_news": []
-    },
-    {
-      "id": "air-india-hijack-alarm",
-      "section": "Other areas",
-      "headline": "Air India Flight Diverted to Jaipur Following Hijack Alarm",
-      "lead": "An Air India Boeing 787-9 operating a Frankfurt-Delhi flight was diverted to Jaipur after transmitting a 7500 transponder code, indicating a hijack alarm. The incident involved 306 passengers and prompted immediate security protocols.",
-      "detailed_analysis": [
-        "The incident triggered standard emergency protocols, demonstrating the aviation industry's rapid response mechanisms to security threats.",
-        "Diversions lead to significant operational disruptions, including delays for passengers, crew scheduling issues, and increased fuel consumption.",
-        "Such events, even if false alarms, can cause reputational damage to the airline and heighten passenger anxiety regarding air travel security.",
-        "The use of the 7500 transponder code is a critical security measure, ensuring air traffic control and authorities are immediately alerted to potential threats.",
-        "Investigations will follow to determine the cause of the alarm, which could range from a genuine threat to a technical malfunction or human error.",
-        "The incident underscores the continuous need for robust security measures and vigilant operational procedures across all airlines."
-      ],
-      "data_points": [
-        "Boeing 787-9",
-        "306 passengers",
-        "7500 transponder code"
-      ],
-      "strategic_impact": "This security incident, regardless of its authenticity, causes significant operational disruption and potential reputational damage for Air India, highlighting the critical importance of robust security protocols and swift emergency response in maintaining aviation safety and passenger confidence.",
-      "market_exposure": [
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-4cc7c463b6cc",
+      "relevance_score": 51.5,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.7,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
         {
-          "carrier": "Air India",
-          "impact": "Negative (Operational/Reputational)",
-          "details": "Faces operational disruption, potential delays, and negative publicity, impacting passenger confidence."
-        },
-        {
-          "carrier": "Global Aviation Industry",
-          "impact": "Security Focus",
-          "details": "Reinforces the need for continuous vigilance and robust security measures across all operations."
+          "name": "Simple Flying",
+          "url": "https://simpleflying.com/why-did-qantas-quietly-kill-its-nonstop-perth-london-flight-in-2026/",
+          "title": "Why Qantas Quietly Killed Its Nonstop Perth-London Flight In 2026",
+          "language": "en"
         }
       ],
-      "thy_impact_assessment": "Weak direct impact. This is an isolated security incident involving a specific airline and route. While it highlights general aviation security concerns, there is no direct impact on THY's operations, revenue, or competitive position.",
-      "why_it_matters": "Security incidents, even false alarms, cause significant operational disruptions, impact passenger confidence, and underscore the critical importance of aviation security protocols.",
-      "original_source": {
-        "title": "Air India uçağında kaçırılma alarmı: Boeing 787-9 Jaipur’a yönlendirildi",
-        "source_name": "HavaHaber",
-        "url": "https://havahaber.com/air-india-ucaginda-kacirilma-alarmi-boeing-787-9-jaipura-yonlendirildi/"
-      },
-      "related_news": []
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T09:15:16+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-18T09:21:17+00:00",
+      "last_updated_at": "2026-10-18T09:21:17+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-18T09:21:17+00:00",
+      "narrative_language": "en",
+      "is_strategic_report": false
     }
   ],
-  "generated_at": "2026-10-14T13:33:39.222690"
+  "excluded_count": 1,
+  "older_archive_count": 32,
+  "hidden_low_count": 6,
+  "yesterday_count": 0
 }

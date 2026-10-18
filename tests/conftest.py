@@ -1,6 +1,6 @@
 import pytest
 
-from api import source_retry
+from api import benchmark_search, source_retry
 
 
 @pytest.fixture(autouse=True)
@@ -10,3 +10,12 @@ def no_live_weekly_retry(request, monkeypatch):
     if request.module.__name__.endswith("test_source_retry"):
         return
     monkeypatch.setattr(source_retry, "retry_blocked", lambda *args, **kwargs: {})
+
+
+@pytest.fixture(autouse=True)
+def no_live_benchmark_search(request, monkeypatch):
+    """fetch_rss_items() calls Gemini Search Grounding in production; unit tests must not make live LLM calls."""
+    if request.module.__name__.endswith("test_benchmark_search"):
+        return
+    monkeypatch.setattr(benchmark_search, "collect", lambda *args, **kwargs: ([], None))
+

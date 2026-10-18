@@ -40,6 +40,15 @@
     .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
         .mast-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
     .mast-meta #updated { font-size: 11px; color: var(--faint); }
+    .page-nav { display: flex; gap: 8px; padding: 4px 0 10px; border-bottom: 1px solid var(--ink); }
+    .page-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border: 1px solid var(--rule-2); border-radius: 999px; font: 600 11.5px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--paper); transition: background .15s ease, color .15s ease; }
+    .page-btn .page-cnt { font: 500 11px/1 var(--mono); color: var(--faint); }
+    .page-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .page-btn[aria-pressed="true"] .page-cnt { color: var(--rule-2); }
+    .report-intro { margin: 0 var(--pad); padding: 14px 0 12px; border-bottom: 1px solid var(--rule); font: 400 13.5px/1.45 var(--sans); color: var(--body); }
+    .report-intro strong { color: var(--ink); font-weight: 600; }
+    .row-dps { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+    .row-dps span { font: 500 11px/1 var(--mono); padding: 4px 7px; background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 3px; color: var(--ink-2); }
     .stale { margin: 10px var(--pad) 0; padding: 10px 12px; background: var(--paper-2); font: 400 12.5px/1.4 var(--sans); color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
     .stale[hidden] { display: none; }
 
@@ -161,6 +170,10 @@
       <div class="mast-row">
         <div class="mast-meta"><span id="counts"></span><span id="updated"></span></div>
       </div>
+      <nav class="page-nav" aria-label="Briefing sections">
+        <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
+        <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
+      </nav>
     </header>
 
     <div class="ios-prompt" id="ios-prompt" hidden>
@@ -218,7 +231,7 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { filter: "All", data: null, stories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
+    const state = { page: "briefing", filter: "All", reportFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
     const initialHash = location.hash ? decodeURIComponent(location.hash.slice(1)) : "";
 
@@ -245,6 +258,7 @@
       const seen = new Set();
       return stories.filter(s => { const k = storyKey(s); if (seen.has(k)) return false; seen.add(k); return true; });
     }
+    function isStrategicReport(story) { return Boolean(story && story.is_strategic_report); }
     function sectionOf(story) { return story.region_section || "Other"; }
     function badgeSet(story) { return new Set(Array.isArray(story.badges) ? story.badges : []); }
     function isBreaking(story) { return badgeSet(story).has("breaking"); }
@@ -298,18 +312,51 @@
       }
     }
 
+    function updateMastCount() {
+      const stories = state.dailyStories;
+      const breakingCount = stories.filter(isBreaking).length;
+      if (state.page === "reports") {
+        $("counts").textContent = `${state.reportStories.length} stratejik rapor & küresel endeks`;
+      } else {
+        $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
+      }
+    }
+
+    function setPage(pageName) {
+      if (pageName !== "briefing" && pageName !== "reports") return;
+      state.page = pageName;
+      document.querySelectorAll("[data-page]").forEach(btn => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.page === pageName));
+      });
+      $("art-back").textContent = pageName === "reports" ? "‹ Raporlar" : "‹ Briefing";
+      if (state.data) {
+        state.stories = pageName === "reports" ? state.reportStories : state.dailyStories;
+        updateMastCount();
+        renderList();
+      }
+    }
+
     function render(data) {
       state.data = data;
       state.pending = null;
       $("new-pill").hidden = true;
-      const stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
+      const allStories = dedupe(Array.isArray(data.stories) ? data.stories : []);
+      const dailyStories = allStories.filter(s => !isStrategicReport(s));
+      const reportStories = allStories.filter(isStrategicReport);
+      state.dailyStories = dailyStories;
+      state.reportStories = reportStories;
+      const stories = state.page === "reports" ? reportStories : dailyStories;
       state.stories = stories;
-      const sections = new Set(stories.map(sectionOf));
+      $("nav-briefing-count").textContent = String(dailyStories.length);
+      $("nav-reports-count").textContent = String(reportStories.length);
+
+      const sections = new Set(dailyStories.map(sectionOf));
       if (state.filter !== "All" && !sections.has(state.filter)) state.filter = "All";
+      const reportSources = new Set(reportStories.map(sourceName));
+      if (state.reportFilter !== "All" && !reportSources.has(state.reportFilter)) state.reportFilter = "All";
 
       $("dateline").textContent = [data.date_str, data.time_str].filter(Boolean).join(" · ") || "—";
-      const breakingCount = stories.filter(isBreaking).length;
-      $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
+      updateMastCount();
       state.updatedAt = parseTime(data.last_pipeline_run_at || data.generated_at);
       renderFreshness();
 
@@ -341,7 +388,52 @@
       band.hidden = !lines.length;
     }
 
+    function renderReportsList() {
+      const { reportFilter } = state;
+      const reports = state.reportStories;
+      if (!reports.length) {
+        state.order = [];
+        $("content").innerHTML = `<div class="state">Henüz stratejik rapor bulunmuyor.</div><div class="end">— Stratejik Raporlar sonu —</div>`;
+        return;
+      }
+      const counts = {};
+      reports.forEach(s => { const k = sourceName(s); counts[k] = (counts[k] || 0) + 1; });
+      const pubNames = Object.keys(counts);
+      const visible = reportFilter === "All" ? reports : reports.filter(s => sourceName(s) === reportFilter);
+      state.order = visible.slice();
+
+      let n = 0;
+      const reportRow = (s) => {
+        n++;
+        const tags = tagsHtml(s, true);
+        const count = sourceCount(s);
+        const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
+        const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${escapeHtml(s.why_it_matters)}</p>` : (s.lead ? `<p lang="${langOf(s)}">${escapeHtml(s.lead)}</p>` : ""));
+        const dps = (Array.isArray(s.data_points) ? s.data_points : []).slice(0, 4).map(d => `<span>${escapeHtml(d)}</span>`).join("");
+        return `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
+          <span class="row-num">${String(n).padStart(2, "0")}</span>
+          <span class="row-body">
+            ${tags ? `<span class="kicker">${tags}</span>` : ""}
+            <h3 lang="${langOf(s)}">${escapeHtml(s.headline)}</h3>
+            ${body}
+            ${dps ? `<span class="row-dps" lang="${langOf(s)}">${dps}</span>` : ""}
+            <span class="src" lang="en">${meta}</span>
+          </span>
+        </button>`;
+      };
+
+      let html = `<div class="report-intro" lang="tr"><strong>Stratejik Raporlar, Küresel Tahminler &amp; Benchmark Endeksleri</strong> — Boeing CMO, Airbus GMF, EUROCONTROL Tahminleri, OAG Megahubs, IdeaWorksCompany, IATA, ACI World, Cirium ve CAPA raporları. Yeni yayımlanan tüm stratejik raporlar otomatik olarak bu sayfaya eklenir.</div>`;
+      html += `<nav class="filters" aria-label="Filter by publisher"><div class="filters-inner">
+        ${[["All", reports.length]].concat(pubNames.map(name => [name, counts[name]])).map(([name, c]) =>
+          `<button class="chip" type="button" data-report-filter="${escapeHtml(name)}" aria-pressed="${name === reportFilter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
+      </div></nav>`;
+      html += `<section class="group"><div lang="en" class="group-head eyebrow">Strategic Outlooks &amp; Benchmark Reports · ${visible.length}</div>${visible.map(reportRow).join("")}</section>`;
+      html += `<div class="end">— End of strategic reports —</div>`;
+      $("content").innerHTML = html;
+    }
+
     function renderList() {
+      if (state.page === "reports") { renderReportsList(); return; }
       const { filter } = state;
       const stories = state.stories;
       if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
@@ -543,8 +635,13 @@
       linkedStoryHandled = true;
       const key = initialHash.trim().toLowerCase();
       history.replaceState(null, "", location.pathname + location.search);
-      if (state.order.some(s => storyKey(s) === key)) openArticle(key, true);
-      else showToast("That story is no longer in this briefing.");
+      if (state.order.some(s => storyKey(s) === key)) { openArticle(key, true); return; }
+      if (state.reportStories.some(s => storyKey(s) === key)) {
+        setPage("reports");
+        openArticle(key, true);
+        return;
+      }
+      showToast("That story is no longer in this briefing.");
     }
 
     function shareBriefing() {
@@ -605,7 +702,7 @@
       }
     }
     function applyPolled(data) {
-      const known = new Set(state.stories.map(storyKey));
+      const known = new Set(state.dailyStories.concat(state.reportStories).map(storyKey));
       const arrived = dedupe(Array.isArray(data.stories) ? data.stories : []).filter(s => !known.has(storyKey(s)));
       const atTop = window.scrollY < SCROLL_TOP_THRESHOLD && !state.articleId;
       const label = `${arrived.length} new ${arrived.length === 1 ? "story" : "stories"}`;
@@ -632,6 +729,10 @@
       });
       checkForNewVersion();
       $("btn-share").addEventListener("click", shareBriefing);
+      document.querySelector(".page-nav").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-page]");
+        if (btn) setPage(btn.dataset.page);
+      });
       $("mkt-toggle").addEventListener("click", () => {
         const table = $("mkt-table"), open = table.hidden;
         table.hidden = !open;
@@ -639,6 +740,14 @@
         $("mkt-toggle").setAttribute("aria-expanded", String(open));
       });
       $("content").addEventListener("click", (e) => {
+        const reportChip = e.target.closest("[data-report-filter]");
+        if (reportChip) {
+          state.reportFilter = reportChip.dataset.reportFilter;
+          renderList();
+          const pressed = [...document.querySelectorAll("[data-report-filter]")].find(el => el.dataset.reportFilter === state.reportFilter);
+          if (pressed) pressed.focus({ preventScroll: true });
+          return;
+        }
         const chip = e.target.closest("[data-filter]");
         if (chip) {
           state.filter = chip.dataset.filter;

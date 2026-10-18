@@ -88,6 +88,72 @@ def previous_day_key(date_text):
     return (date.fromisoformat(date_text) - timedelta(days=1)).isoformat()
 
 
+def is_strategic_report(item):
+    """Whether an article or story is a strategic outlook, forecast, index, or benchmark report."""
+    if not isinstance(item, dict):
+        return False
+    if item.get("is_strategic_report") or item.get("strategic_publication"):
+        return True
+    orig = item.get("original_source") if isinstance(item.get("original_source"), dict) else {}
+    url = str(item.get("link") or orig.get("url") or "").lower()
+    if any(pattern in url for pattern in STRATEGIC_REPORT_URL_PATTERNS):
+        return True
+    title = " ".join(
+        str(part)
+        for part in (item.get("title"), item.get("headline"), orig.get("title"))
+        if part
+    )
+    if STRATEGIC_REPORT_TITLE_PATTERN.search(title):
+        return True
+    publisher = str(item.get("source") or orig.get("source_name") or "").strip().lower()
+    if publisher in BENCHMARK_INSTITUTION_SOURCES and BENCHMARK_REPORT_KEYWORDS.search(f"{title} {url}"):
+        return True
+    return False
+
+
+STRATEGIC_REPORT_URL_PATTERNS = (
+    "/commercial/market/commercial-market-outlook",
+    "/global-market-forecast",
+    "eurocontrol.int/publication/",
+    "eurocontrol.int/forecasting",
+    "oag.com/megahubs",
+    "ideaworkscompany.com/reports",
+    "ideaworkscompany.com/wp-content/uploads",
+)
+
+STRATEGIC_REPORT_TITLE_PATTERN = re.compile(
+    r"\b(?:"
+    r"commercial\s+market\s+outlook|global\s+market\s+forecast|"
+    r"eurocontrol\s+forecast|seven-year\s+forecast|seven‑year\s+forecast|"
+    r"european\s+aviation\s+overview|megahubs|"
+    r"yearbook\s+of\s+ancillary\s+revenue|ancillary\s+revenue\s+yearbook|"
+    r"pilot\s+and\s+technician\s+outlook|services\s+market\s+outlook|"
+    r"global\s+outlook\s+for\s+air\s+transport|world\s+airport\s+traffic|"
+    r"fleet\s+forecast"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+
+BENCHMARK_INSTITUTION_SOURCES = {
+    "ideaworkscompany",
+    "oag",
+    "cirium",
+    "eurocontrol",
+    "iata",
+    "aci world",
+    "capa centre for aviation",
+}
+
+BENCHMARK_REPORT_KEYWORDS = re.compile(
+    r"\b(?:"
+    r"forecast|outlook|yearbook|megahubs|report|index|overview|study|"
+    r"benchmark|whitepaper|bulletin|ancillary\s+revenue|on-time\s+performance|"
+    r"capacity\s+trends|connect(?:ing|ivity)|brand-loyal|a\s+la\s+carte"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+
+
 def published_on_day(story, date_text, config):
     """Whether a story belongs to a local archive day by publication time.
 
@@ -95,6 +161,8 @@ def published_on_day(story, date_text, config):
     rare legacy record without one; this keeps a delayed feed item from appearing
     as new merely because the pipeline first encountered it today.
     """
+    if is_strategic_report(story):
+        return True
     published = parse_iso(story.get("published_at_iso"))
     first_seen = parse_iso(story.get("first_seen_at"))
     moment = published or first_seen
@@ -162,6 +230,8 @@ def score_article(article, source_count, config=None):
     event_weight = article.get("event_weight")
     reliability = article.get("reliability_weight")
     tier = best_tier(article.get("entities"))
+    if is_strategic_report(article) and article.get("tier"):
+        tier = min(tier, article["tier"]) if tier else article["tier"]
     full_at = max(2, int(config["corroboration_full_at_sources"]))
     components = {
         "event_type": float(config["event_type_default"] if event_weight is None else event_weight),
@@ -182,6 +252,27 @@ def _source_entry(article):
         "name": str(article.get("source", "")), "url": str(article.get("link", "")), "title": str(article.get("title", "")),
         "language": article.get("language") or language.detect_language(f"{article.get('title', '')} {article.get('description', '')}"),
     }
+
+
+def _fuse_cluster_descriptions(representative, members):
+    """Combine distinct descriptions across clustered articles so a representative inherits corroborated facts."""
+    base = str(representative.get("description") or "").strip()
+    parts = [base] if base else []
+    seen_lower = {base.lower()} if base else set()
+    for member in members:
+        if member is representative:
+            continue
+        desc = str(member.get("description") or "").strip()
+        title = str(member.get("title") or "").strip()
+        src = str(member.get("source") or "").strip()
+        snippet = f"{title}. {desc}".strip(". ") if desc else title
+        if not snippet or snippet.lower() in seen_lower:
+            continue
+        if any(snippet.lower() in existing for existing in seen_lower):
+            continue
+        seen_lower.add(snippet.lower())
+        parts.append(f"[{src}] {snippet}" if src else snippet)
+    return " | ".join(parts)
 
 
 def enrich_stories(stories, articles, relevance_config=None):
@@ -209,6 +300,11 @@ def enrich_stories(stories, articles, relevance_config=None):
                 if canonical and canonical not in seen:
                     seen.add(canonical)
                     sources.append(_source_entry(member))
+            if len(members) > 1 or article.get("description"):
+                fused = _fuse_cluster_descriptions(article, members)
+                max_len = 300 if story.get("basis") == "headline_only" else 1200
+                if len(fused) > len(str(story.get("source_description") or "")):
+                    story["source_description"] = fused[:max_len]
         publishers = {entry["name"] for entry in sources if entry["name"]}
         score, components = score_article(article, max(1, len(publishers)), config)
         published = article.get("timestamp")
@@ -219,6 +315,7 @@ def enrich_stories(stories, articles, relevance_config=None):
             "sources": sources,
             "source_count": max(1, len(publishers)),
             "published_at_iso": to_iso(datetime.fromtimestamp(published, tz=timezone.utc)) if isinstance(published, (int, float)) else "",
+            "is_strategic_report": bool(is_strategic_report(story) or is_strategic_report(article)),
         })
         story["language"] = language.story_language(story)
     return stories
@@ -306,7 +403,8 @@ def drop_excluded(day, relevance=None):
 
 def select_stories(stories, selection, commentary=None):
     """Stories to archive: the listed ones (score >= min_score, at most max_per_run) and the archive-only low band
-    (archive_min_score <= score < min_score, at most max_low_per_run). Military items and finance commentary are dropped."""
+    (archive_min_score <= score < min_score, at most max_low_per_run). Strategic reports have their own bucket so they
+    never crowd out daily breaking news. Military items and finance commentary are dropped."""
     archive_minimum = selection.get("archive_min_score", selection["min_score"])
     # A story whose safety type was dropped for lack of an airline context (general aviation, contextless crashes) stays in the
     # archive-only band however low it scores: it is hidden from the list, not lost.
@@ -317,7 +415,18 @@ def select_stories(stories, selection, commentary=None):
         and not (selection.get("exclude_commentary") and is_finance_commentary(story, commentary))
     ]
     eligible.sort(key=lambda story: (-float(story["relevance_score"]), story["story_id"]))
-    listed = [story for story in eligible if float(story["relevance_score"]) >= selection["min_score"]][: selection["max_per_run"]]
+    regular_listed = [
+        story for story in eligible
+        if float(story["relevance_score"]) >= selection["min_score"] and not is_strategic_report(story)
+    ][: selection["max_per_run"]]
+    strategic_listed = [
+        story for story in eligible
+        if float(story["relevance_score"]) >= selection["min_score"] and is_strategic_report(story)
+    ][: selection.get("max_strategic_per_run", 12)]
+    listed = sorted(
+        regular_listed + strategic_listed,
+        key=lambda story: (-float(story["relevance_score"]), story["story_id"]),
+    )
     low = [story for story in eligible if float(story["relevance_score"]) < selection["min_score"]][: selection.get("max_low_per_run", selection["max_per_run"])]
     return listed + low
 
@@ -411,6 +520,20 @@ def _apply_incoming(target, story, now_iso, config):
     new_sources = [entry for entry in story.get("sources", []) if canonicalize_url(entry.get("url")) not in known]
     old_score = float(target.get("relevance_score", 0))
     score_changed = abs(float(story.get("relevance_score", 0)) - old_score) >= config["updated"]["min_score_change"]
+    incoming_desc = str(story.get("source_description") or "")
+    if target.get("narrative_status") == NARRATIVE_PENDING and incoming_desc and not target.get("source_description"):
+        target["source_description"] = incoming_desc
+    if (
+        not new_sources
+        and not score_changed
+        and target.get("narrative_status") == "done"
+        and not target.get("data_points")
+        and len(incoming_desc) >= 60
+        and len(str(target.get("source_description") or "")) < 60
+    ):
+        target["source_description"] = incoming_desc
+        target["narrative_status"] = NARRATIVE_PENDING
+        return True
     if not new_sources and not score_changed:
         return False   # an unchanged story is left exactly as stored
     reasons = (["score_change"] if score_changed else []) + (["new_source"] if new_sources else [])
@@ -461,6 +584,10 @@ def build_day(existing_day, previous_day, briefings, now, config=None):
             stored.append(fresh)
         else:
             _apply_incoming(target, story, now_iso, config)
+
+    for prev_story in previous:
+        if is_strategic_report(prev_story) and find_match(prev_story, stored, threshold) is None:
+            stored.append(copy.deepcopy(prev_story))
 
     head = {key: value for key, value in ordered[0].items() if key not in HEAD_KEYS_TO_DROP}
     day = {**head, "date": today, "timezone": config["timezone"], "stories": stored}
@@ -531,6 +658,7 @@ def present_stories(day, now, config=None, levels=None):
     for story in day.get("stories", []):
         story["badges"] = compute_badges(story, now, config)
         story["language"] = language.story_language(story)       # recomputed on every read: sources can be added after the story was stored
+        story["is_strategic_report"] = is_strategic_report(story)
         if levels:
             level = level_for(story.get("relevance_score", 0), levels)
             story["level"] = level["name"] if level else "below"
