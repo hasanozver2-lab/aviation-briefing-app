@@ -1,4 +1,5 @@
 import copy
+import json
 from datetime import datetime, timezone
 
 import pytest
@@ -78,9 +79,14 @@ def test_commentary_and_military_do_not_enter_waiting_area(title):
     assert source_recovery.pending_titles({"stories": [legacy(title=title)]}) == []
 
 
+def source_recovery_config():
+    return json.loads(source_recovery.CONFIG_PATH.read_text(encoding="utf-8"))
+
+
 def test_api_separates_waiting_titles_from_verified_stories_without_rewriting_archive(monkeypatch):
     archive = {"date": "2026-10-19", "stories": [legacy()], "status": "ok"}
     saved = copy.deepcopy(archive)
+    monkeypatch.setattr(source_recovery, "load_config", lambda: {**source_recovery_config(), "serve_pending_titles": True})
     monkeypatch.setattr(_engine.story_lifecycle, "utc_now", lambda: NOW)
     monkeypatch.setattr(_engine.briefing_store, "read_json", lambda path: copy.deepcopy(archive) if "status" not in path else {})
     result = _engine.get_ready_briefing()

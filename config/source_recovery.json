@@ -3,6 +3,8 @@
   "min_title_similarity": 0.8,
   "max_publication_gap_hours": 168,
   "max_pending_titles": 30,
+  "serve_pending_titles": false,
+  "_serve_pending_titles_doc": "false: a headline without a verified publisher link is never served (every story must link to its article). The waiting list code stays; set true to show them again.",
   "publisher_aliases": {
     "Reuters": "Reuters Aviation",
     "Bloomberg": "Bloomberg Aviation",

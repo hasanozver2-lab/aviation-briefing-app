@@ -391,9 +391,39 @@ def is_ground_traffic_story(story, selection):
 def is_excluded(story, relevance):
     """Current deterministic exclusions from config/relevance.json."""
     selection = relevance["selection"]
-    return has_only_unverified_sources(story, selection) or is_military_story(story, selection) or is_ground_traffic_story(story, selection) or bool(
+    return not has_direct_link(story, selection) or has_only_unverified_sources(story, selection) or is_military_story(story, selection) or is_ground_traffic_story(story, selection) or bool(
         selection.get("exclude_commentary") and is_finance_commentary(story, relevance.get("commentary"))
     )
+
+
+def _is_direct_link(url, blocked):
+    """A real article address: http(s), a host, and not a search/redirect host (those are not the publisher's page)."""
+    parsed = urlparse(str(url or "").strip())
+    host = (parsed.hostname or "").lower()
+    return parsed.scheme in ("http", "https") and "." in host and host not in blocked
+
+
+def has_direct_link(story, selection):
+    blocked = set(selection.get("unverified_source_hosts", []))
+    return any(_is_direct_link(url, blocked) for url in [(story.get("original_source") or {}).get("url")] + [entry.get("url") for entry in story.get("sources", [])])
+
+
+def ensure_direct_link(story, selection):
+    """Every served story links to a real article. A redirect link as the main source is replaced by the first direct source;
+    redirect-only entries are removed from the source list. Returns False when no direct link exists (the story is not served)."""
+    blocked = set(selection.get("unverified_source_hosts", []))
+    direct = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked)]
+    original = dict(story.get("original_source") or {})
+    if not _is_direct_link(original.get("url"), blocked):
+        if not direct:
+            return False
+        first = direct[0]
+        original.update(url=first["url"], title=first.get("title") or original.get("title", ""), source_name=first.get("name") or original.get("source_name", ""))
+        story["original_source"] = original
+    if len(direct) != len(story.get("sources", [])):
+        story["sources"] = direct
+        story["source_count"] = min(story.get("source_count", len(direct)), len(direct)) or len(direct)
+    return True
 
 
 def has_only_unverified_sources(story, selection):
@@ -418,7 +448,8 @@ def drop_excluded(day, relevance=None):
     simply stops being served, and comes back if the lists are loosened.
     """
     relevance = relevance or load_relevance_config()
-    kept = [story for story in day.get("stories", []) if not is_excluded(story, relevance)]
+    selection = relevance["selection"]
+    kept = [story for story in day.get("stories", []) if not is_excluded(story, relevance) and ensure_direct_link(story, selection)]
     dropped = len(day.get("stories", [])) - len(kept)
     day["stories"] = kept
     return dropped

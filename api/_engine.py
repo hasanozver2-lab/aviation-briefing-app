@@ -1226,7 +1226,7 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
     is_archive = bool(snapshot.get("date"))
     if is_archive:
         pending_date = today if date is None else None
-        snapshot["verification_pending_stories"] = source_recovery.pending_titles(snapshot, pending_date)
+        snapshot["verification_pending_stories"] = source_recovery.pending_titles(snapshot, pending_date) if source_recovery.load_config().get("serve_pending_titles") else []
         snapshot["verification_pending_count"] = len(snapshot["verification_pending_stories"])
         # Current exclusion lists apply at read time; nothing is removed from the archive file itself.
         snapshot["excluded_count"] = story_lifecycle.drop_excluded(snapshot)
