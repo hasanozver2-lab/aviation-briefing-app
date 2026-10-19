@@ -36,6 +36,7 @@ try:
     from . import source_catalog
     from . import source_recovery
     from . import airspace_radar
+    from . import earnings_calendar
     from .urls import canonicalize_url
 except ImportError:
     import source_registry
@@ -53,6 +54,7 @@ except ImportError:
     import source_catalog
     import source_recovery
     import airspace_radar
+    import earnings_calendar
     from urls import canonicalize_url
 
 # Windows cp1254 encoding fix
@@ -1136,10 +1138,12 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
     source_registry.record_source_statistics(articles, {"stories": selected})
     print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold (deep_scan={is_deep})")
     radar_data = airspace_radar.load_radar()
+    calendar_data = earnings_calendar.load_calendar()
     return {
         "stories": selected,
         "market": market_panel,
         "airspace_radar": radar_data,
+        "earnings_calendar": calendar_data,
         "articles": len(articles),
         "candidates": len(candidates),
         "verification_candidates": candidates,

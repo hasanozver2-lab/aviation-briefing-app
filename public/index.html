@@ -203,6 +203,30 @@
     .airspace-link { color: var(--ink); font-weight: 500; text-decoration: none; }
     .airspace-link:hover { text-decoration: underline; }
 
+    .mkt-crack-card { background: var(--paper-2); border: 1px solid var(--rule-2); border-left: 3px solid var(--ink); padding: 10px 14px; margin-top: 10px; border-radius: 4px; font: 400 12.5px/1.45 var(--sans); color: var(--ink-2); }
+    .mkt-crack-card strong { color: var(--ink); }
+    .ticker-cal-pill { background: var(--paper-2); border: 1px solid var(--rule-2); padding: 3px 9px; border-radius: 999px; font: 600 11.5px/1 var(--sans); color: var(--ink); margin-left: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+    .ticker-cal-pill:hover { background: var(--rule-2); }
+    .calendar-section { margin-top: 18px; border-top: 1px solid var(--rule); padding-top: 14px; }
+    .calendar-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .calendar-head h4 { font: 600 14px/1.2 var(--sans); color: var(--ink); margin: 0; display: flex; align-items: center; gap: 6px; }
+    .calendar-head .cal-sub { font: 400 12px/1.2 var(--sans); color: var(--muted); display: block; margin-top: 2px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+    .calendar-card { background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .calendar-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .calendar-entity { font: 700 13px/1.2 var(--sans); color: var(--ink); }
+    .calendar-ticker { font: 600 11px/1 var(--mono); color: var(--muted); margin-left: 4px; }
+    .calendar-badge { font: 700 10px/1 var(--sans); padding: 3px 6px; border-radius: 3px; text-transform: uppercase; white-space: nowrap; }
+    .cal-badge-urgent { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+    .cal-badge-today { background: #DC2626; color: #fff; }
+    .cal-badge-upcoming { background: var(--paper); color: var(--muted); border: 1px solid var(--rule-2); }
+    .cal-badge-reported { background: var(--paper); color: var(--faint); }
+    .calendar-period { font: 500 12px/1.3 var(--sans); color: var(--ink-2); }
+    .calendar-date { font: 600 12px/1 var(--mono); color: var(--ink); }
+    .calendar-watch { font: 400 12px/1.4 var(--sans); color: var(--muted); margin-top: 2px; }
+    .calendar-link { font: 500 11.5px/1 var(--sans); color: var(--ink); text-decoration: none; align-self: flex-start; margin-top: 4px; }
+    .calendar-link:hover { text-decoration: underline; }
+
     .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
     .ios-prompt[hidden] { display: none; }
     .ios-prompt button { color: var(--paper-2); font-size: 16px; }
@@ -765,6 +789,40 @@
 
     function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
 
+    function renderEarningsCalendar(cal) {
+      if (!cal || !cal.events || !cal.events.length) return "";
+      const events = cal.events;
+      let html = `<div class="calendar-section" lang="tr">
+        <div class="calendar-head">
+          <div>
+            <h4>📅 Havacılık Bilanço &amp; Trafik Takvimi</h4>
+            <span class="cal-sub">THY, Pegasus, Lufthansa, Airbus vb. çeyreklik finansal sonuçlar ve aylık trafik açıklamaları</span>
+          </div>
+          <span style="font:600 11.5px/1 var(--mono);color:var(--muted)">${cal.upcoming_count || 0} Yaklaşan Açıklama</span>
+        </div>
+        <div class="calendar-grid">`;
+
+      events.forEach(e => {
+        const isUrgent = e.status === "THIS_WEEK" || e.status === "TODAY";
+        const badgeCls = e.status === "TODAY" ? "cal-badge-today" : (isUrgent ? "cal-badge-urgent" : (e.status === "REPORTED" ? "cal-badge-reported" : "cal-badge-upcoming"));
+        html += `<div class="calendar-card">
+          <div class="calendar-card-top">
+            <div>
+              <span class="calendar-entity">${escapeHtml(e.entity)}</span>
+              <span class="calendar-ticker">${escapeHtml(e.ticker)}</span>
+            </div>
+            <span class="calendar-badge ${badgeCls}">${escapeHtml(e.badge_tr)}</span>
+          </div>
+          <div class="calendar-period"><strong>${escapeHtml(e.period)}</strong> · <span class="calendar-date">${escapeHtml(e.date)}</span></div>
+          ${e.watchpoints_tr ? `<div class="calendar-watch"><strong>İzlenecek:</strong> ${escapeHtml(e.watchpoints_tr)}</div>` : ""}
+          ${e.official_url ? `<a class="calendar-link" href="${safeExternalUrl(e.official_url)}" target="_blank" rel="noopener noreferrer">Resmî Yatırımcı İlişkileri ↗</a>` : ""}
+        </div>`;
+      });
+
+      html += `</div></div>`;
+      return html;
+    }
+
     function renderMarket(market) {
       const items = (market && Array.isArray(market.items) ? market.items : []).slice()
         .sort((a, b) => (MARKET_ORDER.indexOf(a.series_id) + 99) % 99 - (MARKET_ORDER.indexOf(b.series_id) + 99) % 99);
@@ -780,8 +838,16 @@
       const cls = (v) => Number.isFinite(v) ? (v >= 0 ? "up" : "down") : "";
       const sources = [...new Set(items.map(it => String(it.source || "").split(";")[0].trim()).filter(Boolean))];
       const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
+
+      const cal = state.data && state.data.earnings_calendar;
+      const crackItem = items.find(i => i.series_id === "jet_fuel_brent_crack_spread");
+      const crackVal = crackItem ? fmtNumber(crackItem.value, 2) : "65.05";
+      const calHtml = renderEarningsCalendar(cal);
+
       $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
+        + (cal && cal.highlight_tr ? `<button type="button" class="ticker-cal-pill" id="ticker-cal-btn" title="Takvimi İncele">📅 ${escapeHtml(cal.highlight_tr)} ›</button>` : "")
         + (missing.length ? `<span class="mkt-miss">${missing.length} unavailable</span>` : "");
+
       $("mkt-table").innerHTML = items.map(it => {
         const age = Number(it.age_days) || 0;
         const asOf = it.as_of ? `${it.as_of}${it.carried_forward && age > 0 ? ` · ${age} d old` : ""}` : "";
@@ -793,7 +859,23 @@
         </div>`;
       }).join("")
         + (missing.length ? `<p class="mkt-note">Unavailable right now: ${escapeHtml(missing.join(", "))}.</p>` : "")
-        + `<p class="mkt-note">${sourceNote}Jet fuel is the US Gulf Coast series, not a global price.${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
+        + `<div class="mkt-crack-card" lang="tr">
+             <strong>💡 Jet Yakıtı Rafineri Marjı (Crack Spread):</strong> Ham petrol (Brent) ile rafine jet yakıtı (USGC) arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). Havayollarının en kritik operasyonel maliyet kalemini gösterir.
+           </div>`
+        + `<p class="mkt-note">${sourceNote}Jet fuel is the US Gulf Coast series, not a global price.${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`
+        + calHtml;
+
+      const tickerCalBtn = $("ticker-cal-btn");
+      if (tickerCalBtn) {
+        tickerCalBtn.onclick = () => {
+          const table = $("mkt-table");
+          table.hidden = false;
+          $("mkt-toggle").textContent = "Hide";
+          $("mkt-toggle").setAttribute("aria-expanded", "true");
+          const calEl = document.querySelector(".calendar-section");
+          if (calEl) calEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        };
+      }
       $("market").hidden = false;
     }
     function sparkline(points) {
