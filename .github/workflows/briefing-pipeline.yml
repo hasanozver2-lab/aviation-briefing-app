@@ -32,6 +32,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Collect social radar if cloud credentials exist
+        env:
+          TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
+          TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
+          NODE_USE_SYSTEM_CA: "1"
+        run: |
+          if [ -n "$TWITTER_AUTH_TOKEN" ] && [ -n "$TWITTER_CT0" ]; then
+            echo "Running cloud social radar collection..."
+            python scripts/collect_social.py --publish || echo "Social collection skipped"
+          else
+            echo "TWITTER_AUTH_TOKEN not set in secrets; skipping cloud social fetch."
+          fi
       - name: Publish briefings to the briefing-data branch
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

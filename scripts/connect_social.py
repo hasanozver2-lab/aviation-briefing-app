@@ -37,11 +37,32 @@ def read_cookie(label):
 
 
 def load_agent_config():
-    # Agent Reach is already installed in the base interpreter, not the project's shared venv.
-    package_root = Path(sys.base_prefix) / "Lib" / "site-packages"
-    sys.path.append(str(package_root))
-    module = importlib.import_module("agent_reach.config")
-    return module.Config()
+    token = os.environ.get("TWITTER_AUTH_TOKEN", "").strip()
+    ct0 = os.environ.get("TWITTER_CT0", "").strip()
+    if token and ct0:
+        return {"twitter_auth_token": token, "twitter_ct0": ct0}
+
+    # Direct parse of ~/.agent-reach/config.yaml without external dependencies
+    config_file = TOOL_HOME / "config.yaml"
+    if config_file.is_file():
+        cfg = {}
+        for line in config_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if ":" in line and not line.startswith("#"):
+                key, val = line.split(":", 1)
+                cfg[key.strip()] = val.strip().strip("'\"")
+        if cfg.get("twitter_auth_token") and cfg.get("twitter_ct0"):
+            return cfg
+
+    # Fallback to Agent Reach package if present
+    for candidate in [Path("Q:/DEV/Python3.13/Lib/site-packages"), Path(sys.base_prefix) / "Lib" / "site-packages"]:
+        if (candidate / "agent_reach").is_dir() and str(candidate) not in sys.path:
+            sys.path.append(str(candidate))
+    try:
+        module = importlib.import_module("agent_reach.config")
+        return module.Config()
+    except Exception:
+        return {}
 
 
 def connect_x():

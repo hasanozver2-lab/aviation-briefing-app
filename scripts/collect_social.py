@@ -41,6 +41,10 @@ def load_accounts(path=None):
 
 
 def saved_session(config=None):
+    token = os.environ.get("TWITTER_AUTH_TOKEN", "").strip()
+    ct0 = os.environ.get("TWITTER_CT0", "").strip()
+    if token and ct0:
+        return token, ct0
     config = config or connect_social.load_agent_config()
     return config.get("twitter_auth_token"), config.get("twitter_ct0")
 
@@ -61,9 +65,21 @@ def read_account(account, session, runner=subprocess.run, now=None):
     """(posts, note). note is '' on success and never contains session values or process output."""
     auth_token, ct0 = session
     environment = {**os.environ, "AUTH_TOKEN": auth_token, "CT0": ct0, "NODE_USE_SYSTEM_CA": "1"}
+    
+    if connect_social.BIRD_SCRIPT.is_file():
+        cmd = [shutil.which("node") or "node", str(connect_social.BIRD_SCRIPT), "--timeout", "20000", "user-tweets", account["handle"], "-n", str(POSTS_PER_ACCOUNT), "--json"]
+        cwd = connect_social.TOOL_HOME
+    elif shutil.which("bird"):
+        cmd = [shutil.which("bird"), "--timeout", "20000", "user-tweets", account["handle"], "-n", str(POSTS_PER_ACCOUNT), "--json"]
+        cwd = None
+    elif shutil.which("npx"):
+        cmd = [shutil.which("npx"), "-y", "@steipete/bird", "--timeout", "20000", "user-tweets", account["handle"], "-n", str(POSTS_PER_ACCOUNT), "--json"]
+        cwd = None
+    else:
+        return [], "no bird runner found"
+
     try:
-        result = runner([shutil.which("node"), str(connect_social.BIRD_SCRIPT), "--timeout", "20000", "user-tweets", account["handle"], "-n", str(POSTS_PER_ACCOUNT), "--json"],
-                        cwd=connect_social.TOOL_HOME, env=environment, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=READ_TIMEOUT_SECONDS)
+        result = runner(cmd, cwd=cwd, env=environment, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=READ_TIMEOUT_SECONDS)
         if result.returncode:
             return [], "reader failed"
         raw_posts = json.loads(result.stdout)
