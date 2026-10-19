@@ -871,7 +871,15 @@ Ensure stories are grouped by the 4 required sections in order. Select 6 to 10 o
     try:
         data = None
         last_err = None
-        for model_name in ("gemini-3.5-flash", "gemini-3-flash-preview", "gemini-2.5-pro"):
+        for model_name in (
+            "gemini-3.5-flash",
+            "gemini-3-flash-preview",
+            "gemini-3.7-flash",
+            "gemini-3.8-flash",
+            "gemini-3.5-flash-lite",
+            "gemini-2.5-pro",
+            "gemini-2.5-flash",
+        ):
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
             req = urllib.request.Request(
                 url,
@@ -887,7 +895,7 @@ Ensure stories are grouped by the 4 required sections in order. Select 6 to 10 o
                     break
             except urllib.error.HTTPError as exc:
                 last_err = exc
-                if exc.code == 429:
+                if exc.code in {404, 429, 500, 503}:
                     continue
                 raise
         if data is None and last_err is not None:
@@ -1110,7 +1118,10 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
     candidates = [build_candidate_story(article, index) for index, article in enumerate(story_lifecycle.cluster_representatives(articles), start=1)]
     story_lifecycle.enrich_stories(candidates, articles)
     relevance_config = story_lifecycle.load_relevance_config()
-    selected = story_lifecycle.select_stories(candidates, relevance_config["selection"], relevance_config.get("commentary"))
+    selection_cfg = dict(relevance_config["selection"])
+    if is_deep:
+        selection_cfg["max_per_run"] = max(22, int(selection_cfg.get("max_per_run", 18)))
+    selected = story_lifecycle.select_stories(candidates, selection_cfg, relevance_config.get("commentary"))
     source_registry.record_source_statistics(articles, {"stories": selected})
     print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold (deep_scan={is_deep})")
     return {

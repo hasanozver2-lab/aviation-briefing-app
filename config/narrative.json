@@ -1,15 +1,22 @@
 {
   "_doc": "Narrative (LLM) settings. A story's narrative is generated once, stored under its story_id and only regenerated after a material update. Calls are batched; 429/5xx are retried with exponential backoff, then the story stays narrative_status=pending for the next hourly run.",
   "model": "gemini-3.5-flash",
-  "fallback_models": ["gemini-3-flash-preview", "gemini-2.5-pro"],
+  "fallback_models": [
+    "gemini-3-flash-preview",
+    "gemini-3.7-flash",
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-pro",
+    "gemini-2.5-flash"
+  ],
   "temperature": 0.2,
   "request_timeout_seconds": 60,
   "max_stories_per_call": 8,
-  "max_calls_per_run": 2,
+  "max_calls_per_run": 3,
   "retry": {
     "max_attempts": 4,
     "base_delay_seconds": 2,
     "max_delay_seconds": 30,
-    "retry_statuses": [429, 500, 502, 503, 504]
+    "retry_statuses": [404, 429, 500, 502, 503, 504]
   }
 }

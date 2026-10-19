@@ -50,6 +50,8 @@ def day_payload(collected, now):
     payload = {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
     if collected.get("morning_deep_scan") or story_lifecycle.is_morning_deep_window(now):
         payload["morning_deep_scan"] = True
+    if collected.get("force_morning_reset"):
+        payload["force_morning_reset"] = True
     return payload
 
 
@@ -190,13 +192,19 @@ def weekly_retry(read, now):
         return {}, {}
 
 
-def run(out_dir=None, now=None, api_key=None, narrate=narrative.fill_pending):
+def run(out_dir=None, now=None, api_key=None, narrate=narrative.fill_pending, force_morning_reset=False):
     now = now or datetime.now(timezone.utc)
     api_key = _engine.GEMINI_API_KEY if api_key is None else api_key
     reader = make_reader(out_dir)
     retry, recovered = weekly_retry(reader, now)
     collected, collection_error = collect(recovered)
+    if collected and force_morning_reset:
+        collected["morning_deep_scan"] = True
+        collected["force_morning_reset"] = True
     try:
+        if collected and force_morning_reset:
+            # Propagate force_morning_reset into day_payload
+            pass
         files, report = plan_files(collected, collection_error, reader, now, api_key, narrate, retry)
         print(f"Narratives: calls={report['calls']} narrated={report['narrated']} pending={report['pending']}"
               + (f" (LLM unavailable: {report['error']}; will retry next run)" if report["error"] else ""))
@@ -212,11 +220,29 @@ def run(out_dir=None, now=None, api_key=None, narrate=narrative.fill_pending):
     return 1 if collection_error else 0
 
 
+def _should_skip_unscheduled_cloud_trigger(now):
+    """When an external hourly webhook triggers workflow_dispatch every hour, only run on the 3-hour schedule
+    (02, 05, 08, 11, 14, 17, 20, 23 Europe/Istanbul) so off-hours do not consume LLM quota."""
+    import os
+    if os.environ.get("GITHUB_ACTIONS") != "true":
+        return False
+    config = story_lifecycle.load_badges_config()
+    local_now = now.astimezone(story_lifecycle.local_timezone(config))
+    reset_hour = int(config.get("morning_deep_reset_hour_local", story_lifecycle.MORNING_RESET_HOUR_LOCAL))
+    interval = int(config.get("scan_interval_hours", story_lifecycle.SCAN_INTERVAL_HOURS))
+    return (local_now.hour - reset_hour) % interval != 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out-dir", help="read and write files here instead of the store (dry run)")
+    parser.add_argument("--force-morning-reset", action="store_true", help="force a full 08:00 morning deep reset")
     args = parser.parse_args()
-    return run(args.out_dir)
+    now = datetime.now(timezone.utc)
+    if not args.force_morning_reset and not args.out_dir and _should_skip_unscheduled_cloud_trigger(now):
+        print("Skipping off-hour trigger; next scan runs on the 3-hour schedule (08, 11, 14, 17, 20, 23, 02, 05 Europe/Istanbul).")
+        return 0
+    return run(args.out_dir, now=now, force_morning_reset=args.force_morning_reset)
 
 
 if __name__ == "__main__":

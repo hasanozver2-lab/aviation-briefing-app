@@ -92,7 +92,7 @@ def is_strategic_report(item):
     """Whether an article or story is a strategic outlook, forecast, index, or benchmark report."""
     if not isinstance(item, dict):
         return False
-    if item.get("is_strategic_report") or item.get("strategic_publication"):
+    if item.get("strategic_publication"):
         return True
     orig = item.get("original_source") if isinstance(item.get("original_source"), dict) else {}
     url = str(item.get("link") or orig.get("url") or "").lower()
@@ -103,6 +103,10 @@ def is_strategic_report(item):
         for part in (item.get("title"), item.get("headline"), orig.get("title"))
         if part
     )
+    if "interview" in title.lower():
+        return False
+    if item.get("is_strategic_report"):
+        return True
     if STRATEGIC_REPORT_TITLE_PATTERN.search(title):
         return True
     publisher = str(item.get("source") or orig.get("source_name") or "").strip().lower()
@@ -129,7 +133,7 @@ STRATEGIC_REPORT_TITLE_PATTERN = re.compile(
     r"yearbook\s+of\s+ancillary\s+revenue|ancillary\s+revenue\s+yearbook|"
     r"pilot\s+and\s+technician\s+outlook|services\s+market\s+outlook|"
     r"global\s+outlook\s+for\s+air\s+transport|world\s+airport\s+traffic|"
-    r"fleet\s+forecast"
+    r"fleet\s+forecast|global\s+services\s+forecast"
     r")\b",
     flags=re.IGNORECASE,
 )
@@ -146,9 +150,10 @@ BENCHMARK_INSTITUTION_SOURCES = {
 
 BENCHMARK_REPORT_KEYWORDS = re.compile(
     r"\b(?:"
-    r"forecast|outlook|yearbook|megahubs|report|index|overview|study|"
+    r"forecast|forecasts|outlook|yearbook|megahubs|report|index|overview|study|"
     r"benchmark|whitepaper|bulletin|ancillary\s+revenue|on-time\s+performance|"
-    r"capacity\s+trends|connect(?:ing|ivity)|brand-loyal|a\s+la\s+carte"
+    r"capacity\s+trends|connect(?:ing|ivity)|brand-loyal|a\s+la\s+carte|"
+    r"deliveries\s+(?:through|by)\s+20[34]\d"
     r")\b",
     flags=re.IGNORECASE,
 )
@@ -591,9 +596,13 @@ def build_day(existing_day, previous_day, briefings, now, config=None, morning_r
     now_iso = to_iso(now)
     today = day_key(now, config)
 
+    force_reset = bool(morning_reset or any(isinstance(b, dict) and b.get("force_morning_reset") for b in ordered))
     do_morning_reset = bool(
-        (morning_reset or any(isinstance(b, dict) and b.get("morning_deep_scan") for b in ordered))
-        and not (existing_day or {}).get("morning_reset_at")
+        force_reset
+        or (
+            any(isinstance(b, dict) and b.get("morning_deep_scan") for b in ordered)
+            and not (existing_day or {}).get("morning_reset_at")
+        )
     )
     if do_morning_reset:
         stored = [
@@ -623,7 +632,11 @@ def build_day(existing_day, previous_day, briefings, now, config=None, morning_r
         if is_strategic_report(prev_story) and find_match(prev_story, stored, threshold) is None:
             stored.append(copy.deepcopy(prev_story))
 
-    head = {key: value for key, value in ordered[0].items() if key not in HEAD_KEYS_TO_DROP and key != "morning_deep_scan"}
+    head = {
+        key: value
+        for key, value in ordered[0].items()
+        if key not in HEAD_KEYS_TO_DROP and key not in {"morning_deep_scan", "force_morning_reset"}
+    }
     day = {**head, "date": today, "timezone": config["timezone"], "stories": stored}
     if do_morning_reset:
         day["morning_reset_at"] = now_iso

@@ -19,7 +19,7 @@ Collects recent reports, indices, data bulletins and breaking civil aviation sto
 """
 
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
 import json
@@ -37,7 +37,14 @@ except ImportError:
 
 SOURCE_NAME = "Gemini Benchmark Intelligence (Search Grounded)"
 GEMINI_SEARCH_MODEL = "gemini-3.5-flash"
-GEMINI_FALLBACK_MODELS = ("gemini-3-flash-preview", "gemini-2.5-pro")
+GEMINI_FALLBACK_MODELS = (
+    "gemini-3-flash-preview",
+    "gemini-3.7-flash",
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+)
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 GOOGLE_NEWS_RSS_URL = "https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
 REQUEST_TIMEOUT_SECONDS = 20
@@ -479,6 +486,187 @@ BENCHMARK_PUBLISHERS = {
         "region": "Global",
         "category_hint": "Other areas",
     },
+    # Aviation Trade Media & Turkish Aviation Outlets for Deep Morning Scans
+    "flightglobal.com": {
+        "name": "FlightGlobal",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "simpleflying.com": {
+        "name": "Simple Flying",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "aerotime.aero": {
+        "name": "AeroTime",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Europe",
+        "category_hint": "European and other global airlines",
+    },
+    "airwaysmag.com": {
+        "name": "Airways Magazine",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "aviationbusinessme.com": {
+        "name": "Aviation Business Middle East",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Middle East",
+        "category_hint": "European and other global airlines",
+    },
+    "runwaygirlnetwork.com": {
+        "name": "Runway Girl Network",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "Other areas",
+    },
+    "futuretravelexperience.com": {
+        "name": "Future Travel Experience",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "Other areas",
+    },
+    "aviation24.be": {
+        "name": "Aviation24",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Europe",
+        "category_hint": "European and other global airlines",
+    },
+    "asianaviation.com": {
+        "name": "Asian Aviation",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Asia-Pacific",
+        "category_hint": "European and other global airlines",
+    },
+    "aviationnews.eu": {
+        "name": "Aviation News.eu",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Europe",
+        "category_hint": "European and other global airlines",
+    },
+    "aero-news.net": {
+        "name": "Aero-News Network",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "ainonline.com": {
+        "name": "AIN Online",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "leehamnews.com": {
+        "name": "Leeham News",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "aircargonews.net": {
+        "name": "Air Cargo News",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "Other areas",
+    },
+    "skift.com": {
+        "name": "Skift",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
+    "thepointsguy.com": {
+        "name": "The Points Guy",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.8,
+        "region": "North America",
+        "category_hint": "Route news",
+    },
+    "dailysabah.com": {
+        "name": "Daily Sabah",
+        "source_type": "mainstream",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Turkey",
+        "category_hint": "Turkey / THY and Turkish aviation",
+    },
+    "aa.com.tr": {
+        "name": "Anadolu Agency",
+        "source_type": "mainstream",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "Turkey",
+        "category_hint": "Turkey / THY and Turkish aviation",
+    },
+    "hurriyetdailynews.com": {
+        "name": "Hürriyet Daily News",
+        "source_type": "mainstream",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Turkey",
+        "category_hint": "Turkey / THY and Turkish aviation",
+    },
+    "trtworld.com": {
+        "name": "TRT World",
+        "source_type": "mainstream",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.85,
+        "region": "Turkey",
+        "category_hint": "Turkey / THY and Turkish aviation",
+    },
 }
 
 PUBLISHER_BY_NAME = {
@@ -499,6 +687,9 @@ PUBLISHER_BY_NAME.update({
     "pratt & whitney": BENCHMARK_PUBLISHERS["rtx.com"],
     "rtx": BENCHMARK_PUBLISHERS["rtx.com"],
     "latam.com": BENCHMARK_PUBLISHERS["latamairlines.com"],
+    "runway girl": BENCHMARK_PUBLISHERS["runwaygirlnetwork.com"],
+    "aviation24.be": BENCHMARK_PUBLISHERS["aviation24.be"],
+    "anadolu ajansı": BENCHMARK_PUBLISHERS["aa.com.tr"],
 })
 
 DISALLOWED_HOSTS = {"youtube.com", "youtu.be", "facebook.com", "instagram.com", "tiktok.com"}
@@ -515,11 +706,11 @@ CIVIL_AVIATION_TITLE_PATTERN = re.compile(
     r"commercial\s+market\s+outlook|global\s+market\s+forecast|seven-year\s+forecast|seven‑year\s+forecast|"
     r"cask|rask|aog|gtf|leap-1[ab]?|cfm|pratt\s+&\s+whitney|rolls-royce|"
     r"lufthansa|delta\s+air|united\s+airlines|american\s+airlines|southwest|ryanair|"
-    r"easyjet|wizz\s+air|turkish\s+airlines|thy|pegasus|emirates|qatar\s+airways|"
+    r"easyjet|wizz\s+air|turkish\s+airlines|turkish\s+technic|thy|pegasus|sunexpress|ajet|emirates|qatar\s+airways|"
     r"etihad|klm|air\s+france|iag|british\s+airways|iberia|tap\s+air|tap\s+portugal|qantas|"
     r"singapore\s+airlines|cathay|air\s+canada|indigo|air\s+india|latam|copa\s+airlines|"
-    r"jetblue|alaska\s+air|spirit\s+airlines|frontier\s+airlines|vietnam\s+airlines|"
-    r"korean\s+air|all\s+nippon|japan\s+airlines|avelo"
+    r"jetblue|alaska\s+air|spirit\s+airlines|frontier\s+airlines|vietnam\s+airlines|vietjet|"
+    r"korean\s+air|all\s+nippon|japan\s+airlines|avelo|somon\s+air"
     r")\b",
     flags=re.IGNORECASE,
 )
@@ -528,6 +719,8 @@ OFF_TOPIC_TITLE_TERMS = (
     "spacex", "starlink", "tesla", "roadster", "golf", "asian tour", "nba", "nfl",
     "premier league", "crypto", "bitcoin", "streaming subscription",
     "things to watch in the stock market", "webinar |", "aviation daily,",
+    "you could win", "how to earn mileageplus", "what's new with mileageplus", "what’s new with mileageplus",
+    "wi-fi & entertainment", "airplane art", "careers -", "iphone",
 )
 
 
@@ -565,7 +758,7 @@ GOOGLE_NEWS_QUERIES = (
         "oems_and_wires",
         "(site:airbus.com OR site:boeing.com OR site:embraer.com OR site:rtx.com OR site:safran-group.com OR site:rolls-royce.com "
         "OR site:prnewswire.com OR site:globenewswire.com OR site:businesswire.com) "
-        "(airline OR airlines OR airbus OR boeing OR aircraft OR fleet OR engine OR route) when:2d",
+        "(airline OR airlines OR airbus OR boeing OR aircraft OR fleet OR engine OR route) when:3d",
     ),
 )
 
@@ -576,7 +769,7 @@ DEEP_MORNING_QUERIES = (
     ),
     (
         "deep_fleet_aog",
-        "(airbus OR boeing OR embraer OR \"Pratt & Whitney\" OR CFM OR Rolls-Royce) (delivery OR order OR AOG OR GTF OR LEAP OR fleet OR \"wet lease\") when:2d",
+        "(airbus OR boeing OR embraer OR \"Pratt & Whitney\" OR CFM OR Rolls-Royce) (delivery OR order OR MOU OR AOG OR GTF OR LEAP OR fleet OR \"wet lease\") when:3d",
     ),
     (
         "deep_network_hubs",
@@ -584,7 +777,11 @@ DEEP_MORNING_QUERIES = (
     ),
     (
         "deep_turkey_region",
-        "(\"Turkish Airlines\" OR THY OR Pegasus OR SunExpress OR AJet OR \"Istanbul Airport\" OR IGA) (flight OR route OR fleet OR passenger OR cargo) when:3d",
+        "(\"Turkish Airlines\" OR \"Turkish Technic\" OR THY OR Pegasus OR SunExpress OR AJet OR \"Istanbul Airport\" OR IGA) (flight OR route OR fleet OR engine OR MRO OR passenger OR cargo) when:4d",
+    ),
+    (
+        "deep_trade_media",
+        "(site:flightglobal.com OR site:simpleflying.com OR site:aerotime.aero OR site:airwaysmag.com OR site:runwaygirlnetwork.com OR site:ainonline.com OR site:leehamnews.com OR site:aircargonews.net) (airline OR fleet OR route OR Airbus OR Boeing) when:2d",
     ),
 )
 
@@ -776,6 +973,8 @@ def _build_article(title, url, description, publisher, published_at, now, classi
 
 
 def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=urllib.request.urlopen, max_items=MAX_ITEMS_PER_QUERY):
+    window_match = re.search(r"when:(\d+)d\b", str(query or ""))
+    query_cutoff = min(cutoff, now - timedelta(days=int(window_match.group(1)))) if window_match else cutoff
     url = GOOGLE_NEWS_RSS_URL.format(query=urllib.parse.quote(query))
     request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; aviation-briefing-app)"})
     ctx = ssl.create_default_context()
@@ -800,7 +999,7 @@ def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=
 
         if len(raw_title) < 12 or not _is_allowed_url(link):
             continue
-        published_at = _parse_date_in_window(pub_date_raw, now, cutoff)
+        published_at = _parse_date_in_window(pub_date_raw, now, query_cutoff)
         if published_at is None:
             continue
         publisher = resolve_publisher_meta(source_url or link, source_name)
