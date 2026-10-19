@@ -1,5 +1,13 @@
 # AeroBrief — HANDOFF
 
+## Archive UI — 2026-10-19
+
+- `feature/briefing-archive` builds on `feature/source-integrity-history` (neither merged into main yet). Added an Archive navigation item and accessible date picker with previous/next-day controls, bounded by today's Istanbul date.
+- The existing `/api/briefing?date=YYYY-MM-DD&include_low=1` is used. Archive view includes stored low-score stories and keeps the API's current source/exclusion rules. No new collection, model call, backend mode or storage format was introduced.
+- A missing day has an explicit empty state; network/invalid response errors have a retry message. Historical view hides the current-market strip, live freshness warnings and fresh-event badges. Returning to today's briefing restores its own data.
+- `?archive=YYYY-MM-DD#story-id` links open an archived story directly. Late or polled current-day responses cannot overwrite the archive list. Date selection and request guards remain independent from today's briefing.
+- Optional Edge/Playwright regression tests in `tests/test_archive_ui.py` cover phone and desktop, source details, the low-score band, missing dates, navigation, direct links, background-response isolation and horizontal overflow. They skip if Playwright/Edge is not installed, without adding a dependency.
+
 ## Source integrity and history — 2026-10-19
 
 - Strategic Reports UI remains in `public/index.html`. Collection now uses publisher-written pages rather than Gemini/Google News search output as evidence. Gemini is reserved for narratives after deterministic selection; source collection needs no API key.
