@@ -90,7 +90,7 @@ def test_an_unusable_link_is_dropped(link):
 
 @pytest.mark.parametrize("url, name", [
     ("https://www.reuters.com/a", "Reuters"), ("https://www.bloomberg.com/a", "Bloomberg"), ("https://www.wsj.com/a", "WSJ"),
-    ("https://apnews.com/a", "AP"), ("https://www.ft.com/content/a", "FT"), ("https://example-news.com/a", "Example News"),
+    ("https://apnews.com/a", "AP"), ("https://www.ch-aviation.com/a", "ch-aviation"), ("https://aviationweek.com/a", "Aviation Week"), ("https://www.nytimes.com/a", "The New York Times"), ("https://www.ft.com/content/a", "FT"), ("https://example-news.com/a", "Example News"),
 ])
 def test_the_publisher_name_comes_from_the_target_domain(url, name):
     assert alert_feeds.publisher_name(url) == name

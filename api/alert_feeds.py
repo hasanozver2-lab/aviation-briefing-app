@@ -29,6 +29,7 @@ PUBLISHER_NAMES = {
     "nytimes.com": "The New York Times", "washingtonpost.com": "The Washington Post", "cnbc.com": "CNBC", "economist.com": "The Economist",
     "bbc.com": "BBC", "bbc.co.uk": "BBC", "aviationweek.com": "Aviation Week", "flightglobal.com": "FlightGlobal", "simpleflying.com": "Simple Flying",
     "cnn.com": "CNN", "theguardian.com": "The Guardian", "forbes.com": "Forbes", "marketwatch.com": "MarketWatch", "airlinerating.com": "AirlineRatings",
+    "ch-aviation.com": "ch-aviation", "aviationweek.com": "Aviation Week", "theaircurrent.com": "The Air Current", "capaviation.com": "CAPA", "nikkei.com": "Nikkei Asia", "asia.nikkei.com": "Nikkei Asia",
 }
 
 
