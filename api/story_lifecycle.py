@@ -125,6 +125,14 @@ STRATEGIC_REPORT_URL_PATTERNS = (
     "oag.com/megahubs",
     "ideaworkscompany.com/reports",
     "ideaworkscompany.com/wp-content/uploads",
+    "iata.org/en/publications/",
+    "iata.org/en/pressroom/",
+    "aci.aero/news-and-resources/publications/",
+    "airbus.com/en/products-services/commercial-aircraft/market/",
+    "icao.int",
+    "faa.gov/data_research/aviation/aerospace_forecasts",
+    "oliverwyman.com/our-expertise/insights",
+    "atag.org/our-publications",
 )
 
 STRATEGIC_REPORT_TITLE_PATTERN = re.compile(
@@ -135,7 +143,12 @@ STRATEGIC_REPORT_TITLE_PATTERN = re.compile(
     r"yearbook\s+of\s+ancillary\s+revenue|ancillary\s+revenue\s+yearbook|"
     r"pilot\s+and\s+technician\s+outlook|services\s+market\s+outlook|"
     r"global\s+outlook\s+for\s+air\s+transport|world\s+airport\s+traffic|"
-    r"fleet\s+forecast|global\s+services\s+forecast"
+    r"fleet\s+forecast|global\s+services\s+forecast|"
+    r"air\s+passenger\s+market\s+analysis|air\s+cargo\s+market\s+analysis|"
+    r"world\s+air\s+transport\s+statistics|airport\s+traffic\s+report|busiest\s+airports|"
+    r"wats\s+report|passenger\s+traffic\s+forecast|"
+    r"faa\s+aerospace\s+forecast|fleet\s+and\s+mro\s+forecast|"
+    r"aviation\s+benefits\s+beyond\s+borders|annual\s+safety\s+review"
     r")\b",
     flags=re.IGNORECASE,
 )
@@ -147,7 +160,17 @@ BENCHMARK_INSTITUTION_SOURCES = {
     "eurocontrol",
     "iata",
     "aci world",
+    "aci",
+    "icao",
+    "faa",
+    "easa",
+    "boeing",
+    "airbus",
+    "embraer",
+    "oliver wyman",
+    "atag",
     "capa centre for aviation",
+    "capa",
 }
 
 BENCHMARK_REPORT_KEYWORDS = re.compile(
@@ -155,6 +178,7 @@ BENCHMARK_REPORT_KEYWORDS = re.compile(
     r"forecast|forecasts|outlook|yearbook|megahubs|report|index|overview|study|"
     r"benchmark|whitepaper|bulletin|ancillary\s+revenue|on-time\s+performance|"
     r"capacity\s+trends|connect(?:ing|ivity)|brand-loyal|a\s+la\s+carte|"
+    r"passenger\s+demand|cargo\s+demand|traffic\s+data|passenger\s+traffic|"
     r"deliveries\s+(?:through|by)\s+20[34]\d"
     r")\b",
     flags=re.IGNORECASE,

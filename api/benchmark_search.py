@@ -122,6 +122,51 @@ BENCHMARK_PUBLISHERS = {
         "region": "Europe",
         "category_hint": "European and other global airlines",
     },
+    "icao.int": {
+        "name": "ICAO",
+        "source_type": "regulator",
+        "official": True,
+        "tier": 1,
+        "reliability_weight": 1.0,
+        "region": "Global",
+        "category_hint": "Other areas",
+    },
+    "faa.gov": {
+        "name": "FAA",
+        "source_type": "regulator",
+        "official": True,
+        "tier": 1,
+        "reliability_weight": 1.0,
+        "region": "North America",
+        "category_hint": "Other areas",
+    },
+    "easa.europa.eu": {
+        "name": "EASA",
+        "source_type": "regulator",
+        "official": True,
+        "tier": 1,
+        "reliability_weight": 1.0,
+        "region": "Europe",
+        "category_hint": "European and other global airlines",
+    },
+    "oliverwyman.com": {
+        "name": "Oliver Wyman",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "Global",
+        "category_hint": "Other areas",
+    },
+    "atag.org": {
+        "name": "ATAG",
+        "source_type": "regulator",
+        "official": True,
+        "tier": 1,
+        "reliability_weight": 1.0,
+        "region": "Global",
+        "category_hint": "Other areas",
+    },
     "reuters.com": {
         "name": "Reuters",
         "source_type": "mainstream",
@@ -755,7 +800,18 @@ GOOGLE_NEWS_QUERIES = (
     (
         "outlooks_forecasts",
         "(\"Commercial Market Outlook\" OR \"Global Market Forecast\" OR \"Eurocontrol Forecast\" "
-        "OR site:eurocontrol.int/publication OR \"Megahubs\" OR \"Yearbook of Ancillary Revenue\") when:30d",
+        "OR \"Seven-Year Forecast\" OR site:eurocontrol.int/publication OR \"Megahubs\" OR \"Yearbook of Ancillary Revenue\" "
+        "OR \"World Air Transport Statistics\" OR \"Air Passenger Market Analysis\" OR \"Air Cargo Market Analysis\" "
+        "OR \"Global Outlook for Air Transport\" OR \"World Airport Traffic\") when:30d",
+    ),
+    (
+        "iata_aci_reports",
+        "(site:iata.org OR site:aci.aero) (passenger OR cargo OR forecast OR outlook OR traffic OR demand OR capacity) when:14d",
+    ),
+    (
+        "authorities_and_mro",
+        "(site:icao.int OR site:faa.gov OR site:easa.europa.eu OR site:oliverwyman.com OR site:atag.org) "
+        "(forecast OR outlook OR \"passenger traffic\" OR \"fleet\" OR \"MRO\" OR safety OR cargo) when:14d",
     ),
     (
         "blocked_airlines",

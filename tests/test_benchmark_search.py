@@ -195,6 +195,31 @@ def test_strategic_reports_are_classified_and_separated_from_daily_breaking_news
         "link": "https://www.iata.org/en/publications/global-outlook-2026",
         "source": "IATA",
     }
+    aci_traffic_report = {
+        "title": "ACI World Confirms Top 10 Busiest Airports as Global Passenger Demand Surges",
+        "link": "https://aci.aero/news-and-resources/publications/world-airport-traffic-report-2026/",
+        "source": "ACI World",
+    }
+    airbus_gmf = {
+        "title": "Airbus Forecasts Demand for 42,000 New Aircraft by 2045",
+        "link": "https://www.airbus.com/en/products-services/commercial-aircraft/market/global-market-forecast",
+        "source": "Airbus",
+    }
+    icao_traffic_data = {
+        "title": "ICAO Confirms Global Air Passenger Traffic Surpasses Pre-Pandemic Levels",
+        "link": "https://www.icao.int/news/pages/air-transport-monthly-report-2026.aspx",
+        "source": "ICAO",
+    }
+    faa_forecast = {
+        "title": "FAA Aerospace Forecast Projects Steady Growth in Commercial Fleet Through 2045",
+        "link": "https://www.faa.gov/data_research/aviation/aerospace_forecasts/report-2026",
+        "source": "FAA",
+    }
+    oliver_wyman_mro = {
+        "title": "Oliver Wyman Global Fleet and MRO Forecast Details Supply Chain and Engine Bottlenecks",
+        "link": "https://www.oliverwyman.com/our-expertise/insights/2026/global-fleet-and-mro-forecast.html",
+        "source": "Oliver Wyman",
+    }
     breaking_news = {
         "title": "United Airlines warns rising jet fuel costs could hit Q2 earnings",
         "link": "https://www.reuters.com/business/aerospace-defense/united-airlines-warns-fuel-costs-2026-10-17/",
@@ -203,6 +228,11 @@ def test_strategic_reports_are_classified_and_separated_from_daily_breaking_news
     assert story_lifecycle.is_strategic_report(boeing_cmo) is True
     assert story_lifecycle.is_strategic_report(eurocontrol) is True
     assert story_lifecycle.is_strategic_report(iata_new_report) is True
+    assert story_lifecycle.is_strategic_report(aci_traffic_report) is True
+    assert story_lifecycle.is_strategic_report(airbus_gmf) is True
+    assert story_lifecycle.is_strategic_report(icao_traffic_data) is True
+    assert story_lifecycle.is_strategic_report(faa_forecast) is True
+    assert story_lifecycle.is_strategic_report(oliver_wyman_mro) is True
     assert story_lifecycle.is_strategic_report(breaking_news) is False
 
     # Strategic reports have their own bucket in select_stories and do not crowd out daily breaking news

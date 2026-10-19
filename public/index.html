@@ -153,6 +153,23 @@
     .art-link { font: italic 400 14px/1.45 var(--serif); color: #3A3732; }
     .next { margin-top: 8px; border-top: 3px double var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; text-align: left; width: 100%; }
     .next span:last-child { font: 500 20px/1.2 var(--serif); text-wrap: pretty; }
+    .report-badge-pill { font: 700 10.5px/1 var(--sans); background: var(--ink); color: #fff; padding: 3px 6px; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; vertical-align: middle; }
+    .report-kpi-section { display: flex; flex-direction: column; gap: 8px; margin: 4px 0; }
+    .report-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+    .report-kpi-card { background: var(--paper-2); border: 1px solid var(--rule-2); border-left: 3px solid var(--ink); padding: 10px 12px; border-radius: 3px; display: flex; flex-direction: column; gap: 2px; }
+    .report-kpi-val { font: 700 17px/1.1 var(--mono); color: var(--ink); letter-spacing: -0.02em; }
+    .report-kpi-label { font: 500 10px/1.2 var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .report-takeaways { background: var(--paper-2); border: 1px solid var(--rule-2); padding: 14px 16px; border-radius: 4px; display: flex; flex-direction: column; gap: 8px; }
+    .report-bullets { display: flex; flex-direction: column; gap: 8px; list-style: none; }
+    .report-bullets li { display: grid; grid-template-columns: 16px 1fr; font: 400 14px/1.5 var(--sans); color: var(--ink-2); }
+    .report-bullets li::before { content: "▪"; color: var(--ink); font-size: 14px; line-height: 1.4; }
+    .report-why { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 12px 0; display: flex; flex-direction: column; gap: 6px; }
+    .report-why p { font: italic 400 17px/1.45 var(--serif); color: var(--ink-2); }
+    .report-cta-btn { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--ink); color: var(--paper) !important; border-radius: 4px; font: 600 13.5px/1 var(--sans); text-decoration: none; margin-top: 4px; }
+    .report-cta-btn:hover { opacity: 0.92; }
+    .report-dps-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 2px; }
+    .report-dp-chip { font: 600 11.5px/1 var(--mono); padding: 5px 8px; background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 3px; color: var(--ink); }
+    .report-view-link { color: var(--ink); }
 
     .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
     .ios-prompt[hidden] { display: none; }
@@ -512,24 +529,23 @@
       let n = 0;
       const reportRow = (s) => {
         n++;
-        const tags = tagsHtml(s, true);
         const count = sourceCount(s);
         const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
         const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${escapeHtml(s.why_it_matters)}</p>` : (s.lead ? `<p lang="${langOf(s)}">${escapeHtml(s.lead)}</p>` : ""));
-        const dps = (Array.isArray(s.data_points) ? s.data_points : []).slice(0, 4).map(d => `<span>${escapeHtml(d)}</span>`).join("");
+        const dps = (Array.isArray(s.data_points) ? s.data_points : []).slice(0, 4).map(d => `<span class="report-dp-chip">${escapeHtml(d)}</span>`).join("");
         return `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
           <span class="row-num">${String(n).padStart(2, "0")}</span>
           <span class="row-body">
-            ${tags ? `<span class="kicker">${tags}</span>` : ""}
+            <span class="kicker"><span class="report-badge-pill">STRATEGIC REPORT</span> · <strong>${escapeHtml(sourceName(s))}</strong></span>
             <h3 lang="${langOf(s)}">${escapeHtml(s.headline)}</h3>
             ${body}
-            ${dps ? `<span class="row-dps" lang="${langOf(s)}">${dps}</span>` : ""}
-            <span class="src" lang="en">${meta}</span>
+            ${dps ? `<div class="report-dps-bar" lang="${langOf(s)}">${dps}</div>` : ""}
+            <span class="src" lang="en">${meta} · <strong class="report-view-link">1-Page Summary →</strong></span>
           </span>
         </button>`;
       };
 
-      let html = `<div class="report-intro" lang="tr"><strong>Stratejik Raporlar, Küresel Tahminler &amp; Benchmark Endeksleri</strong> — Boeing CMO, Airbus GMF, EUROCONTROL Tahminleri, OAG Megahubs, IdeaWorksCompany, IATA, ACI World, Cirium ve CAPA raporları. Yeni yayımlanan tüm stratejik raporlar otomatik olarak bu sayfaya eklenir.</div>`;
+      let html = `<div class="report-intro" lang="tr"><strong>Stratejik Raporlar, Küresel Tahminler &amp; Benchmark Endeksleri</strong> — Boeing CMO, Airbus GMF, EUROCONTROL Tahminleri, ICAO, FAA, EASA, IATA, ACI World, Oliver Wyman MRO Forecast, OAG Megahubs, IdeaWorksCompany, Cirium ve CAPA raporları. Yeni yayımlanan tüm stratejik raporlar otomatik olarak bu sayfaya eklenir.</div>`;
       html += `<nav class="filters" aria-label="Filter by publisher"><div class="filters-inner">
         ${[["All", reports.length]].concat(pubNames.map(name => [name, counts[name]])).map(([name, c]) =>
           `<button class="chip" type="button" data-report-filter="${escapeHtml(name)}" aria-pressed="${name === reportFilter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
@@ -710,21 +726,50 @@
       $("art-pos").textContent = `${i + 1} of ${state.order.length}`;
       $("art-prev").disabled = i === 0;
       $("art-next").disabled = !next;
-      $("art-body").innerHTML = `
-        <div class="kicker">${tagsHtml(s, true)}</div>
-        <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
-        <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
-        ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
-        ${isUnverified(s) ? `<p class="art-src" lang="en">This collected headline has not been independently checked. No verified publisher link or analysis is available; please check the named publisher yourself.</p>` : ""}
-        ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}
-        ${s.why_it_matters ? `<div class="art-why"><span lang="en" class="eyebrow">Why it matters</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
-        ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}
-        ${analysis ? `<div style="display:flex;flex-direction:column;gap:8px"><span lang="en" class="eyebrow">Analysis</span><ul class="bullets" lang="${lang}">${analysis}</ul></div>` : ""}
-        ${dps ? `<div class="datapoints" lang="${lang}">${dps}</div>` : ""}
-        ${strategic || exposure ? `<div class="impact"><span lang="en" class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p lang="${lang}">${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
-        ${coverageHtml}
-        ${src.url ? `<a class="art-link" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>` : ""}
-        ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next story ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
+
+      if (isStrategicReport(s)) {
+        const kpiItems = (s.data_points || []).slice(0, 6).map(d =>
+          `<div class="report-kpi-card"><span class="report-kpi-val">${escapeHtml(d)}</span><span class="report-kpi-label">Projection / Stat</span></div>`
+        ).join("");
+        const analysisItems = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
+        const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
+          `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span lang="en" class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p lang="${lang}">${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
+
+        $("art-body").innerHTML = `
+          <div class="kicker"><span class="report-badge-pill">STRATEGIC REPORT</span> · <strong>${escapeHtml(sourceName(s))}</strong>${s.published_at ? ` · ${escapeHtml(s.published_at)}` : ""}</div>
+          <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
+          <div class="art-src" lang="en">Flagship Outlook &amp; Benchmark Publication · ${escapeHtml(sourceName(s))}${src.official ? " · Official Report" : ""}${count > 1 ? ` · ${count} sources` : ""}</div>
+          ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the executive summary appears after the next update.</p>` : ""}
+          ${s.why_it_matters ? `<div class="report-why"><span lang="en" class="eyebrow">Executive Summary</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
+          ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}
+          ${kpiItems ? `<div class="report-kpi-section"><span lang="en" class="eyebrow">Key Metrics &amp; Forecast Indicators</span><div class="report-kpi-grid">${kpiItems}</div></div>` : ""}
+          ${analysisItems ? `<div class="report-takeaways"><span lang="en" class="eyebrow">Key Findings &amp; Industry Projections</span><ul class="report-bullets" lang="${lang}">${analysisItems}</ul></div>` : ""}
+          ${strategic || exposure ? `<div class="impact"><span lang="en" class="eyebrow">Macro &amp; Commercial Market Outlook</span>${strategic ? `<p lang="${lang}">${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
+          ${coverageHtml}
+          ${src.url ? `<a class="report-cta-btn" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer"><span>View Official Report &amp; Data Tables (${escapeHtml(sourceName(s))})</span> <span aria-hidden="true">↗</span></a>` : ""}
+          ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next strategic report ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
+      } else {
+        const analysis = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
+        const dps = (s.data_points || []).map(d => `<span>${escapeHtml(d)}</span>`).join("");
+        const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
+          `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span lang="en" class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p lang="${lang}">${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
+
+        $("art-body").innerHTML = `
+          <div class="kicker">${tagsHtml(s, true)}</div>
+          <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
+          <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+          ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
+          ${isUnverified(s) ? `<p class="art-src" lang="en">This collected headline has not been independently checked. No verified publisher link or analysis is available; please check the named publisher yourself.</p>` : ""}
+          ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}
+          ${s.why_it_matters ? `<div class="art-why"><span lang="en" class="eyebrow">Why it matters</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
+          ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}
+          ${analysis ? `<div style="display:flex;flex-direction:column;gap:8px"><span lang="en" class="eyebrow">Analysis</span><ul class="bullets" lang="${lang}">${analysis}</ul></div>` : ""}
+          ${dps ? `<div class="datapoints" lang="${lang}">${dps}</div>` : ""}
+          ${strategic || exposure ? `<div class="impact"><span lang="en" class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p lang="${lang}">${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
+          ${coverageHtml}
+          ${src.url ? `<a class="art-link" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>` : ""}
+          ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next story ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
+      }
       $("art-scroll").scrollTop = 0;
     }
     function stepArticle(delta, moveFocus = false) {
