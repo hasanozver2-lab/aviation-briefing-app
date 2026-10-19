@@ -703,7 +703,7 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
     alert_articles, report[alert_feeds.SOURCE_NAME] = alert_feeds.collect(_env_value(alert_feeds.ENV_NAME), utc_now(), cutoff, entity_index_factory=entities.EntityIndex.from_csv)
     articles.extend(alert_articles)
     benchmark_articles, benchmark_report = benchmark_search.collect(
-        _env_value("GEMINI_API_KEY") or GEMINI_API_KEY,
+        "",  # Publisher-written reports require no model call or API key.
         utc_now(),
         cutoff,
         classify_topics_fn=classify_topics,

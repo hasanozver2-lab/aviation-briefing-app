@@ -10,14 +10,16 @@ import json
 import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 try:
-    from . import clustering, language, source_registry, text_match
+    from . import clustering, language, source_catalog, source_registry, text_match
     from .urls import canonicalize_url
 except ImportError:
     import clustering
     import language
     import source_registry
+    import source_catalog
     import text_match
     from urls import canonicalize_url
 
@@ -319,8 +321,9 @@ def enrich_stories(stories, articles, relevance_config=None):
             "score_components": components,
             "sources": sources,
             "source_count": max(1, len(publishers)),
-            "published_at_iso": to_iso(datetime.fromtimestamp(published, tz=timezone.utc)) if isinstance(published, (int, float)) else "",
+            "published_at_iso": to_iso(datetime.fromtimestamp(published, tz=timezone.utc)) if isinstance(published, (int, float)) and published > 0 else "",
             "is_strategic_report": bool(is_strategic_report(story) or is_strategic_report(article)),
+            "publication_date_status": article.get("publication_date_status", "verified" if published else "unknown"),
         })
         story["language"] = language.story_language(story)
     return stories
@@ -388,9 +391,24 @@ def is_ground_traffic_story(story, selection):
 def is_excluded(story, relevance):
     """Current deterministic exclusions from config/relevance.json."""
     selection = relevance["selection"]
-    return is_military_story(story, selection) or is_ground_traffic_story(story, selection) or bool(
+    return has_only_unverified_sources(story, selection) or is_military_story(story, selection) or is_ground_traffic_story(story, selection) or bool(
         selection.get("exclude_commentary") and is_finance_commentary(story, relevance.get("commentary"))
     )
+
+
+def has_only_unverified_sources(story, selection):
+    """Legacy search redirects are not publisher evidence; leave their archived records intact."""
+    blocked = set(selection.get("unverified_source_hosts", []))
+    urls = _story_urls(story)
+    if not any((urlparse(url).hostname or "").lower() in blocked for url in urls):
+        return False
+    approved_domains = {
+        source_catalog.registrable_key(row["url"]) for row in source_catalog.read_rows()
+        if row.get("active") == "1" and row.get("status") == "active"
+        and row.get("license_status") == "public" and not source_catalog.notes_of(row).get("license_required")
+    }
+    return not any((urlparse(url).hostname or "").lower() not in blocked
+                   and source_catalog.registrable_key(url) in approved_domains for url in urls)
 
 
 def drop_excluded(day, relevance=None):
@@ -416,6 +434,7 @@ def select_stories(stories, selection, commentary=None):
     eligible = [
         story for story in stories
         if (float(story.get("relevance_score", 0)) >= archive_minimum or story.get("context_demoted_from")) and not is_military_story(story, selection)
+        and not has_only_unverified_sources(story, selection)
         and not is_ground_traffic_story(story, selection)
         and not (selection.get("exclude_commentary") and is_finance_commentary(story, commentary))
     ]
@@ -522,6 +541,15 @@ def _dedupe_incoming(stories, threshold):
 def _apply_incoming(target, story, now_iso, config):
     """Update a stored story from a re-seen one. Returns True when something material changed."""
     known = _story_urls(target)
+    # A corrected publisher date must propagate even when score and sources have not changed.
+    # It does not create an editorial update or reset the story's discovery history.
+    date_status = story.get("publication_date_status")
+    has_verified_date = date_status == "verified" and story.get("published_at_iso")
+    has_unknown_report_date = date_status == "unknown" and is_strategic_report(story)
+    if has_verified_date or has_unknown_report_date:
+        for key in ("published_at_iso", "published_at", "publication_date_status"):
+            if key in story:
+                target[key] = story[key]
     new_sources = [entry for entry in story.get("sources", []) if canonicalize_url(entry.get("url")) not in known]
     old_score = float(target.get("relevance_score", 0))
     score_changed = abs(float(story.get("relevance_score", 0)) - old_score) >= config["updated"]["min_score_change"]
@@ -584,9 +612,8 @@ def should_run_morning_reset(now, existing_day, config=None):
 def build_day(existing_day, previous_day, briefings, now, config=None, morning_reset=False):
     """Merge this run's stories into today's archive file.
 
-    At the 08:00 morning deep scan (`morning_reset=True` or `briefing["morning_deep_scan"]=True`),
-    today's daily breaking news list is refreshed from scratch using the deep scan results (while keeping
-    strategic reports). In subsequent 3-hour runs, existing stories stay and incoming stories are added.
+    A morning deep scan broadens collection without discarding stored stories or their history.
+    Re-seen stories keep their first_seen_at and narratives; all runs merge incrementally.
     """
     config = config or load_badges_config()
     ordered = [briefings[mode] for mode in ("daily", "hourly") if mode in briefings]
@@ -604,19 +631,12 @@ def build_day(existing_day, previous_day, briefings, now, config=None, morning_r
             and not (existing_day or {}).get("morning_reset_at")
         )
     )
-    if do_morning_reset:
-        stored = [
-            copy.deepcopy(story)
-            for story in (existing_day or {}).get("stories", [])
-            if story.get("story_id") and is_strategic_report(story)
-        ]
-    else:
-        stored = [copy.deepcopy(story) for story in (existing_day or {}).get("stories", []) if story.get("story_id")]
+    stored = [copy.deepcopy(story) for story in (existing_day or {}).get("stories", []) if story.get("story_id")]
 
     previous = [story for story in (previous_day or {}).get("stories", []) if story.get("story_id")]
     for story in _dedupe_incoming([s for briefing in ordered for s in briefing.get("stories", [])], threshold):
         target = _consolidate(stored, story, threshold)
-        if target is None and not do_morning_reset:
+        if target is None:
             carried = find_match(story, previous, threshold)
             if carried is not None:
                 target = copy.deepcopy(carried)   # same story as yesterday: keep its history
@@ -656,7 +676,8 @@ def compute_badges(story, now, config=None):
         return []
     hours = lambda moment: (now - moment).total_seconds() / 3600  # noqa: E731
     published = parse_iso(story.get("published_at_iso"))
-    fresh_publication = published is None or hours(published) <= config["max_publication_age_hours"]
+    date_unknown = story.get("publication_date_status") == "unknown"
+    fresh_publication = not date_unknown and (published is None or 0 <= hours(published) <= config["max_publication_age_hours"])
     age = hours(first_seen)
     badges = []
     breaking = config["breaking"]

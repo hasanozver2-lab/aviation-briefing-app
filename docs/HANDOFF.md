@@ -1,5 +1,16 @@
 # AeroBrief — HANDOFF
 
+## Source integrity and history — 2026-10-19
+
+- Strategic Reports UI remains in `public/index.html`. Collection now uses publisher-written pages rather than Gemini/Google News search output as evidence. Gemini is reserved for narratives after deterministic selection; source collection needs no API key.
+- `config/report_collection.json` controls collection permissions. Active/public/full CSV rows are required before any report page request; Boeing's parent-domain alias points to its existing source row. Publisher labels cannot authorize arbitrary domains. Robots rules are checked; redirects are bounded and rechecked before following, including the destination's robots rules. No source was activated.
+- Model-only items and enrichments are rejected. Legacy Google News-only stories are excluded at API read time, leaving the archived file unchanged. Existing narratives and synthetic dates in old archives are not automatically reconstructed: the original publisher evidence is needed for a repair.
+- Actual timestamps are retained. Explicit publication metadata (meta/JSON-LD) is used; missing report dates remain `publication_date_status: unknown` with an empty display date. Unknown dates do not get New/Breaking. Reports can still appear in their separate UI regardless of age.
+- Removed the two-shared-carriers/same-event-type clustering shortcut. A shared publisher/airline set is not proof of a shared event; the existing title/entity/distinctive-signal rules still apply.
+- Morning deep scans merge into the day rather than emptying it. Missing stories, first_seen_at, last_updated_at and completed narratives survive, including during a forced scan and day rollover. Verified publication-date corrections propagate without changing discovery history.
+- Restored the permanent-error retry contract: HTTP 404 is not retried by the batch backoff loop. Model fallback quotas and their measurement remain a separate open issue.
+- Development is on `feature/source-integrity-history`; merge/push/deployment have not been performed.
+
 ## Quality-source update — 2026-10-17 (feature/quality-source-coverage)
 
 Local branch, not merged/deployed: IATA official RSS, ICAO date-scoped newsroom cards and NYT Business RSS restored; ACI World and BBC Business added. Catalog: 104 rows / 37 active. General business feeds apply their 25-item cap after aviation filtering. Details and actual 7-day/48-hour yield: reports/quality_source_coverage.md and .json. Test result: 751 passed.
