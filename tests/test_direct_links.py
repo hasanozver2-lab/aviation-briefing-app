@@ -106,3 +106,47 @@ def test_flash_alerts_and_analyst_radar_classification():
     assert story_lifecycle.is_flash_alert(analyst_story) is True
     assert story_lifecycle.is_flash_alert(social_story) is True
     assert story_lifecycle.is_flash_alert(standard_story) is False
+
+
+def test_fox_news_and_routine_social_are_not_mistaken_for_flash_alerts():
+    fox_story = {
+        "headline": "Airlines prepare for busy holiday travel weekend",
+        "original_source": {"url": "https://www.fox.com/news/airlines-travel", "source_name": "Fox News"},
+        "source": "Fox News",
+    }
+    fox_news_story = {
+        "headline": "Boeing aircraft makes scheduled stop",
+        "original_source": {"url": "https://www.foxnews.com/us/boeing-landing", "source_name": "Fox News"},
+        "source": "Fox News",
+    }
+    routine_marketing_tweet = {
+        "headline": "Book your summer vacation to Rome today with 20% off",
+        "original_source": {"url": "https://x.com/flymepegasus/status/123456", "source_name": "Pegasus on X"},
+        "source": "Pegasus on X",
+        "via_social": True,
+        "is_flash_alert": False,
+    }
+    assert story_lifecycle.is_flash_alert(fox_story) is False
+    assert story_lifecycle.is_flash_alert(fox_news_story) is False
+    assert story_lifecycle.is_flash_alert(routine_marketing_tweet) is False
+
+
+def test_regular_iata_press_releases_and_icao_bulletins_are_not_strategic_reports():
+    iata_press_release = {
+        "headline": "IATA Urges Action on Soaring European Airport Charges",
+        "original_source": {"url": "https://www.iata.org/en/pressroom/pr/2026-10-15-01/", "source_name": "IATA"},
+        "source": "IATA",
+    }
+    icao_announcement = {
+        "headline": "ICAO Council Appoints New Regional Representatives",
+        "original_source": {"url": "https://www.icao.int/newsroom/pages/council-appointments.aspx", "source_name": "ICAO"},
+        "source": "ICAO",
+    }
+    assert story_lifecycle.is_strategic_report(iata_press_release) is False
+    assert story_lifecycle.is_strategic_report(icao_announcement) is False
+
+
+def test_is_direct_link_strictly_rejects_blocked_redirect_hosts_without_publisher_name_bypass():
+    blocked = {"news.google.com"}
+    assert story_lifecycle._is_direct_link("https://news.google.com/rss/articles/CBMi123", blocked) is False
+    assert story_lifecycle._is_direct_link("https://www.reuters.com/business/aerospace/article", blocked) is True

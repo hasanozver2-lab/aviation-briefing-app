@@ -118,14 +118,18 @@ def is_strategic_report(item):
 
 
 def is_flash_alert(item):
-    """Whether an article or story is a fast flash alert from analyst radar or social."""
+    """Whether an article or story is a fast flash alert from analyst radar or breaking wire/social."""
     if not isinstance(item, dict):
         return False
-    if item.get("is_flash_alert") or item.get("via_social"):
+    if item.get("is_flash_alert"):
         return True
     orig = item.get("original_source") if isinstance(item.get("original_source"), dict) else {}
     url = str(item.get("link") or orig.get("url") or "").lower()
-    if any(h in url for h in ("theaircurrent.com", "airlineweekly.com", "x.com", "twitter.com", "linkedin.com")):
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").lower()
+    if host in ("theaircurrent.com", "airlineweekly.com") or any(
+        host.endswith("." + d) for d in ("theaircurrent.com", "airlineweekly.com")
+    ):
         return True
     source_name = str(item.get("source") or orig.get("source_name") or "").lower()
     if any(a in source_name for a in ("the air current", "jon ostrower", "ned russell", "airline weekly", "dominic gates", "brian sumers")):
@@ -145,10 +149,8 @@ STRATEGIC_REPORT_URL_PATTERNS = (
     "ideaworkscompany.com/reports",
     "ideaworkscompany.com/wp-content/uploads",
     "iata.org/en/publications/",
-    "iata.org/en/pressroom/",
     "aci.aero/news-and-resources/publications/",
     "airbus.com/en/products-services/commercial-aircraft/market/",
-    "icao.int",
     "faa.gov/data_research/aviation/aerospace_forecasts",
     "oliverwyman.com/our-expertise/insights",
     "atag.org/our-publications",
@@ -486,15 +488,13 @@ def is_recognized_publisher_story(story):
     return False
 
 
-def _is_direct_link(url, blocked, story=None):
-    """A real article address: http(s), a host, and not a search/redirect host unless from a recognized publisher."""
+def _is_direct_link(url, blocked):
+    """A real article address: http(s), a host, and not a search/redirect host."""
     parsed = urlparse(str(url or "").strip())
     host = (parsed.hostname or "").lower()
     if not (parsed.scheme in ("http", "https") and "." in host):
         return False
     if host in blocked:
-        if story and is_recognized_publisher_story(story):
-            return True
         return False
     return True
 
@@ -502,16 +502,45 @@ def _is_direct_link(url, blocked, story=None):
 def has_direct_link(story, selection):
     blocked = set(selection.get("unverified_source_hosts", []))
     urls = [url for url in [(story.get("original_source") or {}).get("url")] + [entry.get("url") for entry in story.get("sources", [])] if url]
-    return any(_is_direct_link(url, blocked, story=story) for url in urls)
+    if any(_is_direct_link(url, blocked) for url in urls):
+        return True
+    if is_recognized_publisher_story(story):
+        for url in urls:
+            parsed = urlparse(str(url).strip())
+            host = (parsed.hostname or "").lower()
+            if parsed.scheme in ("http", "https") and "." in host and (host in blocked or host.endswith(".google.com")):
+                return True
+    return False
 
 
 def ensure_direct_link(story, selection):
     """Every served story links to a real article. A redirect link as the main source is replaced by the first direct source;
     redirect-only entries are removed from the source list unless from a recognized publisher. Returns False when no usable link exists."""
     blocked = set(selection.get("unverified_source_hosts", []))
-    pure_direct = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked, story=None)]
+
+    # Resolve recognized publisher Google News links to real direct publisher links
+    if is_recognized_publisher_story(story):
+        try:
+            from . import urls
+        except ImportError:
+            import urls
+        for entry in story.get("sources", []):
+            u = entry.get("url", "")
+            if (urlparse(u).hostname or "").lower() in blocked:
+                resolved = urls.unshorten_google_news_url(u)
+                if resolved and _is_direct_link(resolved, blocked):
+                    entry["url"] = resolved
+        orig = story.get("original_source") or {}
+        orig_url = orig.get("url", "")
+        if (urlparse(orig_url).hostname or "").lower() in blocked:
+            resolved = urls.unshorten_google_news_url(orig_url)
+            if resolved and _is_direct_link(resolved, blocked):
+                orig["url"] = resolved
+                story["original_source"] = orig
+
+    pure_direct = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked)]
     original = dict(story.get("original_source") or {})
-    original_is_pure_direct = _is_direct_link(original.get("url"), blocked, story=None)
+    original_is_pure_direct = _is_direct_link(original.get("url"), blocked)
 
     if original_is_pure_direct:
         if len(pure_direct) != len(story.get("sources", [])):
@@ -528,11 +557,11 @@ def ensure_direct_link(story, selection):
         return True
 
     if is_recognized_publisher_story(story):
-        redirect_sources = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked, story=story)]
-        if not redirect_sources and _is_direct_link(original.get("url"), blocked, story=story):
+        redirect_sources = [entry for entry in story.get("sources", []) if urlparse(entry.get("url", "")).scheme in ("http", "https")]
+        if not redirect_sources and urlparse(original.get("url", "")).scheme in ("http", "https"):
             redirect_sources = [original]
         if redirect_sources:
-            if not _is_direct_link(original.get("url"), blocked, story=story):
+            if not _is_direct_link(original.get("url"), blocked):
                 first = redirect_sources[0]
                 original.update(url=first["url"], title=first.get("title") or original.get("title", ""), source_name=first.get("name") or original.get("source_name", ""))
                 story["original_source"] = original

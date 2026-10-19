@@ -156,12 +156,15 @@ def test_mainstream_news_wire_social_accounts_are_monitored_and_filtered_for_avi
     for wire in ("ReutersBiz", "business", "FT", "WSJ", "CNBC"):
         assert wire in handles
 
-    # A mainstream post about airlines is kept and marked as flash alert
+    # A mainstream post about airlines is kept and marked as flash alert with tier 2 and official=False
     aviation_post = post("2001", "Delta Air Lines reports record quarterly transatlantic demand: https://t.co/abc",
                          airline="Reuters", code="RTR", handle="ReutersBiz")
     articles, _ = collect(payload(aviation_post))
     assert len(articles) == 1
     assert articles[0]["is_flash_alert"] is True
+    assert articles[0]["official"] is False
+    assert articles[0]["tier"] == 2
+    assert articles[0]["source_type"] == "social"
     assert "Delta" in articles[0]["title"]
 
     # A mainstream post unrelated to aviation (e.g. crypto/tech) is filtered out
@@ -169,4 +172,14 @@ def test_mainstream_news_wire_social_accounts_are_monitored_and_filtered_for_avi
                           airline="Reuters", code="RTR", handle="ReutersBiz")
     articles, _ = collect(payload(off_topic_post))
     assert len(articles) == 0
+
+    # A routine official airline post is official tier 1, but NOT an urgent flash alert
+    routine_airline_post = post("2003", "Welcome to our new Airbus A350 aircraft joining the fleet: https://t.co/plane",
+                                airline="Turkish Airlines", code="TK", handle="TurkishAirlines")
+    articles, _ = collect(payload(routine_airline_post))
+    assert len(articles) == 1
+    assert articles[0]["official"] is True
+    assert articles[0]["tier"] == 1
+    assert articles[0]["source_type"] == "official_social"
+    assert articles[0]["is_flash_alert"] is False
 

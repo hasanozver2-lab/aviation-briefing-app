@@ -47,6 +47,21 @@ def parse_time(value):
         return None
 
 
+WIRE_HANDLES = {"reutersbiz", "business", "ft", "wsj", "cnbc", "markets", "reuters"}
+ANALYST_ROLES = {
+    "Aviation Analyst & Broadcaster",
+    "Editor-in-Chief, The Air Current",
+    "Pulitzer Aerospace Reporter",
+    "The Airline Observer",
+    "Aviation Reporter, Skift & Airline Weekly",
+    "Aerospace Analyst",
+}
+BREAKING_KEYWORDS = re.compile(
+    r"\b(breaking|alert|urgent|flaş|flas|son dakika|just in|emergency|ground stop|directive)\b",
+    re.IGNORECASE,
+)
+
+
 def article_from_post(post, record):
     published = parse_time(post.get("published_at"))
     title, link = post_title(post.get("text", "")), post.get("link", "")
@@ -54,13 +69,14 @@ def article_from_post(post, record):
         return None
     handle = (post.get("handle") or "").lower()
     text = post.get("text", "")
-    if handle in {"reutersbiz", "business", "ft", "wsj", "cnbc", "markets", "reuters"}:
+    if handle in WIRE_HANDLES:
         filter_cfg = feed_sources.load_aviation_filter()
         if not feed_sources.keyword_hit(text, filter_cfg["keywords"]):
             return None
     article = feed_sources.article_from_item(fd.Item(title, link, published, post_summary(text)), record)
     airline = post.get("airline", "")
     author = post.get("author", "")
+    role = post.get("role", "")
     platform = post.get("platform", "X")
     if author and not airline:
         source_label = f"{author} on {platform}"
@@ -68,8 +84,31 @@ def article_from_post(post, record):
         source_label = f"{airline} on {platform}"
     else:
         source_label = SOURCE_NAME
-    article.update(source=source_label, airline=airline,
-                   airline_code=post.get("airline_code", ""), via_social=True, is_flash_alert=True)
+
+    is_wire = handle in WIRE_HANDLES
+    is_analyst = (
+        role in ANALYST_ROLES
+        or any(a in (author or "").lower() for a in ("jon ostrower", "ned russell", "dominic gates", "brian sumers", "alex macheras"))
+        or any(h in handle for h in ("jonostrower", "nedrussell", "dominicgates", "briansumers", "alexinair", "leehamnews"))
+    )
+    has_breaking = bool(BREAKING_KEYWORDS.search(text))
+
+    # Social feeds should not falsely masquerade as official SEC/KAP filings (tier 1 official)
+    # Only official verified corporate accounts of airlines/OEMs/regulators receive official=True
+    is_official_channel = bool(airline and not is_wire and not is_analyst)
+    tier = 1 if is_official_channel else 2
+    is_flash = is_wire or is_analyst or has_breaking
+
+    article.update(
+        source=source_label,
+        airline=airline,
+        airline_code=post.get("airline_code", ""),
+        via_social=True,
+        is_flash_alert=is_flash,
+        official=is_official_channel,
+        source_type="official_social" if is_official_channel else "social",
+        tier=tier,
+    )
     return article
 
 
