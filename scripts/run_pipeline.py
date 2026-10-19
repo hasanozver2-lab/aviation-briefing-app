@@ -23,6 +23,7 @@ from api import briefing_store
 from api import narrative
 from api import source_catalog
 from api import source_retry
+from api import source_recovery
 from api import story_lifecycle
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
@@ -148,7 +149,10 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
     existing_day = read(day_path)
     previous_day = read(briefing_store.day_path(story_lifecycle.previous_day_key(today)))
     briefings = {"daily": day_payload(collected, now)} if collected else {}
-    day = story_lifecycle.build_day(existing_day, previous_day, briefings, now, config)
+    reconciled_day, recovered_count = source_recovery.reconcile_day(
+        existing_day, (collected or {}).get("verification_candidates", []), now
+    )
+    day = story_lifecycle.build_day(reconciled_day, previous_day, briefings, now, config)
 
     report = {"calls": 0, "narrated": 0, "pending": 0, "error": ""}
     if day:
@@ -160,7 +164,9 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
         for story in day["stories"]:
             if story.get("basis") == HEADLINE_ONLY and not story.get("source_description") and story["story_id"] in incoming:
                 story["source_description"] = incoming[story["story_id"]].get("source_description", "")
-        report = narrate([story for story in day["stories"] if story_lifecycle.is_listed(story)], api_key, description_limit, now=now)
+        relevance = story_lifecycle.load_relevance_config()
+        report = narrate([story for story in day["stories"] if story_lifecycle.is_listed(story)
+                          and not story_lifecycle.is_excluded(story, relevance)], api_key, description_limit, now=now)
         for story in day["stories"]:
             if story.get("basis") == HEADLINE_ONLY:
                 story["source_description"] = ""
@@ -170,6 +176,8 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
         files[day_path] = day
         files[briefing_store.latest_path()] = day
     existing_status = read(briefing_store.status_path())
+    if recovered_count:
+        print(f"Source verification: recovered={recovered_count}")
     new_status = status_payload(collection_error, report, now, collected, existing_status, retry)
     if status_changed(existing_status, new_status):
         files[briefing_store.status_path()] = new_status

@@ -1,0 +1,16 @@
+{
+  "_doc": "Reconcile legacy search-only stories against currently collected, approved publisher articles. Unmatched legacy titles may be shown separately as unverified metadata; model analysis and search links are never exposed there. CSV policy/licence exclusions still win. No new source is activated.",
+  "min_title_similarity": 0.8,
+  "max_publication_gap_hours": 168,
+  "max_pending_titles": 30,
+  "publisher_aliases": {
+    "Reuters": "Reuters Aviation",
+    "Bloomberg": "Bloomberg Aviation",
+    "Financial Times": "Financial Times Aviation",
+    "The Wall Street Journal": "The Wall Street Journal",
+    "Associated Press": "Associated Press Aviation",
+    "CNBC": "CNBC Airlines",
+    "Cirium": "Cirium Thought Cloud",
+    "CAPA Centre for Aviation": "CAPA Centre for Aviation"
+  }
+}
