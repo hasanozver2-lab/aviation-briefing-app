@@ -7,3 +7,6 @@ __pycache__/
 *.log
 data/*.sqlite3
 design_handoff/
+output/
+probe-output/
+.playwright-cli/

@@ -30,7 +30,7 @@ RELEVANCE_CONFIG_PATH = BASE_DIR / "config" / "relevance.json"
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 BADGE_NEW, BADGE_UPDATED, BADGE_BREAKING = "new", "updated", "breaking"
 # Not part of the change fingerprint: they differ on every run without meaning anything.
-VOLATILE_DAY_KEYS = {"generated_at", "time_str", "last_pipeline_run_at", "last_pipeline_attempt_at", "heading", "warning", "market", "badges"}
+VOLATILE_DAY_KEYS = {"generated_at", "time_str", "last_pipeline_run_at", "last_pipeline_attempt_at", "heading", "warning", "market", "airspace_radar", "badges"}
 VOLATILE_STORY_KEYS = {"badges"}
 HEAD_KEYS_TO_DROP = {"stories"}
 # The LLM-written part of a story. It is kept when a story is refreshed, and regenerated only after
@@ -942,4 +942,21 @@ def fingerprint(day):
     )
     market = day.get("market") or {}
     core["market"] = {key: market.get(key) for key in ("status", "skipped", "errors", "items")}
+    radar = day.get("airspace_radar") or {}
+    core["airspace_radar"] = {
+        "status": radar.get("status"),
+        "total_active_zones": radar.get("total_active_zones"),
+        "do_not_operate_count": radar.get("do_not_operate_count"),
+        "restricted_count": radar.get("restricted_count"),
+        "caution_count": radar.get("caution_count"),
+        "zones": [
+            {
+                "country": z.get("country"),
+                "fir": z.get("fir"),
+                "risk_level": z.get("risk_level"),
+                "bulletin_code": z.get("bulletin_code"),
+            }
+            for z in radar.get("zones", [])
+        ],
+    }
     return hashlib.sha256(json.dumps(core, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()

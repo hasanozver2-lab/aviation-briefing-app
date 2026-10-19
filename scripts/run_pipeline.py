@@ -26,6 +26,7 @@ from api import source_retry
 from api import source_recovery
 from api import story_lifecycle
 from api import urls
+from api import airspace_radar
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
 STATUS_FETCH_ERROR = "error"
@@ -49,7 +50,8 @@ def collect(recovered=None):
 
 def day_payload(collected, now):
     head = _engine.build_briefing_payload("daily", [], status="ok")
-    payload = {**head, "market": collected["market"], "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
+    radar = collected.get("airspace_radar") or airspace_radar.load_radar(now=now)
+    payload = {**head, "market": collected["market"], "airspace_radar": radar, "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
     if collected.get("morning_deep_scan") or story_lifecycle.is_morning_deep_window(now):
         payload["morning_deep_scan"] = True
     if collected.get("force_morning_reset"):

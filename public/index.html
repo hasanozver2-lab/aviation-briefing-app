@@ -173,6 +173,36 @@
     .flash-alert-badge { font: 700 10px/1 var(--sans); background: #B91C1C; color: #fff; padding: 3px 6px; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; vertical-align: middle; }
     .flash-alert-banner { background: #FEF2F2; border: 1px solid #FCA5A5; border-left: 4px solid #B91C1C; padding: 10px 14px; border-radius: 3px; font: 400 13px/1.4 var(--sans); color: #991B1B; margin: 4px 0 8px; }
 
+    .airspace-alert-banner { background: #FEF2F2; border: 1px solid #FCA5A5; border-left: 4px solid #DC2626; padding: 10px 14px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 16px; font: 400 13px/1.4 var(--sans); color: #991B1B; }
+    .airspace-alert-banner[hidden] { display: none; }
+    .airspace-banner-text { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .airspace-banner-btn { background: #DC2626; color: #fff; border: none; border-radius: 3px; padding: 6px 12px; font: 600 12px/1 var(--sans); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .airspace-banner-btn:hover { background: #B91C1C; }
+    .airspace-intro { background: var(--paper-2); border: 1px solid var(--rule-2); padding: 14px 16px; border-radius: 4px; font: 400 13px/1.5 var(--sans); color: var(--ink-2); margin-bottom: 14px; }
+    .airspace-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .airspace-stat-card { background: var(--paper-2); border: 1px solid var(--rule-2); padding: 12px 14px; border-radius: 4px; display: flex; flex-direction: column; gap: 3px; border-left: 3px solid var(--ink); }
+    .airspace-stat-card.stat-danger { border-left-color: #DC2626; }
+    .airspace-stat-card.stat-warning { border-left-color: #EA580C; }
+    .airspace-stat-card.stat-caution { border-left-color: #D97706; }
+    .airspace-stat-val { font: 700 20px/1.1 var(--mono); color: var(--ink); }
+    .airspace-stat-label { font: 500 11px/1.2 var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .airspace-list { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+    .airspace-card { background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 10px; border-left: 4px solid #DC2626; }
+    .airspace-card.card-restricted { border-left-color: #EA580C; }
+    .airspace-card.card-caution { border-left-color: #D97706; }
+    .airspace-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .airspace-card-title { font: 600 16px/1.2 var(--sans); color: var(--ink); margin: 0; }
+    .airspace-card-fir { font: 600 12px/1 var(--mono); color: var(--muted); margin-top: 4px; }
+    .airspace-pill { font: 700 10.5px/1 var(--sans); color: #fff; padding: 4px 8px; border-radius: 3px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+    .pill-danger { background: #DC2626; }
+    .pill-warning { background: #EA580C; }
+    .pill-caution { background: #D97706; }
+    .airspace-restr { font: 500 13px/1.4 var(--sans); color: var(--ink-2); background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: 3px; border: 1px solid var(--rule-2); }
+    .airspace-desc { font: 400 13px/1.45 var(--sans); color: var(--ink-2); margin: 0; }
+    .airspace-card-footer { display: flex; justify-content: space-between; align-items: center; font: 400 12px/1 var(--sans); color: var(--muted); padding-top: 6px; border-top: 1px solid var(--rule); flex-wrap: wrap; gap: 8px; }
+    .airspace-link { color: var(--ink); font-weight: 500; text-decoration: none; }
+    .airspace-link:hover { text-decoration: underline; }
+
     .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
     .ios-prompt[hidden] { display: none; }
     .ios-prompt button { color: var(--paper-2); font-size: 16px; }
@@ -197,6 +227,7 @@
       <nav class="page-nav" aria-label="Briefing sections">
         <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
         <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
+        <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span lang="tr">🚨 Hava Sahası Radarı</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
         <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span lang="tr">Arşiv</span></button>
       </nav>
     </header>
@@ -222,6 +253,14 @@
       </div>
       <div class="mkt-table" id="mkt-table" hidden></div>
     </section>
+
+    <div class="airspace-alert-banner" id="airspace-alert-banner" hidden>
+      <div class="airspace-banner-text">
+        <span>🚨</span>
+        <span id="airspace-banner-msg"><strong>Hava Sahası Kriz Uyarısı:</strong> Aktif askeri çatışma ve güvenlik bülteni bulunan hava sahaları mevcuttur.</span>
+      </div>
+      <button type="button" class="airspace-banner-btn" id="airspace-banner-btn">Radarı İncele ›</button>
+    </div>
 
     <main id="content"><div class="state">Loading the briefing…</div></main>
   </div>
@@ -264,7 +303,7 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { page: "briefing", filter: "All", reportFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
+    const state = { page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
     let archiveRequestId = 0;
     state.archiveDate = "";
@@ -372,21 +411,28 @@
       const breakingCount = stories.filter(isBreaking).length;
       if (state.page === "reports") {
         $("counts").textContent = `${state.reportStories.length} stratejik rapor & küresel endeks`;
+      } else if (state.page === "airspace") {
+        const radar = state.data && state.data.airspace_radar;
+        $("counts").textContent = radar ? `${radar.total_active_zones || (radar.zones || []).length} aktif kriz bölgesi · ${radar.do_not_operate_count || 0} uçuşa kapalı` : "Hava Sahası Radarı";
       } else {
         $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
       }
     }
 
     function setPage(pageName) {
-      if (!["briefing", "reports", "archive"].includes(pageName)) return;
+      if (!["briefing", "reports", "airspace", "archive"].includes(pageName)) return;
       state.page = pageName;
       archiveRequestId++;
       $("archive-controls").hidden = pageName !== "archive";
       document.querySelectorAll("[data-page]").forEach(btn => {
         btn.setAttribute("aria-pressed", String(btn.dataset.page === pageName));
       });
-      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : "‹ Briefing";
-      if (pageName === "archive") { loadArchive(state.archiveDate || previousDate(istanbulToday())); return; }
+      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : "‹ Briefing";
+      if (pageName === "archive") {
+        if ($("airspace-alert-banner")) $("airspace-alert-banner").hidden = true;
+        loadArchive(state.archiveDate || previousDate(istanbulToday()));
+        return;
+      }
       const url = new URL(location.href);
       url.searchParams.delete("archive");
       history.replaceState(null, "", url.pathname + url.search + url.hash);
@@ -475,6 +521,22 @@
       if (state.page !== "archive") state.stories = stories;
       $("nav-briefing-count").textContent = String(dailyStories.length);
       $("nav-reports-count").textContent = String(reportStories.length);
+      const radar = data.airspace_radar;
+      const airspaceCount = radar ? (radar.total_active_zones || (radar.zones || []).length) : 0;
+      if ($("nav-airspace-count")) $("nav-airspace-count").textContent = String(airspaceCount);
+
+      const banner = $("airspace-alert-banner");
+      if (banner) {
+        const hasDanger = radar && (radar.do_not_operate_count > 0 || (radar.zones || []).some(z => z.risk_level === "DO_NOT_OPERATE"));
+        if (hasDanger && state.page === "briefing") {
+          const dangerCount = radar.do_not_operate_count || (radar.zones || []).filter(z => z.risk_level === "DO_NOT_OPERATE").length;
+          $("airspace-banner-msg").innerHTML = `<strong>Hava Sahası Kriz Uyarısı:</strong> ${dangerCount} kritik hava sahası sivil uçuşlara kapalı (EASA CZIB / Do Not Fly). Bölgesel çatışma ve GPS karıştırma riski mevcut.`;
+          banner.hidden = false;
+        } else {
+          banner.hidden = true;
+        }
+      }
+
       if (state.page === "archive") return;
 
       const sections = new Set(dailyStories.map(sectionOf));
@@ -559,8 +621,78 @@
       $("content").innerHTML = html;
     }
 
+    function renderAirspaceRadar() {
+      const radar = state.data && state.data.airspace_radar ? state.data.airspace_radar : null;
+      if (!radar || !radar.zones || !radar.zones.length) {
+        $("content").innerHTML = `<div class="state">Aktif hava sahası kriz bülteni bulunamadı.</div><div class="end">— Hava Sahası Radarı Sonu —</div>`;
+        return;
+      }
+      const filter = state.airspaceFilter || "All";
+      const allZones = radar.zones;
+      const visible = filter === "All" ? allZones : allZones.filter(z => z.risk_level === filter);
+
+      let html = `<div class="airspace-intro" lang="tr">
+        <strong>🚨 Havacılık Güvenliği &amp; Çatışma Bölgeleri Radarı</strong> — EASA CZIB (Conflict Zone Information Bulletins) ve küresel FIR kısıtlamaları. THY, Pegasus ve uluslararası havayollarının rota planlamasını ve uçuş güvenliğini doğrudan etkileyen aktif hava sahası yasakları, füze tehditleri, FL irtifa kısıtlamaları ve GPS/GNSS karıştırma ikazları.
+      </div>`;
+
+      html += `<div class="airspace-stats-grid">
+        <div class="airspace-stat-card stat-danger">
+          <span class="airspace-stat-val">${radar.do_not_operate_count || 0}</span>
+          <span class="airspace-stat-label">Uçuşa Kapalı (Do Not Fly)</span>
+        </div>
+        <div class="airspace-stat-card stat-warning">
+          <span class="airspace-stat-val">${radar.restricted_count || 0}</span>
+          <span class="airspace-stat-label">İrtifa / Askeri Kısıt</span>
+        </div>
+        <div class="airspace-stat-card stat-caution">
+          <span class="airspace-stat-val">${radar.caution_count || 0}</span>
+          <span class="airspace-stat-label">GPS / Teyakkuz Sahası</span>
+        </div>
+      </div>`;
+
+      const filterOptions = [
+        ["All", "Tümü", allZones.length],
+        ["DO_NOT_OPERATE", "🔴 Uçuşa Kapalı", radar.do_not_operate_count || 0],
+        ["RESTRICTED", "🟠 İrtifa Kısıtı", radar.restricted_count || 0],
+        ["CAUTION", "🟡 GPS & Teyakkuz", radar.caution_count || 0]
+      ];
+
+      html += `<nav class="filters" aria-label="Filter by risk level"><div class="filters-inner">
+        ${filterOptions.map(([val, label, cnt]) =>
+          `<button class="chip" type="button" data-airspace-filter="${escapeHtml(val)}" aria-pressed="${val === filter}">${escapeHtml(label)}<span>${cnt}</span></button>`).join("")}
+      </div></nav>`;
+
+      html += `<div class="airspace-list">`;
+      visible.forEach(z => {
+        const isDanger = z.risk_level === "DO_NOT_OPERATE";
+        const isRestricted = z.risk_level === "RESTRICTED" || z.risk_level === "HIGH_RISK" || z.risk_level === "WARNING";
+        const cardClass = isDanger ? "" : (isRestricted ? "card-restricted" : "card-caution");
+        const pillClass = isDanger ? "pill-danger" : (isRestricted ? "pill-warning" : "pill-caution");
+
+        html += `<div class="airspace-card ${cardClass}">
+          <div class="airspace-card-head">
+            <div>
+              <h3 class="airspace-card-title">${escapeHtml(z.country)} <span style="font-weight:400;color:var(--muted)">— ${escapeHtml(z.title)}</span></h3>
+              <div class="airspace-card-fir">FIR Kodu: <strong>${escapeHtml(z.fir)}</strong></div>
+            </div>
+            <span class="airspace-pill ${pillClass}">${escapeHtml(z.risk_badge || z.risk_level)}</span>
+          </div>
+          <div class="airspace-restr"><strong>Kısıtlama:</strong> ${escapeHtml(z.restriction_tr || z.restriction_en)}</div>
+          <p class="airspace-desc">${escapeHtml(z.summary_tr || z.summary_en)}</p>
+          <div class="airspace-card-footer">
+            <span>Bülten: <strong>${escapeHtml(z.bulletin_code || "EASA CZIB")}</strong> · ${escapeHtml(z.published_date || "")}</span>
+            <a class="airspace-link" href="${safeExternalUrl(z.link)}" target="_blank" rel="noopener noreferrer">Resmî EASA Bülteni ↗</a>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+      html += `<div class="end">— Hava Sahası Radarı Sonu —</div>`;
+      $("content").innerHTML = html;
+    }
+
     function renderList() {
       if (state.page === "reports") { renderReportsList(); return; }
+      if (state.page === "airspace") { renderAirspaceRadar(); return; }
       const { filter } = state;
       const stories = state.stories;
       if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${state.page === "archive" ? "No eligible stories in this saved briefing." : EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
@@ -889,6 +1021,8 @@
       });
       checkForNewVersion();
       $("btn-share").addEventListener("click", shareBriefing);
+      const airspaceBannerBtn = $("airspace-banner-btn");
+      if (airspaceBannerBtn) airspaceBannerBtn.addEventListener("click", () => setPage("airspace"));
       document.querySelector(".page-nav").addEventListener("click", (e) => {
         const btn = e.target.closest("[data-page]");
         if (btn) setPage(btn.dataset.page);
@@ -903,6 +1037,14 @@
         $("mkt-toggle").setAttribute("aria-expanded", String(open));
       });
       $("content").addEventListener("click", (e) => {
+        const airspaceChip = e.target.closest("[data-airspace-filter]");
+        if (airspaceChip) {
+          state.airspaceFilter = airspaceChip.dataset.airspaceFilter;
+          renderList();
+          const pressed = [...document.querySelectorAll("[data-airspace-filter]")].find(el => el.dataset.airspaceFilter === state.airspaceFilter);
+          if (pressed) pressed.focus({ preventScroll: true });
+          return;
+        }
         const reportChip = e.target.closest("[data-report-filter]");
         if (reportChip) {
           state.reportFilter = reportChip.dataset.reportFilter;
