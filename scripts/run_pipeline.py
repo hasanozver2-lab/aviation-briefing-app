@@ -25,6 +25,7 @@ from api import source_catalog
 from api import source_retry
 from api import source_recovery
 from api import story_lifecycle
+from api import urls
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
 STATUS_FETCH_ERROR = "error"
@@ -158,6 +159,22 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
     if day:
         description_limit = _engine.load_description_limit()
         story_lifecycle.present_stories(day, now, config)
+
+        # Unshorten any Google News URLs on active stories into direct publisher links
+        for story in day.get("stories", []):
+            orig = story.get("original_source") or {}
+            orig_url = orig.get("url", "")
+            if "news.google.com" in orig_url:
+                res = urls.unshorten_google_news_url(orig_url)
+                if res and res != orig_url:
+                    orig["url"] = res
+                    story["original_source"] = orig
+            for entry in story.get("sources", []):
+                entry_url = entry.get("url", "")
+                if "news.google.com" in entry_url:
+                    res = urls.unshorten_google_news_url(entry_url)
+                    if res:
+                        entry["url"] = res
         # The archive-only low band costs no LLM calls; it is narrated if its score ever reaches the list.
         # A headline-only story's publisher summary is held in memory for the model call and never written to the archive.
         incoming = {item["story_id"]: item for item in (collected or {}).get("stories", [])}
