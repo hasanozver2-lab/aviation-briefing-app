@@ -227,6 +227,26 @@
     .calendar-link { font: 500 11.5px/1 var(--sans); color: var(--ink); text-decoration: none; align-self: flex-start; margin-top: 4px; }
     .calendar-link:hover { text-decoration: underline; }
 
+    .fleet-intro { padding: 18px var(--pad) 14px; font: 400 14px/1.55 var(--sans); color: var(--ink-2); background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+    .fleet-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; padding: 14px var(--pad); border-bottom: 1px solid var(--rule); }
+    .fleet-stat-card { background: var(--paper-2); border: 1px solid var(--rule-2); padding: 12px 14px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .fleet-stat-val { font: 700 24px/1 var(--mono); color: var(--ink); }
+    .fleet-stat-label { font: 500 11px/1.3 var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    .fleet-list { padding: 16px var(--pad); display: flex; flex-direction: column; gap: 14px; }
+    .fleet-card { background: var(--paper-2); border: 1px solid var(--rule-2); border-left: 4px solid var(--ink); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .fleet-card.sev-critical { border-left-color: #DC2626; }
+    .fleet-card.sev-high { border-left-color: #EA580C; }
+    .fleet-card.sev-watch { border-left-color: #16A34A; }
+    .fleet-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .fleet-card-title { font: 600 17px/1.25 var(--serif); color: var(--ink); margin: 0; }
+    .fleet-pill { font: 700 10.5px/1 var(--sans); color: #fff; padding: 4px 8px; border-radius: 3px; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+    .fleet-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0; }
+    .fleet-tag { font: 500 11px/1 var(--mono); background: var(--paper); border: 1px solid var(--rule-2); padding: 3px 6px; border-radius: 3px; color: var(--ink-2); }
+    .fleet-thy-box { background: rgba(0,0,0,0.03); border: 1px solid var(--rule-2); border-radius: 4px; padding: 10px 12px; font: 400 13px/1.45 var(--sans); color: var(--ink-2); }
+    .fleet-thy-box strong { color: var(--ink); }
+    .fleet-desc { font: 400 13.5px/1.5 var(--sans); color: var(--ink-2); margin: 0; }
+    .fleet-footer { display: flex; justify-content: space-between; align-items: center; font: 400 11.5px/1.3 var(--sans); color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule); flex-wrap: wrap; gap: 6px; }
+
     .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
     .ios-prompt[hidden] { display: none; }
     .ios-prompt button { color: var(--paper-2); font-size: 16px; }
@@ -252,6 +272,7 @@
         <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
         <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
         <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span lang="tr">🚨 Hava Sahası Radarı</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
+        <button class="page-btn" type="button" data-page="fleet" aria-pressed="false"><span lang="tr">✈️ Filo &amp; Motor Radarı</span> <span class="page-cnt" id="nav-fleet-count">0</span></button>
         <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span lang="tr">Arşiv</span></button>
       </nav>
     </header>
@@ -327,7 +348,7 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
+    const state = { page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", fleetFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
     let archiveRequestId = 0;
     state.archiveDate = "";
@@ -438,20 +459,23 @@
       } else if (state.page === "airspace") {
         const radar = state.data && state.data.airspace_radar;
         $("counts").textContent = radar ? `${radar.total_active_zones || (radar.zones || []).length} aktif kriz bölgesi · ${radar.do_not_operate_count || 0} uçuşa kapalı` : "Hava Sahası Radarı";
+      } else if (state.page === "fleet") {
+        const fleet = state.data && state.data.fleet_watch;
+        $("counts").textContent = fleet ? `${fleet.total_programs || 0} filo programı · ${fleet.grounding_count || 0} kritik motor sorunu` : "Filo & Motor Radarı";
       } else {
         $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
       }
     }
 
     function setPage(pageName) {
-      if (!["briefing", "reports", "airspace", "archive"].includes(pageName)) return;
+      if (!["briefing", "reports", "airspace", "fleet", "archive"].includes(pageName)) return;
       state.page = pageName;
       archiveRequestId++;
       $("archive-controls").hidden = pageName !== "archive";
       document.querySelectorAll("[data-page]").forEach(btn => {
         btn.setAttribute("aria-pressed", String(btn.dataset.page === pageName));
       });
-      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : "‹ Briefing";
+      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : pageName === "fleet" ? "‹ Filo Radarı" : "‹ Briefing";
       if (pageName === "archive") {
         if ($("airspace-alert-banner")) $("airspace-alert-banner").hidden = true;
         loadArchive(state.archiveDate || previousDate(istanbulToday()));
@@ -548,6 +572,9 @@
       const radar = data.airspace_radar;
       const airspaceCount = radar ? (radar.total_active_zones || (radar.zones || []).length) : 0;
       if ($("nav-airspace-count")) $("nav-airspace-count").textContent = String(airspaceCount);
+      const fleet = data.fleet_watch;
+      const fleetCount = fleet ? (fleet.total_programs || (fleet.programs || []).length) : 0;
+      if ($("nav-fleet-count")) $("nav-fleet-count").textContent = String(fleetCount);
 
       const banner = $("airspace-alert-banner");
       if (banner) {
@@ -714,9 +741,86 @@
       $("content").innerHTML = html;
     }
 
+    function renderFleetWatch() {
+      const fleet = state.data && state.data.fleet_watch ? state.data.fleet_watch : null;
+      if (!fleet || !fleet.programs || !fleet.programs.length) {
+        $("content").innerHTML = `<div class="state">Aktif filo ve motor takip kaydı bulunamadı.</div><div class="end">— Filo Radarı Sonu —</div>`;
+        return;
+      }
+      const filter = state.fleetFilter || "All";
+      const allPrograms = fleet.programs;
+      const visible = filter === "All" ? allPrograms : allPrograms.filter(p => p.category === filter);
+
+      let html = `<div class="fleet-intro" lang="tr">
+        <strong>✈️ Filo, Teslimat &amp; Motor Gecikmeleri Radarı</strong> — Airbus, Boeing ve Embraer ticari teslimat hedefleri, Pratt &amp; Whitney GTF (PW1100G) ve CFM LEAP motorlarındaki küresel bakım ve yere indirme (AOG) krizleri, THY ve Pegasus filolarına doğrudan operasyonel ve kapasite etkileri.
+      </div>`;
+
+      html += `<div class="fleet-stats-grid">
+        <div class="fleet-stat-card">
+          <span class="fleet-stat-val" style="color:#DC2626">${fleet.grounding_count || 0}</span>
+          <span class="fleet-stat-label">Motor Bakım / Yere İndirme</span>
+        </div>
+        <div class="fleet-stat-card">
+          <span class="fleet-stat-val" style="color:#EA580C">${fleet.delivery_delay_count || 0}</span>
+          <span class="fleet-stat-label">OEM Teslimat Gecikmesi</span>
+        </div>
+        <div class="fleet-stat-card">
+          <span class="fleet-stat-val">${fleet.total_programs || 0}</span>
+          <span class="fleet-stat-label">İzlenen Filo Programı</span>
+        </div>
+      </div>`;
+
+      const filterOptions = [
+        ["All", "Tümü", allPrograms.length],
+        ["ENGINE_GROUNDING", "🔴 Motor Krizleri (GTF)", fleet.grounding_count || 0],
+        ["DELIVERY_DELAY", "🟠 Teslimat Gecikmeleri", fleet.delivery_delay_count || 0],
+        ["FLEET_EXPANSION", "🟢 Filo Genişleme", allPrograms.filter(p => p.category === "FLEET_EXPANSION").length],
+        ["MAINTENANCE_BOTTLENECK", "🟡 MRO Darboğazı", allPrograms.filter(p => p.category === "MAINTENANCE_BOTTLENECK").length]
+      ];
+
+      html += `<nav class="filters" aria-label="Filter fleet programs"><div class="filters-inner">
+        ${filterOptions.map(([val, label, cnt]) =>
+          `<button class="chip" type="button" data-fleet-filter="${escapeHtml(val)}" aria-pressed="${val === filter}">${escapeHtml(label)}<span>${cnt}</span></button>`).join("")}
+      </div></nav>`;
+
+      html += `<div class="fleet-list">`;
+      visible.forEach(p => {
+        const sevClass = p.severity === "CRITICAL" ? "sev-critical" : (p.severity === "HIGH" ? "sev-high" : "sev-watch");
+        const pillBg = p.severity === "CRITICAL" ? "#DC2626" : (p.severity === "HIGH" ? "#EA580C" : "#16A34A");
+
+        const affectedBadges = (p.affected_carriers || []).map(c => `<span class="fleet-tag"><strong>${escapeHtml(c)}</strong></span>`).join("");
+        const modelBadges = (p.aircraft_models || []).map(m => `<span class="fleet-tag">${escapeHtml(m)}</span>`).join("");
+
+        html += `<div class="fleet-card ${sevClass}">
+          <div class="fleet-card-head">
+            <div>
+              <span class="eyebrow" style="color:var(--muted)">${escapeHtml(p.category_tr)}</span>
+              <h3 class="fleet-card-title">${escapeHtml(p.title_tr)}</h3>
+            </div>
+            <span class="fleet-pill" style="background:${pillBg}">${escapeHtml(p.severity_badge || p.severity)}</span>
+          </div>
+          <div class="fleet-tags">
+            <span class="fleet-tag" style="background:var(--paper-2);font-weight:600">⚙️ ${escapeHtml(p.engine_model)}</span>
+            ${modelBadges}
+          </div>
+          <p class="fleet-desc">${escapeHtml(p.current_status_tr)}</p>
+          ${p.thy_pegasus_impact_tr ? `<div class="fleet-thy-box" lang="tr"><strong>🇹🇷 THY &amp; Pegasus Operasyonel Etkisi:</strong> ${escapeHtml(p.thy_pegasus_impact_tr)}</div>` : ""}
+          <div style="font:400 12.5px/1.4 var(--sans);color:var(--muted)"><strong>Etkilenen Başlıca Havayolları:</strong> <div class="fleet-tags" style="display:inline-flex">${affectedBadges}</div></div>
+          <div class="fleet-footer">
+            <span>Zaman Ufku: <strong>${escapeHtml(p.timeline_horizon || "")}</strong></span>
+            <span>Kaynak: ${escapeHtml(p.source_reference || "")}</span>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+      html += `<div class="end">— Filo Radarı Sonu —</div>`;
+      $("content").innerHTML = html;
+    }
+
     function renderList() {
       if (state.page === "reports") { renderReportsList(); return; }
       if (state.page === "airspace") { renderAirspaceRadar(); return; }
+      if (state.page === "fleet") { renderFleetWatch(); return; }
       const { filter } = state;
       const stories = state.stories;
       if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${state.page === "archive" ? "No eligible stories in this saved briefing." : EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
@@ -1119,6 +1223,14 @@
         $("mkt-toggle").setAttribute("aria-expanded", String(open));
       });
       $("content").addEventListener("click", (e) => {
+        const fleetChip = e.target.closest("[data-fleet-filter]");
+        if (fleetChip) {
+          state.fleetFilter = fleetChip.dataset.fleetFilter;
+          renderList();
+          const pressed = [...document.querySelectorAll("[data-fleet-filter]")].find(el => el.dataset.fleetFilter === state.fleetFilter);
+          if (pressed) pressed.focus({ preventScroll: true });
+          return;
+        }
         const airspaceChip = e.target.closest("[data-airspace-filter]");
         if (airspaceChip) {
           state.airspaceFilter = airspaceChip.dataset.airspaceFilter;

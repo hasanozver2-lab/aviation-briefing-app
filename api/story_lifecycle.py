@@ -30,7 +30,7 @@ RELEVANCE_CONFIG_PATH = BASE_DIR / "config" / "relevance.json"
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 BADGE_NEW, BADGE_UPDATED, BADGE_BREAKING = "new", "updated", "breaking"
 # Not part of the change fingerprint: they differ on every run without meaning anything.
-VOLATILE_DAY_KEYS = {"generated_at", "time_str", "last_pipeline_run_at", "last_pipeline_attempt_at", "heading", "warning", "market", "airspace_radar", "earnings_calendar", "badges"}
+VOLATILE_DAY_KEYS = {"generated_at", "time_str", "last_pipeline_run_at", "last_pipeline_attempt_at", "heading", "warning", "market", "airspace_radar", "earnings_calendar", "fleet_watch", "badges"}
 VOLATILE_STORY_KEYS = {"badges"}
 HEAD_KEYS_TO_DROP = {"stories"}
 # The LLM-written part of a story. It is kept when a story is refreshed, and regenerated only after
@@ -966,6 +966,15 @@ def fingerprint(day):
         "events": [
             {"id": e.get("id"), "date": e.get("date"), "status": e.get("status")}
             for e in cal.get("events", [])
+        ],
+    }
+    fleet = day.get("fleet_watch") or {}
+    core["fleet_watch"] = {
+        "status": fleet.get("status"),
+        "total_programs": fleet.get("total_programs"),
+        "programs": [
+            {"id": p.get("id"), "severity": p.get("severity")}
+            for p in fleet.get("programs", [])
         ],
     }
     return hashlib.sha256(json.dumps(core, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()

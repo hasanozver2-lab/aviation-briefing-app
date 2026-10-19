@@ -28,6 +28,7 @@ from api import story_lifecycle
 from api import urls
 from api import airspace_radar
 from api import earnings_calendar
+from api import fleet_watch
 
 STATUS_OK, STATUS_STALE = "ok", "stale"
 STATUS_FETCH_ERROR = "error"
@@ -53,7 +54,8 @@ def day_payload(collected, now):
     head = _engine.build_briefing_payload("daily", [], status="ok")
     radar = collected.get("airspace_radar") or airspace_radar.load_radar(now=now)
     calendar = collected.get("earnings_calendar") or earnings_calendar.load_calendar(now=now)
-    payload = {**head, "market": collected["market"], "airspace_radar": radar, "earnings_calendar": calendar, "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
+    fleet = collected.get("fleet_watch") or fleet_watch.load_fleet_watch()
+    payload = {**head, "market": collected["market"], "airspace_radar": radar, "earnings_calendar": calendar, "fleet_watch": fleet, "last_pipeline_run_at": timestamp(now), "stories": collected["stories"]}
     if collected.get("morning_deep_scan") or story_lifecycle.is_morning_deep_window(now):
         payload["morning_deep_scan"] = True
     if collected.get("force_morning_reset"):
