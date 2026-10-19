@@ -45,7 +45,9 @@ def archive_page(browser, request):
                                        story("report", "Strategic report", is_strategic_report=True)])
     today["verification_pending_count"] = 1
     today["verification_pending_stories"] = [{"story_id": "pending", "headline": "Publisher headline <unsafe>",
-                                              "reported_source": "Trade press", "language": "en"}]
+                                              "reported_source": "Trade press", "language": "en",
+                                              "lead": "Unsupported old analysis", "badges": ["breaking"],
+                                              "original_source": {"url": "https://news.google.com/fake"}}]
     archived = payload(YESTERDAY, [story("old", "Previously collected airline story"),
                                   story("low", "Lower-score archived story", level="low", listed=False)])
 
@@ -126,17 +128,44 @@ def test_archive_controls_fit_viewport(archive_page):
     assert not errors
 
 
-def test_pending_headlines_are_separate_safe_and_hidden_on_other_pages(archive_page):
+def test_unchecked_headlines_are_normal_clickable_rows_without_unsupported_analysis(archive_page):
     page, errors, requests = archive_page
     page.goto("https://archive.test/", wait_until="networkidle")
-    panel = page.locator("#verification-pending")
-    playwright.expect(panel).to_be_visible()
-    playwright.expect(panel).to_contain_text("Publisher headline <unsafe>")
-    assert panel.locator("a, unsafe, .breaking, .new, [data-open]").count() == 0
-    playwright.expect(page.locator("#counts")).to_contain_text("1 awaiting verification")
+    row = page.locator('#content [data-open="pending"]')
+    playwright.expect(row).to_be_visible()
+    playwright.expect(row).to_contain_text("Publisher headline <unsafe>")
+    playwright.expect(row).to_contain_text("Source not checked")
+    assert row.locator("unsafe, .breaking, .new").count() == 0
+    assert page.locator("#verification-pending").count() == 0
+    playwright.expect(page.locator("#counts")).to_have_text("2 stories · 1 breaking")
+    row.click()
+    playwright.expect(page.locator("#art-body h1")).to_have_text("Publisher headline <unsafe>")
+    assert "Unsupported old analysis" not in page.locator("#art-body").inner_text()
+    assert page.locator("#art-body a, #art-body .breaking").count() == 0
+    page.locator("#art-back").click()
     page.locator('[data-page="reports"]').click()
-    playwright.expect(panel).to_be_hidden()
+    assert page.locator('#content [data-open="pending"]').count() == 0
     page.locator('[data-page="archive"]').click()
     playwright.expect(page.locator("#archive-status")).to_contain_text("2 stories")
-    playwright.expect(panel).to_be_hidden()
+    assert page.locator('#content [data-open="pending"]').count() == 0
+    assert not errors
+
+
+def test_unchecked_headlines_join_polling_and_deduplicate_when_verified(archive_page):
+    page, errors, requests = archive_page
+    page.goto("https://archive.test/", wait_until="networkidle")
+    page.evaluate("""() => {
+      window.scrollTo(0, 0);
+      applyPolled({...state.data, verification_pending_stories: [
+        ...state.data.verification_pending_stories,
+        {story_id: 'new-unchecked', headline: 'Newly collected publisher title', reported_source: 'Official'}
+      ]});
+    }""")
+    playwright.expect(page.locator('#content [data-open="new-unchecked"]')).to_be_visible()
+    page.evaluate("""() => render({...state.data,
+      stories: [...state.data.stories, {story_id: 'pending', headline: 'Confirmed publisher title',
+        region_section: 'Europe', sources: [], badges: [], narrative_status: 'pending'}]
+    })""")
+    playwright.expect(page.locator('#content [data-open="pending"]')).to_have_count(1)
+    playwright.expect(page.locator('#content [data-open="pending"]')).to_contain_text("Confirmed publisher title")
     assert not errors

@@ -1,5 +1,11 @@
 # AeroBrief — HANDOFF
 
+## Immediate headline visibility — 2026-10-19
+
+- User decision: show previously collected, unverified publisher headlines in the normal news list immediately; source checks are left to the reader. The separate waiting area and verified-only counter wording are removed.
+- `visibleStories()` combines the verified API stories with a whitelisted projection of `verification_pending_stories` in daily, archived and polled views. Confirmed stories win by permanent ID, preventing duplicate rows when evidence arrives. Policy/licence, military and commentary exclusions remain unchanged.
+- Unchecked rows open in the ordinary story reader and carry “Source not checked”, not fake scores, Breaking/New badges, generated facts or invented publisher links. Missing source URLs no longer render a bogus “Original source” link. Archived records and the pipeline's direct-evidence recovery are unchanged.
+
 ## Verified coverage recovery — 2026-10-19
 
 - The source-integrity filter hid legitimate-looking legacy headlines together with unverified ones. Do not relax publisher policy or restore generated facts: `api/source_recovery.py` reconciles archived search-only stories against the full pool of currently collected, active/public CSV publisher candidates, before selection caps. Matching requires near-identical publisher titles, compatible quantities and a real publication timestamp within the configured date window (`config/source_recovery.json`).

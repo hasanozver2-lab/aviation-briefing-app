@@ -46,12 +46,6 @@
     .archive-controls input, .archive-controls button { padding: 9px; min-height: 44px; border: 1px solid var(--rule-2); border-radius: 4px; background: var(--paper); color: var(--ink); font: inherit; max-width: 100%; }
     .archive-controls button:disabled { opacity: .45; cursor: default; }
     .archive-note { width: 100%; margin: 0; color: var(--muted); font-weight: 400; }
-    .verification-pending { margin: 18px var(--pad); padding: 16px 0; border-top: 1px solid var(--rule); font: 400 13px/1.5 var(--sans); color: var(--body); }
-    .verification-pending[hidden] { display: none; }
-    .verification-pending h2 { margin: 0 0 8px; font: 600 16px/1.3 var(--sans); color: var(--ink); }
-    .verification-pending ul { padding-left: 20px; }
-    .verification-pending li { margin: 12px 0; }
-    .verification-pending .by { display: block; color: var(--muted); font-size: 12px; }
     .page-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border: 1px solid var(--rule-2); border-radius: 999px; font: 600 11.5px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--paper); transition: background .15s ease, color .15s ease; }
     .page-btn .page-cnt { font: 500 11px/1 var(--mono); color: var(--faint); }
     .page-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -211,7 +205,6 @@
     </section>
 
     <main id="content"><div class="state">Loading the briefing…</div></main>
-    <section id="verification-pending" class="verification-pending" aria-label="Headlines awaiting source verification" hidden></section>
   </div>
 
   <button id="new-pill" type="button" hidden></button>
@@ -283,6 +276,17 @@
       const seen = new Set();
       return stories.filter(s => { const k = storyKey(s); if (seen.has(k)) return false; seen.add(k); return true; });
     }
+    function visibleStories(data) {
+      const stories = Array.isArray(data.stories) ? data.stories : [];
+      const unchecked = Array.isArray(data.verification_pending_stories) ? data.verification_pending_stories : [];
+      // Show collected titles immediately, without reviving unsupported analysis or inventing source URLs.
+      return dedupe(stories.concat(unchecked.map(item => ({
+        story_id: item.story_id, headline: item.headline, language: langOf(item),
+        original_source: { source_name: item.reported_source }, sources: [], badges: [],
+        source_verification_status: "unverified", narrative_status: "unavailable"
+      }))));
+    }
+    function isUnverified(story) { return story.source_verification_status === "unverified"; }
     function isStrategicReport(story) { return Boolean(story && story.is_strategic_report); }
     function sectionOf(story) { return story.region_section || "Other"; }
     function badgeSet(story) { return new Set(Array.isArray(story.badges) ? story.badges : []); }
@@ -296,6 +300,7 @@
       const badges = state.page === "archive" ? new Set() : badgeSet(story);
       const level = LEVEL_LABELS[story.level];
       return [
+        isUnverified(story) ? `<span lang="en">Source not checked</span>` : "",
         level ? `<span lang="en" class="lvl-${escapeHtml(story.level)}">${level}</span>` : "",
         badges.has("breaking") ? `<span lang="en" class="breaking">Breaking</span>` : "",
         badges.has("new") ? `<span lang="en" class="new">New</span>` : "",
@@ -347,8 +352,7 @@
       if (state.page === "reports") {
         $("counts").textContent = `${state.reportStories.length} stratejik rapor & küresel endeks`;
       } else {
-        const pendingCount = (state.data && state.data.verification_pending_count) || 0;
-        $("counts").textContent = `${stories.length} verified ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking${pendingCount ? ` · ${pendingCount} awaiting verification` : ""}`;
+        $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
       }
     }
 
@@ -386,12 +390,11 @@
     }
     function renderArchive(data) {
       state.archiveData = data;
-      state.stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
+      state.stories = visibleStories(data);
       state.filter = "All";
       updateMastCount();
       $("archive-status").textContent = `${state.stories.length} stories collected for this day.`;
       renderList();
-      renderVerificationPending(data);
       openLinkedStory();
     }
     async function loadArchive(dateText) {
@@ -409,7 +412,6 @@
       $("stale").hidden = true;
       $("market").hidden = true;
       $("new-pill").hidden = true;
-      $("verification-pending").hidden = true;
       $("archive-status").textContent = "Loading archive…";
       $("counts").textContent = "Archive";
       $("content").innerHTML = `<div class="state">Loading the selected day's stories…</div>`;
@@ -443,7 +445,7 @@
       state.data = data;
       state.pending = null;
       $("new-pill").hidden = true;
-      const allStories = dedupe(Array.isArray(data.stories) ? data.stories : []);
+      const allStories = visibleStories(data);
       const dailyStories = allStories.filter(s => !isStrategicReport(s));
       const reportStories = allStories.filter(isStrategicReport);
       state.dailyStories = dailyStories;
@@ -466,19 +468,11 @@
 
       renderMarket(data.market);
       renderList();
-      renderVerificationPending(data);
       if (state.articleId) renderArticle();
       openLinkedStory();
     }
 
     function parseTime(value) { const t = Date.parse(value || ""); return Number.isFinite(t) ? t : null; }
-    function renderVerificationPending(data) {
-      const panel = $("verification-pending");
-      const items = Array.isArray(data.verification_pending_stories) ? data.verification_pending_stories : [];
-      panel.hidden = state.page === "reports" || !items.length;
-      if (panel.hidden) { panel.innerHTML = ""; return; }
-      panel.innerHTML = `<h2>Awaiting source verification · ${items.length}</h2><p>Previously collected headlines awaiting confirmation from a direct publisher source. These are not verified briefing stories; analysis and source links appear only after confirmation.</p><ul>${items.map(item => `<li lang="${langOf(item)}">${escapeHtml(item.headline)}<span class="by" lang="en">Reported source: ${escapeHtml(item.reported_source || "Unknown")} · Unverified</span></li>`).join("")}</ul>`;
-    }
     function ageText(minutes) {
       if (minutes < 1) return "just now";
       if (minutes < 60) return `${minutes} min ago`;
@@ -703,7 +697,7 @@
       const s = state.order[i], next = state.order[i + 1];
       const lang = langOf(s);
       const src = s.original_source || {};
-      const type = SOURCE_TYPES[src.source_type] || "Verified source";
+      const type = isUnverified(s) ? "Source not checked" : (SOURCE_TYPES[src.source_type] || "Verified source");
       const analysis = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
       const dps = (s.data_points || []).map(d => `<span>${escapeHtml(d)}</span>`).join("");
       const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
@@ -721,6 +715,7 @@
         <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
         <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
         ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
+        ${isUnverified(s) ? `<p class="art-src" lang="en">This collected headline has not been independently checked. No verified publisher link or analysis is available; please check the named publisher yourself.</p>` : ""}
         ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}
         ${s.why_it_matters ? `<div class="art-why"><span lang="en" class="eyebrow">Why it matters</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
         ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}
@@ -728,7 +723,7 @@
         ${dps ? `<div class="datapoints" lang="${lang}">${dps}</div>` : ""}
         ${strategic || exposure ? `<div class="impact"><span lang="en" class="eyebrow">Strategic &amp; market impact</span>${strategic ? `<p lang="${lang}">${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
         ${coverageHtml}
-        <a class="art-link" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>
+        ${src.url ? `<a class="art-link" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>` : ""}
         ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next story ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
       $("art-scroll").scrollTop = 0;
     }
@@ -818,7 +813,7 @@
     function applyPolled(data) {
       if (state.page === "archive") return;
       const known = new Set(state.dailyStories.concat(state.reportStories).map(storyKey));
-      const arrived = dedupe(Array.isArray(data.stories) ? data.stories : []).filter(s => !known.has(storyKey(s)));
+      const arrived = visibleStories(data).filter(s => !known.has(storyKey(s)));
       const atTop = window.scrollY < SCROLL_TOP_THRESHOLD && !state.articleId;
       const label = `${arrived.length} new ${arrived.length === 1 ? "story" : "stories"}`;
       if (!arrived.length) { if (atTop) render(data); return; }
