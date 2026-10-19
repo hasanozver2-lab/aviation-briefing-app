@@ -9,6 +9,12 @@ on:
   schedule:
     - cron: "0 2,5,8,11,14,17,20,23 * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force run even in off-hours'
+        required: false
+        type: boolean
+        default: true
 
 # The narrowest permission that lets the job push the data branch with GITHUB_TOKEN.
 permissions:
@@ -34,4 +40,9 @@ jobs:
           ALERT_FEEDS: ${{ secrets.ALERT_FEEDS }}
           BRIEFING_STORE: github
           MARKET_DB_PATH: ${{ runner.temp }}/aerobrief-market.sqlite3
-        run: python scripts/run_pipeline.py
+        run: |
+          FORCE_ARG=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" != "false" ]; then
+            FORCE_ARG="--force"
+          fi
+          python scripts/run_pipeline.py $FORCE_ARG

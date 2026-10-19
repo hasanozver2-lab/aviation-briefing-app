@@ -262,9 +262,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out-dir", help="read and write files here instead of the store (dry run)")
     parser.add_argument("--force-morning-reset", action="store_true", help="force a full 08:00 morning deep reset")
+    parser.add_argument("--force", action="store_true", help="force run even during off-hours")
     args = parser.parse_args()
     now = datetime.now(timezone.utc)
-    if not args.force_morning_reset and not args.out_dir and _should_skip_unscheduled_cloud_trigger(now):
+    if not args.force and not args.force_morning_reset and not args.out_dir and _should_skip_unscheduled_cloud_trigger(now):
         print("Skipping off-hour trigger; next scan runs on the 3-hour schedule (08, 11, 14, 17, 20, 23, 02, 05 Europe/Istanbul).")
         return 0
     return run(args.out_dir, now=now, force_morning_reset=args.force_morning_reset)
