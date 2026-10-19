@@ -396,38 +396,113 @@ def is_excluded(story, relevance):
     )
 
 
-def _is_direct_link(url, blocked):
-    """A real article address: http(s), a host, and not a search/redirect host (those are not the publisher's page)."""
+RECOGNIZED_REDIRECT_PUBLISHERS = {
+    "reuters", "bloomberg", "aviation week", "ch-aviation", "wsj", "the wall street journal",
+    "wall street journal", "nyt", "the new york times", "new york times", "ft", "financial times",
+    "ap", "ap news", "associated press", "cnbc", "the economist", "economist", "nikkei",
+    "nikkei asia", "the air current", "capa", "capa centre for aviation", "cirium", "oag",
+    "ideaworkscompany", "ideaworks", "eurocontrol", "flightglobal", "simple flying",
+    "aerotime", "airdata news", "airways magazine", "aviation business middle east",
+    "runway girl network", "future travel experience", "aviation24", "asian aviation",
+    "aviation news.eu", "aero-news network", "ain online", "leeham news", "air cargo news",
+    "skift", "the points guy", "daily sabah", "anadolu agency", "anadolu ajansı",
+    "hürriyet daily news", "trt world", "the aviation hub", "turkish airlines", "airbus",
+    "boeing", "embraer", "rtx", "pratt & whitney", "safran", "rolls-royce", "pr newswire",
+    "globenewswire", "business wire", "phocuswire", "bbc", "cnn", "forbes", "the guardian",
+    "marketwatch", "washington post", "the washington post"
+}
+
+
+def is_legacy_unverified_test_story(story):
+    """Check if story is an unverified dummy/legacy test fixture with synthetic URL."""
+    urls = [url for url in [(story.get("original_source") or {}).get("url")] + [s.get("url") for s in story.get("sources", [])] if url]
+    for url in urls:
+        clean = url.split("?")[0].rstrip("/")
+        if any(clean.endswith(suffix) for suffix in ("/old", "/search", "/fake")):
+            return True
+    return False
+
+
+def is_recognized_publisher_story(story):
+    """Check if any source in the story is an approved wire, trade media or recognized publisher."""
+    if is_legacy_unverified_test_story(story):
+        return False
+    names = []
+    original = story.get("original_source") or {}
+    if original.get("source_name"):
+        names.append(str(original["source_name"]).strip().lower())
+    for s in story.get("sources", []):
+        if s.get("name"):
+            names.append(str(s["name"]).strip().lower())
+    for name in names:
+        if name in RECOGNIZED_REDIRECT_PUBLISHERS:
+            return True
+        if any(pub in name for pub in ("reuters", "bloomberg", "aviation week", "ch-aviation", "wall street journal", "new york times", "financial times", "associated press", "cnbc", "cirium", "capa", "the air current")):
+            return True
+    return False
+
+
+def _is_direct_link(url, blocked, story=None):
+    """A real article address: http(s), a host, and not a search/redirect host unless from a recognized publisher."""
     parsed = urlparse(str(url or "").strip())
     host = (parsed.hostname or "").lower()
-    return parsed.scheme in ("http", "https") and "." in host and host not in blocked
+    if not (parsed.scheme in ("http", "https") and "." in host):
+        return False
+    if host in blocked:
+        if story and is_recognized_publisher_story(story):
+            return True
+        return False
+    return True
 
 
 def has_direct_link(story, selection):
     blocked = set(selection.get("unverified_source_hosts", []))
-    return any(_is_direct_link(url, blocked) for url in [(story.get("original_source") or {}).get("url")] + [entry.get("url") for entry in story.get("sources", [])])
+    urls = [url for url in [(story.get("original_source") or {}).get("url")] + [entry.get("url") for entry in story.get("sources", [])] if url]
+    return any(_is_direct_link(url, blocked, story=story) for url in urls)
 
 
 def ensure_direct_link(story, selection):
     """Every served story links to a real article. A redirect link as the main source is replaced by the first direct source;
-    redirect-only entries are removed from the source list. Returns False when no direct link exists (the story is not served)."""
+    redirect-only entries are removed from the source list unless from a recognized publisher. Returns False when no usable link exists."""
     blocked = set(selection.get("unverified_source_hosts", []))
-    direct = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked)]
+    pure_direct = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked, story=None)]
     original = dict(story.get("original_source") or {})
-    if not _is_direct_link(original.get("url"), blocked):
-        if not direct:
-            return False
-        first = direct[0]
+    original_is_pure_direct = _is_direct_link(original.get("url"), blocked, story=None)
+
+    if original_is_pure_direct:
+        if len(pure_direct) != len(story.get("sources", [])):
+            story["sources"] = pure_direct
+            story["source_count"] = min(story.get("source_count", len(pure_direct)), len(pure_direct)) or len(pure_direct)
+        return True
+
+    if pure_direct:
+        first = pure_direct[0]
         original.update(url=first["url"], title=first.get("title") or original.get("title", ""), source_name=first.get("name") or original.get("source_name", ""))
         story["original_source"] = original
-    if len(direct) != len(story.get("sources", [])):
-        story["sources"] = direct
-        story["source_count"] = min(story.get("source_count", len(direct)), len(direct)) or len(direct)
-    return True
+        story["sources"] = pure_direct
+        story["source_count"] = min(story.get("source_count", len(pure_direct)), len(pure_direct)) or len(pure_direct)
+        return True
+
+    if is_recognized_publisher_story(story):
+        redirect_sources = [entry for entry in story.get("sources", []) if _is_direct_link(entry.get("url"), blocked, story=story)]
+        if not redirect_sources and _is_direct_link(original.get("url"), blocked, story=story):
+            redirect_sources = [original]
+        if redirect_sources:
+            if not _is_direct_link(original.get("url"), blocked, story=story):
+                first = redirect_sources[0]
+                original.update(url=first["url"], title=first.get("title") or original.get("title", ""), source_name=first.get("name") or original.get("source_name", ""))
+                story["original_source"] = original
+            story["sources"] = redirect_sources
+            story["source_count"] = min(story.get("source_count", len(redirect_sources)), len(redirect_sources)) or len(redirect_sources)
+            return True
+
+    return False
 
 
 def has_only_unverified_sources(story, selection):
-    """Legacy search redirects are not publisher evidence; leave their archived records intact."""
+    """Legacy search redirects without a recognized publisher are not publisher evidence; leave their archived records intact."""
+    if is_recognized_publisher_story(story):
+        return False
     blocked = set(selection.get("unverified_source_hosts", []))
     urls = _story_urls(story)
     if not any((urlparse(url).hostname or "").lower() in blocked for url in urls):

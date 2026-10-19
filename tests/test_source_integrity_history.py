@@ -63,7 +63,8 @@ def test_model_json_and_numbers_are_not_publisher_evidence():
     assert seeds == original
 
 
-def test_google_news_is_not_an_alternative_to_disabled_sources():
+def test_google_news_is_not_an_alternative_to_disabled_sources(monkeypatch):
+    monkeypatch.setattr(benchmark_search, "collection_config", lambda: {"allow_google_news": False})
     def forbidden_opener(*args, **kwargs):
         pytest.fail("Google News must not be fetched")
     assert benchmark_search.fetch_google_news_query("airlines", NOW, NOW - timedelta(days=2), opener=forbidden_opener) == []

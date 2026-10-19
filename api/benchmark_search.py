@@ -194,6 +194,15 @@ BENCHMARK_PUBLISHERS = {
         "region": "Global",
         "category_hint": "European and other global airlines",
     },
+    "nytimes.com": {
+        "name": "The New York Times",
+        "source_type": "mainstream",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "Global",
+        "category_hint": "European and other global airlines",
+    },
     "asia.nikkei.com": {
         "name": "Nikkei Asia",
         "source_type": "mainstream",
@@ -687,6 +696,9 @@ PUBLISHER_BY_NAME.update({
     "runway girl": BENCHMARK_PUBLISHERS["runwaygirlnetwork.com"],
     "aviation24.be": BENCHMARK_PUBLISHERS["aviation24.be"],
     "anadolu ajansı": BENCHMARK_PUBLISHERS["aa.com.tr"],
+    "nyt": BENCHMARK_PUBLISHERS["nytimes.com"],
+    "new york times": BENCHMARK_PUBLISHERS["nytimes.com"],
+    "the new york times": BENCHMARK_PUBLISHERS["nytimes.com"],
 })
 
 DISALLOWED_HOSTS = {"youtube.com", "youtu.be", "facebook.com", "instagram.com", "tiktok.com"}
@@ -736,6 +748,7 @@ GOOGLE_NEWS_QUERIES = (
     ("reuters", "site:reuters.com (airline OR airlines OR aviation OR airbus OR boeing OR airport) when:2d"),
     ("bloomberg", "site:bloomberg.com (airline OR airlines OR aviation OR airbus OR boeing OR airport) when:2d"),
     ("ft_wsj", "(site:ft.com OR site:wsj.com) (airline OR airlines OR aviation OR airbus OR boeing) when:2d"),
+    ("nyt", "(site:nytimes.com) (airline OR airlines OR aviation OR airbus OR boeing OR airport OR flight) when:3d"),
     ("cnbc_ap", "(site:cnbc.com OR site:apnews.com) (airline OR airlines OR aviation OR airbus OR boeing) when:2d"),
     ("trade_intel", "(site:aviationweek.com OR site:ch-aviation.com OR site:centreforaviation.com) (airline OR fleet OR capacity OR route OR engine) when:3d"),
     ("benchmarks", "(site:oag.com OR site:cirium.com OR site:ideaworkscompany.com OR OAG OR Cirium OR IdeaWorksCompany) (airline OR aviation OR ancillary OR megahubs OR fleet OR capacity) when:7d"),
@@ -870,6 +883,10 @@ def resolve_publisher_meta(url, source_name=""):
     for domain, meta in BENCHMARK_PUBLISHERS.items():
         if host == domain or host.endswith("." + domain):
             return meta
+    if host in ("", "news.google.com", "google.com") and source_name:
+        clean_name = str(source_name).strip().lower()
+        if clean_name in PUBLISHER_BY_NAME:
+            return PUBLISHER_BY_NAME[clean_name]
     return None
 
 
@@ -1595,17 +1612,29 @@ def parse_search_response(response, now, cutoff, classify_topics_fn=None):
 
 
 def collect(api_key, now, cutoff, post=None, classify_topics_fn=None, include_rss=None, deep_scan=False):
-    """Collect publisher-written strategic reports without using LLM output as source data.
+    """Collect publisher-written strategic reports and wire/trade articles without using LLM output as source data.
 
     Legacy arguments remain for compatibility. Existing RSS/newsroom collection handles daily news.
     """
     if include_rss is False:
         return [], {"status": "not_configured", "error": "Direct publication collection disabled", "articles": 0}
+    articles = []
+    errors = []
     try:
-        articles = collect_strategic_publications(now, cutoff, classify_topics_fn=classify_topics_fn)
+        strat_articles = collect_strategic_publications(now, cutoff, classify_topics_fn=classify_topics_fn)
+        articles.extend(strat_articles)
     except Exception as exc:
         LOGGER.warning("Strategic publication collection failed", exc_info=True)
-        return [], {"status": "error", "error": type(exc).__name__, "articles": 0}
+        errors.append(type(exc).__name__)
+    if collection_config().get("allow_google_news", False):
+        try:
+            gnews_articles = collect_google_news_rss(now, cutoff, classify_topics_fn=classify_topics_fn, deep_scan=deep_scan)
+            articles.extend(gnews_articles)
+        except Exception as exc:
+            LOGGER.warning("Google News RSS collection failed", exc_info=True)
+            errors.append(type(exc).__name__)
+    if not articles and errors:
+        return [], {"status": "error", "error": "; ".join(errors), "articles": 0}
     if not articles:
         return [], {"status": "error", "error": "No verified strategic publications available", "articles": 0}
-    return articles, {"status": "active", "error": "", "articles": len(articles)}
+    return articles, {"status": "active", "error": "; ".join(errors), "articles": len(articles)}

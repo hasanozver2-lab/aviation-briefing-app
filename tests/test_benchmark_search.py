@@ -54,6 +54,7 @@ def test_collect_uses_publisher_articles_without_calling_search(monkeypatch):
         published, NOW,
     )
     monkeypatch.setattr(benchmark_search, "collect_strategic_publications", lambda *args, **kwargs: [article])
+    monkeypatch.setattr(benchmark_search, "collect_google_news_rss", lambda *args, **kwargs: [])
     def forbidden_search():
         pytest.fail("Collection must not call Gemini for source data")
     articles, report = benchmark_search.collect("", NOW, CUTOFF, post=forbidden_search)
@@ -72,6 +73,7 @@ def test_collect_handles_network_failure_gracefully(monkeypatch):
         raise TimeoutError("Gemini search timed out")
 
     monkeypatch.setattr(benchmark_search, "collect_strategic_publications", failing_post)
+    monkeypatch.setattr(benchmark_search, "collect_google_news_rss", lambda *args, **kwargs: [])
     articles, report = benchmark_search.collect("", NOW, CUTOFF)
     assert articles == [] and report == {"status": "error", "error": "TimeoutError", "articles": 0}
 

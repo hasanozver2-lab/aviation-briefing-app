@@ -3,7 +3,7 @@
   "publisher_source_names": {
     "boeing.com": "Boeing News Releases"
   },
-  "allow_google_news": false,
+  "allow_google_news": true,
   "allow_llm_source_data": false,
   "max_redirects": 3,
   "max_edition_lead_years": 1

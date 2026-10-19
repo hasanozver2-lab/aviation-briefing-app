@@ -1,13 +1,13 @@
 {
   "mode": "daily",
   "source_policy": "airline-only-v6",
-  "date_str": "18 October 2026",
-  "time_str": "15:21 UTC",
-  "heading": "Aviation Briefing | 18 October 2026",
+  "date_str": "19 October 2026",
+  "time_str": "05:46 UTC",
+  "heading": "Aviation Briefing | 19 October 2026",
   "intro_sentence": "Below is a summary of the most important verified aviation developments from the last 48 hours.",
   "status": "ok",
   "warning": "",
-  "generated_at": "2026-10-18T15:21:42.696413+00:00",
+  "generated_at": "2026-10-19T05:46:56.963987+00:00",
   "market": {
     "status": "ok",
     "items": [
@@ -149,7 +149,7 @@
         "unit": "USD/varil",
         "source": "FRED (EIA)",
         "carried_forward": true,
-        "age_days": 4
+        "age_days": 5
       },
       {
         "as_of": "2026-10-14",
@@ -289,7 +289,7 @@
         "unit": "USD/galon",
         "source": "FRED (EIA)",
         "carried_forward": true,
-        "age_days": 4
+        "age_days": 5
       },
       {
         "as_of": "2026-10-14",
@@ -432,7 +432,7 @@
         "deviation_from_mean_standard_deviations": 0.009263299567428126,
         "series_id": "jet_fuel_brent_crack_spread",
         "carried_forward": true,
-        "age_days": 4
+        "age_days": 5
       }
     ],
     "iata_monitor": {
@@ -448,10 +448,353 @@
     "fuel_provider": "fred",
     "events": []
   },
-  "last_pipeline_run_at": "2026-10-18T15:21:17+00:00",
-  "date": "2026-10-18",
+  "last_pipeline_run_at": "2026-10-19T05:46:09+00:00",
+  "date": "2026-10-19",
   "timezone": "Europe/Istanbul",
   "stories": [
+    {
+      "id": "story-79948a2765bf",
+      "section": "European and other global airlines",
+      "headline": "Austrian Airlines Flight From Tel Aviv Diverts to Sofia After Threat",
+      "published_at": "18 Oct 22:41",
+      "lead": "An Austrian Airlines flight departing from Tel Aviv was forced to divert to Sofia, Bulgaria, following a reported security threat.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The flight originated in Tel Aviv and was diverted to Sofia.",
+        "The incident was reported as a bomb threat by multiple sources.",
+        "The aircraft landed safely in Bulgaria following the diversion."
+      ],
+      "data_points": [],
+      "strategic_impact": "Security-related diversions on Middle Eastern routes increase operational costs and highlight ongoing regional risks.",
+      "market_exposure": [
+        {
+          "carrier": "Austrian Airlines",
+          "impact": "Negative",
+          "details": "Operational disruption and emergency diversion due to security threat"
+        },
+        {
+          "carrier": "Tel Aviv",
+          "impact": "Negative",
+          "details": "Origin airport for the flight involved in the security incident"
+        },
+        {
+          "carrier": "Sofia",
+          "impact": "Neutral",
+          "details": "Diversion airport for the affected flight"
+        }
+      ],
+      "event_type": "operations_disruption",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000003",
+            "slug": "austrian-airlines",
+            "iata": "OS",
+            "name": "Austrian Airlines",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 3
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Security threats on sensitive routes necessitate immediate and costly operational adjustments to ensure passenger safety.",
+      "original_source": {
+        "title": "Austrian Airlines flight from Tel Aviv diverts to Sofia after 'threat'",
+        "source_name": "Reuters",
+        "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPSUtxZ043QVFPYU1WRmVrQU1EOUswTG5xYWhwYWxrcXhPaFdWX0F0Z2E2TXFNM3lnOE9NdHd4amJtbWRXSkpsOXlVN3M2OUgyYVlrTkNjYUx0YUN3ZlBieEplbXNyLVRKNTYzRGJvdExqZGxjWjNlRE5TdVpyUUhKbzlfeGNVN2diOGcwaU9hS1I5VnE2YjJ3X3REZFFwSkJqdHMzZWpUdEtORElCUnB2RXd2MUJLV2ktYk5DZWVn?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-79948a2765bf",
+      "relevance_score": 73.5,
+      "score_components": {
+        "event_type": 0.8,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.4,
+        "official_source": 0.0,
+        "corroboration": 1.0
+      },
+      "sources": [
+        {
+          "name": "The Aviation Hub",
+          "url": "https://theaviationhub.co.uk/austrian-airlines-flight-tel-aviv-vienna-declares-emergency/?utm_source=rss&utm_medium=rss&utm_campaign=austrian-airlines-flight-tel-aviv-vienna-declares-emergency",
+          "title": "Austrian Airlines Flight Tel Aviv-Vienna Declares Emergency",
+          "language": "en"
+        },
+        {
+          "name": "Associated Press",
+          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQQ0VEeWVKc016WmRCZlRtMkVXS09IaEJOUTZpM080ZlBGV2ZJNjVBSWhJam5HWU5WUHRSektQaUJ0ejFoRUtmNk9scjZQbmNzUUJuRnM1b2F0TmlyTHBreGd5OUNxR185ZE5nb3d5TzFIeUcwamV5SUw4Y2VxTWpfOUM5Q2M1UnpoTnBkMk1SQktlTFNGMDV5dw?oc=5",
+          "title": "Flight from Tel Aviv to Vienna makes emergency landing in Bulgaria after bomb threat",
+          "language": "en"
+        },
+        {
+          "name": "Reuters",
+          "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPSUtxZ043QVFPYU1WRmVrQU1EOUswTG5xYWhwYWxrcXhPaFdWX0F0Z2E2TXFNM3lnOE9NdHd4amJtbWRXSkpsOXlVN3M2OUgyYVlrTkNjYUx0YUN3ZlBieEplbXNyLVRKNTYzRGJvdExqZGxjWjNlRE5TdVpyUUhKbzlfeGNVN2diOGcwaU9hS1I5VnE2YjJ3X3REZFFwSkJqdHMzZWpUdEtORElCUnB2RXd2MUJLV2ktYk5DZWVn?oc=5",
+          "title": "Austrian Airlines flight from Tel Aviv diverts to Sofia after 'threat'",
+          "language": "en"
+        },
+        {
+          "name": "The Aviation Hub",
+          "url": "https://theaviationhub.co.uk/austrian-airlines-os83-bomb-threat-sofia-diversion-analysis/?utm_source=rss&utm_medium=rss&utm_campaign=austrian-airlines-os83-bomb-threat-sofia-diversion-analysis",
+          "title": "Austrian Airlines OS83 Bomb Threat: What the Sofia Diversion Tells Us",
+          "language": "en"
+        }
+      ],
+      "source_count": 3,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "breaking",
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-f9ef21a54433",
+      "section": "European and other global airlines",
+      "headline": "Vueling Flight Performs Emergency Return to Barcelona After Bird Strike",
+      "published_at": "18 Oct 17:32",
+      "lead": "A Vueling flight was forced to make an emergency return to Barcelona following a bird strike incident over the weekend.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The incident occurred over the weekend shortly after departure.",
+        "The flight suffered a bird strike, necessitating an immediate return.",
+        "The aircraft landed safely back at Barcelona airport."
+      ],
+      "data_points": [],
+      "strategic_impact": "Bird strike incidents cause minor operational disruptions and require immediate safety inspections and potential maintenance.",
+      "market_exposure": [
+        {
+          "carrier": "Vueling",
+          "impact": "Negative",
+          "details": "Emergency return and operational disruption due to bird strike"
+        },
+        {
+          "carrier": "Barcelona",
+          "impact": "Neutral",
+          "details": "Site of the bird strike and emergency return"
+        }
+      ],
+      "event_type": "safety_incident",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000011",
+            "slug": "vueling",
+            "iata": "VY",
+            "name": "Vueling",
+            "region": "Europe",
+            "group_entity_id": "group:000002",
+            "tier": 2
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Routine safety incidents like bird strikes highlight the need for operational flexibility and rapid maintenance response at hub airports.",
+      "original_source": {
+        "title": "Vueling Flight Suffers Bird Strike in Barcelona",
+        "source_name": "The Aviation Hub",
+        "url": "https://theaviationhub.co.uk/vueling-flight-suffers-bird-strike-in-barcelona/?utm_source=rss&utm_medium=rss&utm_campaign=vueling-flight-suffers-bird-strike-in-barcelona",
+        "source_type": "trade",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-f9ef21a54433",
+      "relevance_score": 62.8,
+      "score_components": {
+        "event_type": 0.95,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.7,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "The Aviation Hub",
+          "url": "https://theaviationhub.co.uk/vueling-flight-suffers-bird-strike-in-barcelona/?utm_source=rss&utm_medium=rss&utm_campaign=vueling-flight-suffers-bird-strike-in-barcelona",
+          "title": "Vueling Flight Suffers Bird Strike in Barcelona",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T17:32:21+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "breaking",
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-c61b3d06229e",
+      "section": "European and other global airlines",
+      "headline": "Turkish Airlines and CFM Sign MOU for Over 600 LEAP-1B Engines",
+      "published_at": "16 Oct 17:34",
+      "lead": "Turkish Airlines has signed a Memorandum of Understanding with CFM International for the acquisition of more than 600 LEAP-1B engines to support its fleet expansion.",
+      "source_description": "Turkish Airlines, CFM Ink MOU For More Than 600 Leap-1B Engines | [TradeArabia] Turkish Airlines, CFM sign MoU for over 600 LEAP-1B engines | [Asian Aviation] Turkish Airlines and CFM sign MOU for more than 600 LEAP-1B engines | [Daily Sabah] Turkish Airlines signs deal with CFM to buy over 300 LEAP-1B engines | [Aviation News.eu] Turkish Airlines Secures Over 300 CFM LEAP-1B Engines in Landmark Fleet Expansion Deal",
+      "detailed_analysis": [
+        "The deal involves the procurement of more than 600 LEAP-1B engines, though some reports specify over 300 units.",
+        "This agreement is characterized as a landmark fleet expansion deal for the carrier.",
+        "The MOU secures the necessary propulsion systems for the airline's growing narrowbody fleet."
+      ],
+      "data_points": [
+        "600",
+        "300",
+        "LEAP-1B"
+      ],
+      "strategic_impact": "The agreement ensures long-term engine supply and operational support for a massive narrowbody capacity increase.",
+      "market_exposure": [
+        {
+          "carrier": "Turkish Airlines",
+          "impact": "Positive",
+          "details": "Secures critical engine components for major narrowbody fleet growth"
+        },
+        {
+          "carrier": "CFM",
+          "impact": "Positive",
+          "details": "Secures a large-scale order for LEAP-1B engines"
+        }
+      ],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000021",
+            "slug": "turkish-airlines",
+            "iata": "TK",
+            "name": "Turkish Airlines",
+            "region": "Europe",
+            "group_entity_id": "group:000004",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [
+        "Manufacturers & Supply Chain"
+      ],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "This massive engine commitment is a foundational step in Turkish Airlines' strategy to significantly expand its global narrowbody footprint.",
+      "original_source": {
+        "title": "Turkish Airlines, CFM Ink MOU For More Than 600 Leap-1B Engines",
+        "source_name": "Aviation Week",
+        "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOTW9JLVFTQmduVi1BTmlSTjFxdTFUeHdpSDYxR2JGQmVlV0dHWG5JNHFiYm9NYzdsMGxveTZqbGliZExGdGtDeHBWT1RWR0Vjc1pUWUJoZ3U2NVlxcnY3d3hQZGFVWTJubGNuOUZzdnFpMVVZeEkzeGtiSm13Ykc3aGtJSFRuUU1jNXR2WmdjWVNRU1d4Z2JqSDY2TUNFVkpaS3pLUGVtYWM1N1hWMnc?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "fleet"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-c61b3d06229e",
+      "relevance_score": 81.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 1.0
+      },
+      "sources": [
+        {
+          "name": "Asian Aviation",
+          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQc0JzOGUxeGkxOGNDdHdnaGtvU3lCYkQ1N3hSU1U0bUVBbW1HU01hNDI3OFFZMWliQjVma3QtYVE4cXVrc2ZGSWZLd2NVTXlRWFdGNGM3ZElWMUQ0bDNzbXlORl8xa2ZLMXY0QmV2VHFtMm1LcmpONUQ3VEhfcUswdVItN2ZxaVh3WXdnY0s1U0RRdWE5ZkktSzRadWx1dUFv?oc=5",
+          "title": "Turkish Airlines and CFM sign MOU for more than 600 LEAP-1B engines",
+          "language": "en"
+        },
+        {
+          "name": "Aviation Week",
+          "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOTW9JLVFTQmduVi1BTmlSTjFxdTFUeHdpSDYxR2JGQmVlV0dHWG5JNHFiYm9NYzdsMGxveTZqbGliZExGdGtDeHBWT1RWR0Vjc1pUWUJoZ3U2NVlxcnY3d3hQZGFVWTJubGNuOUZzdnFpMVVZeEkzeGtiSm13Ykc3aGtJSFRuUU1jNXR2WmdjWVNRU1d4Z2JqSDY2TUNFVkpaS3pLUGVtYWM1N1hWMnc?oc=5",
+          "title": "Turkish Airlines, CFM Ink MOU For More Than 600 Leap-1B Engines",
+          "language": "en"
+        },
+        {
+          "name": "Daily Sabah",
+          "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNMVpEZERNYmEweXIwS3ZoeWs0M1k4MjQ5VjVneUU0aWJJWHpjU3ZaSmNXb1o3MUNNMThaYktEMTliWF9PZWVkcklvbWJrYjYxd1pwbFd2Z0pueEdKeWVycUl2VzU4T2ZobzRtb1Y0TWpVNGFWUzNvR3V5b3pDc0RMTHRoOHNRbncyaXFFTC1BWTVUQ1d5NVdjMEJuc0Y0UjhPTEI3MUh4bkVjb2xQRkZjMXhB?oc=5",
+          "title": "Turkish Airlines signs deal with CFM to buy over 300 LEAP-1B engines",
+          "language": "en"
+        },
+        {
+          "name": "Aviation News.eu",
+          "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQbW9aNmZqWjdLZTB2QXkwdU5vUmt2WU1DZmI1Vy1WSXByMThNQXN2blNmNkM2MnRJdTNSZnV2SEtweElDNktvaTZYMmYzRk11VTR4OERLRm9Eb3hybnJSZEVPUWc2cHpMMUhLOVNYbWotc2ZFR0dIWDA1Q1pkRm1zbDVYNEt0T1hsc1Fyb0tYZVZWNGpfeUZxRDhiVXhWN0xLanNLYVZGSWoyWkxwWlN0WW9KR3V0NVhqT0FHQ3hYNmh5UQ?oc=5",
+          "title": "Turkish Airlines Secures Over 300 CFM LEAP-1B Engines in Landmark Fleet Expansion Deal",
+          "language": "en"
+        }
+      ],
+      "source_count": 4,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "critical",
+      "level_label": "Kritik",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
     {
       "id": "story-6a1a9ac74a07",
       "section": "Other areas",
@@ -559,10 +902,7 @@
       "first_seen_at": "2026-10-18T14:40:39+00:00",
       "last_updated_at": "2026-10-18T14:40:39+00:00",
       "update_reasons": [],
-      "badges": [
-        "breaking",
-        "new"
-      ],
+      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
@@ -675,111 +1015,13 @@
       "first_seen_at": "2026-10-18T14:40:39+00:00",
       "last_updated_at": "2026-10-18T14:40:39+00:00",
       "update_reasons": [],
-      "badges": [
-        "breaking",
-        "new"
-      ],
+      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-18T14:40:39+00:00",
       "narrative_language": "en",
       "is_strategic_report": true
-    },
-    {
-      "id": "story-3430dd4e7d1d",
-      "section": "European and other global airlines",
-      "headline": "American Airlines Passengers Evacuate After Emergency Landing",
-      "published_at": "18 Oct 12:42",
-      "lead": "An American Airlines flight made an emergency landing due to cabin haze, leading to passenger evacuation onto the runway.",
-      "source_description": "Some passengers jumped from the wing after oxygen masks deployed shortly after takeoff.",
-      "detailed_analysis": [
-        "An American Airlines flight experienced cabin haze.",
-        "This incident necessitated an emergency landing.",
-        "Oxygen masks deployed shortly after takeoff.",
-        "Passengers evacuated onto the runway, with some jumping from the wing."
-      ],
-      "data_points": [],
-      "strategic_impact": "This incident could lead to operational disruptions and potential reputational damage for the carrier, impacting passenger confidence.",
-      "market_exposure": [
-        {
-          "carrier": "American Airlines",
-          "impact": "Negative",
-          "details": "Emergency landing and passenger evacuation due to cabin haze."
-        }
-      ],
-      "event_type": "safety_incident",
-      "entities": {
-        "groups": [],
-        "carriers": [
-          {
-            "entity_id": "carrier:000114",
-            "slug": "american-airlines",
-            "iata": "AA",
-            "name": "American Airlines",
-            "region": "Americas",
-            "group_entity_id": "",
-            "tier": 1
-          }
-        ],
-        "airports": [],
-        "aircraft": []
-      },
-      "region_section": "Americas",
-      "secondary_tags": [],
-      "thy_impact_assessment": "",
-      "why_it_matters": "Safety incidents can lead to increased scrutiny, operational delays, and potential financial implications for the affected airline.",
-      "original_source": {
-        "title": "American Airlines Passengers Evacuate Onto Runway After Cabin Haze Forces Emergency Landing",
-        "source_name": "Simple Flying",
-        "url": "https://simpleflying.com/american-airlines-passengers-evacuate-st-louis-runway-odor-emergency-landing/",
-        "source_type": "trade_media",
-        "official": false,
-        "airline": "",
-        "topics": [
-          "airports_airspace"
-        ],
-        "license_required": false,
-        "license_status": "public",
-        "region": "Global",
-        "tier": 4,
-        "reliability_weight": 0.4
-      },
-      "related_news": [],
-      "narrative_status": "done",
-      "story_id": "story-3430dd4e7d1d",
-      "relevance_score": 68.8,
-      "score_components": {
-        "event_type": 0.95,
-        "source_reliability": 0.4,
-        "entity_prominence": 1.0,
-        "official_source": 0.0,
-        "corroboration": 0.0
-      },
-      "sources": [
-        {
-          "name": "Simple Flying",
-          "url": "https://simpleflying.com/american-airlines-passengers-evacuate-st-louis-runway-odor-emergency-landing/",
-          "title": "American Airlines Passengers Evacuate Onto Runway After Cabin Haze Forces Emergency Landing",
-          "language": "en"
-        }
-      ],
-      "source_count": 1,
-      "published_at_iso": "2026-10-18T12:42:21+00:00",
-      "language": "en",
-      "first_seen_at": "2026-10-18T13:21:19+00:00",
-      "last_updated_at": "2026-10-18T13:21:19+00:00",
-      "update_reasons": [],
-      "badges": [
-        "breaking",
-        "new"
-      ],
-      "level": "critical",
-      "level_label": "Kritik",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T13:21:19+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
     },
     {
       "id": "story-473d4ece6572",
@@ -857,9 +1099,7 @@
       "first_seen_at": "2026-10-18T14:47:06+00:00",
       "last_updated_at": "2026-10-18T14:47:06+00:00",
       "update_reasons": [],
-      "badges": [
-        "new"
-      ],
+      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
@@ -870,15 +1110,15 @@
     {
       "id": "story-6a24187746a1",
       "section": "European and other global airlines",
-      "headline": "Middle East Crisis Impacts European Network Traffic and Hub Recovery",
-      "published_at": "18 Oct 14:47",
-      "lead": "Week 41 saw a slight decline in daily flights, while the ongoing Middle East crisis continues to create a significant disparity in recovery rates between Gulf and European carriers.",
-      "source_description": "The network averaged 33,491 daily flights (including overflights) in Week 41, representing a 2.7% decrease compared to Week 40 and remaining unchanged from the same week in 2025. Year-to-date traffic (excluding overflights) between Europe and the Middle East remains 14% below 2025 levels, representing a 20% decline from pre-crisis levels (Jan-Feb 2026) when flights were averaging 9% above 2025. The 3 major Gulf hub carriers (Emirates, Etihad and Qatar) are recovering faster than most of the European airline groups, back up to 23% below pre-crisis levels vs circa 82% below for European carriers. Israeli carriers on the other hand are operating 56% above pre-crisis flight levels. Among the 10 busiest carriers, capacity fell 1.2% week-on-week on average. Wizz Air Group was the only one to grow (+2%), while SAS Group saw the largest drop (-5%). Across the 10 busiest States, flight volumes decreased by 2.3% week-on-week on average, with none recording growth. Greece saw the steepest decline (-10%). Network arrival and departure punctuality were 74.1% and 69.8%, worse than in the equivalent week of 2025. En-route ATFM delays decreased by 11% compared to the previous week, with a daily av",
+      "headline": "Eurocontrol Reports 2.7% Weekly Traffic Decline in European Network",
+      "published_at": "15 Oct 12:00",
+      "lead": "The European aviation network averaged 33,491 daily flights in Week 41, representing a 2.7% decrease compared to the previous week.",
+      "source_description": "[Eurocontrol] EUROCONTROL European Aviation Overview. The network averaged 33,491 daily flights (including overflights) in Week 41, representing a 2.7% decrease compared to Week 40 and remaining unchanged from the same week in 2025. Year-to-date traffic (excluding overflights) between Europe and the Middle East remains 14% below 2025 levels, representing a 20% decline from pre-crisis levels (Jan-Feb 2026) when flights were averaging 9% above 2025. The 3 major Gulf hub carriers (Emirates, Etihad and Qatar) are recovering faster than most of the European airline groups, back up to 23% below pre-crisis levels vs circa 82% below for European carriers. Israeli carriers on the other hand are operating 56% above pre-crisis flight levels. Among the 10 busiest carriers, capacity fell 1.2% week-on-week on average. Wizz Air Group was the only one to grow (+2%), while SAS Group saw the largest drop (-5%). Across the 10 busiest States, flight volumes decreased by 2.3% week-on-week on average, with none recording growth. Greece saw the steepest decline (-10%). Network arrival and departure punctuality were 74.1% and 69.8%, worse than in the equivalent week of 2025. En-route ATFM delays decreased",
       "detailed_analysis": [
-        "Network traffic averaged 33,491 daily flights in Week 41, a 2.7% decrease compared to Week 40.",
-        "Year-to-date traffic between Europe and the Middle East remains 14% below 2025 levels and 20% below pre-crisis levels of early 2026.",
-        "Gulf hub carriers (Emirates, Etihad, and Qatar) are recovering faster, sitting 23% below pre-crisis levels compared to circa 82% below for European groups.",
-        "Israeli carriers are operating 56% above pre-crisis flight levels, while Wizz Air Group was the only top 10 carrier to grow capacity week-on-week."
+        "Traffic between Europe and the Middle East remains 14% below 2025 levels and 20% below pre-crisis levels.",
+        "Gulf hub carriers (Emirates, Etihad, and Qatar) are recovering faster, currently 23% below pre-crisis levels compared to circa 82% below for European carriers.",
+        "Israeli carriers are operating 56% above pre-crisis flight levels.",
+        "Capacity among the 10 busiest carriers fell 1.2% week-on-week."
       ],
       "data_points": [
         "33,491",
@@ -891,27 +1131,22 @@
         "56%",
         "1.2%"
       ],
-      "strategic_impact": "Divergent recovery paths between regions and carrier types are reshaping competitive dynamics on routes connecting Europe and the Middle East.",
+      "strategic_impact": "The data shows a widening gap in recovery resilience between Gulf hubs and European airline groups amid regional volatility.",
       "market_exposure": [
         {
           "carrier": "Emirates",
           "impact": "Positive",
-          "details": "Recovering faster than European airline groups, currently 23% below pre-crisis levels."
+          "details": "Recovering faster than European peers at 23% below pre-crisis levels"
         },
         {
           "carrier": "Etihad",
           "impact": "Positive",
-          "details": "Recovering faster than European airline groups, currently 23% below pre-crisis levels."
+          "details": "Recovering faster than European peers at 23% below pre-crisis levels"
         },
         {
           "carrier": "Qatar",
           "impact": "Positive",
-          "details": "Recovering faster than European airline groups, currently 23% below pre-crisis levels."
-        },
-        {
-          "carrier": "Wizz Air Group",
-          "impact": "Positive",
-          "details": "Only carrier among the 10 busiest to grow capacity week-on-week."
+          "details": "Recovering faster than European peers at 23% below pre-crisis levels"
         }
       ],
       "event_type": "macro_demand",
@@ -923,19 +1158,18 @@
       },
       "region_section": "Regulation & Airspace",
       "secondary_tags": [],
+      "is_strategic_report": true,
       "thy_impact_assessment": "",
-      "why_it_matters": "The stark contrast in recovery percentages suggests a structural shift in market share on Euro-ME corridors during the current crisis.",
+      "why_it_matters": "Network planners must account for the starkly different recovery trajectories of regional hubs when managing Europe-Middle East connectivity.",
       "original_source": {
-        "title": "EUROCONTROL European Aviation Overview",
+        "title": "EUROCONTROL European Aviation Overview 2026 - Week 41",
         "source_name": "Eurocontrol",
-        "url": "https://www.eurocontrol.int/publication/eurocontrol-european-aviation-overview-2026-week-41",
+        "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQcGZrc2Y4ZjFHTVB4NXE2Ymxza2MyV3F2dDlwdzJueFA0dXJPS0lLRWNfN3U0RkJRcEFkZWczX0JFdThJREZqVUppV2hadmVMYTlreUphelIxTS1CZnlIR3ZSVmtzX0l0M096VWROcmNHb3BxVDlzX21TSmt0TC1sMVpnSlQ3cGRIaE9EejdXc1N2THh2TFE?oc=5",
         "source_type": "regulator",
         "official": true,
         "airline": "",
         "topics": [
-          "airline_operations",
-          "regulation_safety",
-          "airports_airspace"
+          "regulation_safety"
         ],
         "license_required": false,
         "license_status": "public",
@@ -960,23 +1194,37 @@
           "url": "https://www.eurocontrol.int/publication/eurocontrol-european-aviation-overview-2026-week-41",
           "title": "EUROCONTROL European Aviation Overview",
           "language": "en"
+        },
+        {
+          "name": "Eurocontrol",
+          "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQWXlZLUVOcFlhZklod21lU3BEMEs5OG0yeWU5UnowQXh6Z1g1QzFVQXQ5VVFGQjJtTEZydFdRak1Idk51TzlaUkVoX1c5dmhWc2wxV21Wd25UWE9saWx5UFU3WEdJQUhzbERQc1VRSy1FMHZ5NE9CN3ppS0NnUkxDQ2sxWkdsQnVTZFFKaFEtOThSRDNocFE?oc=5",
+          "title": "EUROCONTROL European Aviation Overview 2026 - Week 39",
+          "language": "en"
+        },
+        {
+          "name": "Eurocontrol",
+          "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQcGZrc2Y4ZjFHTVB4NXE2Ymxza2MyV3F2dDlwdzJueFA0dXJPS0lLRWNfN3U0RkJRcEFkZWczX0JFdThJREZqVUppV2hadmVMYTlreUphelIxTS1CZnlIR3ZSVmtzX0l0M096VWROcmNHb3BxVDlzX21TSmt0TC1sMVpnSlQ3cGRIaE9EejdXc1N2THh2TFE?oc=5",
+          "title": "EUROCONTROL European Aviation Overview 2026 - Week 41",
+          "language": "en"
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T14:47:21+00:00",
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
       "language": "en",
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en",
       "first_seen_at": "2026-10-18T14:47:06+00:00",
-      "last_updated_at": "2026-10-18T14:47:06+00:00",
-      "update_reasons": [],
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "previous_score": 72.8,
+      "update_reasons": [
+        "new_source"
+      ],
       "badges": [
-        "new"
+        "updated"
       ],
       "level": "critical",
       "level_label": "Kritik",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T14:54:14+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": true
+      "listed": true
     },
     {
       "id": "story-9fb6dd653852",
@@ -1072,9 +1320,7 @@
       "first_seen_at": "2026-10-18T14:51:42+00:00",
       "last_updated_at": "2026-10-18T14:51:42+00:00",
       "update_reasons": [],
-      "badges": [
-        "new"
-      ],
+      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
@@ -1171,110 +1417,13 @@
       "first_seen_at": "2026-10-18T14:47:06+00:00",
       "last_updated_at": "2026-10-18T14:47:06+00:00",
       "update_reasons": [],
-      "badges": [
-        "new"
-      ],
+      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-18T14:47:06+00:00",
       "narrative_language": "en",
       "is_strategic_report": true
-    },
-    {
-      "id": "story-86e684107d82",
-      "section": "European and other global airlines",
-      "headline": "Southwest, United Shake Up Their Frequent-Flier Programs",
-      "published_at": "18 Oct 07:17",
-      "lead": "Southwest Airlines and United Airlines are implementing changes to their frequent-flier programs.",
-      "source_description": "",
-      "detailed_analysis": [
-        "Southwest Airlines is adjusting its frequent-flier program.",
-        "United Airlines is adjusting its frequent-flier program.",
-        "The changes involve their respective loyalty schemes."
-      ],
-      "data_points": [],
-      "strategic_impact": "These adjustments could influence customer loyalty and competitive positioning within the airline industry.",
-      "market_exposure": [
-        {
-          "carrier": "Southwest",
-          "impact": "Neutral",
-          "details": "Adjustments to frequent-flier program."
-        },
-        {
-          "carrier": "United",
-          "impact": "Neutral",
-          "details": "Adjustments to frequent-flier program."
-        }
-      ],
-      "event_type": "airline_financials",
-      "entities": {
-        "groups": [],
-        "carriers": [
-          {
-            "entity_id": "carrier:000117",
-            "slug": "southwest-airlines",
-            "iata": "WN",
-            "name": "Southwest Airlines",
-            "region": "Americas",
-            "group_entity_id": "",
-            "tier": 1
-          }
-        ],
-        "airports": [],
-        "aircraft": []
-      },
-      "region_section": "Americas",
-      "secondary_tags": [],
-      "thy_impact_assessment": "",
-      "why_it_matters": "Changes to frequent-flier programs can significantly alter passenger behavior and loyalty, impacting future revenue streams.",
-      "original_source": {
-        "title": "Southwest, United Shake Up Their Frequent-Flier Programs",
-        "source_name": "The Wall Street Journal",
-        "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOV2ZodzFFM2RJNW5Gb2w2eHo2alFOY1hZMl9sc2ZuclNlcThJYjlSNlZhVEpPYW05WUFQVE5BOTZHUkJNM2llbGgwc2E5Zk5LbDZ0Wkg4dnV3M1N6N3Uwa0QwUktzVHd0QVk0UHZRLVlOTlJYMTJnV2tOc3Z6TGNCVXVkTjI2UWUwblNrOUJJbGZOTk1OM2k3M3BDa1BaM1M2LVln?oc=5",
-        "source_type": "mainstream",
-        "official": false,
-        "airline": "",
-        "topics": [],
-        "license_required": false,
-        "license_status": "public",
-        "region": "Global",
-        "tier": 2,
-        "reliability_weight": 0.9
-      },
-      "related_news": [],
-      "narrative_status": "done",
-      "basis": "headline_only",
-      "story_id": "story-86e684107d82",
-      "relevance_score": 71.8,
-      "score_components": {
-        "event_type": 0.85,
-        "source_reliability": 0.9,
-        "entity_prominence": 1.0,
-        "official_source": 0.0,
-        "corroboration": 0.0
-      },
-      "sources": [
-        {
-          "name": "The Wall Street Journal",
-          "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOV2ZodzFFM2RJNW5Gb2w2eHo2alFOY1hZMl9sc2ZuclNlcThJYjlSNlZhVEpPYW05WUFQVE5BOTZHUkJNM2llbGgwc2E5Zk5LbDZ0Wkg4dnV3M1N6N3Uwa0QwUktzVHd0QVk0UHZRLVlOTlJYMTJnV2tOc3Z6TGNCVXVkTjI2UWUwblNrOUJJbGZOTk1OM2k3M3BDa1BaM1M2LVln?oc=5",
-          "title": "Southwest, United Shake Up Their Frequent-Flier Programs",
-          "language": "en"
-        }
-      ],
-      "source_count": 1,
-      "published_at_iso": "2026-10-18T07:17:20+00:00",
-      "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:06:28+00:00",
-      "update_reasons": [],
-      "badges": [],
-      "level": "critical",
-      "level_label": "Kritik",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T09:08:11+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
     },
     {
       "id": "story-25c0e24f3e18",
@@ -1436,9 +1585,7 @@
       "first_seen_at": "2026-10-18T14:40:39+00:00",
       "last_updated_at": "2026-10-18T14:40:39+00:00",
       "update_reasons": [],
-      "badges": [
-        "new"
-      ],
+      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
@@ -1447,246 +1594,33 @@
       "is_strategic_report": true
     },
     {
-      "id": "story-8258686aef2f",
-      "section": "European and other global airlines",
-      "headline": "Virgin Atlantic Launches New 14-Hour Nonstop Heathrow Route",
-      "published_at": "18 Oct 13:00",
-      "lead": "Virgin Atlantic has commenced a new 14-hour nonstop route from Heathrow today.",
-      "source_description": "The seasonal route will run until late March.",
-      "detailed_analysis": [
-        "The new service is a nonstop route.",
-        "It operates from Heathrow.",
-        "The flight duration is 14 hours.",
-        "This is a seasonal route.",
-        "The service will run until late March."
-      ],
-      "data_points": [
-        "14-Hour",
-        "late March"
-      ],
-      "strategic_impact": "This new seasonal route expands Virgin Atlantic's network capacity and offers new travel options, potentially increasing demand on the specific corridor.",
-      "market_exposure": [
-        {
-          "carrier": "Virgin Atlantic",
-          "impact": "Positive",
-          "details": "Launching a new 14-hour nonstop route from Heathrow."
-        },
-        {
-          "carrier": "Heathrow",
-          "impact": "Positive",
-          "details": "Gaining a new nonstop route."
-        }
-      ],
-      "event_type": "route_network_change",
-      "entities": {
-        "groups": [],
-        "carriers": [],
-        "airports": [
-          {
-            "entity_id": "airport:000043",
-            "slug": "london-heathrow",
-            "iata": "LHR",
-            "name": "London Heathrow",
-            "country": "United Kingdom",
-            "tier": 1
-          }
-        ],
-        "aircraft": []
-      },
-      "region_section": "Europe",
-      "secondary_tags": [],
-      "thy_impact_assessment": "",
-      "why_it_matters": "This new seasonal service expands Virgin Atlantic's network and offers passengers a direct long-haul option from Heathrow for the upcoming season.",
-      "original_source": {
-        "title": "Virgin Atlantic Launches New 14-Hour Nonstop Heathrow Route Today: See Map Now",
-        "source_name": "Simple Flying",
-        "url": "https://simpleflying.com/virgin-launches-new-14-hour-route-today/",
-        "source_type": "trade_media",
-        "official": false,
-        "airline": "",
-        "topics": [
-          "route_network"
-        ],
-        "license_required": false,
-        "license_status": "public",
-        "region": "Global",
-        "tier": 4,
-        "reliability_weight": 0.4
-      },
-      "related_news": [],
-      "narrative_status": "done",
-      "story_id": "story-8258686aef2f",
-      "relevance_score": 65.5,
-      "score_components": {
-        "event_type": 0.7,
-        "source_reliability": 0.4,
-        "entity_prominence": 1.0,
-        "official_source": 0.0,
-        "corroboration": 0.5
-      },
-      "sources": [
-        {
-          "name": "Simple Flying",
-          "url": "https://simpleflying.com/virgin-launches-new-14-hour-route-today/",
-          "title": "Virgin Atlantic Launches New 14-Hour Nonstop Heathrow Route Today: See Map Now",
-          "language": "en"
-        },
-        {
-          "name": "Aviation24",
-          "url": "https://www.aviation24.be/airlines/virgin-atlantic/architect-convicted-after-drunken-assault-on-virgin-atlantic-cabin-crew/",
-          "title": "Architect convicted after drunken assault on Virgin Atlantic cabin crew",
-          "language": "en"
-        }
-      ],
-      "source_count": 2,
-      "published_at_iso": "2026-10-18T13:00:17+00:00",
-      "language": "en",
-      "narrative_generated_at": "2026-10-18T14:21:16+00:00",
-      "narrative_language": "en",
-      "first_seen_at": "2026-10-18T13:21:19+00:00",
-      "last_updated_at": "2026-10-18T14:21:16+00:00",
-      "previous_score": 57.5,
-      "update_reasons": [
-        "score_change",
-        "new_source"
-      ],
-      "badges": [
-        "new",
-        "updated"
-      ],
-      "level": "critical",
-      "level_label": "Kritik",
-      "listed": true,
-      "is_strategic_report": false
-    },
-    {
-      "id": "story-1e31412f4e2c",
-      "section": "European and other global airlines",
-      "headline": "United, Air Canada Plan to Add Routes Amid Trade Tensions",
-      "published_at": "16 Oct 19:16",
-      "lead": "United Airlines and Air Canada are planning to add new routes between Canada and the U.S. as part of their Transborder Joint Business agreement.",
-      "source_description": "",
-      "detailed_analysis": [
-        "The carriers intend to expand connectivity between Canada and the U.S. starting in the Summer 2027 season.",
-        "The expansion is being pursued under the existing Transborder Joint Business framework.",
-        "The plan to increase options for travelers comes despite noted trade tensions."
-      ],
-      "data_points": [
-        "Summer 2027"
-      ],
-      "strategic_impact": "The move aims to strengthen the joint business partnership and increase capacity in the competitive North American transborder market.",
-      "market_exposure": [
-        {
-          "carrier": "United",
-          "impact": "Positive",
-          "details": "Planned network expansion and growth of the transborder joint business."
-        },
-        {
-          "carrier": "Air Canada",
-          "impact": "Positive",
-          "details": "Increased connectivity and capacity between Canada and the U.S."
-        }
-      ],
-      "event_type": "route_network_change",
-      "entities": {
-        "groups": [],
-        "carriers": [
-          {
-            "entity_id": "carrier:000128",
-            "slug": "air-canada",
-            "iata": "AC",
-            "name": "Air Canada",
-            "region": "Americas",
-            "group_entity_id": "",
-            "tier": 1
-          }
-        ],
-        "airports": [],
-        "aircraft": []
-      },
-      "region_section": "Americas",
-      "secondary_tags": [],
-      "thy_impact_assessment": "",
-      "why_it_matters": "Expanding joint business routes allows partner airlines to optimize schedules and capture a larger share of high-demand transborder traffic.",
-      "original_source": {
-        "title": "United, Air Canada Plan to Add Routes Amid Trade Tensions",
-        "source_name": "Bloomberg",
-        "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPWFVpYmgyaFlGQTVqdzZKZzNsQUd4eUNoNHJtNUxBcm5ya1BtN2RmRUliOGkxcFBjZlBXM3pGN1lHQmYtX1BvQ2pxUXM3RGRINGlwaXhhQ2VTTXRGeXlVWWhnNHVfdVo5OG5NQzd3NnJILTZlZ0VtVWd6azJSRnJFS21PQW1TSWYwQnlneDV3UkdmY1BweVlyQVcwTlNNRFFydXA0TjhOd3BEcHZCQnlvTWtqMVc?oc=5",
-        "source_type": "mainstream",
-        "official": false,
-        "airline": "",
-        "topics": [
-          "route_network"
-        ],
-        "license_required": false,
-        "license_status": "public",
-        "region": "Global",
-        "tier": 2,
-        "reliability_weight": 0.9
-      },
-      "related_news": [],
-      "narrative_status": "done",
-      "basis": "headline_only",
-      "story_id": "story-1e31412f4e2c",
-      "relevance_score": 65.0,
-      "score_components": {
-        "event_type": 0.7,
-        "source_reliability": 0.9,
-        "entity_prominence": 1.0,
-        "official_source": 0.0,
-        "corroboration": 0.0
-      },
-      "sources": [
-        {
-          "name": "Bloomberg",
-          "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPWFVpYmgyaFlGQTVqdzZKZzNsQUd4eUNoNHJtNUxBcm5ya1BtN2RmRUliOGkxcFBjZlBXM3pGN1lHQmYtX1BvQ2pxUXM3RGRINGlwaXhhQ2VTTXRGeXlVWWhnNHVfdVo5OG5NQzd3NnJILTZlZ0VtVWd6azJSRnJFS21PQW1TSWYwQnlneDV3UkdmY1BweVlyQVcwTlNNRFFydXA0TjhOd3BEcHZCQnlvTWtqMVc?oc=5",
-          "title": "United, Air Canada Plan to Add Routes Amid Trade Tensions",
-          "language": "en"
-        }
-      ],
-      "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
-      "language": "en",
-      "first_seen_at": "2026-10-18T09:31:14+00:00",
-      "last_updated_at": "2026-10-18T09:31:14+00:00",
-      "update_reasons": [],
-      "badges": [],
-      "level": "critical",
-      "level_label": "Kritik",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T09:40:59+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
-    },
-    {
       "id": "story-95280471d71e",
       "section": "European and other global airlines",
-      "headline": "Lufthansa to transfer up to eight A350s to TAP Air Portugal post-2030.",
+      "headline": "Lufthansa to Transfer Up to Eight Airbus A350s to TAP After 2030",
       "published_at": "16 Oct 22:49",
-      "lead": "Lufthansa plans to transfer a maximum of eight Airbus A350 aircraft to TAP Air Portugal after the year 2030.",
-      "source_description": "ch-aviation",
+      "lead": "Lufthansa plans to transfer a portion of its widebody fleet to TAP Air Portugal starting after the year 2030.",
+      "source_description": "",
       "detailed_analysis": [
-        "Lufthansa will transfer A350 aircraft.",
-        "The number of aircraft transferred will be up to eight.",
-        "The transfer will occur after 2030.",
-        "The recipient airline is TAP Air Portugal."
+        "The plan involves the transfer of up to eight Airbus A350 aircraft.",
+        "The timeline for the transfer is set for after 2030.",
+        "This move indicates long-term fleet redistribution between the two carriers."
       ],
       "data_points": [
         "eight",
         "A350s",
         "2030"
       ],
-      "strategic_impact": "This future fleet transfer will impact the long-term capacity and fleet planning for both Lufthansa and TAP Air Portugal, potentially affecting their respective long-haul operations and network strategies.",
+      "strategic_impact": "The transfer represents a significant long-term capacity shift and fleet modernization for TAP Air Portugal.",
       "market_exposure": [
         {
           "carrier": "Lufthansa",
           "impact": "Neutral",
-          "details": "Future transfer of up to eight A350s to TAP after 2030."
+          "details": "Transferring widebody assets as part of long-term fleet planning"
         },
         {
           "carrier": "TAP",
           "impact": "Positive",
-          "details": "Will receive up to eight A350s from Lufthansa after 2030, enhancing long-haul fleet."
+          "details": "Set to receive up to eight A350 aircraft for long-haul operations"
         }
       ],
       "event_type": "fleet_orders",
@@ -1717,8 +1651,9 @@
       },
       "region_section": "Europe",
       "secondary_tags": [],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "Long-term fleet transfers can significantly reshape an airline's operational capabilities and market presence in the future.",
+      "why_it_matters": "This fleet transfer signals strategic alignment and long-term capacity planning between Lufthansa and TAP.",
       "original_source": {
         "title": "Lufthansa to transfer up to eight A350s to TAP after 2030",
         "source_name": "ch-aviation",
@@ -1755,146 +1690,39 @@
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
       "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
       "update_reasons": [],
-      "badges": [],
+      "badges": [
+        "new"
+      ],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
-      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
-    },
-    {
-      "id": "story-c52865d489f1",
-      "section": "European and other global airlines",
-      "headline": "Air Canada and United Airlines Announce Six New Transborder Routes",
-      "published_at": "16 Oct 18:42",
-      "lead": "Air Canada and United Airlines have detailed plans to add six new routes to their joint Canada-U.S. network for the 2027 summer season.",
-      "source_description": "",
-      "detailed_analysis": [
-        "The expansion includes the addition of six specific transborder routes scheduled for 2027.",
-        "The carriers are seeking to enhance their partnership and provide more direct options for passengers.",
-        "This growth is part of a broader strategy to expand the Canada-U.S. network footprint."
-      ],
-      "data_points": [
-        "Six (6)",
-        "2027"
-      ],
-      "strategic_impact": "The addition of six routes significantly increases the joint venture's capacity and competitive positioning in the transborder sector.",
-      "market_exposure": [
-        {
-          "carrier": "Air Canada",
-          "impact": "Positive",
-          "details": "Expansion of the transborder network with six new routes."
-        },
-        {
-          "carrier": "United Airlines",
-          "impact": "Positive",
-          "details": "Increased capacity and network reach through the joint partnership."
-        }
-      ],
-      "event_type": "route_network_change",
-      "entities": {
-        "groups": [],
-        "carriers": [
-          {
-            "entity_id": "carrier:000128",
-            "slug": "air-canada",
-            "iata": "AC",
-            "name": "Air Canada",
-            "region": "Americas",
-            "group_entity_id": "",
-            "tier": 1
-          },
-          {
-            "entity_id": "carrier:000116",
-            "slug": "united-airlines",
-            "iata": "UA",
-            "name": "United Airlines",
-            "region": "Americas",
-            "group_entity_id": "",
-            "tier": 1
-          }
-        ],
-        "airports": [],
-        "aircraft": []
-      },
-      "region_section": "Americas",
-      "secondary_tags": [],
-      "thy_impact_assessment": "",
-      "why_it_matters": "The introduction of six new routes demonstrates a long-term commitment to scaling the joint venture and improving passenger connectivity across North America.",
-      "original_source": {
-        "title": "Air Canada, United Airlines to expand Canada-US network with new summer routes",
-        "source_name": "Reuters",
-        "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUWhVSVRMY0h0ckpudkJjbGc1WFgzVDFGUjljZVk0MVpQZDBzNDZYcVBLXzZobFEtQlRzNktKbWJNRU9qZ1RRdGRQMzNqcXpLWkxTdUtlWEQ3UlhHSzRNdVNwcFlPSGVQZWdzNm9xZlhBSURoS3p2RFVfc1NDV3lkYTU2QThRamtxclNxbENaTEpka0I2MVlyUmtHeUdrczV4RXJxRGFiZkhiV3BZMUJldGNNdlUwMEMtRm9r?oc=5",
-        "source_type": "mainstream",
-        "official": false,
-        "airline": "",
-        "topics": [
-          "route_network"
-        ],
-        "license_required": false,
-        "license_status": "public",
-        "region": "Global",
-        "tier": 2,
-        "reliability_weight": 0.9
-      },
-      "related_news": [],
-      "narrative_status": "done",
-      "basis": "headline_only",
-      "story_id": "story-c52865d489f1",
-      "relevance_score": 65.0,
-      "score_components": {
-        "event_type": 0.7,
-        "source_reliability": 0.9,
-        "entity_prominence": 1.0,
-        "official_source": 0.0,
-        "corroboration": 0.0
-      },
-      "sources": [
-        {
-          "name": "Reuters",
-          "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUWhVSVRMY0h0ckpudkJjbGc1WFgzVDFGUjljZVk0MVpQZDBzNDZYcVBLXzZobFEtQlRzNktKbWJNRU9qZ1RRdGRQMzNqcXpLWkxTdUtlWEQ3UlhHSzRNdVNwcFlPSGVQZWdzNm9xZlhBSURoS3p2RFVfc1NDV3lkYTU2QThRamtxclNxbENaTEpka0I2MVlyUmtHeUdrczV4RXJxRGFiZkhiV3BZMUJldGNNdlUwMEMtRm9r?oc=5",
-          "title": "Air Canada, United Airlines to expand Canada-US network with new summer routes",
-          "language": "en"
-        }
-      ],
-      "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
-      "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:06:28+00:00",
-      "update_reasons": [],
-      "badges": [],
-      "level": "critical",
-      "level_label": "Kritik",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T09:40:59+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
     },
     {
       "id": "story-d43cb360f275",
       "section": "European and other global airlines",
-      "headline": "Southwest Airlines has not yet decided on its long-haul fleet choice.",
+      "headline": "Southwest Airlines Evaluates Long-Haul Fleet Options",
       "published_at": "16 Oct 08:26",
-      "lead": "Southwest Airlines indicates it has not finalized its decision regarding a long-haul fleet.",
-      "source_description": "Aviation Week",
+      "lead": "Southwest Airlines has indicated it is not yet ready to finalize a decision regarding its future long-haul fleet.",
+      "source_description": "",
       "detailed_analysis": [
-        "Southwest Airlines is considering a long-haul fleet.",
-        "The airline has not yet made a choice."
+        "The carrier is currently 'not there yet' on selecting a specific long-haul aircraft type.",
+        "Evaluation of fleet requirements for potential long-haul operations is ongoing.",
+        "No specific timeline for a final fleet choice has been established."
       ],
       "data_points": [],
-      "strategic_impact": "The ongoing deliberation on a long-haul fleet choice suggests potential future capacity expansion into new markets, which could significantly alter Southwest's operational model and competitive landscape.",
+      "strategic_impact": "The delay in fleet selection suggests a cautious approach to entering the long-haul market.",
       "market_exposure": [
         {
           "carrier": "Southwest",
           "impact": "Neutral",
-          "details": "Still evaluating options for a long-haul fleet."
+          "details": "Ongoing evaluation of long-haul fleet strategy without a final decision"
         }
       ],
       "event_type": "fleet_orders",
@@ -1916,8 +1744,9 @@
       },
       "region_section": "Americas",
       "secondary_tags": [],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "A decision on a long-haul fleet could mark a significant strategic shift for the airline, opening new market opportunities.",
+      "why_it_matters": "",
       "original_source": {
         "title": "Southwest ‘Not There Yet’ on Long-Haul Fleet Choice",
         "source_name": "Aviation Week",
@@ -1954,134 +1783,148 @@
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
       "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
       "update_reasons": [],
-      "badges": [],
+      "badges": [
+        "new"
+      ],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
-      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
     },
     {
-      "id": "story-8bfc7ceba2b9",
+      "id": "story-6516a5a16be8",
       "section": "European and other global airlines",
-      "headline": "Lufthansa Exploring Sale of Software Assets",
-      "published_at": "16 Oct 13:56",
-      "lead": "Lufthansa is reportedly exploring the sale of its software assets.",
-      "source_description": "",
+      "headline": "United Airlines Unveils Five New Nonstop Routes and Loyalty Changes",
+      "published_at": "19 Oct 01:18",
+      "lead": "United Airlines is expanding its nonstop network with five new routes while simultaneously raising the threshold for its Premier 1K status.",
+      "source_description": "United Airlines Unveils 5 New Nonstop Routes: See Full List Now | [Rus Tourism News] United Airlines Makes Elite Status Harder in 2027 as Premier 1K Threshold Jumps | [Simple Flying] United Airlines Unveils 5 New Nonstop Routes: See Full List Now. United is teaming up with Air Canada to give flyers more choices",
       "detailed_analysis": [
-        "Lufthansa is exploring the sale of software assets.",
-        "The potential deal is valued at €1bn."
+        "United is launching five new nonstop routes to expand its network reach.",
+        "The airline is collaborating with Air Canada to provide passengers with more travel choices.",
+        "The Premier 1K status threshold is set to jump in 2027, making elite status more difficult to achieve."
       ],
       "data_points": [
-        "€1bn"
+        "5",
+        "2027"
       ],
-      "strategic_impact": "A potential sale of software assets could impact Lufthansa's revenue and strategic focus on core aviation operations.",
+      "strategic_impact": "United is balancing network growth with yield management by tightening requirements for its most frequent flyers.",
       "market_exposure": [
         {
-          "carrier": "Lufthansa",
-          "impact": "Neutral",
-          "details": "Exploring sale of non-core software assets."
+          "carrier": "United Airlines",
+          "impact": "Positive",
+          "details": "Expanding nonstop network and increasing loyalty program exclusivity"
+        },
+        {
+          "carrier": "Air Canada",
+          "impact": "Positive",
+          "details": "Teaming up with United to offer expanded flyer choices"
         }
       ],
-      "event_type": "partnerships_mna",
+      "event_type": "route_network_change",
       "entities": {
         "groups": [],
         "carriers": [
           {
-            "entity_id": "carrier:000001",
-            "slug": "lufthansa",
-            "iata": "LH",
-            "name": "Lufthansa",
-            "region": "Europe",
-            "group_entity_id": "group:000001",
+            "entity_id": "carrier:000116",
+            "slug": "united-airlines",
+            "iata": "UA",
+            "name": "United Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
             "tier": 1
           }
         ],
         "airports": [],
         "aircraft": []
       },
-      "region_section": "Europe",
+      "region_section": "Americas",
       "secondary_tags": [],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "This move could streamline Lufthansa's operations and generate significant capital, potentially for reinvestment in its core airline business.",
+      "why_it_matters": "The combination of new routes and stricter loyalty requirements aims to drive both volume and higher-yield passenger retention.",
       "original_source": {
-        "title": "Lufthansa exploring sale of software assets in €1bn deal",
-        "source_name": "Financial Times",
-        "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOUFRINC1iemlHeVZpMTZSNVYyME04Y0JuaThpMGtUazViUTNHNDNqRVNwUVY0UkxQY1V1WVJaRjlNSWhNSTFBRjktLVh2ZExmWGgzU1JxZy1RUlVkaXZkTmVvSFVzVTFhd2pGNllHSkp3cW84MzdsV1N0ZEZYY3VsM2g0Y1I?oc=5",
-        "source_type": "mainstream",
+        "title": "United Airlines Unveils 5 New Nonstop Routes: See Full List Now",
+        "source_name": "Simple Flying",
+        "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE8xc0tHWDZmVG1sd0xmTlo4dXNxS2lzTFh5dDdXVDRhMXhzQ0IxemxvSmZ0QWEzdUM3ZGtlckVEeFktNmNiVGt6V0laV1pNd2JnNW9iN1BxS2xURmpMUTlEN2drUEV6MEtWN2JtSkxn?oc=5",
+        "source_type": "trade_media",
         "official": false,
         "airline": "",
-        "topics": [],
+        "topics": [
+          "route_network"
+        ],
         "license_required": false,
         "license_status": "public",
         "region": "Global",
         "tier": 2,
-        "reliability_weight": 0.9
+        "reliability_weight": 0.85
       },
       "related_news": [],
       "narrative_status": "done",
-      "basis": "headline_only",
-      "story_id": "story-8bfc7ceba2b9",
-      "relevance_score": 62.8,
+      "story_id": "story-6516a5a16be8",
+      "relevance_score": 64.2,
       "score_components": {
-        "event_type": 0.65,
-        "source_reliability": 0.9,
+        "event_type": 0.7,
+        "source_reliability": 0.85,
         "entity_prominence": 1.0,
         "official_source": 0.0,
         "corroboration": 0.0
       },
       "sources": [
         {
-          "name": "Financial Times",
-          "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOUFRINC1iemlHeVZpMTZSNVYyME04Y0JuaThpMGtUazViUTNHNDNqRVNwUVY0UkxQY1V1WVJaRjlNSWhNSTFBRjktLVh2ZExmWGgzU1JxZy1RUlVkaXZkTmVvSFVzVTFhd2pGNllHSkp3cW84MzdsV1N0ZEZYY3VsM2g0Y1I?oc=5",
-          "title": "Lufthansa exploring sale of software assets in €1bn deal",
+          "name": "Simple Flying",
+          "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE8xc0tHWDZmVG1sd0xmTlo4dXNxS2lzTFh5dDdXVDRhMXhzQ0IxemxvSmZ0QWEzdUM3ZGtlckVEeFktNmNiVGt6V0laV1pNd2JnNW9iN1BxS2xURmpMUTlEN2drUEV6MEtWN2JtSkxn?oc=5",
+          "title": "United Airlines Unveils 5 New Nonstop Routes: See Full List Now",
+          "language": "en"
+        },
+        {
+          "name": "Simple Flying",
+          "url": "https://simpleflying.com/united-airlnes-5-new-nonstop-routes/",
+          "title": "United Airlines Unveils 5 New Nonstop Routes: See Full List Now",
           "language": "en"
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "published_at_iso": "2026-10-19T01:18:00+00:00",
       "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:13:24+00:00",
-      "previous_score": 38.0,
-      "update_reasons": [
-        "score_change"
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
       ],
-      "badges": [],
       "level": "critical",
       "level_label": "Kritik",
       "listed": true,
-      "narrative_generated_at": "2026-10-18T09:13:24+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
     },
     {
       "id": "story-563be0a43b81",
       "section": "European and other global airlines",
-      "headline": "KLM Royal Dutch Airlines wet leases A319 aircraft capacity.",
+      "headline": "KLM Royal Dutch Airlines to Wet Lease Airbus A319 Capacity",
       "published_at": "16 Oct 21:46",
-      "lead": "KLM Royal Dutch Airlines is utilizing wet lease agreements to acquire additional Airbus A319 capacity.",
-      "source_description": "ch-aviation",
+      "lead": "KLM Royal Dutch Airlines is augmenting its short-haul fleet by wet leasing Airbus A319 aircraft.",
+      "source_description": "",
       "detailed_analysis": [
-        "KLM Royal Dutch Airlines is wet leasing aircraft.",
-        "The aircraft type is A319.",
-        "This is to acquire additional capacity."
+        "The airline is utilizing wet lease agreements to bring in additional A319 capacity.",
+        "The move is intended to support KLM's existing network and operational requirements.",
+        "Wet leasing allows for immediate capacity adjustments without long-term capital expenditure."
       ],
       "data_points": [
         "A319"
       ],
-      "strategic_impact": "Wet leasing A319 capacity allows KLM to flexibly address short-term capacity needs or operational disruptions without long-term fleet commitments, impacting operational costs and scheduling.",
+      "strategic_impact": "The use of wet leases provides KLM with the flexibility to maintain flight frequencies despite potential fleet constraints.",
       "market_exposure": [
         {
-          "carrier": "KLM Royal Dutch Airlines",
-          "impact": "Neutral",
-          "details": "Wet leasing A319 capacity to supplement operations."
+          "carrier": "KLM",
+          "impact": "Positive",
+          "details": "Securing additional narrowbody capacity to support network operations"
         }
       ],
       "event_type": "fleet_orders",
@@ -2113,8 +1956,9 @@
       "secondary_tags": [
         "Manufacturers & Supply Chain"
       ],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "Wet leasing provides a flexible solution for airlines to manage capacity fluctuations and maintain operational schedules.",
+      "why_it_matters": "Wet leasing remains a critical tool for major carriers to manage short-term capacity gaps and maintain market share.",
       "original_source": {
         "title": "KLM Royal Dutch Airlines wet leases in A319 capacity",
         "source_name": "ch-aviation",
@@ -2149,77 +1993,786 @@
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
       "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-1481c5a27ca7",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "easyJet 2027 Yaz Sezonu İçin 5 Yeni Rota Duyurdu",
+      "published_at": "17 Oct 12:50",
+      "lead": "easyJet, 2027 yaz sezonu uçuş ağını İngiltere çıkışlı 5 yeni hat ekleyerek toplamda 23 yeni rotaya çıkardı.",
+      "source_description": "İngiliz hava yolu şirketi easyJet, 2027 yaz sezonu için uçuş ağını genişletmeye devam ediyor. Şirket, eylül ayında duyurduğu 18 yeni rotaya ek olarak İngiltere çıkışlı 5 yeni hattı daha satışa açtı. Böylece 2027 yaz sezonu için açıklanan yeni rota sayısı 23’e yükseldi. easyJet’in yeni uçuş planlaması kapsamında Southampton, Londra Gatwick ve Londra Luton havalimanlarından Avrupa’daki... easyJet’ten 2027 yaz sezonu için 5 yeni rota daha! İngiltere’den Avrupa’ya yeni uçuşlar yazısı ilk önce HavaHaber üzerinde ortaya çıktı.",
+      "detailed_analysis": [
+        "Eylül ayında duyurulan 18 rotaya ek olarak 5 yeni hat daha satışa açıldı.",
+        "Yeni uçuşlar Southampton, Londra Gatwick ve Londra Luton havalimanlarından Avrupa'daki destinasyonlara gerçekleştirilecek.",
+        "2027 yaz dönemi için planlanan toplam yeni rota sayısı bu son eklemelerle 23'e ulaştı."
+      ],
+      "data_points": [
+        "5",
+        "2027",
+        "18",
+        "23"
+      ],
+      "strategic_impact": "İngiltere pazarında kapasite artışı ve uzun vadeli ağ genişletme stratejisi uygulanmaktadır.",
+      "market_exposure": [
+        {
+          "carrier": "easyJet",
+          "impact": "Positive",
+          "details": "2027 yaz sezonu için uçuş ağını 23 yeni rotaya genişleterek pazar payını artırıyor."
+        },
+        {
+          "carrier": "Southampton",
+          "impact": "Positive",
+          "details": "easyJet'in yeni 2027 yaz rotaları için belirlenen kalkış noktalarından biri."
+        },
+        {
+          "carrier": "Londra Gatwick",
+          "impact": "Positive",
+          "details": "easyJet'in genişleyen Avrupa ağı kapsamında yeni uçuşlara ev sahipliği yapacak."
+        },
+        {
+          "carrier": "Londra Luton",
+          "impact": "Positive",
+          "details": "2027 yaz sezonu planlamasında yeni rotaların merkezi olarak yer alıyor."
+        }
+      ],
+      "event_type": "route_network_change",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000030",
+            "slug": "easyjet",
+            "iata": "U2",
+            "name": "easyJet",
+            "region": "Europe",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [
+          {
+            "entity_id": "airport:000051",
+            "slug": "london-gatwick",
+            "iata": "LGW",
+            "name": "London Gatwick",
+            "country": "United Kingdom",
+            "tier": 2
+          }
+        ],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "easyJet'in üç yıl sonrasına yönelik yaptığı bu planlama, havayolunun İngiltere çıkışlı Avrupa pazarındaki rekabetçi konumunu güçlendirme kararlılığını göstermektedir.",
+      "original_source": {
+        "title": "easyJet’ten 2027 yaz sezonu için 5 yeni rota daha! İngiltere’den Avrupa’ya yeni uçuşlar",
+        "source_name": "HavaHaber",
+        "url": "https://havahaber.com/easyjetten-2027-yaz-sezonu-icin-5-yeni-rota-daha-ingiltereden-avrupaya-yeni-ucuslar/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "route_network"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Turkey",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-1481c5a27ca7",
+      "relevance_score": 57.5,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.4,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "HavaHaber",
+          "url": "https://havahaber.com/easyjetten-2027-yaz-sezonu-icin-5-yeni-rota-daha-ingiltereden-avrupaya-yeni-ucuslar/",
+          "title": "easyJet’ten 2027 yaz sezonu için 5 yeni rota daha! İngiltere’den Avrupa’ya yeni uçuşlar",
+          "language": "tr"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-17T12:50:05+00:00",
+      "language": "tr",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
       "update_reasons": [],
       "badges": [],
       "level": "important",
       "level_label": "Önemli",
       "listed": true,
-      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "tr"
     },
     {
-      "id": "story-cd3a35d4a291",
+      "id": "story-164806bd63d2",
       "section": "European and other global airlines",
-      "headline": "Vietnam Airlines Seeks 25 Airbus Jets to Revive Low Cost Carrier",
-      "published_at": "16 Oct 09:26",
-      "lead": "Vietnam Airlines is reportedly seeking to acquire 25 Airbus aircraft. This initiative is aimed at supporting the revival of its low-cost carrier operations.",
+      "headline": "Austrian Airlines Flight from Israel Diverts to Bulgaria Following Threat",
+      "published_at": "19 Oct 00:58",
+      "lead": "An Austrian Airlines flight departing from Israel was forced to divert to Bulgaria after receiving a security threat.",
       "source_description": "",
       "detailed_analysis": [
-        "Vietnam Airlines is in the process of looking for new aircraft.",
-        "The airline is targeting 25 jets for this acquisition.",
-        "The specific aircraft manufacturer mentioned is Airbus.",
-        "The primary objective of this fleet expansion is to revive a low-cost carrier."
+        "The flight was diverted to Bulgaria following a reported bomb threat.",
+        "The aircraft made an emergency landing as a precautionary measure.",
+        "Multiple news sources confirmed the diversion from the original flight path due to the security alert."
       ],
-      "data_points": [
-        "25"
-      ],
-      "strategic_impact": "This potential fleet expansion could significantly increase capacity for the low-cost segment, impacting competitive dynamics and operational scale for Vietnam Airlines.",
+      "data_points": [],
+      "strategic_impact": "Operational disruption and increased security costs for the carrier on sensitive routes.",
       "market_exposure": [
         {
-          "carrier": "Vietnam Airlines",
-          "impact": "Positive",
-          "details": "Seeking 25 Airbus jets to revive low-cost carrier."
-        },
-        {
-          "carrier": "Airbus",
-          "impact": "Positive",
-          "details": "Potential order for 25 jets from Vietnam Airlines."
+          "carrier": "Austrian Airlines",
+          "impact": "Negative",
+          "details": "Flight from Israel required emergency diversion and landing due to a bomb threat."
         }
       ],
-      "event_type": "fleet_orders",
+      "event_type": "operations_disruption",
       "entities": {
         "groups": [],
         "carriers": [
           {
-            "entity_id": "carrier:000083",
-            "slug": "vietnam-airlines",
-            "iata": "VN",
-            "name": "Vietnam Airlines",
-            "region": "Asia-Pacific",
-            "group_entity_id": "",
-            "tier": 2
+            "entity_id": "carrier:000003",
+            "slug": "austrian-airlines",
+            "iata": "OS",
+            "name": "Austrian Airlines",
+            "region": "Europe",
+            "group_entity_id": "group:000001",
+            "tier": 3
           }
         ],
         "airports": [],
         "aircraft": []
       },
-      "region_section": "Asia-Pacific",
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Security threats on routes from Israel continue to impact operational reliability and necessitate strict safety protocols.",
+      "original_source": {
+        "title": "Flight from Israel diverted after ‘threat’",
+        "source_name": "Financial Times",
+        "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5CR1NMc0dMQzdPOHJqX0pVM3JHblFMdDg5bG5BTUZFUGROQk0zOGZfbzA2a0FUMGprZDk4eVpCQjZBd3ZQNzVPbXppcHN2UWdlcENodmlEalhFS29yaHN3bWN3UlZ1OUkyUmJ4M25ocGY?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-164806bd63d2",
+      "relevance_score": 57.5,
+      "score_components": {
+        "event_type": 0.8,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.4,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Financial Times",
+          "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5CR1NMc0dMQzdPOHJqX0pVM3JHblFMdDg5bG5BTUZFUGROQk0zOGZfbzA2a0FUMGprZDk4eVpCQjZBd3ZQNzVPbXppcHN2UWdlcENodmlEalhFS29yaHN3bWN3UlZ1OUkyUmJ4M25ocGY?oc=5",
+          "title": "Flight from Israel diverted after ‘threat’",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:58:28+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-0b908d325e2c",
+      "section": "European and other global airlines",
+      "headline": "Houthis Strike Yemen Airport Amid Pause in Russia Energy Sanctions",
+      "published_at": "17 Oct 12:02",
+      "lead": "Yemen's airport was targeted by Houthi forces while a 60-day pause on Russian energy sanctions was announced to analyze global impacts.",
+      "source_description": "",
+      "detailed_analysis": [
+        "Houthi forces conducted a strike on an airport in Yemen.",
+        "A 60-day pause on Russia energy sanctions has been initiated to assess global impact.",
+        "The pause aims to analyze the effect of sanctions on international markets, including India."
+      ],
+      "data_points": [
+        "60-day"
+      ],
+      "strategic_impact": "Increased geopolitical risk for regional aviation infrastructure and potential shifts in global energy costs.",
+      "market_exposure": [
+        {
+          "carrier": "Yemen Airport",
+          "impact": "Negative",
+          "details": "The facility was hit by Houthi forces, causing direct infrastructure damage."
+        }
+      ],
+      "event_type": "geopolitics_airspace",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Regulation & Airspace",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Direct attacks on airport infrastructure highlight ongoing regional instability affecting aviation safety and logistics.",
+      "original_source": {
+        "title": "Trump Pauses Russia Energy Sanctions, Houthis Hit Yemen Airport",
+        "source_name": "Bloomberg",
+        "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNemQxekg0Z2U2YkRxTjZHb1IwZTlBLTQ2VU53NHN0aGg2UWtMTHR3VTJ2dEMtdVhYVnBDTlBmN0lsWHl0NnE0eUw1R2JjVHQ2a0xsUE56MDJkSTliaFRmMzcyWGJybEVXYVMtY1NwNm9RZDZjdy1OeDdYSmljaGRVZkdNMnUwdWltbjFwcnJwSERiV0ZuYVU0WFNPb043RlRBaUxCUW1PRHdCWTQxOEpxUU95bHpQbVgzaVotbElnVXlUeDM1MTdUTExadHpCRmpvU2h3?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-0b908d325e2c",
+      "relevance_score": 56.2,
+      "score_components": {
+        "event_type": 0.95,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Bloomberg",
+          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNemQxekg0Z2U2YkRxTjZHb1IwZTlBLTQ2VU53NHN0aGg2UWtMTHR3VTJ2dEMtdVhYVnBDTlBmN0lsWHl0NnE0eUw1R2JjVHQ2a0xsUE56MDJkSTliaFRmMzcyWGJybEVXYVMtY1NwNm9RZDZjdy1OeDdYSmljaGRVZkdNMnUwdWltbjFwcnJwSERiV0ZuYVU0WFNPb043RlRBaUxCUW1PRHdCWTQxOEpxUU95bHpQbVgzaVotbElnVXlUeDM1MTdUTExadHpCRmpvU2h3?oc=5",
+          "title": "Trump Pauses Russia Energy Sanctions, Houthis Hit Yemen Airport",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-c4e424509c8e",
+      "section": "European and other global airlines",
+      "headline": "Private Jet Skids Off Runway at Las Vegas Airport",
+      "published_at": "18 Oct 21:29",
+      "lead": "A private aircraft veered off the runway and struck a perimeter fence at Las Vegas airport.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The incident involved a private jet skidding off the runway during operations.",
+        "The aircraft made contact with a fence at the airport after leaving the paved surface.",
+        "No specific injuries or aircraft type were detailed in the initial reports."
+      ],
+      "data_points": [],
+      "strategic_impact": "Temporary operational disruption at the airport and potential infrastructure repair costs.",
+      "market_exposure": [
+        {
+          "carrier": "Las Vegas airport",
+          "impact": "Negative",
+          "details": "Runway excursion incident involving a private jet hitting a perimeter fence."
+        }
+      ],
+      "event_type": "airport_infrastructure",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [
+          {
+            "entity_id": "airport:000008",
+            "slug": "harry-reid-international",
+            "iata": "LAS",
+            "name": "Harry Reid International",
+            "country": "United States",
+            "tier": 1
+          }
+        ],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Runway excursions pose significant safety risks and can cause immediate closures of airport movement areas, affecting overall capacity.",
+      "original_source": {
+        "title": "Private jet skids off runway, hits fence at Las Vegas airport",
+        "source_name": "Associated Press",
+        "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPNHZCaEJyU1JITnVWWE5SaFhiVmY2dmNHYnRrUDI5Uy1Ud0l5bDNLajJ0d29XVnRBUVBIbGV0eGdMdWtUMk9rR1hoVklZUG13YnJPLTlWWWhBQWRBOS1MWkRVMzlObThKRUZLYUZkS1FzcVUzZE1Ec3lGemoyWlp2dURYeV94aC1wU3M0?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.85
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-c4e424509c8e",
+      "relevance_score": 55.2,
+      "score_components": {
+        "event_type": 0.5,
+        "source_reliability": 0.85,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Associated Press",
+          "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPNHZCaEJyU1JITnVWWE5SaFhiVmY2dmNHYnRrUDI5Uy1Ud0l5bDNLajJ0d29XVnRBUVBIbGV0eGdMdWtUMk9rR1hoVklZUG13YnJPLTlWWWhBQWRBOS1MWkRVMzlObThKRUZLYUZkS1FzcVUzZE1Ec3lGemoyWlp2dURYeV94aC1wU3M0?oc=5",
+          "title": "Private jet skids off runway, hits fence at Las Vegas airport",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-be2a1d5a98bf",
+      "section": "European and other global airlines",
+      "headline": "Air Canada and United Expand Transborder Network with Six New Routes for 2027",
+      "published_at": "16 Oct 17:04",
+      "lead": "Air Canada and United Airlines have announced six new Canada-U.S. routes for the Summer 2027 season under their joint business agreement.",
+      "source_description": "Air Canada Expands Canada-U.S. Connectivity with New Summer 2027 Routes, Increasing Options for Travellers Under its Transborder Joint Business Agreement with United Airlines | [Ottawa International Airport Authority] Air Canada Expands Canada-U.S. Connectivity with New Summer 2027… | [TravelPulse Canada] Air Canada, United Announce U.S. Routes from Six (6) Canadian Cities for 2027 | [Pluang] Air Canada and United Airlines expand Canada-U.... | [The Points Guy] United, Air Canada expand partnership, add 6 routes for 2027 | [Aviation24] Air Canada and United add six Canada–US routes for summer 2027. Air Canada and United Airlines have announced six new routes between Canada and the United States for summer 2027, alongside plans to renew and expand their transborder joint business agreement, subject to regulatory approval. Air Canada will introduce three seasonal services: Route Operating period Frequency Toronto–Louisville 28 April–31 October 2027 Increasing to daily in May […]",
+      "detailed_analysis": [
+        "The expansion includes new routes connecting six Canadian cities to the United States.",
+        "The move is part of a plan to renew and expand the existing transborder joint business agreement.",
+        "The partnership aims to increase travel options and connectivity between the two nations for the 2027 summer season."
+      ],
+      "data_points": [
+        "6",
+        "2027"
+      ],
+      "strategic_impact": "Strengthened competitive position in the transborder market through increased capacity and joint operations.",
+      "market_exposure": [
+        {
+          "carrier": "Air Canada",
+          "impact": "Positive",
+          "details": "Expanding transborder connectivity with six new routes in partnership with United Airlines."
+        },
+        {
+          "carrier": "United Airlines",
+          "impact": "Positive",
+          "details": "Renewing and expanding its transborder joint business agreement with Air Canada."
+        }
+      ],
+      "event_type": null,
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000128",
+            "slug": "air-canada",
+            "iata": "AC",
+            "name": "Air Canada",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          },
+          {
+            "entity_id": "carrier:000116",
+            "slug": "united-airlines",
+            "iata": "UA",
+            "name": "United Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "The expansion demonstrates a long-term commitment to the joint venture model to dominate the North American transborder market.",
+      "original_source": {
+        "title": "Air Canada Expands Canada-U.S. Connectivity with New Summer 2027 Routes, Increasing Options for Travellers Under its Transborder Joint Business Agreement with United Airlines",
+        "source_name": "GlobeNewswire",
+        "url": "https://news.google.com/rss/articles/CBMi4gJBVV95cUxNdXI3aS1YT1F3YmtMNEVSMlNZRkhDVkp1WS1iZkZ3NzkwTEhnQWg1LUdNbkdtSWxvRDU2QlFkWDN0bVFXTWl4amd5WUJCVmw3MXBsNi1SLUplYkFpODA2QVJIOHJIWjVoU1YtUlNfaEJOeG8zQjRMTFJDVUV2UTFsV3Q4Yi14aTNXaV9CS2xUZ2NySWtOblNxU0pUT3NOUXJXVy0ySjYtWmlCSmpJYjFjTGluc1A2WWlOSUtVUktzLW5uUmlBU1Z1czBCOGdqcjVUdjlVdHI0Um5QZGNLd3B1dnJXbVJ6blE3eHVIUHBqcVl4d3FtME12akRUQ2hoZzJ6MTBUQzZwME4yU0Q1WVQtVkFSZGtrLTZOZ2FDU1JlTUgwcmtRSUo3RTRMX3FLSWwwVXhmSFF4RUhNQUFaaGtpRDBxendBVDRZbFBJVnVWYWc1ZXQ1S0plRjNtR1p1dVlnM2c?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "route_network",
+          "orders_deliveries",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.85
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-be2a1d5a98bf",
+      "relevance_score": 53.2,
+      "score_components": {
+        "event_type": 0.1,
+        "source_reliability": 0.85,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 1.0
+      },
+      "sources": [
+        {
+          "name": "Aviation24",
+          "url": "https://www.aviation24.be/airlines/air-canada/air-canada-and-united-add-six-canada-us-routes-for-summer-2027/",
+          "title": "Air Canada and United add six Canada–US routes for summer 2027",
+          "language": "en"
+        },
+        {
+          "name": "GlobeNewswire",
+          "url": "https://news.google.com/rss/articles/CBMi4gJBVV95cUxNdXI3aS1YT1F3YmtMNEVSMlNZRkhDVkp1WS1iZkZ3NzkwTEhnQWg1LUdNbkdtSWxvRDU2QlFkWDN0bVFXTWl4amd5WUJCVmw3MXBsNi1SLUplYkFpODA2QVJIOHJIWjVoU1YtUlNfaEJOeG8zQjRMTFJDVUV2UTFsV3Q4Yi14aTNXaV9CS2xUZ2NySWtOblNxU0pUT3NOUXJXVy0ySjYtWmlCSmpJYjFjTGluc1A2WWlOSUtVUktzLW5uUmlBU1Z1czBCOGdqcjVUdjlVdHI0Um5QZGNLd3B1dnJXbVJ6blE3eHVIUHBqcVl4d3FtME12akRUQ2hoZzJ6MTBUQzZwME4yU0Q1WVQtVkFSZGtrLTZOZ2FDU1JlTUgwcmtRSUo3RTRMX3FLSWwwVXhmSFF4RUhNQUFaaGtpRDBxendBVDRZbFBJVnVWYWc1ZXQ1S0plRjNtR1p1dVlnM2c?oc=5",
+          "title": "Air Canada Expands Canada-U.S. Connectivity with New Summer 2027 Routes, Increasing Options for Travellers Under its Transborder Joint Business Agreement with United Airlines",
+          "language": "en"
+        },
+        {
+          "name": "The Points Guy",
+          "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQZ2xCMXpJT1otSlJFdVZHcHJhTkNkbng1QjliY2VtNVJMd2J5TjNWc085WkpTWTQtNVlDVnkyMHU3Vk80WEJhZGZmUHNNUk55TzRzdkVaNmw1dnVNY1lYUE1HU05LR1haYVdaLWE3cnc5NG9LekI3X0QwRzRyRUJuanVwN3BRUQ?oc=5",
+          "title": "United, Air Canada expand partnership, add 6 routes for 2027",
+          "language": "en"
+        }
+      ],
+      "source_count": 3,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-639952bb6e04",
+      "section": "European and other global airlines",
+      "headline": "United Airlines CEO Defends Fare Hikes Amid Rising Costs",
+      "published_at": "18 Oct 12:34",
+      "lead": "United Airlines' CEO has addressed the necessity of fare increases to offset rising operational costs as the market awaits Q3 earnings.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The carrier's stock (UAL) underperformed on Friday compared to the broader market.",
+        "Management is defending fare hikes as a response to increasing cost pressures.",
+        "Investors are focused on the upcoming Q3 earnings report for performance indicators."
+      ],
+      "data_points": [],
+      "strategic_impact": "Focus on yield management and revenue protection to counter inflationary cost trends.",
+      "market_exposure": [
+        {
+          "carrier": "United Airlines",
+          "impact": "Neutral",
+          "details": "Stock underperformed recently while management defends fare hikes to cover rising costs."
+        }
+      ],
+      "event_type": "capital_markets",
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000116",
+            "slug": "united-airlines",
+            "iata": "UA",
+            "name": "United Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "The ability to pass on costs to consumers via fare hikes is critical for maintaining margins in a high-cost environment.",
+      "original_source": {
+        "title": "Check out United Airlines Holdings's stock price (UAL) in real time",
+        "source_name": "CNBC",
+        "url": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE9MUGJlS2ZsTTJaaWNKb2pjS2dHNDd6S3lsbzBNNWRKaVdveC12NzY2RmxRYndPUklRTHllN2gtb3pwZE5kSmc?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "finance_investor",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.85
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-639952bb6e04",
+      "relevance_score": 53.0,
+      "score_components": {
+        "event_type": 0.45,
+        "source_reliability": 0.85,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "CNBC",
+          "url": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE9MUGJlS2ZsTTJaaWNKb2pjS2dHNDd6S3lsbzBNNWRKaVdveC12NzY2RmxRYndPUklRTHllN2gtb3pwZE5kSmc?oc=5",
+          "title": "Check out United Airlines Holdings's stock price (UAL) in real time",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-fdc7938492d4",
+      "section": "European and other global airlines",
+      "headline": "Red Sea Airlines Flight Diverts to Helsinki Due to Drone Alert at Pulkovo",
+      "published_at": "17 Oct 14:41",
+      "lead": "A Red Sea Airlines charter flight from Egypt to Russia was forced to divert to Finland after a drone alert closed St. Petersburg's Pulkovo Airport.",
+      "source_description": "Red Sea Airlines) charter flight 4S321 from Hurghada, Egypt, to St. Petersburg, Russian Federation, operated by a Boeing 737-800 (reg. SU-RSB, pictured above), diverted to Helsinki-Vantaa, Finland, after a drone alert prompted the closure of Pulkovo Airport. According to the Finnish Border Guard, the passenger aircraft landed overnight in Helsinki, refuelled and subsequently continued to […]",
+      "detailed_analysis": [
+        "Flight 4S321 was operated by a Boeing 737-800 with registration SU-RSB.",
+        "The aircraft diverted to Helsinki-Vantaa (HEL) following the closure of Pulkovo Airport (LED).",
+        "The plane refuelled in Helsinki before continuing its journey to the original destination."
+      ],
+      "data_points": [
+        "4S321",
+        "737-800",
+        "SU-RSB"
+      ],
+      "strategic_impact": "Operational disruption and additional fuel/landing costs due to airspace security issues.",
+      "market_exposure": [
+        {
+          "carrier": "Red Sea Airlines",
+          "impact": "Negative",
+          "details": "Charter flight 4S321 required an unscheduled diversion to Helsinki."
+        },
+        {
+          "carrier": "Pulkovo Airport",
+          "impact": "Negative",
+          "details": "Airport was closed due to a drone alert, forcing incoming traffic to divert."
+        },
+        {
+          "carrier": "Helsinki-Vantaa",
+          "impact": "Neutral",
+          "details": "Served as the diversion airport for the affected Red Sea Airlines flight."
+        }
+      ],
+      "event_type": "operations_disruption",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [
+          {
+            "entity_id": "airport:000070",
+            "slug": "helsinki-vantaa",
+            "iata": "HEL",
+            "name": "Helsinki-Vantaa",
+            "country": "Finland",
+            "tier": 3
+          }
+        ],
+        "aircraft": [
+          {
+            "entity_id": "aircraft:000025",
+            "slug": "b737-800",
+            "code": "B738",
+            "family": "737",
+            "manufacturer": "Boeing"
+          }
+        ]
+      },
+      "region_section": "Europe",
       "secondary_tags": [
         "Manufacturers & Supply Chain"
       ],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "The acquisition of these aircraft is crucial for Vietnam Airlines' strategy to re-establish and grow its low-cost operations.",
+      "why_it_matters": "Drone-related airport closures are becoming a frequent cause of significant operational diversions and safety concerns in the region.",
       "original_source": {
-        "title": "Vietnam Airlines Seeks 25 Airbus Jets to Revive Low Cost Carrier",
-        "source_name": "Bloomberg",
-        "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPZ25ISDRWTFZoUHh4aEI4REoxbWdmNFFaTmdzZURBVnB0bWlYTzByY0h2RloyYUVNYXBRWWJtbWZxb1RicmJRNEVaYzdJejZDM0lYd201WlZiVHc4Q0JJRXZhN0d3ZF9RNFFIdHJMb2IzMWhOamloUE9WbGo4d3NPbVJpZVJJSllPcW05d1NnTklrQ0tLQmpaQVR6dlJNTTlLb3RhYWpxQTQwZm1xMFZRd2NHRklKUQ?oc=5",
-        "source_type": "mainstream",
+        "title": "St. Petersburg-bound charter diverts to Helsinki after drone alert",
+        "source_name": "Aviation24",
+        "url": "https://www.aviation24.be/airlines/red-sea-airlines/st-petersburg-bound-charter-diverts-to-helsinki-after-drone-alert/",
+        "source_type": "trade_media",
         "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "fleet",
+          "orders_deliveries",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-fdc7938492d4",
+      "relevance_score": 50.0,
+      "score_components": {
+        "event_type": 0.8,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.4,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Aviation24",
+          "url": "https://www.aviation24.be/airlines/red-sea-airlines/st-petersburg-bound-charter-diverts-to-helsinki-after-drone-alert/",
+          "title": "St. Petersburg-bound charter diverts to Helsinki after drone alert",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-17T14:41:30+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-44f4623e381e",
+      "section": "Other areas",
+      "headline": "Cirium Forecasts 43,000 New Aircraft Deliveries by 2045",
+      "published_at": "13 Oct 09:00",
+      "lead": "Aviation analytics firm Cirium projects that the global aviation industry will see 43,000 aircraft deliveries over the next two decades.",
+      "source_description": "",
+      "detailed_analysis": [
+        "The long-term forecast covers the period through 2045.",
+        "The projection highlights significant expected growth in the global commercial fleet.",
+        "This data serves as a benchmark for manufacturers, lessors, and airlines for long-term fleet planning."
+      ],
+      "data_points": [
+        "43,000",
+        "2045"
+      ],
+      "strategic_impact": "Indicates strong long-term demand for fleet renewal and expansion globally.",
+      "market_exposure": [],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": true,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Massive delivery projections underscore the industry's scale of investment required for future capacity and sustainability goals.",
+      "original_source": {
+        "title": "Cirium projects 43,000 aircraft deliveries through 2045",
+        "source_name": "Cirium",
+        "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPZFlSSTFYbF9ZMjJXVHFsSjU4UC1YM0dtNThvcEM0cFRHVDVFSGJNaHUwQWJwZTg4S3Vla2MybFFfalpBNE50WXJiZ2V4anZrbjl5Wk5mM1Z3ckNncGxYMXZPM1pkS0NSc0RBcVJveXZGOVFOTkVySnpxMmhQRzB4cVpsUTRURzJFSDVfZmRQVzN4ZHdFMXpOLVllR3kwTGlST3JDOWp3?oc=5",
+        "source_type": "trade_media",
+        "official": true,
         "airline": "",
         "topics": [
           "fleet"
@@ -2232,84 +2785,749 @@
       },
       "related_news": [],
       "narrative_status": "done",
-      "basis": "headline_only",
-      "story_id": "story-cd3a35d4a291",
-      "relevance_score": 59.0,
+      "story_id": "story-44f4623e381e",
+      "relevance_score": 49.0,
       "score_components": {
         "event_type": 0.7,
         "source_reliability": 0.9,
-        "entity_prominence": 0.7,
+        "entity_prominence": 0.0,
+        "official_source": 1.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Cirium",
+          "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPZFlSSTFYbF9ZMjJXVHFsSjU4UC1YM0dtNThvcEM0cFRHVDVFSGJNaHUwQWJwZTg4S3Vla2MybFFfalpBNE50WXJiZ2V4anZrbjl5Wk5mM1Z3ckNncGxYMXZPM1pkS0NSc0RBcVJveXZGOVFOTkVySnpxMmhQRzB4cVpsUTRURzJFSDVfZmRQVzN4ZHdFMXpOLVllR3kwTGlST3JDOWp3?oc=5",
+          "title": "Cirium projects 43,000 aircraft deliveries through 2045",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-455fd3438c4b",
+      "section": "European and other global airlines",
+      "headline": "Turkish Technic to Develop LEAP Engine MRO Capabilities",
+      "published_at": "19 Oct 04:50",
+      "lead": "Turkish Technic is expanding its maintenance, repair, and overhaul (MRO) services to include the LEAP engine series.",
+      "source_description": "",
+      "detailed_analysis": [
+        "Turkish Technic will develop specialized capabilities for LEAP engine MRO.",
+        "The move targets the growing global fleet of aircraft powered by LEAP engines.",
+        "This expansion strengthens the provider's position in the high-demand narrowbody engine maintenance market."
+      ],
+      "data_points": [],
+      "strategic_impact": "Enhances technical service offerings and revenue potential in the narrowbody engine maintenance sector.",
+      "market_exposure": [
+        {
+          "carrier": "Turkish Technic",
+          "impact": "Positive",
+          "details": "Expanding MRO capabilities to include LEAP engines"
+        }
+      ],
+      "event_type": "operations_disruption",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "This development provides additional MRO capacity for the global LEAP engine fleet, addressing critical maintenance demand for modern narrowbody aircraft.",
+      "original_source": {
+        "title": "Turkish Technic To Develop LEAP Engine MRO Capabilities",
+        "source_name": "Aviation Business Middle East",
+        "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQOWV1d3lxNVdVSjg0SWlDaVZRMDRQZ1Q2WDhkdWFlbHRQcHdZTE1jRlNmb1ZyYkRYNkRXNzNnZHViaXJKNkM3MFVzZzF0bnlwVlg2RWtHLWp3Nk9oWUc2NWVrdVVvODNPNC1hUVMzVlNaY2Q4MzVOb2FWLXlkd09oSmU5aWFlLWl3Ull5b2FNTGJJaXhySm13d083Zw?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "fleet"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Middle East",
+        "tier": 2,
+        "reliability_weight": 0.85
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-455fd3438c4b",
+      "relevance_score": 48.8,
+      "score_components": {
+        "event_type": 0.8,
+        "source_reliability": 0.85,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Aviation Business Middle East",
+          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQOWV1d3lxNVdVSjg0SWlDaVZRMDRQZ1Q2WDhkdWFlbHRQcHdZTE1jRlNmb1ZyYkRYNkRXNzNnZHViaXJKNkM3MFVzZzF0bnlwVlg2RWtHLWp3Nk9oWUc2NWVrdVVvODNPNC1hUVMzVlNaY2Q4MzVOb2FWLXlkd09oSmU5aWFlLWl3Ull5b2FNTGJJaXhySm13d083Zw?oc=5",
+          "title": "Turkish Technic To Develop LEAP Engine MRO Capabilities",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T04:50:29+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-1ff4bcdd392a",
+      "section": "European and other global airlines",
+      "headline": "Airlines Reduce Capacity to Tulum Amid Declining Tourist Interest",
+      "published_at": "17 Oct 15:00",
+      "lead": "Carriers are scaling back operations at Tulum as the destination loses its appeal among travelers.",
+      "source_description": "",
+      "detailed_analysis": [
+        "Airlines are pulling back from the once-popular Mexican destination.",
+        "Tourists are reportedly abandoning the location.",
+        "The shift reflects a change in market demand for the region."
+      ],
+      "data_points": [],
+      "strategic_impact": "Capacity reallocation away from underperforming leisure markets to more profitable routes.",
+      "market_exposure": [
+        {
+          "carrier": "Tulum",
+          "impact": "Negative",
+          "details": "Declining tourist interest and reduced airline capacity"
+        }
+      ],
+      "event_type": "route_network_change",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "The withdrawal of capacity highlights the volatility of leisure-driven markets and the need for flexible network planning.",
+      "original_source": {
+        "title": "Airlines Pull Back From Once-Hot Tulum as Tourists Abandon Mexico Party Paradise",
+        "source_name": "Bloomberg",
+        "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxNOThIMUZtTHkyazdJekc1b1VjQ1BWMlFDUHdndVdRMzBOT1V5TkV0Ui15Mks1dUo4UXByQlplUFFCZFNZbTJ3NXlsUV9JX2Zsa0tEdmYxZHdTZ2tyTjJ3bk1ib1RESE1ieWp1N0oyY1htcmpKWlVnanlxU3lPcUc0bFJHN3FrdlVEYVNLZ0dGNlh0STRQOU82TXd4NHR0WUN6TFZfWUxHdDJGc3ZlNU12MnplcVNONldyUW45dk1uZkd0aTNCWHNQOVNhQQ?oc=5",
+        "source_type": "mainstream",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-1ff4bcdd392a",
+      "relevance_score": 45.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.0,
         "official_source": 0.0,
         "corroboration": 0.0
       },
       "sources": [
         {
           "name": "Bloomberg",
-          "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPZ25ISDRWTFZoUHh4aEI4REoxbWdmNFFaTmdzZURBVnB0bWlYTzByY0h2RloyYUVNYXBRWWJtbWZxb1RicmJRNEVaYzdJejZDM0lYd201WlZiVHc4Q0JJRXZhN0d3ZF9RNFFIdHJMb2IzMWhOamloUE9WbGo4d3NPbVJpZVJJSllPcW05d1NnTklrQ0tLQmpaQVR6dlJNTTlLb3RhYWpxQTQwZm1xMFZRd2NHRklKUQ?oc=5",
-          "title": "Vietnam Airlines Seeks 25 Airbus Jets to Revive Low Cost Carrier",
+          "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxNOThIMUZtTHkyazdJekc1b1VjQ1BWMlFDUHdndVdRMzBOT1V5TkV0Ui15Mks1dUo4UXByQlplUFFCZFNZbTJ3NXlsUV9JX2Zsa0tEdmYxZHdTZ2tyTjJ3bk1ib1RESE1ieWp1N0oyY1htcmpKWlVnanlxU3lPcUc0bFJHN3FrdlVEYVNLZ0dGNlh0STRQOU82TXd4NHR0WUN6TFZfWUxHdDJGc3ZlNU12MnplcVNONldyUW45dk1uZkd0aTNCWHNQOVNhQQ?oc=5",
+          "title": "Airlines Pull Back From Once-Hot Tulum as Tourists Abandon Mexico Party Paradise",
           "language": "en"
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T00:01:00+00:00",
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
       "language": "en",
-      "first_seen_at": "2026-10-18T09:06:28+00:00",
-      "last_updated_at": "2026-10-18T09:06:28+00:00",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
       "update_reasons": [],
-      "badges": [],
+      "badges": [
+        "new"
+      ],
       "level": "important",
       "level_label": "Önemli",
       "listed": true,
-      "narrative_generated_at": "2026-10-18T09:06:28+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
     },
     {
-      "id": "story-1589514bcc01",
+      "id": "story-a96d898f3fe6",
       "section": "European and other global airlines",
-      "headline": "SWISS and Lufthansa to Retire Airbus A340 Fleets",
-      "published_at": "18 Oct 09:18",
-      "lead": "SWISS and Lufthansa are retiring their Airbus A340 fleets, marking the end of a 23-year era for four-engine long-haul operations within the group.",
+      "headline": "2026 Airliner Deliveries Forecast to Remain Below 2018 Levels",
+      "published_at": "16 Oct 08:11",
+      "lead": "Aviation Week forecasts that global aircraft deliveries in 2026 will not reach the levels seen in 2018.",
       "source_description": "",
       "detailed_analysis": [
-        "SWISS and Lufthansa are retiring their Airbus A340 fleets.",
-        "This concludes a 23-year period of four-engine long-haul flying.",
-        "The retirement affects both carriers within the group."
+        "The forecast indicates a prolonged recovery in aircraft manufacturing output.",
+        "Deliveries in 2026 are expected to be short of the 2018 benchmark.",
+        "Supply chain constraints and production challenges continue to impact the industry."
       ],
       "data_points": [
-        "23-year"
+        "2026",
+        "2018"
       ],
-      "strategic_impact": "This fleet retirement impacts long-haul capacity and operational costs, shifting towards more fuel-efficient twin-engine aircraft.",
-      "market_exposure": [
+      "strategic_impact": "Persistent aircraft shortages will likely force airlines to extend leases and maintain older fleets, increasing maintenance costs.",
+      "market_exposure": [],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Continued delivery shortfalls constrain global capacity growth and fleet modernization efforts through the middle of the decade.",
+      "original_source": {
+        "title": "2026 Airliner Deliveries To Be Short Of 2018, Aviation Week Forecasts",
+        "source_name": "Aviation Week",
+        "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQVVRjSXMzY0wyclV4RHV3Mk0tMzJkdTRpTFdqbWp6OHZFYTc2bWFVQUVVaVlXbTZkSFJfYThDcDVZYjlNb1pwOXptRUVfeVNKWFQ0TVowQTBMckszU2o4UlBHY2NvRkpqaHlaU2xhZ0FETmNpM2d3Z2ZsNzZRMGE2cXBhbVRFaXh4b0FFcUtfUnNDMndtbnhsZUplUnNfdmxCc21USXdFaU1JM3VVMFdzVklGT3RYYUlDLWpySXVn?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-a96d898f3fe6",
+      "relevance_score": 45.0,
+      "score_components": {
+        "event_type": 0.7,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
         {
-          "carrier": "SWISS",
-          "impact": "Neutral",
-          "details": "Retiring Airbus A340 fleet."
-        },
-        {
-          "carrier": "Lufthansa",
-          "impact": "Neutral",
-          "details": "Retiring Airbus A340 fleet."
-        },
-        {
-          "carrier": "Airbus",
-          "impact": "Neutral",
-          "details": "A340 fleet retirement by SWISS and Lufthansa."
+          "name": "Aviation Week",
+          "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQVVRjSXMzY0wyclV4RHV3Mk0tMzJkdTRpTFdqbWp6OHZFYTc2bWFVQUVVaVlXbTZkSFJfYThDcDVZYjlNb1pwOXptRUVfeVNKWFQ0TVowQTBMckszU2o4UlBHY2NvRkpqaHlaU2xhZ0FETmNpM2d3Z2ZsNzZRMGE2cXBhbVRFaXh4b0FFcUtfUnNDMndtbnhsZUplUnNfdmxCc21USXdFaU1JM3VVMFdzVklGT3RYYUlDLWpySXVn?oc=5",
+          "title": "2026 Airliner Deliveries To Be Short Of 2018, Aviation Week Forecasts",
+          "language": "en"
         }
       ],
-      "event_type": "fleet_orders",
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "important",
+      "level_label": "Önemli",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-d61b073ad641",
+      "section": "European and other global airlines",
+      "headline": "Air India Express Flight Aborts Landing at Bengaluru Due to Runway FOD",
+      "published_at": "18 Oct 18:00",
+      "lead": "An Air India Express flight from Goa performed a go-around at Kempegowda International Airport after a foreign object was detected on the runway.",
+      "source_description": "",
+      "detailed_analysis": [
+        "ATC spotted a foreign object on the runway during the aircraft's approach.",
+        "The flight from Goa was forced to abort its landing.",
+        "The incident occurred at Kempegowda International Airport in Bengaluru."
+      ],
+      "data_points": [],
+      "strategic_impact": "Minor operational disruption and increased fuel burn due to the go-around procedure.",
+      "market_exposure": [
+        {
+          "carrier": "Air India Express",
+          "impact": "Neutral",
+          "details": "Operational disruption due to external factors"
+        },
+        {
+          "carrier": "Kempegowda International Airport",
+          "impact": "Neutral",
+          "details": "Runway safety intervention"
+        }
+      ],
+      "event_type": "airport_infrastructure",
       "entities": {
         "groups": [],
         "carriers": [
           {
-            "entity_id": "carrier:000002",
-            "slug": "swiss",
-            "iata": "LX",
-            "name": "SWISS International Air Lines",
-            "region": "Europe",
-            "group_entity_id": "group:000001",
+            "entity_id": "carrier:000093",
+            "slug": "air-india-express",
+            "iata": "IX",
+            "name": "Air India Express",
+            "region": "Asia-Pacific",
+            "group_entity_id": "group:000016",
             "tier": 2
-          },
+          }
+        ],
+        "airports": [
+          {
+            "entity_id": "airport:000110",
+            "slug": "kempegowda-international",
+            "iata": "BLR",
+            "name": "Kempegowda International",
+            "country": "India",
+            "tier": 2
+          }
+        ],
+        "aircraft": []
+      },
+      "region_section": "Asia-Pacific",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Runway safety remains a critical operational priority, with foreign object debris (FOD) requiring immediate air traffic control intervention.",
+      "original_source": {
+        "title": "Air India Express Aborts Landing at Bengaluru After Foreign Object Found on Runway",
+        "source_name": "The Aviation Hub",
+        "url": "https://theaviationhub.co.uk/air-india-express-aborts-landing-bengaluru-foreign-object/?utm_source=rss&utm_medium=rss&utm_campaign=air-india-express-aborts-landing-bengaluru-foreign-object",
+        "source_type": "trade",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "basis": "headline_only",
+      "story_id": "story-d61b073ad641",
+      "relevance_score": 42.5,
+      "score_components": {
+        "event_type": 0.5,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.7,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "The Aviation Hub",
+          "url": "https://theaviationhub.co.uk/air-india-express-aborts-landing-bengaluru-foreign-object/?utm_source=rss&utm_medium=rss&utm_campaign=air-india-express-aborts-landing-bengaluru-foreign-object",
+          "title": "Air India Express Aborts Landing at Bengaluru After Foreign Object Found on Runway",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T18:00:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "watch",
+      "level_label": "İzle",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-7abaf88b7059",
+      "section": "European and other global airlines",
+      "headline": "Storm Disrupts Operations at Ibiza Airport with Cancellations and Diversions",
+      "published_at": "18 Oct 21:12",
+      "lead": "Heavy rain and airfield flooding forced Ibiza Airport to suspend operations twice, resulting in multiple flight disruptions.",
+      "source_description": "Heavy rain forced Ibiza Airport to suspend operations twice on Sunday, causing five flight cancellations and 16 diversions, according to airport operator Aena. Operations were halted between 10:00 and 11:00, then again from 11:15 to 12:15 as the storm intensified and water had to be cleared from parts of the airfield. The two suspensions totalled […]",
+      "detailed_analysis": [
+        "Operations were halted between 10:00 and 11:00, and again from 11:15 to 12:15.",
+        "The storm required water clearance from parts of the airfield.",
+        "A total of five flights were cancelled and 16 were diverted."
+      ],
+      "data_points": [
+        "five",
+        "16",
+        "10:00",
+        "11:00",
+        "11:15",
+        "12:15"
+      ],
+      "strategic_impact": "Operational delays and increased costs for airlines due to diversions and ground handling challenges.",
+      "market_exposure": [
+        {
+          "carrier": "Ibiza Airport",
+          "impact": "Negative",
+          "details": "Operational suspension due to weather"
+        },
+        {
+          "carrier": "Aena",
+          "impact": "Neutral",
+          "details": "Managed airport response"
+        }
+      ],
+      "event_type": "operations_disruption",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Severe weather events continue to challenge airport infrastructure resilience and schedule reliability in key leisure hubs.",
+      "original_source": {
+        "title": "Ibiza Airport storm causes five cancellations and 16 diversions",
+        "source_name": "Aviation24",
+        "url": "https://www.aviation24.be/airports/ibiza-airport-ibz/ibiza-airport-storm-causes-five-cancellations-and-16-diversions/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "airports_airspace"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-7abaf88b7059",
+      "relevance_score": 42.0,
+      "score_components": {
+        "event_type": 0.8,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Aviation24",
+          "url": "https://www.aviation24.be/airports/ibiza-airport-ibz/ibiza-airport-storm-causes-five-cancellations-and-16-diversions/",
+          "title": "Ibiza Airport storm causes five cancellations and 16 diversions",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T21:12:44+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "watch",
+      "level_label": "İzle",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-ea7126bf4a72",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "İtalya’da 20-22 Kasım Tarihlerinde Geniş Kapsamlı Grev Uyarısı",
+      "published_at": "18 Oct 20:58",
+      "lead": "İtalya genelinde 20-22 Kasım 2026 tarihlerinde planlanan grevler, hava ve demiryolu ulaşımında ciddi aksamalara yol açabilir.",
+      "source_description": "İtalya’da 20-22 Kasım 2026 tarihleri arasında planlanan grevler, hava, kara ve demiryolu ulaşımında aksamalara neden olabilir. Ülke genelindeki genel grev çağrısının yanı sıra demiryolu çalışanları, hava trafik kontrolörleri ve bazı havalimanı personelinin iş bırakma eylemleri nedeniyle Türkiye’den İtalya’ya seyahat edecek yolcuların uçuş ve tren seferlerini yakından takip etmesi gerekiyor. İtalya’nın en büyük işçi konfederasyonu CGIL’in... İtalya’da 20-22 Kasım’da grev alarmı: Uçuşlar ve tren seferleri etkilenebilir yazısı ilk önce HavaHaber üzerinde ortaya çıktı.",
+      "detailed_analysis": [
+        "Grev çağrısı İtalya’nın en büyük işçi konfederasyonu CGIL tarafından yapıldı.",
+        "Eyleme hava trafik kontrolörleri, demiryolu çalışanları ve havalimanı personeli katılacak.",
+        "Türkiye’den İtalya’ya seyahat edecek yolcuların seferlerini yakından takip etmesi öneriliyor.",
+        "İş bırakma eylemleri ülke genelindeki ulaşım ağını etkileyecek."
+      ],
+      "data_points": [
+        "20-22 Kasım 2026"
+      ],
+      "strategic_impact": "Operasyonel aksamalar, uçuş iptalleri ve yolcu mağduriyeti nedeniyle havayolları üzerinde mali ve operasyonel baskı.",
+      "market_exposure": [
+        {
+          "carrier": "CGIL",
+          "impact": "Neutral",
+          "details": "Grev çağrısını yapan konfederasyon"
+        }
+      ],
+      "event_type": "operations_disruption",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Geniş katılımlı grevler, Avrupa ağındaki uçuş trafiğini ve bağlantılı seferlerin zamanında gerçekleşmesini olumsuz etkileyebilir.",
+      "original_source": {
+        "title": "İtalya’da 20-22 Kasım’da grev alarmı: Uçuşlar ve tren seferleri etkilenebilir",
+        "source_name": "HavaHaber",
+        "url": "https://havahaber.com/italyada-20-22-kasimda-grev-alarmi-ucuslar-ve-tren-seferleri-etkilenebilir/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "airports_airspace",
+          "labor"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Turkey",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-ea7126bf4a72",
+      "relevance_score": 42.0,
+      "score_components": {
+        "event_type": 0.8,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "HavaHaber",
+          "url": "https://havahaber.com/italyada-20-22-kasimda-grev-alarmi-ucuslar-ve-tren-seferleri-etkilenebilir/",
+          "title": "İtalya’da 20-22 Kasım’da grev alarmı: Uçuşlar ve tren seferleri etkilenebilir",
+          "language": "tr"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T20:58:02+00:00",
+      "language": "tr",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "watch",
+      "level_label": "İzle",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "tr"
+    },
+    {
+      "id": "story-c8aad10ccbed",
+      "section": "European and other global airlines",
+      "headline": "Avelo Airlines CEO Discusses Strategic Outlook in CAPA Interview",
+      "published_at": "18 Oct 05:20",
+      "lead": "Avelo Airlines CEO Andrew Levy shared insights into the carrier's strategy and market position during a recent CAPA interview.",
+      "source_description": "Airline Leader Interview Avelo CEO Andrew Levy CAPA - Centre for Aviation",
+      "detailed_analysis": [
+        "The interview features Andrew Levy, CEO of Avelo Airlines.",
+        "The discussion was hosted by CAPA - Centre for Aviation.",
+        "The content focuses on leadership perspectives within the airline industry."
+      ],
+      "data_points": [],
+      "strategic_impact": "Provides market intelligence on low-cost carrier strategies and executive sentiment.",
+      "market_exposure": [
+        {
+          "carrier": "Avelo",
+          "impact": "Neutral",
+          "details": "Executive interview regarding strategy"
+        }
+      ],
+      "event_type": "regulation_policy",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "Executive insights offer valuable context for understanding the competitive landscape and strategic direction of emerging carriers.",
+      "original_source": {
+        "title": "Airline Leader Interview Avelo CEO Andrew Levy - CAPA",
+        "source_name": "CAPA Centre for Aviation",
+        "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOMWFBa19qZC1XREhIUWg3UGtvaDlWRnFXN2lMaTBxWG10TFZCdTFwaGhpLWRJRmlqTWM2R2xyZmhrYXpEMlRieWFRVnl4REF6dkhfS2NwNWpSZ196LUxWTWpSVGRLZ3l1ZWJaeUtmZFg0cnV0Tjlmb0Jzck1ILVAzN1BjMFBsWDhia241NV8xS2dyQ3hvLUx3aVFKMVE?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.9
+      },
+      "related_news": [],
+      "narrative_status": "done",
+      "story_id": "story-c8aad10ccbed",
+      "relevance_score": 40.5,
+      "score_components": {
+        "event_type": 0.6,
+        "source_reliability": 0.9,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "CAPA Centre for Aviation",
+          "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOMWFBa19qZC1XREhIUWg3UGtvaDlWRnFXN2lMaTBxWG10TFZCdTFwaGhpLWRJRmlqTWM2R2xyZmhrYXpEMlRieWFRVnl4REF6dkhfS2NwNWpSZ196LUxWTWpSVGRLZ3l1ZWJaeUtmZFg0cnV0Tjlmb0Jzck1ILVAzN1BjMFBsWDhia241NV8xS2dyQ3hvLUx3aVFKMVE?oc=5",
+          "title": "Airline Leader Interview Avelo CEO Andrew Levy - CAPA",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "watch",
+      "level_label": "İzle",
+      "listed": true,
+      "narrative_generated_at": "2026-10-19T05:46:09+00:00",
+      "narrative_language": "en"
+    },
+    {
+      "id": "story-94c82ac6ae81",
+      "section": "European and other global airlines",
+      "headline": "Architect convicted after drunken assault on Virgin Atlantic cabin crew",
+      "published_at": "18 Oct 14:16",
+      "lead": "British architect Simone de Gale, 44, has been convicted of four offences following an incident aboard a Virgin Atlantic flight from Dubai to London Heathrow on February 5, 2026. She was found guilty in her absence at Ealing Magistrates’ Court on October 15 after failing to attend her trial, and a warrant was issued for […]",
+      "source_description": "British architect Simone de Gale, 44, has been convicted of four offences following an incident aboard a Virgin Atlantic flight from Dubai to London Heathrow on February 5, 2026. She was found guilty in her absence at Ealing Magistrates’ Court on October 15 after failing to attend her trial, and a warrant was issued for […]",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": "workforce_hr",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [
+          {
+            "entity_id": "airport:000043",
+            "slug": "london-heathrow",
+            "iata": "LHR",
+            "name": "London Heathrow",
+            "country": "United Kingdom",
+            "tier": 1
+          }
+        ],
+        "aircraft": []
+      },
+      "region_section": "Europe",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "",
+      "original_source": {
+        "title": "Architect convicted after drunken assault on Virgin Atlantic cabin crew",
+        "source_name": "Aviation24",
+        "url": "https://www.aviation24.be/airlines/virgin-atlantic/architect-convicted-after-drunken-assault-on-virgin-atlantic-cabin-crew/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "regulation_safety",
+          "labor"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "pending",
+      "story_id": "story-94c82ac6ae81",
+      "relevance_score": 39.5,
+      "score_components": {
+        "event_type": 0.3,
+        "source_reliability": 0.4,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Aviation24",
+          "url": "https://www.aviation24.be/airlines/virgin-atlantic/architect-convicted-after-drunken-assault-on-virgin-atlantic-cabin-crew/",
+          "title": "Architect convicted after drunken assault on Virgin Atlantic cabin crew",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T14:16:45+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "low",
+      "level_label": "Arşiv",
+      "listed": false
+    },
+    {
+      "id": "story-0964a71d6464",
+      "section": "European and other global airlines",
+      "headline": "Lufthansa prepares for final A340-600 flights",
+      "published_at": "17 Oct 16:43",
+      "lead": "Lufthansa will end Airbus A340-600 passenger operations on 18 October, with the final scheduled service arriving in Frankfurt the following morning, ending almost 23 years of service for the German airline. Flight LH419 from Washington Dulles is scheduled to depart at 17:55 local time on Sunday, 18 October, and land in Frankfurt at 07:55 on […]",
+      "source_description": "Lufthansa will end Airbus A340-600 passenger operations on 18 October, with the final scheduled service arriving in Frankfurt the following morning, ending almost 23 years of service for the German airline. Flight LH419 from Washington Dulles is scheduled to depart at 17:55 local time on Sunday, 18 October, and land in Frankfurt at 07:55 on […] | [AeroTime] Lufthansa prepares for final A340-600 flight as 17-year-old aircraft exits fleet. Lufthansa is scheduled to operate its final Airbus A340-600 passenger service on October 18, ending the aircraft type’s… The post Lufthansa prepares for final A340-600 flight as 17-year-old aircraft exits fleet appeared first on AeroTime",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": null,
+      "entities": {
+        "groups": [],
+        "carriers": [
           {
             "entity_id": "carrier:000001",
             "slug": "lufthansa",
@@ -2335,16 +3553,20 @@
       "secondary_tags": [
         "Manufacturers & Supply Chain"
       ],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "The phase-out of four-engine aircraft signals a broader industry trend towards modern, more economical twin-engine long-haul operations.",
+      "why_it_matters": "",
       "original_source": {
-        "title": "SWISS A340 Retirement: What the End of Four Engines Means",
-        "source_name": "The Aviation Hub",
-        "url": "https://theaviationhub.co.uk/swiss-airbus-a340-retirement-analysis/?utm_source=rss&utm_medium=rss&utm_campaign=swiss-airbus-a340-retirement-analysis",
-        "source_type": "trade",
+        "title": "Lufthansa prepares for final A340-600 flights",
+        "source_name": "Aviation24",
+        "url": "https://www.aviation24.be/airlines/lufthansa-group/lufthansa/lufthansa-prepares-for-final-a340-600-flights/",
+        "source_type": "trade_media",
         "official": false,
         "airline": "",
-        "topics": [],
+        "topics": [
+          "airline_operations",
+          "fleet"
+        ],
         "license_required": false,
         "license_status": "public",
         "region": "Global",
@@ -2352,136 +3574,502 @@
         "reliability_weight": 0.4
       },
       "related_news": [],
-      "narrative_status": "done",
-      "basis": "headline_only",
-      "story_id": "story-1589514bcc01",
-      "relevance_score": 57.5,
+      "narrative_status": "pending",
+      "story_id": "story-0964a71d6464",
+      "relevance_score": 38.5,
+      "score_components": {
+        "event_type": 0.1,
+        "source_reliability": 0.4,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.5
+      },
+      "sources": [
+        {
+          "name": "Aviation24",
+          "url": "https://www.aviation24.be/airlines/lufthansa-group/lufthansa/lufthansa-prepares-for-final-a340-600-flights/",
+          "title": "Lufthansa prepares for final A340-600 flights",
+          "language": "en"
+        },
+        {
+          "name": "AeroTime",
+          "url": "https://www.aerotime.aero/articles/lufthansa-prepares-for-final-a340-600-flight-as-17-year-old-aircraft-exits-fleet",
+          "title": "Lufthansa prepares for final A340-600 flight as 17-year-old aircraft exits fleet",
+          "language": "en"
+        }
+      ],
+      "source_count": 2,
+      "published_at_iso": "2026-10-17T16:43:49+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [],
+      "level": "low",
+      "level_label": "Arşiv",
+      "listed": false
+    },
+    {
+      "id": "story-e61cc04e5a40",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "TUSAŞ’tan ANKA III hamlesi: 80 adetlik sipariş ve yeni üretim hattı",
+      "published_at": "17 Oct 07:01",
+      "lead": "Türk Silahlı Kuvvetleri’nin 80 adet ANKA III siparişi verdiği, ilk teslimatın ise 2027 yılında yapılmasının planlandığı bildirildi. Türk Havacılık ve Uzay Sanayii (TUSAŞ), insansız savaş uçağı ANKA III’ün seri üretim sürecine yönelik ikinci üretim hattının yapımını tamamladı. Güncellenen platformun faydalı yük kapasitesinin 1,3 tondan 1,75 tona çıkarılması hedefleniyor. ABD merkezli savunma yayını",
+      "source_description": "Türk Silahlı Kuvvetleri’nin 80 adet ANKA III siparişi verdiği, ilk teslimatın ise 2027 yılında yapılmasının planlandığı bildirildi. Türk Havacılık ve Uzay Sanayii (TUSAŞ), insansız savaş uçağı ANKA III’ün seri üretim sürecine yönelik ikinci üretim hattının yapımını tamamladı. Güncellenen platformun faydalı yük kapasitesinin 1,3 tondan 1,75 tona çıkarılması hedefleniyor. ABD merkezli savunma yayını Breaking Defense’in haberine... TUSAŞ’tan ANKA III hamlesi: 80 adetlik sipariş ve yeni üretim hattı yazısı ilk önce HavaHaber üzerinde ortaya çıktı.",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": "fleet_orders",
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "",
+      "original_source": {
+        "title": "TUSAŞ’tan ANKA III hamlesi: 80 adetlik sipariş ve yeni üretim hattı",
+        "source_name": "HavaHaber",
+        "url": "https://havahaber.com/tusastan-anka-iii-hamlesi-80-adetlik-siparis-ve-yeni-uretim-hatti/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "orders_deliveries"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Turkey",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "pending",
+      "story_id": "story-e61cc04e5a40",
+      "relevance_score": 37.5,
       "score_components": {
         "event_type": 0.7,
         "source_reliability": 0.4,
-        "entity_prominence": 1.0,
+        "entity_prominence": 0.0,
         "official_source": 0.0,
         "corroboration": 0.0
       },
       "sources": [
         {
-          "name": "The Aviation Hub",
-          "url": "https://theaviationhub.co.uk/swiss-airbus-a340-retirement-analysis/?utm_source=rss&utm_medium=rss&utm_campaign=swiss-airbus-a340-retirement-analysis",
-          "title": "SWISS A340 Retirement: What the End of Four Engines Means",
-          "language": "en"
+          "name": "HavaHaber",
+          "url": "https://havahaber.com/tusastan-anka-iii-hamlesi-80-adetlik-siparis-ve-yeni-uretim-hatti/",
+          "title": "TUSAŞ’tan ANKA III hamlesi: 80 adetlik sipariş ve yeni üretim hattı",
+          "language": "tr"
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T09:18:29+00:00",
-      "language": "en",
-      "first_seen_at": "2026-10-18T09:21:17+00:00",
-      "last_updated_at": "2026-10-18T09:21:17+00:00",
+      "published_at_iso": "2026-10-17T07:01:43+00:00",
+      "language": "tr",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
       "update_reasons": [],
       "badges": [],
-      "level": "important",
-      "level_label": "Önemli",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T09:21:17+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "level": "low",
+      "level_label": "Arşiv",
+      "listed": false
     },
     {
-      "id": "story-4cc7c463b6cc",
+      "id": "story-6f25fc8211c8",
       "section": "European and other global airlines",
-      "headline": "Qantas to Discontinue Nonstop Perth-London Flight in 2026",
-      "published_at": "18 Oct 09:15",
-      "lead": "Qantas is discontinuing its nonstop Perth-London flight in 2026, affecting one of the world's longest non-stop routes.",
-      "source_description": "A closer look at why Qantas made adjustment to one of the world's longest non-stop flights",
-      "detailed_analysis": [
-        "Qantas will cease its nonstop Perth-London flight.",
-        "The discontinuation is scheduled for 2026.",
-        "This route is recognized as one of the world's longest non-stop flights.",
-        "The airline made adjustments to this service."
-      ],
-      "data_points": [
-        "2026"
-      ],
-      "strategic_impact": "This route network change will impact Qantas's long-haul capacity and competitive positioning on the Australia-Europe corridor, potentially affecting demand and revenue.",
-      "market_exposure": [
-        {
-          "carrier": "Qantas",
-          "impact": "Competitive Headwind",
-          "details": "Discontinuing nonstop Perth-London flight in 2026."
-        }
-      ],
-      "event_type": "route_network_change",
+      "headline": "Cathay Pacific Plans Talks With Boeing, Airbus For Up To 50 Aircraft",
+      "published_at": "19 Oct 02:56",
+      "lead": "",
+      "source_description": "",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": null,
       "entities": {
         "groups": [],
         "carriers": [
           {
-            "entity_id": "carrier:000047",
-            "slug": "qantas",
-            "iata": "QF",
-            "name": "Qantas",
+            "entity_id": "carrier:000069",
+            "slug": "cathay-pacific",
+            "iata": "CX",
+            "name": "Cathay Pacific",
             "region": "Asia-Pacific",
-            "group_entity_id": "group:000006",
-            "tier": 2
+            "group_entity_id": "group:000013",
+            "tier": 1
           }
         ],
         "airports": [],
         "aircraft": []
       },
       "region_section": "Asia-Pacific",
-      "secondary_tags": [],
+      "secondary_tags": [
+        "Manufacturers & Supply Chain"
+      ],
+      "is_strategic_report": false,
       "thy_impact_assessment": "",
-      "why_it_matters": "The adjustment to this ultra-long-haul route highlights the evolving operational and commercial considerations for such services.",
+      "why_it_matters": "",
       "original_source": {
-        "title": "Why Qantas Quietly Killed Its Nonstop Perth-London Flight In 2026",
-        "source_name": "Simple Flying",
-        "url": "https://simpleflying.com/why-did-qantas-quietly-kill-its-nonstop-perth-london-flight-in-2026/",
+        "title": "Cathay Pacific Plans Talks With Boeing, Airbus For Up To 50 Aircraft",
+        "source_name": "Aero-News Network",
+        "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNbHlaQ20yalJDcGVpX190VFN2T3laZmRrVVpLc2lVcmxBZnRYZjJjb3lOT1ZoVjZYU051dldwRnEwLTJjRWpST3BWX0FhMThvOElId3BvUUtUUFMxUTc4SWdJRnV1ZWI4ODJpbF9oWUMtNldMRDJwSHVjV2ttQzRtaVU1NEFzNng0T0dpUkdRV3V0Z28zbXFQTzBFQzY0SnFXWnc?oc=5",
         "source_type": "trade_media",
         "official": false,
         "airline": "",
         "topics": [
-          "airline_operations"
+          "fleet"
         ],
         "license_required": false,
         "license_status": "public",
         "region": "Global",
-        "tier": 4,
-        "reliability_weight": 0.4
+        "tier": 2,
+        "reliability_weight": 0.85
       },
       "related_news": [],
-      "narrative_status": "done",
-      "story_id": "story-4cc7c463b6cc",
-      "relevance_score": 51.5,
+      "narrative_status": "pending",
+      "story_id": "story-6f25fc8211c8",
+      "relevance_score": 37.2,
       "score_components": {
-        "event_type": 0.7,
-        "source_reliability": 0.4,
-        "entity_prominence": 0.7,
+        "event_type": 0.1,
+        "source_reliability": 0.85,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "Aero-News Network",
+          "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNbHlaQ20yalJDcGVpX190VFN2T3laZmRrVVpLc2lVcmxBZnRYZjJjb3lOT1ZoVjZYU051dldwRnEwLTJjRWpST3BWX0FhMThvOElId3BvUUtUUFMxUTc4SWdJRnV1ZWI4ODJpbF9oWUMtNldMRDJwSHVjV2ttQzRtaVU1NEFzNng0T0dpUkdRV3V0Z28zbXFQTzBFQzY0SnFXWnc?oc=5",
+          "title": "Cathay Pacific Plans Talks With Boeing, Airbus For Up To 50 Aircraft",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-19T02:56:55+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "low",
+      "level_label": "Arşiv",
+      "listed": false
+    },
+    {
+      "id": "story-e45856576c88",
+      "section": "European and other global airlines",
+      "headline": "Flight Cuts: Delta Air Lines Set To Pause Premium Transcon Route While American Stays Daily",
+      "published_at": "18 Oct 20:20",
+      "lead": "Flight Cuts: Delta Air Lines Set To Pause Premium Transcon Route While American Stays Daily | [Simple Flying] Delta Air Lines Cancels All Flights To 8 Destinations: See Full List Now",
+      "source_description": "Flight Cuts: Delta Air Lines Set To Pause Premium Transcon Route While American Stays Daily | [Simple Flying] Delta Air Lines Cancels All Flights To 8 Destinations: See Full List Now",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": null,
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000115",
+            "slug": "delta-air-lines",
+            "iata": "DL",
+            "name": "Delta Air Lines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "",
+      "original_source": {
+        "title": "Flight Cuts: Delta Air Lines Set To Pause Premium Transcon Route While American Stays Daily",
+        "source_name": "Simple Flying",
+        "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNYTNhV1VhSmJoUlBzMGlXYW51M2ZuQUhOc1VKMFZrNnhrZ191RnBlU3VRMkNPOTJvVHdKMGZjdU5xSVlIazNiMG54VlEyTUxiU3VVRkRGTUs2Qzk5VmdNbThOYl9YVldoMmRhckk3NWsxaGltSHpSY2NLbXNtMVZqM3pocXBRU2QyNm12YVBzMk00RzZT?oc=5",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "route_network"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 2,
+        "reliability_weight": 0.85
+      },
+      "related_news": [],
+      "narrative_status": "pending",
+      "story_id": "story-e45856576c88",
+      "relevance_score": 37.2,
+      "score_components": {
+        "event_type": 0.1,
+        "source_reliability": 0.85,
+        "entity_prominence": 1.0,
         "official_source": 0.0,
         "corroboration": 0.0
       },
       "sources": [
         {
           "name": "Simple Flying",
-          "url": "https://simpleflying.com/why-did-qantas-quietly-kill-its-nonstop-perth-london-flight-in-2026/",
-          "title": "Why Qantas Quietly Killed Its Nonstop Perth-London Flight In 2026",
+          "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNYTNhV1VhSmJoUlBzMGlXYW51M2ZuQUhOc1VKMFZrNnhrZ191RnBlU3VRMkNPOTJvVHdKMGZjdU5xSVlIazNiMG54VlEyTUxiU3VVRkRGTUs2Qzk5VmdNbThOYl9YVldoMmRhckk3NWsxaGltSHpSY2NLbXNtMVZqM3pocXBRU2QyNm12YVBzMk00RzZT?oc=5",
+          "title": "Flight Cuts: Delta Air Lines Set To Pause Premium Transcon Route While American Stays Daily",
           "language": "en"
         }
       ],
       "source_count": 1,
-      "published_at_iso": "2026-10-18T09:15:16+00:00",
+      "published_at_iso": "2026-10-19T00:01:00+00:00",
       "language": "en",
-      "first_seen_at": "2026-10-18T09:21:17+00:00",
-      "last_updated_at": "2026-10-18T09:21:17+00:00",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "low",
+      "level_label": "Arşiv",
+      "listed": false
+    },
+    {
+      "id": "story-2ccffff31ca5",
+      "section": "European and other global airlines",
+      "headline": "United’s C.E.O. Says It Should Cost More Not to Sit in the Middle Seat",
+      "published_at": "18 Oct 09:00",
+      "lead": "",
+      "source_description": "",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": null,
+      "entities": {
+        "groups": [],
+        "carriers": [
+          {
+            "entity_id": "carrier:000116",
+            "slug": "united-airlines",
+            "iata": "UA",
+            "name": "United Airlines",
+            "region": "Americas",
+            "group_entity_id": "",
+            "tier": 1
+          }
+        ],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Americas",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "",
+      "original_source": {
+        "title": "United’s C.E.O. Says It Should Cost More Not to Sit in the Middle Seat",
+        "source_name": "The New York Times",
+        "url": "https://www.nytimes.com/2026/10/18/business/scott-kirby-united-airlines.html",
+        "source_type": "wire_headline",
+        "official": false,
+        "airline": "",
+        "topics": [],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Global",
+        "tier": 3,
+        "reliability_weight": 0.7
+      },
+      "related_news": [],
+      "narrative_status": "pending",
+      "basis": "headline_only",
+      "story_id": "story-2ccffff31ca5",
+      "relevance_score": 35.0,
+      "score_components": {
+        "event_type": 0.1,
+        "source_reliability": 0.7,
+        "entity_prominence": 1.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "The New York Times",
+          "url": "https://www.nytimes.com/2026/10/18/business/scott-kirby-united-airlines.html",
+          "title": "United’s C.E.O. Says It Should Cost More Not to Sit in the Middle Seat",
+          "language": "en"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T09:00:18+00:00",
+      "language": "en",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "low",
+      "level_label": "Arşiv",
+      "listed": false
+    },
+    {
+      "id": "story-5ef014e3944a",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "Nijerya’da özel jetin kapısı havada koptu! Pilotlar üç kez Mayday çağrısı yaptı",
+      "published_at": "17 Oct 07:21",
+      "lead": "Nijerya’da Triton Aviation tarafından işletilen Bombardier Challenger 600 serisi özel jetin kapısı, kalkıştan kısa süre sonra havada koptu. Yaklaşık 3 bin feet irtifada acil durum ilan eden pilotlar, hava trafik kontrolüne üç kez “Mayday” çağrısında bulundu. Abuja’ya acil iniş yapan uçak güvenli şekilde piste ulaşırken, kopan kapının çevredeki çiftçiler tarafından bir tarlada bulunduğu bildirildi.",
+      "source_description": "Nijerya’da Triton Aviation tarafından işletilen Bombardier Challenger 600 serisi özel jetin kapısı, kalkıştan kısa süre sonra havada koptu. Yaklaşık 3 bin feet irtifada acil durum ilan eden pilotlar, hava trafik kontrolüne üç kez “Mayday” çağrısında bulundu. Abuja’ya acil iniş yapan uçak güvenli şekilde piste ulaşırken, kopan kapının çevredeki çiftçiler tarafından bir tarlada bulunduğu bildirildi. Olay,... Nijerya’da özel jetin kapısı havada koptu! Pilotlar üç kez Mayday çağrısı yaptı yazısı ilk önce HavaHaber üzerinde ortaya çıktı.",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": null,
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Manufacturers & Supply Chain",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "",
+      "original_source": {
+        "title": "Nijerya’da özel jetin kapısı havada koptu! Pilotlar üç kez Mayday çağrısı yaptı",
+        "source_name": "HavaHaber",
+        "url": "https://havahaber.com/nijeryada-ozel-jetin-kapisi-havada-koptu-pilotlar-uc-kez-mayday-cagrisi-yapti/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "fleet",
+          "airports_airspace",
+          "labor"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Turkey",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "pending",
+      "context_demoted_from": "safety_incident",
+      "story_id": "story-5ef014e3944a",
+      "relevance_score": 10.5,
+      "score_components": {
+        "event_type": 0.1,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "HavaHaber",
+          "url": "https://havahaber.com/nijeryada-ozel-jetin-kapisi-havada-koptu-pilotlar-uc-kez-mayday-cagrisi-yapti/",
+          "title": "Nijerya’da özel jetin kapısı havada koptu! Pilotlar üç kez Mayday çağrısı yaptı",
+          "language": "tr"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-17T07:21:36+00:00",
+      "language": "tr",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
       "update_reasons": [],
       "badges": [],
-      "level": "important",
-      "level_label": "Önemli",
-      "listed": true,
-      "narrative_generated_at": "2026-10-18T09:21:17+00:00",
-      "narrative_language": "en",
-      "is_strategic_report": false
+      "level": "below",
+      "level_label": "",
+      "listed": false
+    },
+    {
+      "id": "story-b6e1e18db266",
+      "section": "Turkey / THY and Turkish aviation",
+      "headline": "Uçak Teknisyeni Maaşları 2026: Uçak Bakım Teknisyenleri Ne Kadar Kazanıyor?",
+      "published_at": "18 Oct 10:22",
+      "lead": "Havacılık sektöründe çalışmak isteyenlerin merak ettiği uçak teknisyeni maaşları, 2026 yılında deneyim, uzmanlık ve görev yapılan pozisyona göre değişiyor. Eleman.net verilerine göre uçak teknisyenlerinin aylık ortalama maaşı 60 bin 900 TL seviyesinde bulunuyor. Uçak Teknisyeni Maaşları 2026: Uçak Bakım Teknisyenleri Ne Kadar Kazanıyor? yazısı ilk önce HavaHaber üzerinde ortaya çıktı.",
+      "source_description": "Havacılık sektöründe çalışmak isteyenlerin merak ettiği uçak teknisyeni maaşları, 2026 yılında deneyim, uzmanlık ve görev yapılan pozisyona göre değişiyor. Eleman.net verilerine göre uçak teknisyenlerinin aylık ortalama maaşı 60 bin 900 TL seviyesinde bulunuyor. Uçak Teknisyeni Maaşları 2026: Uçak Bakım Teknisyenleri Ne Kadar Kazanıyor? yazısı ilk önce HavaHaber üzerinde ortaya çıktı.",
+      "detailed_analysis": [],
+      "data_points": [],
+      "strategic_impact": "",
+      "market_exposure": [],
+      "event_type": null,
+      "entities": {
+        "groups": [],
+        "carriers": [],
+        "airports": [],
+        "aircraft": []
+      },
+      "region_section": "Other",
+      "secondary_tags": [],
+      "is_strategic_report": false,
+      "thy_impact_assessment": "",
+      "why_it_matters": "",
+      "original_source": {
+        "title": "Uçak Teknisyeni Maaşları 2026: Uçak Bakım Teknisyenleri Ne Kadar Kazanıyor?",
+        "source_name": "HavaHaber",
+        "url": "https://havahaber.com/ucak-teknisyeni-maaslari-2026-ucak-bakim-teknisyenleri-ne-kadar-kazaniyor/",
+        "source_type": "trade_media",
+        "official": false,
+        "airline": "",
+        "topics": [
+          "airline_operations",
+          "fleet",
+          "regulation_safety"
+        ],
+        "license_required": false,
+        "license_status": "public",
+        "region": "Turkey",
+        "tier": 4,
+        "reliability_weight": 0.4
+      },
+      "related_news": [],
+      "narrative_status": "pending",
+      "context_demoted_from": "safety_incident",
+      "story_id": "story-b6e1e18db266",
+      "relevance_score": 10.5,
+      "score_components": {
+        "event_type": 0.1,
+        "source_reliability": 0.4,
+        "entity_prominence": 0.0,
+        "official_source": 0.0,
+        "corroboration": 0.0
+      },
+      "sources": [
+        {
+          "name": "HavaHaber",
+          "url": "https://havahaber.com/ucak-teknisyeni-maaslari-2026-ucak-bakim-teknisyenleri-ne-kadar-kazaniyor/",
+          "title": "Uçak Teknisyeni Maaşları 2026: Uçak Bakım Teknisyenleri Ne Kadar Kazanıyor?",
+          "language": "tr"
+        }
+      ],
+      "source_count": 1,
+      "published_at_iso": "2026-10-18T10:22:18+00:00",
+      "language": "tr",
+      "first_seen_at": "2026-10-19T05:46:09+00:00",
+      "last_updated_at": "2026-10-19T05:46:09+00:00",
+      "update_reasons": [],
+      "badges": [
+        "new"
+      ],
+      "level": "below",
+      "level_label": "",
+      "listed": false
     }
   ],
-  "excluded_count": 1,
-  "older_archive_count": 32,
-  "hidden_low_count": 6,
-  "yesterday_count": 0
+  "morning_reset_at": "2026-10-19T05:46:09+00:00"
 }

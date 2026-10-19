@@ -21,12 +21,22 @@ def test_a_redirect_primary_link_is_replaced_by_the_first_direct_source():
     assert [entry["url"] for entry in item["sources"]] == [DIRECT] and item["source_count"] == 1
 
 
-def test_a_story_with_only_redirect_or_missing_links_is_not_served():
-    for item in (story(sources=[("Reuters", REDIRECT)]), story(original="", sources=[]), story(original="javascript:alert(1)"), story(original="not a url")):
+def test_unrecognized_redirect_or_missing_links_are_not_served():
+    fake = story(original=REDIRECT, sources=[("Unknown Fake", REDIRECT)], original_source={"url": REDIRECT, "source_name": "Unknown Fake"})
+    for item in (fake, story(original="", sources=[]), story(original="javascript:alert(1)"), story(original="not a url")):
         assert not story_lifecycle.has_direct_link(item, SELECTION)
         assert not story_lifecycle.ensure_direct_link(item, SELECTION)
-    day = {"stories": [story(sources=[("Reuters", REDIRECT)]), story(original=DIRECT)]}
+    day = {"stories": [fake, story(original=DIRECT)]}
     assert story_lifecycle.drop_excluded(day) == 1 and day["stories"][0]["original_source"]["url"] == DIRECT
+
+
+def test_recognized_publishers_with_redirect_links_are_served():
+    for pub in ("Reuters", "Bloomberg", "Aviation Week", "ch-aviation", "The Wall Street Journal", "The New York Times"):
+        item = story(original=REDIRECT, sources=[(pub, REDIRECT)], original_source={"url": REDIRECT, "source_name": pub})
+        assert story_lifecycle.has_direct_link(item, SELECTION)
+        assert story_lifecycle.ensure_direct_link(item, SELECTION)
+        day = {"stories": [item]}
+        assert story_lifecycle.drop_excluded(day) == 0
 
 
 def test_a_direct_story_is_left_untouched():
