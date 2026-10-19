@@ -30,6 +30,7 @@ try:
     from . import feed_discovery
     from . import feed_sources
     from . import alert_feeds
+    from . import social_feed
     from . import benchmark_search
     from . import safety_context
     from . import source_catalog
@@ -45,6 +46,7 @@ except ImportError:
     import feed_discovery
     import feed_sources
     import alert_feeds
+    import social_feed
     import benchmark_search
     import safety_context
     import source_catalog
@@ -605,7 +607,7 @@ def _read_catalog_feeds(cutoff, report, entity_index_factory=None, recovered=Non
     rows = source_catalog.read_rows()
     discovered = feed_sources.load_discovered()
     preferred = feed_sources.catalog_preferred_names(rows, discovered)
-    handled = ({source["name"] for source in get_builtin_source_records()} - preferred) | {alert_feeds.SOURCE_NAME}    # alerts have their own reader
+    handled = ({source["name"] for source in get_builtin_source_records()} - preferred) | {alert_feeds.SOURCE_NAME, social_feed.SOURCE_NAME}    # these have their own readers
     recovered = recovered or {}
     sources = feed_sources.catalog_feed_sources(rows, handled)
     for row in rows:
@@ -704,6 +706,8 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
     articles.extend(_read_catalog_feeds(cutoff, report, entity_index_factory=entities.EntityIndex.from_csv, recovered=recovered))
     alert_articles, report[alert_feeds.SOURCE_NAME] = alert_feeds.collect(_env_value(alert_feeds.ENV_NAME), utc_now(), cutoff, entity_index_factory=entities.EntityIndex.from_csv)
     articles.extend(alert_articles)
+    social_articles, report[social_feed.SOURCE_NAME] = social_feed.collect(utc_now(), cutoff)
+    articles.extend(social_articles)
     benchmark_articles, benchmark_report = benchmark_search.collect(
         "",  # Publisher-written reports require no model call or API key.
         utc_now(),
@@ -730,6 +734,8 @@ def fetch_rss_items(max_hours=48, report=None, recovered=None):
             if article.get("via_alert")
             else benchmark_search.SOURCE_NAME
             if article.get("via_benchmark_search")
+            else social_feed.SOURCE_NAME
+            if article.get("via_social")
             else article["source"]
         )
         entry = report.setdefault(report_key, {"status": "active", "error": "", "articles": 0})

@@ -171,6 +171,13 @@ Tek mantıksal kaynak: **Google Alerts (wire headlines)** (`source_type=wire_hea
 - Hikâyeler `basis: headline_only`; feed_only kuralları aynen geçerli (kaynak metin saklanmaz/yayınlanmaz, sayı iddiası yok, arayüzde yayıncıya bağlantı). Havacılık varlık/anahtar kelime süzgecinden geçmeyenler atılır. Kümeleme, puanlama ve eşikler değişmedi; puanlama `wire_headline` ayarlarını kullanır.
 - Probe ve genel katalog okuyucusu bu kaynağa dokunmaz (probe adres istemez).
 
+## Resmî havayolu sosyal paylaşımları (feature/social-source-setup)
+Tek mantıksal kaynak: **Official social (airline accounts)** (`airline_ir`, `feed_only`, `commercial_use_risk=high`). Kod: `api/social_feed.py` (okuyucu), `scripts/collect_social.py` (yerel toplayıcı), `config/social_accounts.json` (hesaplar; elle düzeltilir, tahmin edilmez).
+- **Akış:** Toplama yalnızca sahibin bilgisayarında, kendi X oturumuyla yapılır (`connect_social.cmd` → 1 ile bir kez bağlanılır; sonra `collect_social.cmd` ya da `python scripts/collect_social.py --publish`). Betik `briefings/social_items.json`'u veri dalına yazar; günlük pipeline yalnızca bu dosyayı OKUR. Oturum değeri GitHub'a, rapora, günlüğe ya da dosyaya girmez.
+- Yanıtlar ve yeniden paylaşımlar alınmaz. Her paylaşımdan ilk satır (başlık), ≤300 karakter özet, zaman ve paylaşımın kendi bağlantısı tutulur; hikâyeler `headline_only` kurallarıyla işlenir (arayüzde paylaşıma bağlantı).
+- Dosya yoksa `status.json`'da `not_configured`; 36 saatten eskiyse kaynak hata olarak görünür. Toplayıcı hesap başına 3 sn bekler, hesapları sırayla okur.
+- **KISIT:** X şartları otomatik okumayı kısıtlayabilir; kendi oturumunuzla kullanım sizin sorumluluğunuzdadır (ayrı bir hesap önerilir). Ticari katmanda yeniden değerlendirilecek. LinkedIn toplama henüz yok (yalnızca bağlantı yardımcısı var).
+
 ## Kümeleme borcu (2026-10-17; kural GENİŞLETİLMEDİ)
 Aynı olayın iki hikâyeye bölündüğü üç gerçek örnek ve eksik olan sinyaller (`api/clustering.py` kuralları: 1 başlık benzerliği, 2 ortak güçlü varlık + ortak başlık sözcükleri, 3 ortak taşıyıcı + belirli uçak varyantı, 4 başlık+açıklamada ≥3 ortak ayırt edici sinyal ve sayı+model/üretici, uyumlu olay türleri):
 1. **ACG siparişi** — AeroTime «Airbus secures order for 75 Airbus A320neo family aircraft from ACG» ↔ AirDataNews «Airbus wins order for 75 A320neo Family jets…». Ortak sinyal yalnızca `75` ve `a320neo` (2 < 3); ortak güçlü varlık yok (ACG/Aviation Capital Group bir varlık değil, uçak ailesi geniş sayılıp dışlanıyor); «airbus», «order», «family» genel sözcük. Eksik: kiralayıcı/müşteri varlığı (lessor tohumları) ya da üçüncü bir ayırt edici sinyal.

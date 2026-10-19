@@ -127,7 +127,7 @@ def test_the_generic_catalog_reader_and_the_probe_leave_the_alert_source_alone()
     record = alert_feeds.catalog_record()
     probe_record, articles = source_probe.probe_source({row["name"]: row for row in source_catalog.read_rows()}[alert_feeds.SOURCE_NAME], record, {}, {}, NOW)
     assert articles == [] and probe_record["status"] == "active" and probe_record["requests"] == 0
-    assert "alert_feeds.SOURCE_NAME}" in open(_engine.__file__, encoding="utf-8").read()
+    assert "alert_feeds.SOURCE_NAME," in open(_engine.__file__, encoding="utf-8").read()
 
 
 def test_narrative_rules_for_headline_only_apply_to_alert_articles():

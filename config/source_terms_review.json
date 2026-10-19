@@ -973,6 +973,15 @@
    "automated_reading_forbidden": false,
    "quote": "",
    "read": false
+  },
+  "Official social (airline accounts)": {
+   "terms_url": "https://x.com/en/tos",
+   "commercial_use_risk": "high",
+   "summary": "X/LinkedIn kullanım şartları otomatik okumayı kısıtlayabilir; yerel toplama yalnızca sahibin kendi oturumuyla, ticari katmanda yeniden değerlendirilecek",
+   "robots": "Not applicable: read on the owner's computer with the owner's own session; only the post's first line, a short summary, time and link are kept.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": false
   }
  }
 }
