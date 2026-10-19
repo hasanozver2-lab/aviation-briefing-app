@@ -148,3 +148,25 @@ def test_without_a_saved_session_the_collector_stops_with_a_message(monkeypatch,
     monkeypatch.setattr(collect_social.connect_social, "BIRD_SCRIPT", collect_social.PROJECT_DIR / "api" / "social_feed.py")
     monkeypatch.setattr(collect_social.shutil, "which", lambda name: "node")
     assert collect_social.main([]) == 1 and "connect_social.cmd" in capsys.readouterr().out
+
+
+def test_mainstream_news_wire_social_accounts_are_monitored_and_filtered_for_aviation():
+    accounts = collect_social.load_accounts()
+    handles = {a["handle"] for a in accounts}
+    for wire in ("ReutersBiz", "business", "FT", "WSJ", "CNBC"):
+        assert wire in handles
+
+    # A mainstream post about airlines is kept and marked as flash alert
+    aviation_post = post("2001", "Delta Air Lines reports record quarterly transatlantic demand: https://t.co/abc",
+                         airline="Reuters", code="RTR", handle="ReutersBiz")
+    articles, _ = collect(payload(aviation_post))
+    assert len(articles) == 1
+    assert articles[0]["is_flash_alert"] is True
+    assert "Delta" in articles[0]["title"]
+
+    # A mainstream post unrelated to aviation (e.g. crypto/tech) is filtered out
+    off_topic_post = post("2002", "Bitcoin reaches new milestone amid tech earnings rally: https://t.co/xyz",
+                          airline="Reuters", code="RTR", handle="ReutersBiz")
+    articles, _ = collect(payload(off_topic_post))
+    assert len(articles) == 0
+

@@ -144,6 +144,236 @@
    "role": "The Airline Observer",
    "platform": "X",
    "handle": "briansumers"
+  },
+  {
+   "airline": "Reuters",
+   "airline_code": "RTR",
+   "author": "Reuters Business",
+   "role": "Global News Wire",
+   "platform": "X",
+   "handle": "ReutersBiz"
+  },
+  {
+   "airline": "Bloomberg",
+   "airline_code": "BBG",
+   "author": "Bloomberg Business",
+   "role": "Global Financial Wire",
+   "platform": "X",
+   "handle": "business"
+  },
+  {
+   "airline": "Financial Times",
+   "airline_code": "FT",
+   "author": "Financial Times",
+   "role": "Global Financial Media",
+   "platform": "X",
+   "handle": "FT"
+  },
+  {
+   "airline": "The Wall Street Journal",
+   "airline_code": "WSJ",
+   "author": "The Wall Street Journal",
+   "role": "Business & Aerospace",
+   "platform": "X",
+   "handle": "WSJ"
+  },
+  {
+   "airline": "CNBC",
+   "airline_code": "CNBC",
+   "author": "CNBC Business",
+   "role": "Business News",
+   "platform": "X",
+   "handle": "CNBC"
+  },
+  {
+   "airline": "FlightGlobal",
+   "airline_code": "FG",
+   "author": "FlightGlobal",
+   "role": "Aviation Media",
+   "platform": "X",
+   "handle": "FlightGlobal"
+  },
+  {
+   "airline": "Aviation Week",
+   "airline_code": "AWST",
+   "author": "Aviation Week",
+   "role": "Aerospace Intelligence",
+   "platform": "X",
+   "handle": "AviationWeek"
+  },
+  {
+   "airline": "AeroTime",
+   "airline_code": "AT",
+   "author": "AeroTime Hub",
+   "role": "Global Aviation Media",
+   "platform": "X",
+   "handle": "AeroTime"
+  },
+  {
+   "airline": "Simple Flying",
+   "airline_code": "SF",
+   "author": "Simple Flying",
+   "role": "Aviation News",
+   "platform": "X",
+   "handle": "simple_flying"
+  },
+  {
+   "airline": "ch-aviation",
+   "airline_code": "CHAV",
+   "author": "ch-aviation",
+   "role": "Airline Fleet & Data",
+   "platform": "X",
+   "handle": "chaviation"
+  },
+  {
+   "airline": "CAPA Centre for Aviation",
+   "airline_code": "CAPA",
+   "author": "CAPA Aviation",
+   "role": "Market Intelligence",
+   "platform": "X",
+   "handle": "CAPA_Aviation"
+  },
+  {
+   "airline": "Cirium",
+   "airline_code": "CIR",
+   "author": "Cirium",
+   "role": "Aviation Analytics & Fleets",
+   "platform": "X",
+   "handle": "Cirium"
+  },
+  {
+   "airline": "OAG",
+   "airline_code": "OAG",
+   "author": "OAG Aviation",
+   "role": "Global Flight Data",
+   "platform": "X",
+   "handle": "OAG_Aviation"
+  },
+  {
+   "airline": "Alex Macheras",
+   "airline_code": "ALX",
+   "author": "Alex Macheras",
+   "role": "Aviation Analyst & Broadcaster",
+   "platform": "X",
+   "handle": "AlexInAir"
+  },
+  {
+   "airline": "AirlineGeeks",
+   "airline_code": "AG",
+   "author": "AirlineGeeks",
+   "role": "Commercial Aviation",
+   "platform": "X",
+   "handle": "AirlineGeeks"
+  },
+  {
+   "airline": "Leeham News",
+   "airline_code": "LNA",
+   "author": "Leeham News and Analysis",
+   "role": "Aerospace Analyst",
+   "platform": "X",
+   "handle": "LeehamNews"
+  },
+  {
+   "airline": "Boeing",
+   "airline_code": "BA",
+   "author": "Boeing Airplanes",
+   "role": "OEM Manufacturer",
+   "platform": "X",
+   "handle": "BoeingAirplanes"
+  },
+  {
+   "airline": "Airbus",
+   "airline_code": "AIR",
+   "author": "Airbus",
+   "role": "OEM Manufacturer",
+   "platform": "X",
+   "handle": "Airbus"
+  },
+  {
+   "airline": "IATA",
+   "airline_code": "IATA",
+   "author": "IATA",
+   "role": "Air Transport Association",
+   "platform": "X",
+   "handle": "IATA"
+  },
+  {
+   "airline": "Eurocontrol",
+   "airline_code": "ECTL",
+   "author": "EUROCONTROL",
+   "role": "European Air Traffic",
+   "platform": "X",
+   "handle": "EUROCONTROL"
+  },
+  {
+   "airline": "FAA",
+   "airline_code": "FAA",
+   "author": "FAA News",
+   "role": "Civil Aviation Regulator",
+   "platform": "X",
+   "handle": "FAANews"
+  },
+  {
+   "airline": "EASA",
+   "airline_code": "EASA",
+   "author": "EASA",
+   "role": "European Aviation Safety Agency",
+   "platform": "X",
+   "handle": "EASA"
+  },
+  {
+   "airline": "Pegasus Airlines",
+   "airline_code": "PC",
+   "platform": "X",
+   "handle": "flymepegasus"
+  },
+  {
+   "airline": "SunExpress",
+   "airline_code": "XQ",
+   "platform": "X",
+   "handle": "SunExpress"
+  },
+  {
+   "airline": "AJet",
+   "airline_code": "VF",
+   "platform": "X",
+   "handle": "ajet_tr"
+  },
+  {
+   "airline": "Air Canada",
+   "airline_code": "AC",
+   "platform": "X",
+   "handle": "AirCanada"
+  },
+  {
+   "airline": "Cathay Pacific",
+   "airline_code": "CX",
+   "platform": "X",
+   "handle": "cathaypacific"
+  },
+  {
+   "airline": "Etihad Airways",
+   "airline_code": "EY",
+   "platform": "X",
+   "handle": "etihad"
+  },
+  {
+   "airline": "Qantas",
+   "airline_code": "QF",
+   "platform": "X",
+   "handle": "Qantas"
+  },
+  {
+   "airline": "Air India",
+   "airline_code": "AI",
+   "platform": "X",
+   "handle": "airindia"
+  },
+  {
+   "airline": "IndiGo",
+   "airline_code": "6E",
+   "platform": "X",
+   "handle": "IndiGo6E"
   }
  ]
 }

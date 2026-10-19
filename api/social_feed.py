@@ -52,7 +52,13 @@ def article_from_post(post, record):
     title, link = post_title(post.get("text", "")), post.get("link", "")
     if not (published and title and link.startswith("https://")):
         return None
-    article = feed_sources.article_from_item(fd.Item(title, link, published, post_summary(post.get("text", ""))), record)
+    handle = (post.get("handle") or "").lower()
+    text = post.get("text", "")
+    if handle in {"reutersbiz", "business", "ft", "wsj", "cnbc", "markets", "reuters"}:
+        filter_cfg = feed_sources.load_aviation_filter()
+        if not feed_sources.keyword_hit(text, filter_cfg["keywords"]):
+            return None
+    article = feed_sources.article_from_item(fd.Item(title, link, published, post_summary(text)), record)
     airline = post.get("airline", "")
     author = post.get("author", "")
     platform = post.get("platform", "X")
