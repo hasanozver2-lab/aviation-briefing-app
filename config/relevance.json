@@ -96,6 +96,7 @@
           "hava sahası*"
         ],
         "exclude_commentary": true,
+        "unverified_source_hosts": ["news.google.com", "vertexaisearch.cloud.google.com"],
         "ground_traffic": {
           "_doc": "Exclude road and traffic incidents that mention an airport only as a nearby landmark. A road term or road-number pattern and an incident term must both match. Direct aircraft, runway, taxiway, apron or airside involvement keeps the story.",
           "road_terms": [

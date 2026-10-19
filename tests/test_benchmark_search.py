@@ -46,62 +46,20 @@ def test_prompt_covers_all_mandatory_benchmark_and_wire_sources():
         assert required in prompt
 
 
-def test_collect_parses_grounded_benchmark_and_wire_items_and_filters_off_topic():
-    raw_items = [
-        {
-            "title": "IdeaWorksCompany reports global airline ancillary revenue reaches $148 billion",
-            "url": "https://ideaworkscompany.com/reports/2026-ancillary-revenue-yearbook",
-            "source_name": "IdeaWorksCompany",
-            "published_at": "2026-10-17",
-            "description": "Global ancillary revenue rose 11% driven by unbundling and FFP co-brand credit cards.",
-        },
-        {
-            "title": "OAG Megahubs 2026 index ranks top connecting banks and OTP performance",
-            "url": "https://www.oag.com/blog/megahubs-index-2026",
-            "source_name": "OAG",
-            "published_at": "2026-10-18",
-            "description": "IST and LHR lead international connectivity as MCT windows tighten.",
-        },
-        {
-            "title": "United Airlines warns rising jet fuel costs could hit Q2 earnings",
-            "url": "https://www.reuters.com/business/aerospace-defense/united-airlines-warns-fuel-costs-2026-10-17/",
-            "source_name": "Reuters",
-            "published_at": "2026-10-17",
-            "description": "United Airlines said higher jet fuel prices could reduce quarterly profit.",
-        },
-        {
-            "title": "SpaceX valuation hits $1.75 trillion ahead of IPO",
-            "url": "https://www.reuters.com/technology/space/spacex-valuation-2026-10-17/",
-            "source_name": "Reuters",
-            "published_at": "2026-10-17",
-            "description": "Off-topic space item that should be filtered out.",
-        },
-        {
-            "title": "Outdated Cirium report from last month",
-            "url": "https://www.cirium.com/thoughtcloud/old-report",
-            "source_name": "Cirium",
-            "published_at": "2026-09-01",
-            "description": "Stale item outside the 48h window.",
-        },
-    ]
-    articles, report = benchmark_search.collect(
-        "fake-api-key",
-        NOW,
-        CUTOFF,
-        post=lambda: gemini_response(raw_items),
-        classify_topics_fn=_engine.classify_topics,
+def test_collect_uses_publisher_articles_without_calling_search(monkeypatch):
+    published = NOW - timedelta(days=1)
+    article = benchmark_search._build_article(
+        "Boeing Commercial Market Outlook", "https://www.boeing.com/commercial/market/commercial-market-outlook",
+        "Publisher forecasts 44000 deliveries.", benchmark_search.BENCHMARK_PUBLISHERS["boeing.com"],
+        published, NOW,
     )
-    assert report == {"status": "active", "error": "", "articles": 3}
-    by_source = {a["source"]: a for a in articles}
-    assert set(by_source) == {"IdeaWorksCompany", "OAG", "Reuters"}
-    assert by_source["IdeaWorksCompany"]["tier"] == 2
-    assert by_source["IdeaWorksCompany"]["reliability_weight"] == 0.9
-    assert by_source["IdeaWorksCompany"]["via_benchmark_search"] is True
-    assert by_source["Reuters"]["source_type"] == "mainstream"
-    assert by_source["Reuters"]["tier"] == 2
-    assert by_source["Reuters"]["basis"] == "headline_only"
-    assert "finance_investor" in by_source["IdeaWorksCompany"]["topics"]
-    assert "route_network" in by_source["OAG"]["topics"]
+    monkeypatch.setattr(benchmark_search, "collect_strategic_publications", lambda *args, **kwargs: [article])
+    def forbidden_search():
+        pytest.fail("Collection must not call Gemini for source data")
+    articles, report = benchmark_search.collect("", NOW, CUTOFF, post=forbidden_search)
+    assert articles == [article]
+    assert articles[0]["timestamp"] == published.timestamp()
+    assert report == {"status": "active", "error": "", "articles": 1}
 
 
 def test_collect_without_api_key_returns_not_configured_without_raising():
@@ -109,11 +67,12 @@ def test_collect_without_api_key_returns_not_configured_without_raising():
     assert articles == [] and report["status"] == "not_configured"
 
 
-def test_collect_handles_network_failure_gracefully():
-    def failing_post():
+def test_collect_handles_network_failure_gracefully(monkeypatch):
+    def failing_post(*args, **kwargs):
         raise TimeoutError("Gemini search timed out")
 
-    articles, report = benchmark_search.collect("fake-api-key", NOW, CUTOFF, post=failing_post)
+    monkeypatch.setattr(benchmark_search, "collect_strategic_publications", failing_post)
+    articles, report = benchmark_search.collect("", NOW, CUTOFF)
     assert articles == [] and report == {"status": "error", "error": "TimeoutError", "articles": 0}
 
 
@@ -211,10 +170,9 @@ def test_apply_search_enrichment_populates_thin_rss_descriptions_and_corroborati
         ]
     }
     count = benchmark_search.apply_search_enrichment(response, seeds, classify_topics_fn=_engine.classify_topics)
-    assert count == 1
-    assert "15%" in seeds[0]["description"]
-    assert seeds[0]["corroborating_sources"] == ["The Wall Street Journal", "Reuters"]
-    assert "finance_investor" in seeds[0]["topics"]
+    assert count == 0
+    assert seeds[0]["description"] == ""
+    assert "corroborating_sources" not in seeds[0]
 
 
 def test_strategic_reports_are_classified_and_separated_from_daily_breaking_news():
@@ -302,7 +260,7 @@ def test_morning_deep_reset_at_08_local_and_subsequent_3h_appends():
     assert {s["story_id"] for s in day_05["stories"]} == {"early-1", "report-boeing"}
     assert "morning_reset_at" not in day_05
 
-    # At 08:00 Istanbul, morning_deep_scan=True refreshes daily stories from scratch while preserving strategic reports
+    # The 08:00 deep scan preserves previously stored news as well as strategic reports
     morning_story = {
         "story_id": "morning-1",
         "headline": "Lufthansa Group Posts Record Q3 Operating Profit",
@@ -317,7 +275,7 @@ def test_morning_deep_reset_at_08_local_and_subsequent_3h_appends():
         {"daily": {"mode": "daily", "morning_deep_scan": True, "stories": [morning_story]}},
         t_08_local,
     )
-    assert {s["story_id"] for s in day_08["stories"]} == {"morning-1", "report-boeing"}
+    assert {s["story_id"] for s in day_08["stories"]} == {"early-1", "morning-1", "report-boeing"}
     assert day_08.get("morning_reset_at") == story_lifecycle.to_iso(t_08_local)
 
     # At 11:00 Istanbul (next 3-hour scan), new stories are appended onto the 08:00 stories
@@ -335,7 +293,7 @@ def test_morning_deep_reset_at_08_local_and_subsequent_3h_appends():
         {"daily": {"mode": "daily", "morning_deep_scan": False, "stories": [midday_story]}},
         t_11_local,
     )
-    assert {s["story_id"] for s in day_11["stories"]} == {"morning-1", "midday-1", "report-boeing"}
+    assert {s["story_id"] for s in day_11["stories"]} == {"early-1", "morning-1", "midday-1", "report-boeing"}
     assert day_11.get("morning_reset_at") == story_lifecycle.to_iso(t_08_local)
 
 

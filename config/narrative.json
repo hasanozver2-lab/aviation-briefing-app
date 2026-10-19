@@ -17,6 +17,6 @@
     "max_attempts": 4,
     "base_delay_seconds": 2,
     "max_delay_seconds": 30,
-    "retry_statuses": [404, 429, 500, 502, 503, 504]
+    "retry_statuses": [429, 500, 502, 503, 504]
   }
 }

@@ -1,0 +1,10 @@
+{
+  "_doc": "Direct publication collection respects active/public/full permissions in sources.csv. Domain aliases only identify an existing source; they never activate one. Undated reports retain an unknown publication date and get no New/Breaking badge.",
+  "publisher_source_names": {
+    "boeing.com": "Boeing News Releases"
+  },
+  "allow_google_news": false,
+  "allow_llm_source_data": false,
+  "max_redirects": 3,
+  "max_edition_lead_years": 1
+}

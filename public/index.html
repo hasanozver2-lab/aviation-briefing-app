@@ -40,7 +40,12 @@
     .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
         .mast-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
     .mast-meta #updated { font-size: 11px; color: var(--faint); }
-    .page-nav { display: flex; gap: 8px; padding: 4px 0 10px; border-bottom: 1px solid var(--ink); }
+    .page-nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 10px; border-bottom: 1px solid var(--ink); }
+    .archive-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px var(--pad); font: 500 13px/1.4 var(--sans); }
+    .archive-controls[hidden] { display: none; }
+    .archive-controls input, .archive-controls button { padding: 9px; min-height: 44px; border: 1px solid var(--rule-2); border-radius: 4px; background: var(--paper); color: var(--ink); font: inherit; max-width: 100%; }
+    .archive-controls button:disabled { opacity: .45; cursor: default; }
+    .archive-note { width: 100%; margin: 0; color: var(--muted); font-weight: 400; }
     .page-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border: 1px solid var(--rule-2); border-radius: 999px; font: 600 11.5px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--paper); transition: background .15s ease, color .15s ease; }
     .page-btn .page-cnt { font: 500 11px/1 var(--mono); color: var(--faint); }
     .page-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -173,6 +178,7 @@
       <nav class="page-nav" aria-label="Briefing sections">
         <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
         <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
+        <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span lang="tr">Arşiv</span></button>
       </nav>
     </header>
 
@@ -181,6 +187,14 @@
       <button type="button" id="ios-close" aria-label="Dismiss">✕</button>
     </div>
     <div class="stale" id="stale" role="status" hidden></div>
+    <section id="archive-controls" class="archive-controls" aria-label="Briefing archive" hidden>
+      <label for="archive-date">Archive date</label>
+      <input id="archive-date" type="date" required>
+      <button id="archive-prev" type="button" aria-label="Previous archive day">←</button>
+      <button id="archive-next" type="button" aria-label="Next archive day">→</button>
+      <p class="archive-note">Previously collected stories, including the lower-score archive. Dates follow Istanbul time.</p>
+      <span id="archive-status" role="status" aria-live="polite"></span>
+    </section>
 
     <section class="market" id="market" hidden aria-label="Markets and fuel">
       <div class="ticker-row">
@@ -233,6 +247,10 @@
 
     const state = { page: "briefing", filter: "All", reportFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
+    let archiveRequestId = 0;
+    state.archiveDate = "";
+    state.archiveData = null;
+    const initialArchiveDate = new URLSearchParams(location.search).get("archive");
     const initialHash = location.hash ? decodeURIComponent(location.hash.slice(1)) : "";
 
     const HTML_ESCAPE_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
@@ -268,7 +286,7 @@
     function sourcesOf(story) { return Array.isArray(story.sources) ? story.sources : []; }
     function sourceCount(story) { return Math.max(Number(story.source_count) || 0, sourcesOf(story).length); }
     function tagsHtml(story, withRegion) {
-      const badges = badgeSet(story);
+      const badges = state.page === "archive" ? new Set() : badgeSet(story);
       const level = LEVEL_LABELS[story.level];
       return [
         level ? `<span lang="en" class="lvl-${escapeHtml(story.level)}">${level}</span>` : "",
@@ -313,6 +331,10 @@
     }
 
     function updateMastCount() {
+      if (state.page === "archive") {
+        $("counts").textContent = `${state.stories.length} archived stories`;
+        return;
+      }
       const stories = state.dailyStories;
       const breakingCount = stories.filter(isBreaking).length;
       if (state.page === "reports") {
@@ -323,16 +345,87 @@
     }
 
     function setPage(pageName) {
-      if (pageName !== "briefing" && pageName !== "reports") return;
+      if (!["briefing", "reports", "archive"].includes(pageName)) return;
       state.page = pageName;
+      archiveRequestId++;
+      $("archive-controls").hidden = pageName !== "archive";
       document.querySelectorAll("[data-page]").forEach(btn => {
         btn.setAttribute("aria-pressed", String(btn.dataset.page === pageName));
       });
-      $("art-back").textContent = pageName === "reports" ? "‹ Raporlar" : "‹ Briefing";
-      if (state.data) {
-        state.stories = pageName === "reports" ? state.reportStories : state.dailyStories;
-        updateMastCount();
-        renderList();
+      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : "‹ Briefing";
+      if (pageName === "archive") { loadArchive(state.archiveDate || previousDate(istanbulToday())); return; }
+      const url = new URL(location.href);
+      url.searchParams.delete("archive");
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+      if (state.data) render(state.data);
+      else loadBriefing();
+    }
+
+    function istanbulToday() {
+      const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Istanbul", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+      const field = kind => parts.find(part => part.type === kind).value;
+      return `${field("year")}-${field("month")}-${field("day")}`;
+    }
+    function shiftDate(value, days) {
+      const date = new Date(value + "T12:00:00Z");
+      date.setUTCDate(date.getUTCDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+    function previousDate(value) { return shiftDate(value, -1); }
+    function validArchiveDate(value) {
+      return /^\d{4}-\d{2}-\d{2}$/.test(value || "") && Number.isFinite(Date.parse(value + "T00:00:00Z"))
+        && new Date(value + "T00:00:00Z").toISOString().slice(0, 10) === value && value <= istanbulToday();
+    }
+    function renderArchive(data) {
+      state.archiveData = data;
+      state.stories = dedupe(Array.isArray(data.stories) ? data.stories : []);
+      state.filter = "All";
+      updateMastCount();
+      $("archive-status").textContent = `${state.stories.length} stories collected for this day.`;
+      renderList();
+      openLinkedStory();
+    }
+    async function loadArchive(dateText) {
+      if (!validArchiveDate(dateText)) { $("archive-status").textContent = "Choose a valid date up to today."; return; }
+      const requestId = ++archiveRequestId;
+      state.archiveDate = dateText;
+      state.archiveData = null;
+      state.stories = [];
+      state.order = [];
+      $("archive-date").value = dateText;
+      $("archive-date").max = istanbulToday();
+      $("archive-next").disabled = dateText >= istanbulToday();
+      $("dateline").textContent = `Archive · ${dateText}`;
+      $("updated").textContent = "Historical briefing";
+      $("stale").hidden = true;
+      $("market").hidden = true;
+      $("new-pill").hidden = true;
+      $("archive-status").textContent = "Loading archive…";
+      $("counts").textContent = "Archive";
+      $("content").innerHTML = `<div class="state">Loading the selected day's stories…</div>`;
+      const url = new URL(location.href);
+      url.searchParams.set("archive", dateText);
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+      try {
+        const query = new URLSearchParams({ date: dateText, include_low: "1" });
+        const response = await fetch(`${BRIEFING_URL}?${query}`, { headers: { "Accept": "application/json" } });
+        if (requestId !== archiveRequestId || state.page !== "archive") return;
+        if (response.status === 404) {
+          $("archive-status").textContent = "No archive was saved for this date.";
+          $("content").innerHTML = `<div class="state">No saved briefing for ${escapeHtml(dateText)}. Choose another day.</div>`;
+          updateMastCount();
+          return;
+        }
+        if (!response.ok || !(response.headers.get("content-type") || "").includes("application/json")) throw new Error("Archive request failed");
+        const data = await response.json();
+        if (requestId !== archiveRequestId || state.page !== "archive") return;
+        if (data.date !== dateText || !Array.isArray(data.stories)) throw new Error("Invalid archive response");
+        renderArchive(data);
+      } catch (error) {
+        if (requestId !== archiveRequestId || state.page !== "archive") return;
+        $("archive-status").textContent = "Archive couldn't be loaded. Choose the date again to retry.";
+        $("content").innerHTML = `<div class="state">The archive couldn't be loaded. Please try again.</div>`;
+        console.error("Archive load failed:", error);
       }
     }
 
@@ -346,9 +439,10 @@
       state.dailyStories = dailyStories;
       state.reportStories = reportStories;
       const stories = state.page === "reports" ? reportStories : dailyStories;
-      state.stories = stories;
+      if (state.page !== "archive") state.stories = stories;
       $("nav-briefing-count").textContent = String(dailyStories.length);
       $("nav-reports-count").textContent = String(reportStories.length);
+      if (state.page === "archive") return;
 
       const sections = new Set(dailyStories.map(sectionOf));
       if (state.filter !== "All" && !sections.has(state.filter)) state.filter = "All";
@@ -375,6 +469,7 @@
     }
     // The band explains why the data may be old: the last pipeline run failed (status "stale") or no run reached the site for a while.
     function renderFreshness() {
+      if (state.page === "archive") return;
       const data = state.data || {};
       const minutes = state.updatedAt === null ? null : Math.max(0, Math.round((Date.now() - state.updatedAt) / 60000));
       $("updated").textContent = minutes === null ? "" : `Updated ${ageText(minutes)}`;
@@ -436,7 +531,7 @@
       if (state.page === "reports") { renderReportsList(); return; }
       const { filter } = state;
       const stories = state.stories;
-      if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
+      if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${state.page === "archive" ? "No eligible stories in this saved briefing." : EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
       const counts = {};
       stories.forEach(s => { const k = sectionOf(s); counts[k] = (counts[k] || 0) + 1; });
       const sectionNames = Object.keys(counts).sort((a, b) => sectionRank(a) - sectionRank(b));
@@ -645,8 +740,9 @@
     }
 
     function shareBriefing() {
-      if (!state.data) return;
-      let text = `${state.data.heading || "The Aviation Briefing"}\n${state.data.intro_sentence || ""}\n`;
+      const data = state.page === "archive" ? state.archiveData : state.data;
+      if (!data) return;
+      let text = `${data.heading || "The Aviation Briefing"}\n${state.page === "archive" ? `Archive · ${state.archiveDate}` : data.intro_sentence || ""}\n`;
       const order = state.order.length ? state.order : state.stories;
       order.forEach(s => {
         text += `\n• ${s.headline}\n`;
@@ -654,7 +750,7 @@
         if (s.original_source && s.original_source.url) text += `  ${s.original_source.url}\n`;
       });
       const copy = () => navigator.clipboard.writeText(text).then(() => showToast("Briefing copied to clipboard.")).catch(() => showToast("Couldn't copy."));
-      if (navigator.share) navigator.share({ title: state.data.heading || "The Aviation Briefing", text }).catch(copy);
+      if (navigator.share) navigator.share({ title: data.heading || "The Aviation Briefing", text }).catch(copy);
       else copy();
     }
 
@@ -687,7 +783,7 @@
     // New stories are added without a reload: poll quietly, insert at once when the reader is at the top,
     // otherwise offer a "new stories" button so the reading position never jumps.
     async function pollBriefing() {
-      if (document.hidden || state.polling || !state.data) return;
+      if (document.hidden || state.polling || !state.data || state.page === "archive") return;
       state.polling = true;
       state.lastPoll = Date.now();
       try {
@@ -702,6 +798,7 @@
       }
     }
     function applyPolled(data) {
+      if (state.page === "archive") return;
       const known = new Set(state.dailyStories.concat(state.reportStories).map(storyKey));
       const arrived = dedupe(Array.isArray(data.stories) ? data.stories : []).filter(s => !known.has(storyKey(s)));
       const atTop = window.scrollY < SCROLL_TOP_THRESHOLD && !state.articleId;
@@ -733,6 +830,9 @@
         const btn = e.target.closest("[data-page]");
         if (btn) setPage(btn.dataset.page);
       });
+      $("archive-date").addEventListener("change", (e) => loadArchive(e.target.value));
+      $("archive-prev").addEventListener("click", () => loadArchive(previousDate(state.archiveDate)));
+      $("archive-next").addEventListener("click", () => loadArchive(shiftDate(state.archiveDate, 1)));
       $("mkt-toggle").addEventListener("click", () => {
         const table = $("mkt-table"), open = table.hidden;
         table.hidden = !open;
@@ -785,7 +885,11 @@
       if (isIos && !standalone && !safeStorage.get("ios_prompt_dismissed")) $("ios-prompt").hidden = false;
       $("ios-close").addEventListener("click", () => { $("ios-prompt").hidden = true; safeStorage.set("ios_prompt_dismissed", "true"); });
 
-      loadBriefing();
+      if (validArchiveDate(initialArchiveDate)) {
+        state.archiveDate = initialArchiveDate;
+        setPage("archive");
+        loadBriefing();
+      } else loadBriefing();
     });
   </script>
 </body>

@@ -1,27 +1,16 @@
-"""Benchmark & Wire Intelligence collector (Google News RSS + Gemini Google Search Grounding).
+"""Collect publisher-written strategic reports under the CSV's current permissions.
 
-Collects recent reports, indices, data bulletins and breaking civil aviation stories from:
-1. Mandatory Aviation Intelligence & Benchmark Sources:
-   - IdeaWorksCompany (ideaworkscompany.com): Ancillary revenue, a la carte pricing, FFP/loyalty revenue, unbundling trends.
-   - OAG (oag.com): Capacity trends, Megahubs indices, connecting banks, On-Time Performance (OTP).
-   - Cirium (cirium.com) & ch-aviation (ch-aviation.com): Fleet deliveries, aircraft utilization, GTF/LEAP engine & AOG statistics.
-   - IATA (iata.org) & ACI World (aci.aero): Global passenger (RPK) and cargo (CTK) demand, jet fuel crack spread, airport passenger volumes.
-   - CAPA Centre for Aviation (centreforaviation.com) & Eurocontrol (eurocontrol.int): Strategic airline analyses, bilateral air service agreements, European slot/ATC delays.
-2. Global Financial & Aviation Wire / Press Sources (blocked or without public RSS):
-   - Reuters (reuters.com)
-   - Bloomberg (bloomberg.com)
-   - Financial Times (ft.com)
-   - The Wall Street Journal (wsj.com)
-   - Associated Press (apnews.com)
-   - CNBC (cnbc.com)
-   - Aviation Week (aviationweek.com)
-   - Nikkei Asia (asia.nikkei.com)
+Search/model helpers remain for compatibility but are disabled as production evidence.
+Reports without reliable publication metadata keep an explicitly unknown date.
 """
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
+from html.parser import HTMLParser
+from pathlib import Path
+import logging
 import json
 import re
 import ssl
@@ -31,11 +20,19 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 try:
-    from . import language
+    from . import language, source_catalog, source_registry
 except ImportError:
     import language
+    import source_catalog
+    import source_registry
 
-SOURCE_NAME = "Gemini Benchmark Intelligence (Search Grounded)"
+SOURCE_NAME = "Verified Strategic Publications"
+LOGGER = logging.getLogger(__name__)
+COLLECTION_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "report_collection.json"
+
+
+def collection_config():
+    return json.loads(COLLECTION_CONFIG_PATH.read_text(encoding="utf-8"))
 GEMINI_SEARCH_MODEL = "gemini-3.5-flash"
 GEMINI_FALLBACK_MODELS = (
     "gemini-3-flash-preview",
@@ -873,10 +870,33 @@ def resolve_publisher_meta(url, source_name=""):
     for domain, meta in BENCHMARK_PUBLISHERS.items():
         if host == domain or host.endswith("." + domain):
             return meta
-    normalized_name = str(source_name or "").strip().lower()
-    for key, meta in PUBLISHER_BY_NAME.items():
-        if key == normalized_name or key in normalized_name:
-            return meta
+    return None
+
+
+def approved_publisher(url):
+    """Source identity and permissions come from the CSV, never a model's source_name."""
+    parsed = urllib.parse.urlparse(str(url or ""))
+    if parsed.scheme != "https" or parsed.username or parsed.password or parsed.port not in (None, 443):
+        return None
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    alias = collection_config().get("publisher_source_names", {}).get(host)
+    rows = source_catalog.read_rows()
+    matching = [row for row in rows if source_catalog.registrable_key(row["url"]) == source_catalog.registrable_key(url)
+                or (alias and row["name"] == alias)]
+    for row in matching:
+        notes = source_catalog.notes_of(row)
+        if row.get("active") != "1" or row.get("status") != "active" or row.get("mode") != "full":
+            continue
+        if notes.get("license_required") or row.get("license_status") != "public":
+            continue
+        identity = resolve_publisher_meta(url)
+        if identity is None:
+            continue
+        tier = int(row["tier"])
+        return {**identity, "name": row["name"], "tier": tier,
+                "reliability_weight": source_registry.reliability_weight_for_tier(tier),
+                "official": str(row.get("official", "")).lower() == "true",
+                "region": row["region"], "license_status": row["license_status"]}
     return None
 
 
@@ -892,7 +912,7 @@ def _parse_date_in_window(date_str, now, cutoff):
     if parsed is None:
         for fmt in ("%Y-%m-%d", "%d %B %Y", "%d %b %Y", "%B %d, %Y"):
             try:
-                parsed = datetime.strptime(raw[:10] if fmt == "%Y-%m-%d" else raw, fmt)
+                parsed = datetime.strptime(raw, fmt)
                 break
             except ValueError:
                 continue
@@ -902,9 +922,8 @@ def _parse_date_in_window(date_str, now, cutoff):
         except ValueError:
             return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(hour=now.hour, minute=now.minute, tzinfo=timezone.utc)
-    cutoff_floor = cutoff.replace(hour=0, minute=0, second=0, microsecond=0)
-    if parsed < cutoff_floor or parsed > now.replace(hour=23, minute=59, second=59):
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    if parsed < cutoff or parsed > now:
         return None
     return parsed
 
@@ -938,10 +957,6 @@ def _build_article(title, url, description, publisher, published_at, now, classi
     except ImportError:
         import story_lifecycle as _story_lifecycle
     topics = classify_topics_fn(f"{title} {description}") if classify_topics_fn else []
-    effective_ts = max(
-        published_at.timestamp(),
-        now.replace(hour=0, minute=1, second=0, microsecond=0).timestamp(),
-    )
     article = {
         "title": title,
         "link": url,
@@ -954,14 +969,16 @@ def _build_article(title, url, description, publisher, published_at, now, classi
         "airline": publisher.get("airline", ""),
         "airline_code": publisher.get("airline_code", ""),
         "license_required": False,
-        "license_status": "public",
+        "license_status": publisher.get("license_status", "public"),
         "source_id": None,
         "region": publisher["region"],
         "tier": publisher["tier"],
         "reliability_weight": publisher["reliability_weight"],
         "topics": topics,
-        "pub_date": published_at.strftime("%d %b %H:%M"),
-        "timestamp": effective_ts,
+        "pub_date": published_at.strftime("%d %b %H:%M") if published_at else "",
+        "timestamp": published_at.timestamp() if published_at else 0,
+        "publication_date_status": "verified" if published_at else "unknown",
+        "source_verified": True,
         "via_benchmark_search": True,
     }
     if headline_only:
@@ -973,6 +990,8 @@ def _build_article(title, url, description, publisher, published_at, now, classi
 
 
 def fetch_google_news_query(query, now, cutoff, classify_topics_fn=None, opener=urllib.request.urlopen, max_items=MAX_ITEMS_PER_QUERY):
+    if not collection_config().get("allow_google_news", False):
+        return []
     window_match = re.search(r"when:(\d+)d\b", str(query or ""))
     query_cutoff = min(cutoff, now - timedelta(days=int(window_match.group(1)))) if window_match else cutoff
     url = GOOGLE_NEWS_RSS_URL.format(query=urllib.parse.quote(query))
@@ -1088,6 +1107,8 @@ def _corroboration_tokens(title):
 
 
 def corroborate_one_article(article, classify_topics_fn=None, opener=urllib.request.urlopen):
+    if not collection_config().get("allow_google_news", False):
+        return False
     title = str(article.get("title") or "").strip()
     tokens = _corroboration_tokens(title)
     if len(tokens) < 3:
@@ -1199,14 +1220,103 @@ QUANTITATIVE_BLOCK_PATTERN = re.compile(
 )
 
 
-def _fetch_html_page(url, opener=urllib.request.urlopen, timeout=RSS_QUERY_TIMEOUT_SECONDS):
+class NoPublicationRedirects(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _fetch_html_page(url, opener=urllib.request.urlopen, timeout=RSS_QUERY_TIMEOUT_SECONDS, redirects_remaining=None):
+    publisher = approved_publisher(url)
+    if publisher is None:
+        raise ValueError("publication source is not approved for page reading")
+    if redirects_remaining is None:
+        redirects_remaining = collection_config()["max_redirects"]
+    try:
+        from .feed_discovery import RobotsRules, ROBOTS_TOKEN, USER_AGENT, MAX_BODY_BYTES
+    except ImportError:
+        from feed_discovery import RobotsRules, ROBOTS_TOKEN, USER_AGENT, MAX_BODY_BYTES
+    if opener is urllib.request.urlopen:
+        opener = urllib.request.build_opener(NoPublicationRedirects()).open
+    parsed = urllib.parse.urlparse(url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    robots_request = urllib.request.Request(origin + "/robots.txt", headers={"User-Agent": USER_AGENT})
+    try:
+        with opener(robots_request, timeout=timeout) as reply:
+            robots = RobotsRules(reply.read(MAX_BODY_BYTES).decode("utf-8", errors="replace").splitlines())
+    except urllib.error.HTTPError as exc:
+        if exc.code not in (404, 410):
+            raise
+        robots = RobotsRules()
+    if not robots.can_fetch(ROBOTS_TOKEN, url):
+        raise ValueError("publication path disallowed by robots.txt")
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+        headers={"User-Agent": USER_AGENT},
     )
-    ctx = ssl.create_default_context()
-    with opener(request, context=ctx, timeout=timeout) as response:
-        return response.read().decode("utf-8", errors="replace")
+    try:
+        with opener(request, timeout=timeout) as response:
+            final_publisher = approved_publisher(response.geturl())
+            if final_publisher is None or final_publisher["name"] != publisher["name"]:
+                raise ValueError("publication redirected to a different publisher")
+            return response.read(MAX_BODY_BYTES).decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as exc:
+        if exc.code not in (301, 302, 303, 307, 308) or redirects_remaining <= 0:
+            raise
+        target = urllib.parse.urljoin(url, exc.headers.get("Location", ""))
+        target_publisher = approved_publisher(target)
+        if target_publisher is None or target_publisher["name"] != publisher["name"]:
+            raise ValueError("publication redirect is not approved") from None
+        return _fetch_html_page(target, opener=opener, timeout=timeout, redirects_remaining=redirects_remaining - 1)
+
+
+class PublicationDateParser(HTMLParser):
+    """Only explicit publisher metadata qualifies; forecast years are not release dates."""
+
+    def __init__(self):
+        super().__init__()
+        self.values = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        key = attrs.get("property") or attrs.get("name") or attrs.get("itemprop")
+        if tag == "meta" and key in ("article:published_time", "datePublished", "date", "DC.date.issued"):
+            self.values.append(attrs.get("content", ""))
+        if tag == "time" and attrs.get("itemprop") == "datePublished":
+            self.values.append(attrs.get("datetime", ""))
+
+
+def publication_date(html_text, now, report_title=""):
+    parser = PublicationDateParser()
+    parser.feed(html_text)
+    try:
+        from .feed_discovery import JSONLD_PATTERN
+    except ImportError:
+        from feed_discovery import JSONLD_PATTERN
+
+    def dates(node):
+        if isinstance(node, list):
+            for child in node:
+                dates(child)
+        elif isinstance(node, dict):
+            if node.get("datePublished"):
+                parser.values.append(node["datePublished"])
+            for key in ("@graph", "mainEntity"):
+                dates(node.get(key))
+
+    for block in JSONLD_PATTERN.findall(html_text):
+        try:
+            dates(json.loads(unescape(block)))
+        except (ValueError, TypeError):
+            LOGGER.warning("Invalid publication JSON-LD metadata")
+    for value in parser.values:
+        published = _parse_date_in_window(value, now, datetime.min.replace(tzinfo=timezone.utc))
+        if published:
+            edition = re.search(r"\b(20\d{2})\s*[-–]\s*20\d{2}\b", report_title)
+            if edition and published.year < int(edition.group(1)) - collection_config()["max_edition_lead_years"]:
+                LOGGER.warning("Publication metadata predates the report edition; release date remains unknown")
+                continue
+            return published
+    return None
 
 
 def extract_publication_page(html_text, fallback_title="", brand_prefix=""):
@@ -1366,6 +1476,7 @@ def discover_eurocontrol_publications(opener=urllib.request.urlopen):
                 if full_url not in discovered:
                     discovered.append(full_url)
         except Exception:
+            LOGGER.warning("EUROCONTROL publication discovery failed", exc_info=True)
             continue
     return discovered
 
@@ -1385,11 +1496,12 @@ def collect_strategic_publications(now, cutoff, classify_topics_fn=None, opener=
 
     def _fetch_one(spec):
         url, source_hint, fallback_title = spec
+        publisher = approved_publisher(url)
+        if publisher is None:
+            LOGGER.info("Skipped unapproved publication source: %s", source_hint)
+            return None
         try:
             html_text = _fetch_html_page(url, opener=opener)
-            publisher = resolve_publisher_meta(url, source_hint)
-            if publisher is None:
-                return None
             title, description = extract_publication_page(
                 html_text,
                 fallback_title=fallback_title,
@@ -1402,7 +1514,7 @@ def collect_strategic_publications(now, cutoff, classify_topics_fn=None, opener=
                 url,
                 description,
                 publisher,
-                now,
+                publication_date(html_text, now, title),
                 now,
                 classify_topics_fn=classify_topics_fn,
                 headline_only=False,
@@ -1410,6 +1522,7 @@ def collect_strategic_publications(now, cutoff, classify_topics_fn=None, opener=
             item["strategic_publication"] = True
             return item
         except Exception:
+            LOGGER.warning("Publication collection failed: %s", source_hint, exc_info=True)
             return None
 
     with ThreadPoolExecutor(max_workers=min(6, len(pages_to_fetch)), thread_name_prefix="strategic-pubs") as pool:
@@ -1417,16 +1530,17 @@ def collect_strategic_publications(now, cutoff, classify_topics_fn=None, opener=
             if item is not None:
                 articles.append(item)
 
+    iw_pub = approved_publisher("https://ideaworkscompany.com/reports/")
     try:
-        iw_html = _fetch_html_page("https://ideaworkscompany.com/reports/", opener=opener)
-        iw_pub = BENCHMARK_PUBLISHERS["ideaworkscompany.com"]
+        iw_html = _fetch_html_page("https://ideaworkscompany.com/reports/", opener=opener) if iw_pub else ""
         for title, link, desc in extract_ideaworks_reports(iw_html, max_reports=2):
+            report_html = _fetch_html_page(link, opener=opener)
             iw_item = _build_article(
                 title,
                 link,
-                desc,
+                extract_publication_page(report_html, fallback_title=title)[1],
                 iw_pub,
-                now,
+                publication_date(report_html, now),
                 now,
                 classify_topics_fn=classify_topics_fn,
                 headline_only=False,
@@ -1434,12 +1548,14 @@ def collect_strategic_publications(now, cutoff, classify_topics_fn=None, opener=
             iw_item["strategic_publication"] = True
             articles.append(iw_item)
     except Exception:
-        pass
+        LOGGER.warning("IdeaWorks publication collection failed", exc_info=True)
 
     return articles
 
 
 def post_search_query(api_key, now, cutoff, seed_articles=None, timeout=REQUEST_TIMEOUT_SECONDS, deep_scan=False):
+    if not collection_config().get("allow_llm_source_data", False):
+        raise ValueError("LLM source data is disabled; narratives run after deterministic selection")
     prompt_text = build_search_prompt(now, cutoff, seed_articles=seed_articles, deep_scan=deep_scan)
     ctx = ssl.create_default_context()
     last_error = None
@@ -1469,148 +1585,27 @@ def post_search_query(api_key, now, cutoff, seed_articles=None, timeout=REQUEST_
 
 
 def apply_search_enrichment(response, seed_articles, classify_topics_fn=None):
-    """Apply search-grounded factual summaries and corroborating sources to thin RSS articles."""
-    if not seed_articles or not isinstance(response, dict):
-        return 0
-    candidates = response.get("candidates") or []
-    if not candidates or not isinstance(candidates[0], dict):
-        return 0
-    parts = (candidates[0].get("content") or {}).get("parts") or []
-    raw_text = "\n".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
-    parsed_json = _extract_json_object(raw_text)
-    enrichments = parsed_json.get("enrichments") if isinstance(parsed_json, dict) else []
-    if not isinstance(enrichments, list):
-        return 0
-
-    enriched_count = 0
-    for entry in enrichments:
-        if not isinstance(entry, dict):
-            continue
-        idx = entry.get("index")
-        desc = str(entry.get("description") or "").strip()
-        if not isinstance(idx, int) or idx < 0 or idx >= len(seed_articles) or len(desc) < 25:
-            continue
-        target = seed_articles[idx]
-        max_len = 300 if target.get("basis") == "headline_only" else 1200
-        target["description"] = _normalize_number_words(desc)[:max_len]
-        corroborating = [
-            str(src).strip()
-            for src in (entry.get("corroborating_sources") or [])
-            if isinstance(src, str) and str(src).strip()
-        ]
-        if corroborating:
-            target["corroborating_sources"] = corroborating[:4]
-        if classify_topics_fn:
-            target["topics"] = classify_topics_fn(f"{target.get('title', '')} {target['description']}")
-        enriched_count += 1
-    return enriched_count
+    """Legacy entry point: search-generated prose is never publisher evidence."""
+    return 0
 
 
 def parse_search_response(response, now, cutoff, classify_topics_fn=None):
-    candidates = response.get("candidates") if isinstance(response, dict) else []
-    if not candidates or not isinstance(candidates[0], dict):
-        return []
-    parts = (candidates[0].get("content") or {}).get("parts") or []
-    raw_text = "\n".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
-    parsed_json = _extract_json_object(raw_text)
-    raw_items = parsed_json.get("items") if isinstance(parsed_json, dict) else []
-    if not isinstance(raw_items, list):
-        return []
-
-    grounded_uris = _grounding_urls(response)
-    articles = []
-    seen_urls = set()
-    seen_titles = set()
-    for index, item in enumerate(raw_items[:MAX_BENCHMARK_ITEMS]):
-        if not isinstance(item, dict):
-            continue
-        title = str(item.get("title") or "").strip()
-        url = str(item.get("url") or "").strip()
-        if (not url.startswith(("http://", "https://"))) and index < len(grounded_uris):
-            url = grounded_uris[index]
-        if len(title) < 12 or not _is_allowed_url(url):
-            continue
-        title_key = title.lower()
-        if url in seen_urls or title_key in seen_titles:
-            continue
-
-        published_at = _parse_date_in_window(item.get("published_at"), now, cutoff)
-        if published_at is None:
-            continue
-
-        publisher = resolve_publisher_meta(url, item.get("source_name", ""))
-        if publisher is None:
-            continue
-
-        description = str(item.get("description") or "").strip()[:1200]
-        if not is_civil_aviation_item(title, description, publisher):
-            continue
-        seen_urls.add(url)
-        seen_titles.add(title_key)
-        articles.append(
-            _build_article(
-                title,
-                url,
-                description,
-                publisher,
-                published_at,
-                now,
-                classify_topics_fn=classify_topics_fn,
-                headline_only=publisher["source_type"] == "mainstream",
-            )
-        )
-    return articles
+    """Legacy entry point: model JSON cannot establish a real article, date or publisher."""
+    return []
 
 
 def collect(api_key, now, cutoff, post=None, classify_topics_fn=None, include_rss=None, deep_scan=False):
-    """Collect recent benchmark, wire, and blocked official airline/OEM reports via Google News RSS + Gemini Search Grounding.
+    """Collect publisher-written strategic reports without using LLM output as source data.
 
-    Never raises: returns (articles, report_dict).
+    Legacy arguments remain for compatibility. Existing RSS/newsroom collection handles daily news.
     """
-    if not api_key and post is None and not include_rss:
-        return [], {"status": "not_configured", "error": "GEMINI_API_KEY is not configured", "articles": 0}
-
-    use_rss = (post is None) if include_rss is None else bool(include_rss)
-    rss_articles = []
-    errors = []
-
-    if use_rss:
-        try:
-            rss_articles.extend(collect_strategic_publications(now, cutoff, classify_topics_fn=classify_topics_fn))
-            rss_articles.extend(collect_google_news_rss(now, cutoff, classify_topics_fn=classify_topics_fn, deep_scan=deep_scan))
-            corroborate_thin_articles(
-                rss_articles,
-                classify_topics_fn=classify_topics_fn,
-                max_articles=36 if deep_scan else 24,
-            )
-        except Exception as exc:
-            errors.append(type(exc).__name__)
-
-    seed_limit = 20 if deep_scan else 12
-    thin_seeds = [article for article in rss_articles if len(str(article.get("description") or "")) < 60][:seed_limit]
-    grounded_articles = []
-
-    if api_key or post is not None:
-        sender = post or (lambda: post_search_query(api_key, now, cutoff, seed_articles=thin_seeds, deep_scan=deep_scan))
-        try:
-            response = sender()
-            apply_search_enrichment(response, thin_seeds, classify_topics_fn=classify_topics_fn)
-            grounded_articles.extend(parse_search_response(response, now, cutoff, classify_topics_fn=classify_topics_fn))
-        except urllib.error.HTTPError as exc:
-            errors.append(f"HTTPError {exc.code}")
-        except Exception as exc:
-            errors.append(type(exc).__name__)
-
-    deduped = []
-    seen_keys = set()
-    for article in rss_articles + grounded_articles:
-        key = (article["source"].lower(), article["title"].lower()[:60])
-        if key in seen_keys or article["link"] in seen_keys:
-            continue
-        seen_keys.add(key)
-        seen_keys.add(article["link"])
-        deduped.append(article)
-
-    if not deduped and errors:
-        return [], {"status": "error", "error": "; ".join(errors), "articles": 0}
-    return deduped, {"status": "active", "error": "", "articles": len(deduped)}
+    if include_rss is False:
+        return [], {"status": "not_configured", "error": "Direct publication collection disabled", "articles": 0}
+    try:
+        articles = collect_strategic_publications(now, cutoff, classify_topics_fn=classify_topics_fn)
+    except Exception as exc:
+        LOGGER.warning("Strategic publication collection failed", exc_info=True)
+        return [], {"status": "error", "error": type(exc).__name__, "articles": 0}
+    if not articles:
+        return [], {"status": "error", "error": "No verified strategic publications available", "articles": 0}
+    return articles, {"status": "active", "error": "", "articles": len(articles)}
