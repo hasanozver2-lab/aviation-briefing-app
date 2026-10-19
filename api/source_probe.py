@@ -13,10 +13,11 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
 try:
-    from . import alert_feeds, clustering, entities, feed_discovery as fd, feed_sources, market_data, safety_context, source_catalog, story_lifecycle
+    from . import alert_feeds, social_feed, clustering, entities, feed_discovery as fd, feed_sources, market_data, safety_context, source_catalog, story_lifecycle
     from .urls import canonicalize_url
 except ImportError:
     import alert_feeds
+    import social_feed
     import clustering
     import entities
     import feed_discovery as fd
@@ -59,7 +60,7 @@ def suggest_status(row, result, legacy_found):
 
 def probe_source(row, source, builtin_by_name, discovered, now, fetch=None, legacy_fetch=None):
     """Probe one source; a crash inside the probe becomes a recorded reason, never a missing result."""
-    if row["name"] == alert_feeds.SOURCE_NAME:
+    if row["name"] in (alert_feeds.SOURCE_NAME, social_feed.SOURCE_NAME):
         return _alert_record(row, source), []
     try:
         return _probe_source(row, source, builtin_by_name, discovered, now, fetch, legacy_fetch)

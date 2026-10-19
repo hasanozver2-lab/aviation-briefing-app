@@ -1,8 +1,30 @@
 {
  "_doc": "Sources to add to config/sources.csv (scripts/build_catalog.py merges them). A source whose registrable domain already has a row updates that row instead of adding one; urls beyond the first are extra discovery candidates. Feeds are never written here: they are discovered and stored in config/feeds_discovered.json.",
  "sources": [
-  {"group":"B","name":"ACI World News","urls":["https://aci.aero/","https://aci.aero/feed/"],"source_type":"regulator","region":"Global","language":"en","mode":"feed_only"},
-  {"group":"D","name":"BBC News Business","urls":["https://www.bbc.com/news/business","https://feeds.bbci.co.uk/news/business/rss.xml"],"source_type":"wire_headline","region":"Global","language":"en","mode":"feed_only"},
+  {
+   "group": "B",
+   "name": "ACI World News",
+   "urls": [
+    "https://aci.aero/",
+    "https://aci.aero/feed/"
+   ],
+   "source_type": "regulator",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
+  {
+   "group": "D",
+   "name": "BBC News Business",
+   "urls": [
+    "https://www.bbc.com/news/business",
+    "https://feeds.bbci.co.uk/news/business/rss.xml"
+   ],
+   "source_type": "wire_headline",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only"
+  },
   {
    "group": "A",
    "name": "Delta News Hub",
@@ -1134,6 +1156,18 @@
    "language": "en",
    "mode": "feed_only",
    "aviation_filter": true,
+   "timeout_s": 10
+  },
+  {
+   "group": "I",
+   "name": "Official social (airline accounts)",
+   "urls": [
+    "https://x.com/"
+   ],
+   "source_type": "airline_ir",
+   "region": "Global",
+   "language": "en",
+   "mode": "feed_only",
    "timeout_s": 10
   }
  ]

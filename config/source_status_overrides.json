@@ -64,6 +64,10 @@
   "Google Alerts (wire headlines)": {
    "status": "active",
    "reason": "Google Alerts kişisel kullanım; yayıncı başlıkları ticari katmanda yeniden değerlendirilecek"
+  },
+  "Official social (airline accounts)": {
+   "status": "active",
+   "reason": "X/LinkedIn kullanım şartları otomatik okumayı kısıtlayabilir; yerel toplama yalnızca sahibin kendi oturumuyla, ticari katmanda yeniden değerlendirilecek"
   }
  }
 }

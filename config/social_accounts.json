@@ -1,0 +1,101 @@
+{
+ "_doc": "Official airline X accounts read by scripts/collect_social.py. A handle that returns nothing is reported by the collector and should be corrected here; handles are not guessed at read time.",
+ "accounts": [
+  {
+   "airline": "Delta Air Lines",
+   "airline_code": "DL",
+   "platform": "X",
+   "handle": "Delta"
+  },
+  {
+   "airline": "United Airlines",
+   "airline_code": "UA",
+   "platform": "X",
+   "handle": "United"
+  },
+  {
+   "airline": "American Airlines",
+   "airline_code": "AA",
+   "platform": "X",
+   "handle": "AmericanAir"
+  },
+  {
+   "airline": "Southwest Airlines",
+   "airline_code": "WN",
+   "platform": "X",
+   "handle": "SouthwestAir"
+  },
+  {
+   "airline": "JetBlue",
+   "airline_code": "B6",
+   "platform": "X",
+   "handle": "JetBlue"
+  },
+  {
+   "airline": "Alaska Airlines",
+   "airline_code": "AS",
+   "platform": "X",
+   "handle": "AlaskaAir"
+  },
+  {
+   "airline": "Turkish Airlines",
+   "airline_code": "TK",
+   "platform": "X",
+   "handle": "TurkishAirlines"
+  },
+  {
+   "airline": "Lufthansa",
+   "airline_code": "LH",
+   "platform": "X",
+   "handle": "lufthansa"
+  },
+  {
+   "airline": "Air France",
+   "airline_code": "AF",
+   "platform": "X",
+   "handle": "airfrance"
+  },
+  {
+   "airline": "British Airways",
+   "airline_code": "BA",
+   "platform": "X",
+   "handle": "British_Airways"
+  },
+  {
+   "airline": "Emirates",
+   "airline_code": "EK",
+   "platform": "X",
+   "handle": "emirates"
+  },
+  {
+   "airline": "Qatar Airways",
+   "airline_code": "QR",
+   "platform": "X",
+   "handle": "qatarairways"
+  },
+  {
+   "airline": "Ryanair",
+   "airline_code": "FR",
+   "platform": "X",
+   "handle": "Ryanair"
+  },
+  {
+   "airline": "easyJet",
+   "airline_code": "U2",
+   "platform": "X",
+   "handle": "easyJet"
+  },
+  {
+   "airline": "KLM",
+   "airline_code": "KL",
+   "platform": "X",
+   "handle": "KLM"
+  },
+  {
+   "airline": "Singapore Airlines",
+   "airline_code": "SQ",
+   "platform": "X",
+   "handle": "SingaporeAir"
+  }
+ ]
+}
