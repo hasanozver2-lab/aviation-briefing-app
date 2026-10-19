@@ -117,6 +117,25 @@ def is_strategic_report(item):
     return False
 
 
+def is_flash_alert(item):
+    """Whether an article or story is a fast flash alert from analyst radar or social."""
+    if not isinstance(item, dict):
+        return False
+    if item.get("is_flash_alert") or item.get("via_social"):
+        return True
+    orig = item.get("original_source") if isinstance(item.get("original_source"), dict) else {}
+    url = str(item.get("link") or orig.get("url") or "").lower()
+    if any(h in url for h in ("theaircurrent.com", "airlineweekly.com", "x.com", "twitter.com", "linkedin.com")):
+        return True
+    source_name = str(item.get("source") or orig.get("source_name") or "").lower()
+    if any(a in source_name for a in ("the air current", "jon ostrower", "ned russell", "airline weekly", "dominic gates", "brian sumers")):
+        return True
+    title = str(item.get("title") or item.get("headline") or "").lower()
+    if any(k in title for k in ("flash alert", "breaking signal", "kısa sinyal", "the air current:", "jon ostrower:")):
+        return True
+    return False
+
+
 STRATEGIC_REPORT_URL_PATTERNS = (
     "/commercial/market/commercial-market-outlook",
     "/global-market-forecast",
@@ -261,7 +280,7 @@ def score_article(article, source_count, config=None):
     event_weight = article.get("event_weight")
     reliability = article.get("reliability_weight")
     tier = best_tier(article.get("entities"))
-    if is_strategic_report(article) and article.get("tier"):
+    if (is_strategic_report(article) or is_flash_alert(article)) and article.get("tier"):
         tier = min(tier, article["tier"]) if tier else article["tier"]
     full_at = max(2, int(config["corroboration_full_at_sources"]))
     components = {
@@ -347,6 +366,7 @@ def enrich_stories(stories, articles, relevance_config=None):
             "source_count": max(1, len(publishers)),
             "published_at_iso": to_iso(datetime.fromtimestamp(published, tz=timezone.utc)) if isinstance(published, (int, float)) and published > 0 else "",
             "is_strategic_report": bool(is_strategic_report(story) or is_strategic_report(article)),
+            "is_flash_alert": bool(is_flash_alert(story) or is_flash_alert(article)),
             "publication_date_status": article.get("publication_date_status", "verified" if published else "unknown"),
         })
         story["language"] = language.story_language(story)
@@ -861,6 +881,7 @@ def present_stories(day, now, config=None, levels=None):
         story["badges"] = compute_badges(story, now, config)
         story["language"] = language.story_language(story)       # recomputed on every read: sources can be added after the story was stored
         story["is_strategic_report"] = is_strategic_report(story)
+        story["is_flash_alert"] = is_flash_alert(story)
         if levels:
             level = level_for(story.get("relevance_score", 0), levels)
             story["level"] = level["name"] if level else "below"

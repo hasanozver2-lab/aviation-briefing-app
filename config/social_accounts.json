@@ -96,6 +96,54 @@
    "airline_code": "SQ",
    "platform": "X",
    "handle": "SingaporeAir"
+  },
+  {
+   "airline": "Jon Ostrower",
+   "airline_code": "TAC",
+   "author": "Jon Ostrower",
+   "role": "Editor-in-Chief, The Air Current",
+   "platform": "X",
+   "handle": "jonostrower"
+  },
+  {
+   "airline": "The Air Current",
+   "airline_code": "TAC",
+   "author": "The Air Current",
+   "role": "Aviation Intelligence",
+   "platform": "X",
+   "handle": "theaircurrent"
+  },
+  {
+   "airline": "Edward Russell",
+   "airline_code": "AW",
+   "author": "Edward Russell",
+   "role": "Aviation Reporter, Skift & Airline Weekly",
+   "platform": "X",
+   "handle": "byerussell"
+  },
+  {
+   "airline": "Airline Weekly",
+   "airline_code": "AW",
+   "author": "Airline Weekly",
+   "role": "Aviation Media",
+   "platform": "X",
+   "handle": "AirlineWeekly"
+  },
+  {
+   "airline": "Dominic Gates",
+   "airline_code": "ST",
+   "author": "Dominic Gates",
+   "role": "Pulitzer Aerospace Reporter",
+   "platform": "X",
+   "handle": "dominicgates"
+  },
+  {
+   "airline": "The Airline Observer",
+   "airline_code": "TAO",
+   "author": "Brian Sumers",
+   "role": "The Airline Observer",
+   "platform": "X",
+   "handle": "briansumers"
   }
  ]
 }

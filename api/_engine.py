@@ -774,6 +774,7 @@ def deterministic_fields(article):
         "region_section": article.get("region_section", ""),
         "secondary_tags": article.get("secondary_tags") or [],
         "is_strategic_report": story_lifecycle.is_strategic_report(article),
+        "is_flash_alert": story_lifecycle.is_flash_alert(article),
     }
 
 

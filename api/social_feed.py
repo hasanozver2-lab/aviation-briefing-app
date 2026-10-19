@@ -54,8 +54,16 @@ def article_from_post(post, record):
         return None
     article = feed_sources.article_from_item(fd.Item(title, link, published, post_summary(post.get("text", ""))), record)
     airline = post.get("airline", "")
-    article.update(source=f"{airline} on {post.get('platform', 'X')}" if airline else SOURCE_NAME, airline=airline,
-                   airline_code=post.get("airline_code", ""), via_social=True)
+    author = post.get("author", "")
+    platform = post.get("platform", "X")
+    if author and not airline:
+        source_label = f"{author} on {platform}"
+    elif airline:
+        source_label = f"{airline} on {platform}"
+    else:
+        source_label = SOURCE_NAME
+    article.update(source=source_label, airline=airline,
+                   airline_code=post.get("airline_code", ""), via_social=True, is_flash_alert=True)
     return article
 
 

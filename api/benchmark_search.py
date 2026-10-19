@@ -21,10 +21,12 @@ import xml.etree.ElementTree as ET
 
 try:
     from . import language, source_catalog, source_registry
+    from .urls import canonicalize_url, unshorten_google_news_url
 except ImportError:
     import language
     import source_catalog
     import source_registry
+    from urls import canonicalize_url, unshorten_google_news_url
 
 SOURCE_NAME = "Verified Strategic Publications"
 LOGGER = logging.getLogger(__name__)
@@ -537,7 +539,25 @@ BENCHMARK_PUBLISHERS = {
         "region": "Global",
         "category_hint": "Other areas",
     },
-    # Aviation Trade Media & Turkish Aviation Outlets for Deep Morning Scans
+    # Aviation Trade Media & Aviation Intelligence Radars
+    "theaircurrent.com": {
+        "name": "The Air Current",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.95,
+        "region": "North America",
+        "category_hint": "European and other global airlines",
+    },
+    "airlineweekly.com": {
+        "name": "Airline Weekly",
+        "source_type": "trade_media",
+        "official": False,
+        "tier": 2,
+        "reliability_weight": 0.9,
+        "region": "North America",
+        "category_hint": "European and other global airlines",
+    },
     "flightglobal.com": {
         "name": "FlightGlobal",
         "source_type": "trade_media",
@@ -744,6 +764,12 @@ PUBLISHER_BY_NAME.update({
     "nyt": BENCHMARK_PUBLISHERS["nytimes.com"],
     "new york times": BENCHMARK_PUBLISHERS["nytimes.com"],
     "the new york times": BENCHMARK_PUBLISHERS["nytimes.com"],
+    "the air current": BENCHMARK_PUBLISHERS["theaircurrent.com"],
+    "theaircurrent": BENCHMARK_PUBLISHERS["theaircurrent.com"],
+    "jon ostrower": BENCHMARK_PUBLISHERS["theaircurrent.com"],
+    "airline weekly": BENCHMARK_PUBLISHERS["airlineweekly.com"],
+    "airlineweekly": BENCHMARK_PUBLISHERS["airlineweekly.com"],
+    "ned russell": BENCHMARK_PUBLISHERS["airlineweekly.com"],
 })
 
 DISALLOWED_HOSTS = {"youtube.com", "youtu.be", "facebook.com", "instagram.com", "tiktok.com"}
@@ -751,6 +777,7 @@ DISALLOWED_HOSTS = {"youtube.com", "youtu.be", "facebook.com", "instagram.com", 
 CIVIL_AVIATION_TITLE_PATTERN = re.compile(
     r"\b(?:"
     r"airline|airlines|airways|airliner|airliners|aviation|"
+    r"the\s+air\s+current|jon\s+ostrower|ned\s+russell|airline\s+weekly|dominic\s+gates|"
     r"flight|flights|flying|flier|flyer|frequent-flier|frequent\s+flyer|"
     r"airport|airports|airspace|air\s+traffic|atc|faa|easa|iata|icao|eurocontrol|"
     r"oag|cirium|ideaworks|ideaworkscompany|capa|ch-aviation|"
@@ -826,6 +853,11 @@ GOOGLE_NEWS_QUERIES = (
         "OR site:prnewswire.com OR site:globenewswire.com OR site:businesswire.com) "
         "(airline OR airlines OR airbus OR boeing OR aircraft OR fleet OR engine OR route) when:3d",
     ),
+    (
+        "analyst_radar",
+        "(\"The Air Current\" OR \"Jon Ostrower\" OR \"Ned Russell\" OR \"Airline Weekly\" OR \"Dominic Gates\" OR site:theaircurrent.com) "
+        "(airline OR aircraft OR fleet OR route OR boeing OR airbus OR FAA) when:3d",
+    ),
 )
 
 DEEP_MORNING_QUERIES = (
@@ -892,6 +924,7 @@ GROUP A — Mandatory Aviation Intelligence, Benchmark & Flagship Forecast Sourc
 GROUP B — Global Wire, Financial, Official Airline/OEM & Press Wire Sources (Civil Aviation / Airlines Only):
 7. Reuters (reuters.com), Bloomberg (bloomberg.com), Financial Times (ft.com), The Wall Street Journal (wsj.com), Associated Press (apnews.com), CNBC (cnbc.com), Aviation Week (aviationweek.com), Nikkei Asia (asia.nikkei.com).
 8. Official Airline & OEM Newsrooms / Press Wires: Turkish Airlines (turkishairlines.com), IAG (iairgroup.com), Air France-KLM (airfranceklm.com), Qatar Airways (qatarairways.com), Etihad (etihad.com), United (united.com), Qantas, IndiGo, Air India, LATAM, Airbus (airbus.com), Boeing (boeing.com), Embraer (embraer.com), RTX/Pratt & Whitney (rtx.com), Safran (safran-group.com), Rolls-Royce (rolls-royce.com), PR Newswire (prnewswire.com), GlobeNewswire (globenewswire.com), Business Wire (businesswire.com).
+9. Aviation Intelligence & Analyst Radar (Flash Alerts): The Air Current (theaircurrent.com, Jon Ostrower), Airline Weekly (airlineweekly.com, Ned Russell), Dominic Gates.
 
 Rules:
 - Include ONLY real, verifiable civil aviation / airline items published between {cutoff_str} and {today_str}. Never invent URLs, titles, dates, or figures.
@@ -1059,6 +1092,8 @@ def _build_article(title, url, description, publisher, published_at, now, classi
     if _story_lifecycle.is_strategic_report(article):
         article["strategic_publication"] = True
         article["is_strategic_report"] = True
+    if _story_lifecycle.is_flash_alert(article):
+        article["is_flash_alert"] = True
     return article
 
 
@@ -1140,6 +1175,29 @@ def collect_google_news_rss(now, cutoff, classify_topics_fn=None, opener=urllib.
     with ThreadPoolExecutor(max_workers=min(8, len(queries)), thread_name_prefix="benchmark-rss") as pool:
         for batch in pool.map(_run_one, queries):
             collected.extend(batch)
+
+    # Parallel URL unshortening: resolve news.google.com links directly to publisher articles
+    google_news_articles = [a for a in collected if "news.google.com" in str(a.get("link", ""))]
+    if google_news_articles:
+        def _unshorten_item(article):
+            curr_link = article.get("link", "")
+            resolved = unshorten_google_news_url(curr_link, timeout=5, opener=opener)
+            if resolved and resolved != curr_link:
+                article["link"] = resolved
+                if article.get("source") in {"Google News", "Unknown", ""}:
+                    meta = resolve_publisher_meta(resolved)
+                    if meta:
+                        article["source"] = meta["name"]
+                        article["category_hint"] = meta["category_hint"]
+                        article["source_type"] = meta["source_type"]
+                        article["official"] = meta["official"]
+                        article["region"] = meta["region"]
+                        article["tier"] = meta["tier"]
+                        article["reliability_weight"] = meta["reliability_weight"]
+
+        with ThreadPoolExecutor(max_workers=min(12, len(google_news_articles)), thread_name_prefix="rss-unshorten") as pool:
+            list(pool.map(_unshorten_item, google_news_articles))
+
     return collected
 
 

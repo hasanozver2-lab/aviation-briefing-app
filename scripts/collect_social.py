@@ -78,7 +78,9 @@ def read_account(account, session, runner=subprocess.run, now=None):
         if not published or published < cutoff:
             continue
         post_id, text, _ = fields
-        posts.append({"id": post_id, "airline": account["airline"], "airline_code": account["airline_code"], "platform": account["platform"], "handle": account["handle"],
+        posts.append({"id": post_id, "airline": account.get("airline", ""), "airline_code": account.get("airline_code", ""),
+                      "author": account.get("author", ""), "role": account.get("role", ""),
+                      "platform": account["platform"], "handle": account["handle"],
                       "text": text, "link": f"https://x.com/{account['handle']}/status/{post_id}", "published_at": published.isoformat(timespec="seconds")})
     return posts, "" if posts else "no recent original posts"
 

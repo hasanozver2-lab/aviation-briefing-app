@@ -170,6 +170,8 @@
     .report-dps-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 2px; }
     .report-dp-chip { font: 600 11.5px/1 var(--mono); padding: 5px 8px; background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 3px; color: var(--ink); }
     .report-view-link { color: var(--ink); }
+    .flash-alert-badge { font: 700 10px/1 var(--sans); background: #B91C1C; color: #fff; padding: 3px 6px; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; vertical-align: middle; }
+    .flash-alert-banner { background: #FEF2F2; border: 1px solid #FCA5A5; border-left: 4px solid #B91C1C; padding: 10px 14px; border-radius: 3px; font: 400 13px/1.4 var(--sans); color: #991B1B; margin: 4px 0 8px; }
 
     .ios-prompt { margin: 12px var(--pad) 0; padding: 12px 14px; background: var(--ink); color: var(--paper); display: flex; gap: 12px; align-items: flex-start; font: 400 13px/1.4 var(--sans); }
     .ios-prompt[hidden] { display: none; }
@@ -316,8 +318,10 @@
     function tagsHtml(story, withRegion) {
       const badges = state.page === "archive" ? new Set() : badgeSet(story);
       const level = LEVEL_LABELS[story.level];
+      const isFlash = Boolean(story && (story.is_flash_alert || (story.badges && story.badges.includes("flash_alert"))));
       return [
         isUnverified(story) ? `<span lang="en">Source not checked</span>` : "",
+        isFlash ? `<span lang="en" class="flash-alert-badge">⚡ FLASH ALERT</span>` : "",
         level ? `<span lang="en" class="lvl-${escapeHtml(story.level)}">${level}</span>` : "",
         badges.has("breaking") ? `<span lang="en" class="breaking">Breaking</span>` : "",
         badges.has("new") ? `<span lang="en" class="new">New</span>` : "",
@@ -758,6 +762,7 @@
           <div class="kicker">${tagsHtml(s, true)}</div>
           <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
           <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+          ${s.is_flash_alert ? `<div class="flash-alert-banner" lang="tr"><strong>⚡ Sektör Radarı (Kısa Sinyal):</strong> Kritik havacılık analistleri ve sektör radarı kaynaklı hızlı gelişme.</div>` : ""}
           ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
           ${isUnverified(s) ? `<p class="art-src" lang="en">This collected headline has not been independently checked. No verified publisher link or analysis is available; please check the named publisher yourself.</p>` : ""}
           ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}

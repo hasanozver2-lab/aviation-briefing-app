@@ -329,3 +329,59 @@ def test_morning_deep_reset_at_08_local_and_subsequent_3h_appends():
     assert day_11.get("morning_reset_at") == story_lifecycle.to_iso(t_08_local)
 
 
+def test_collect_google_news_rss_unshortens_links_and_ingests_analyst_radar(monkeypatch):
+    rss_xml = """<rss version="2.0"><channel>
+      <item>
+        <title>Boeing 737 MAX certification flights pick up pace - Reuters</title>
+        <link>https://news.google.com/rss/articles/CBMi_test123</link>
+        <pubDate>Sun, 18 Oct 2026 08:00:00 GMT</pubDate>
+        <description>Flight tests continue for European and FAA review.</description>
+        <source url="https://www.reuters.com">Reuters</source>
+      </item>
+      <item>
+        <title>The Air Current: New FAA AD issued for high-cycle narrowbodies</title>
+        <link>https://theaircurrent.com/aviation-safety/new-faa-ad-narrowbody</link>
+        <pubDate>Sun, 18 Oct 2026 08:15:00 GMT</pubDate>
+        <description>FAA directive affects fleet engines and airframes.</description>
+        <source url="https://theaircurrent.com">The Air Current</source>
+      </item>
+    </channel></rss>"""
+
+    class MockResponse:
+        def __init__(self, data):
+            self.data = data.encode("utf-8") if isinstance(data, str) else data
+        def read(self):
+            return self.data
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+
+    def mock_opener(req, timeout=None, context=None):
+        url = req.full_url if hasattr(req, "full_url") else str(req)
+        if "news.google.com/rss/search" in url:
+            return MockResponse(rss_xml)
+        if "news.google.com/rss/articles" in url:
+            return MockResponse('<div data-n-a-sg="sg1" data-n-a-ts="100"></div>')
+        if "batchexecute" in url:
+            return MockResponse(')]}\'\n[["wrb.fr","Fbv4je","[\\"garturlres\\",\\"https://www.reuters.com/business/aerospace/boeing-737-max-flights\\"]",null,null,null,"generic"]]')
+        raise ValueError("Unexpected url: " + url)
+
+    monkeypatch.setattr(benchmark_search, "GOOGLE_NEWS_QUERIES", (("reuters", "query"),))
+    monkeypatch.setattr(benchmark_search, "collection_config", lambda: {"allow_google_news": True})
+
+    articles = benchmark_search.collect_google_news_rss(NOW, CUTOFF, opener=mock_opener)
+    assert len(articles) == 2
+    reuters_art = next(a for a in articles if "Reuters" in a["source"])
+    analyst_art = next(a for a in articles if "The Air Current" in a["source"])
+
+    # Google News opaque redirect link was unshortened to direct publisher URL
+    assert reuters_art["link"] == "https://www.reuters.com/business/aerospace/boeing-737-max-flights"
+
+    # Analyst Radar item is tagged as flash alert
+    assert analyst_art["is_flash_alert"] is True
+    assert analyst_art["source"] == "The Air Current"
+    assert analyst_art["tier"] == 2
+
+
+
