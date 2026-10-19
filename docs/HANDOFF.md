@@ -1,5 +1,12 @@
 # AeroBrief — HANDOFF
 
+## Verified coverage recovery — 2026-10-19
+
+- The source-integrity filter hid legitimate-looking legacy headlines together with unverified ones. Do not relax publisher policy or restore generated facts: `api/source_recovery.py` reconciles archived search-only stories against the full pool of currently collected, active/public CSV publisher candidates, before selection caps. Matching requires near-identical publisher titles, compatible quantities and a real publication timestamp within the configured date window (`config/source_recovery.json`).
+- A confirmed match keeps its permanent story ID and first_seen_at; its publication date and factual inputs come from the direct candidate. Unsupported narrative fields are discarded and narrative_status becomes pending. Repeating reconciliation is idempotent. Unverified/excluded archived stories are not sent to the narrator.
+- The API also returns `verification_pending_stories` and `verification_pending_count`: only previously archived publisher-title metadata, without model prose, links, scores or badges. The UI shows a separate “Awaiting source verification” area; these titles do not inflate the verified briefing count. Daily pending titles follow the Istanbul publication-day filter; dated archives preserve their original contents. Policy-restricted publishers, investment commentary and military/road incidents remain excluded from the waiting area too.
+- No new source is activated, no Google News request is made, and no archive record is deleted. Recovery is conditional on genuine publisher evidence: a waiting title is not a verified event and is never advertised as newly confirmed.
+
 ## Archive UI — 2026-10-19
 
 - `feature/briefing-archive` builds on `feature/source-integrity-history` (neither merged into main yet). Added an Archive navigation item and accessible date picker with previous/next-day controls, bounded by today's Istanbul date.

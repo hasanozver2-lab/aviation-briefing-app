@@ -43,6 +43,9 @@ def archive_page(browser, request):
     page.on("pageerror", lambda error: errors.append(str(error)))
     today = payload(TODAY.isoformat(), [story("today", "Today's airline story"),
                                        story("report", "Strategic report", is_strategic_report=True)])
+    today["verification_pending_count"] = 1
+    today["verification_pending_stories"] = [{"story_id": "pending", "headline": "Publisher headline <unsafe>",
+                                              "reported_source": "Trade press", "language": "en"}]
     archived = payload(YESTERDAY, [story("old", "Previously collected airline story"),
                                   story("low", "Lower-score archived story", level="low", listed=False)])
 
@@ -120,4 +123,20 @@ def test_archive_controls_fit_viewport(archive_page):
     page.goto("https://archive.test/?archive=" + YESTERDAY, wait_until="networkidle")
     playwright.expect(page.locator("#archive-status")).to_contain_text("2 stories")
     assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    assert not errors
+
+
+def test_pending_headlines_are_separate_safe_and_hidden_on_other_pages(archive_page):
+    page, errors, requests = archive_page
+    page.goto("https://archive.test/", wait_until="networkidle")
+    panel = page.locator("#verification-pending")
+    playwright.expect(panel).to_be_visible()
+    playwright.expect(panel).to_contain_text("Publisher headline <unsafe>")
+    assert panel.locator("a, unsafe, .breaking, .new, [data-open]").count() == 0
+    playwright.expect(page.locator("#counts")).to_contain_text("1 awaiting verification")
+    page.locator('[data-page="reports"]').click()
+    playwright.expect(panel).to_be_hidden()
+    page.locator('[data-page="archive"]').click()
+    playwright.expect(page.locator("#archive-status")).to_contain_text("2 stories")
+    playwright.expect(panel).to_be_hidden()
     assert not errors

@@ -33,6 +33,7 @@ try:
     from . import benchmark_search
     from . import safety_context
     from . import source_catalog
+    from . import source_recovery
     from .urls import canonicalize_url
 except ImportError:
     import source_registry
@@ -47,6 +48,7 @@ except ImportError:
     import benchmark_search
     import safety_context
     import source_catalog
+    import source_recovery
     from urls import canonicalize_url
 
 # Windows cp1254 encoding fix
@@ -1129,6 +1131,7 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
         "market": market_panel,
         "articles": len(articles),
         "candidates": len(candidates),
+        "verification_candidates": candidates,
         "source_report": source_report,
         "morning_deep_scan": is_deep,
     }
@@ -1216,6 +1219,9 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
     snapshot["last_pipeline_run_at"] = snapshot.get("last_pipeline_run_at") or snapshot.get("generated_at", "")
     is_archive = bool(snapshot.get("date"))
     if is_archive:
+        pending_date = today if date is None else None
+        snapshot["verification_pending_stories"] = source_recovery.pending_titles(snapshot, pending_date)
+        snapshot["verification_pending_count"] = len(snapshot["verification_pending_stories"])
         # Current exclusion lists apply at read time; nothing is removed from the archive file itself.
         snapshot["excluded_count"] = story_lifecycle.drop_excluded(snapshot)
         snapshot = story_lifecycle.present_stories(snapshot, now, config)
