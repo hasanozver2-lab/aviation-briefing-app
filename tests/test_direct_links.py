@@ -54,7 +54,7 @@ def test_the_waiting_headline_list_is_not_served_unless_switched_on(monkeypatch)
 def test_the_page_renders_the_original_source_link_for_every_story():
     page = open("public/index.html", encoding="utf-8").read()
     assert "Original source:" in page and "safeExternalUrl(src.url)" in page
-    assert ".flash-alert-badge" in page and "⚡ FLASH ALERT" in page
+    assert ".flash-alert-badge" in page and ">FLASH ALERT<" in page
 
 
 def test_unshorten_google_news_url_resolves_to_direct_publisher():
