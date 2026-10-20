@@ -28,6 +28,7 @@ DEFAULT_DATABASE_PATH = BASE_DIR / "data" / "pipeline.sqlite3"
 EIA_SPOT_ENDPOINT = "https://api.eia.gov/v2/petroleum/pri/spt/data/"
 FRED_OBSERVATIONS_ENDPOINT = "https://api.stlouisfed.org/fred/series/observations"
 FRED_GRAPH_CSV_ENDPOINT = "https://fred.stlouisfed.org/graph/fredgraph.csv"
+YAHOO_BRENT_ENDPOINT = "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F"
 FUEL_SERIES = ("brent_spot", "us_gulf_coast_jet_fuel")
 GALLONS_PER_BARREL = 42
 ECB_EXR_ENDPOINT = "https://data-api.ecb.europa.eu/service/data/EXR"
@@ -161,6 +162,39 @@ def fetch_fred_series(series_id, api_key, start_date, end_date):
     return fetch_fred_series_keyless(series_id, start_date, end_date)
 
 
+def fetch_live_brent(timeout=8):
+    """Fetch recent daily closing observations for Brent Crude Futures (BZ=F) from Yahoo Finance.
+
+    Returns a list of (date, value) tuples sorted by date. On any network or parsing failure,
+    returns an empty list so callers safely fall back to retrospective FRED/EIA data.
+    """
+    url = f"{YAHOO_BRENT_ENDPOINT}?range=1mo&interval=1d"
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json",
+    }
+    try:
+        payload = _json_request(url, headers=headers, timeout=timeout)
+        result = payload.get("chart", {}).get("result", [])
+        if not result:
+            return []
+        item = result[0]
+        timestamps = item.get("timestamp", [])
+        quotes = item.get("indicators", {}).get("quote", [{}])[0].get("close", [])
+        observations = []
+        for ts, close in zip(timestamps, quotes):
+            if close is None:
+                continue
+            obs_date = datetime.fromtimestamp(ts, tz=timezone.utc).date()
+            observations.append((obs_date, round(float(close), 2)))
+        return sorted(observations)
+    except Exception:
+        return []
+
+
 def ecb_fx_url(start_date, end_date):
     currencies = "+".join(("USD",) + FX_CURRENCIES[1:])
     key = f"D.{currencies}.EUR.SP00.A"
@@ -237,7 +271,7 @@ def apply_display_settings(market):
 
 
 def provider_label(provider):
-    return load_market_config()["providers"][provider]
+    return load_market_config()["providers"].get(provider, provider)
 
 
 def market_series_definitions(provider_by_series=None):
@@ -746,7 +780,7 @@ def _fetch_fuel_series(fetch, series_key, config, today, start):
     return {series_id: fetch(config[series_id][series_key], start, today) for series_id in FUEL_SERIES}
 
 
-def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=None, gemini_api_key="", fred_api_key=""):
+def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=None, gemini_api_key="", fred_api_key="", live_brent=None):
     """Fetch, persist, calculate, and emit deterministic market signals for a pipeline run.
 
     Fuel series: EIA when EIA_API_KEY is set, with FRED as the fallback; FRED alone otherwise. A missing
@@ -781,6 +815,19 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
     provider_by_series = {series_id: fuel_provider for series_id in FUEL_SERIES} if fuel_provider else {}
     if observations:
         upsert_observations(target, observations, provider_by_series=provider_by_series)
+    should_live_brent = (
+        bool(live_brent)
+        if live_brent is not None
+        else (os.environ.get("ENABLE_LIVE_BRENT", "").strip().lower() in ("1", "true", "yes"))
+    )
+    if should_live_brent and (end_date is None or end_date >= utc_now().date()):
+        try:
+            live_brent_rows = fetch_live_brent()
+            if live_brent_rows:
+                provider_by_series["brent_spot"] = "ice"
+                upsert_observations(target, {"brent_spot": live_brent_rows}, provider_by_series=provider_by_series)
+        except Exception as exc:
+            errors.append(f"LiveBrent: {type(exc).__name__}")
     panel, indicators = build_market_panel(target, provider_by_series)
     panel["errors"] = errors
     panel["skipped"] = skipped

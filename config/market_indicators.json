@@ -31,7 +31,8 @@
   "providers": {
     "eia": "U.S. Energy Information Administration",
     "fred": "FRED (EIA)",
-    "_doc": "EIA is primary when EIA_API_KEY is set; otherwise (or when EIA fails) FRED serves the same EIA series. FRED uses FRED_API_KEY when set, else the keyless fredgraph.csv."
+    "ice": "ICE Futures (Piyasa Kapanışı)",
+    "_doc": "EIA is primary when EIA_API_KEY is set; otherwise (or when EIA fails) FRED serves the same EIA series. FRED uses FRED_API_KEY when set, else the keyless fredgraph.csv. ICE Futures Europe provides daily market closes for Brent crude (BZ=F)."
   },
   "market": {
     "display_fx": false,

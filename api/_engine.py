@@ -1121,7 +1121,7 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
     entity_index = entities.EntityIndex.from_csv()
     entities.sync_entities(local_market_database)
     # Commentary on market events stays template-based: it keeps the run's LLM budget for story narratives.
-    market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="", fred_api_key=_env_value("FRED_API_KEY"))
+    market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="", fred_api_key=_env_value("FRED_API_KEY"), live_brent=True)
     source_report = {}
     articles = fetch_rss_items(max_hours=48, report=source_report, recovered=recovered)
     if not articles:
@@ -1179,6 +1179,7 @@ def run_pipeline(mode="daily", market_database=None):
         eia_api_key=_env_value("EIA_API_KEY"),
         fred_api_key=_env_value("FRED_API_KEY"),
         gemini_api_key=GEMINI_API_KEY,
+        live_brent=True,
     )
     articles = fetch_rss_items(max_hours=48 if mode == "daily" else 2)
     market_data.record_article_events(local_market_database, articles)

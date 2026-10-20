@@ -126,3 +126,43 @@ def test_a_failing_keyed_call_falls_back_to_keyless_without_leaking_the_key(monk
 def test_the_workflow_passes_the_fred_secret_by_reference_only():
     workflow = (market_data.BASE_DIR / ".github" / "workflows" / "briefing-pipeline.yml").read_text(encoding="utf-8")
     assert "FRED_API_KEY: ${{ secrets.FRED_API_KEY }}" in workflow
+
+
+def test_fetch_live_brent_parses_quotes(monkeypatch):
+    mock_payload = {
+        "chart": {
+            "result": [{
+                "timestamp": [1729425600, 1729512000],
+                "indicators": {
+                    "quote": [{
+                        "close": [109.55, 109.96]
+                    }]
+                }
+            }]
+        }
+    }
+    monkeypatch.setattr(market_data, "_json_request", lambda *a, **k: mock_payload)
+    rows = market_data.fetch_live_brent()
+    assert len(rows) == 2
+    assert rows[1][1] == 109.96
+
+
+def test_fetch_live_brent_network_failure_returns_empty_list(monkeypatch):
+    monkeypatch.setattr(market_data, "_json_request", lambda *a, **k: (_ for _ in ()).throw(TimeoutError()))
+    assert market_data.fetch_live_brent() == []
+
+
+def test_refresh_market_data_with_live_brent(tmp_path, calls, monkeypatch):
+    live_quotes = [(TODAY - timedelta(days=1), 109.55), (TODAY, 109.96)]
+    monkeypatch.setattr(market_data, "fetch_live_brent", lambda: live_quotes)
+    monkeypatch.setattr(market_data, "utc_now", lambda: datetime(TODAY.year, TODAY.month, TODAY.day, 12, tzinfo=timezone.utc))
+
+    panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", end_date=TODAY, live_brent=True)
+    brent = item(panel, "brent_spot")
+    assert brent["value"] == 109.96
+    assert brent["as_of"] == TODAY.isoformat()
+    assert brent["source"] == "ICE Futures (Piyasa Kapanışı)"
+    assert brent["carried_forward"] is False
+    assert brent["age_days"] == 0
+    assert panel["fuel_provider"] == "fred"
+    assert item(panel, "us_gulf_coast_jet_fuel")["source"] == "FRED (EIA)"
