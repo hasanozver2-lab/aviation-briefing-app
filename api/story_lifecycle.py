@@ -361,10 +361,16 @@ def enrich_stories(stories, articles, relevance_config=None):
         score, components = score_article(article, max(1, len(publishers)), config)
         published = article.get("timestamp")
         img = str(story.get("image_url") or article.get("image_url") or "")
+        body = str(story.get("article_body") or article.get("article_body") or story.get("source_description") or "")
         if not img:
             for member in members:
                 if member.get("image_url"):
                     img = str(member["image_url"])
+                    break
+        if not body:
+            for member in members:
+                if member.get("article_body"):
+                    body = str(member["article_body"])
                     break
         story.update({
             "story_id": story.get("id") or stable_story_id(source.get("url"), story.get("headline")),
@@ -377,6 +383,7 @@ def enrich_stories(stories, articles, relevance_config=None):
             "is_flash_alert": bool(is_flash_alert(story) or is_flash_alert(article)),
             "publication_date_status": article.get("publication_date_status", "verified" if published else "unknown"),
             "image_url": img,
+            "article_body": body,
         })
         story["language"] = language.story_language(story)
     return stories
@@ -743,6 +750,8 @@ def _apply_incoming(target, story, now_iso, config):
                 target[key] = story[key]
     if not target.get("image_url") and story.get("image_url"):
         target["image_url"] = story["image_url"]
+    if not target.get("article_body") and story.get("article_body"):
+        target["article_body"] = story["article_body"]
     new_sources = [entry for entry in story.get("sources", []) if canonicalize_url(entry.get("url")) not in known]
     old_score = float(target.get("relevance_score", 0))
     score_changed = abs(float(story.get("relevance_score", 0)) - old_score) >= config["updated"]["min_score_change"]

@@ -46,6 +46,13 @@ Rules:
 - Numbers, dates, names, aircraft types, airport and airline codes come from the item and are never changed, converted, rounded or re-spelled by the translation. market_exposure impact stays one of the English labels listed below.
 - For "tr", write natural Turkish as an aviation professional would (havayolu, uçuş, hat, filo, sefer, yolcu); avoid word-for-word English calques. Established industry terms may stay as they are (ASK, RPK, doluluk oranı, yield, slot, codeshare, MRO, SAF).
 - An item with basis "headline_only" comes from a press headline feed: only its title and a short summary exist. Write only what they state, in your own words. Do not add any number, date, percentage, count, price, ranking or other figure that is not literally in the title or summary, and never estimate one. data_points holds only figures that appear literally in the title or summary, otherwise [].
+- CRITICAL FOCUS ON DATA & METRICS ANALYSIS:
+  * If the item contains concrete numbers, figures, percentages, financial amounts, dates, aircraft orders, or passenger/seat capacities:
+    - Extract each exact figure into `data_points` (e.g. ['42,060 yeni uçak', '+%2.7 haftalık düşüş', '$1.3 milyar']).
+    - In `detailed_analysis`, write bullets that STRICTLY analyze and contextualize those specific data points (explaining what each number means for the airline or industry, comparisons, capacity or cost implications).
+  * If the item contains NO concrete figures or metrics:
+    - `data_points` MUST be empty `[]`.
+    - `detailed_analysis` MUST be empty `[]` or at most 1 concise bullet stating the confirmed action (never invent filler speculation).
 - Return pure JSON: {"stories": [ ... ]} with exactly one object per input item, using the item's story_id unchanged.
 Each object has: story_id, headline (one concise factual headline), lead (one or two sentences), detailed_analysis (3 to 5 short bullet strings), data_points (array of concrete figures quoted from the item; empty when there are none), strategic_impact (one or two sentences on capacity, demand, revenue, cost, competition or operations), market_exposure (array of {carrier, impact, details} for named carriers, airports or manufacturers only; impact is one of Positive, Negative, Neutral, Competitive Headwind), why_it_matters (one consequence-focused sentence)."""
 

@@ -447,6 +447,16 @@ def clean_html(raw_html):
     return " ".join(unescape(clean).split()).strip()
 
 
+def clean_html_paragraphs(raw_html):
+    """HTML etiketlerini temizler ancak paragraf geçişlerini korur."""
+    if not raw_html:
+        return ""
+    text = re.sub(r'</?(?:p|div|br|li|h[1-6])[^>]*>', '\n\n', raw_html, flags=re.IGNORECASE)
+    clean = re.sub(r'<.*?>', ' ', text)
+    paragraphs = [re.sub(r'\s+', ' ', unescape(p)).strip() for p in clean.split('\n\n')]
+    return '\n\n'.join(p for p in paragraphs if len(p) > 10).strip()
+
+
 def _local_name(tag):
     return tag.rsplit("}", 1)[-1].lower()
 
@@ -561,7 +571,7 @@ def fetch_og_image(url, timeout=2.5):
 
 def entry_values(entry, include_description=True):
     title = _child_text(entry, {"title"})
-    description = _child_text(entry, {"description", "summary", "content"}) if include_description else ""
+    description = _child_text(entry, {"encoded", "description", "summary", "content"}) if include_description else ""
     link = _child_text(entry, {"link"})
     if not link:
         for child in list(entry):
@@ -633,12 +643,15 @@ def _fetch_source_articles(source, cutoff, headers):
             if is_html_source:
                 title = item.get("title", "")
                 link = item.get("link", "")
-                description = ""
+                description = item.get("description", "")
                 pub_date = item.get("pub_date", "")
                 image_url = item.get("image_url", "")
+                raw_body = description
             else:
                 title, link, description, pub_date = entry_values(item, include_description=not is_paid_source)
                 image_url = extract_entry_image(item)
+                raw_body = _child_text(item, {"encoded", "content", "description", "summary"})
+                raw_body = clean_html_paragraphs(raw_body) if raw_body else description
 
             if not title or not link:
                 continue
@@ -693,6 +706,7 @@ def _fetch_source_articles(source, cutoff, headers):
                 "pub_date": pub_str,
                 "timestamp": pub_ts,
                 "image_url": image_url,
+                "article_body": raw_body,
             }
             if feed_only:
                 article["basis"] = feed_sources.BASIS_HEADLINE_ONLY
@@ -1159,6 +1173,7 @@ def build_candidate_story(article, index=1):
         # A headline-only source's summary is used once to write the model's own summary; it is never published as the lead.
         "lead": "" if article.get("basis") else str(article.get("description", ""))[:400],
         "source_description": str(article.get("description", "")),
+        "article_body": str(article.get("article_body") or article.get("description", "")),
         "detailed_analysis": [],
         "data_points": [],
         "strategic_impact": "",
@@ -1200,6 +1215,7 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
             story.pop(key, None)
         story["lead"] = str(article.get("description", ""))
         story["image_url"] = str(article.get("image_url") or "")
+        story["article_body"] = str(article.get("article_body") or article.get("description", ""))
         stories.append(story)
     status = "degraded" if stories else "unavailable"
     return build_briefing_payload(mode, stories, status=status, warning=warning)
