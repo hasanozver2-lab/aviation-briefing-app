@@ -424,14 +424,14 @@
     function fmtChange(v) { const n = Number(v); if (!Number.isFinite(n)) return ""; return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(1) + "%"; }
     function showToast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2500); }
 
-    async function loadBriefing(requestLatest = false) {
+    async function loadBriefing(requestLatest = true) {
       const requestId = ++briefingRequestId;
       const keepsCurrent = requestLatest && state.data;
       if (!keepsCurrent) $("content").innerHTML = `<div class="state">${LOADING_TEXT}</div>`;
       try {
-        const cacheBuster = requestLatest ? `?view=${Date.now()}` : "";
+        const cacheBuster = `?t=${Date.now()}`;
         const res = await fetch(`${BRIEFING_URL}${cacheBuster}`, {
-          cache: requestLatest ? "no-store" : "default",
+          cache: "no-store",
           headers: { "Accept": "application/json" }
         });
         if (!res.ok) throw new Error("HTTP error " + res.status);
@@ -1168,7 +1168,7 @@
       state.polling = true;
       state.lastPoll = Date.now();
       try {
-        const res = await fetch(BRIEFING_URL, { cache: "default", headers: { "Accept": "application/json" } });
+        const res = await fetch(`${BRIEFING_URL}?t=${Date.now()}`, { cache: "no-store", headers: { "Accept": "application/json" } });
         if (!res.ok || !(res.headers.get("content-type") || "").includes("application/json")) return;
         const data = await res.json();
         applyPolled(data);
@@ -1206,7 +1206,7 @@
         if (Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing();
       });
       checkForNewVersion();
-      $("btn-share").addEventListener("click", shareBriefing);
+$("btn-share").addEventListener("click", shareBriefing);
       const airspaceBannerBtn = $("airspace-banner-btn");
       if (airspaceBannerBtn) airspaceBannerBtn.addEventListener("click", () => setPage("airspace"));
       document.querySelector(".page-nav").addEventListener("click", (e) => {

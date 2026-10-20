@@ -11,7 +11,7 @@ import ipaddress
 import mimetypes
 import urllib.parse
 from pathlib import Path
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
 # Windows cp1254 encoding fix
 if hasattr(sys.stdout, 'reconfigure'):
@@ -87,7 +87,7 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
             if index_path.exists():
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
-                self.send_header("Cache-Control", "no-cache")
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
                 self.end_headers()
                 self.wfile.write(index_path.read_bytes())
                 return
@@ -174,7 +174,7 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
 def run_server(port=8090):
     local_ip = get_local_ip()
     server_address = ('0.0.0.0', port)
-    httpd = HTTPServer(server_address, BriefingRequestHandler)
+    httpd = ThreadingHTTPServer(server_address, BriefingRequestHandler)
     
     print("\n" + "="*60)
     print("✈️  AVIATION BRIEFING — iOS & MOBILE EXECUTIVE APP")
