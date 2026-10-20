@@ -20,7 +20,8 @@ def page(relative_path=INDEX):
 
 
 def css_color(name, html):
-    return re.search(rf"--{name}:\s*(#[0-9A-Fa-f]{{6}})", html).group(1)
+    value = re.search(rf"--{name}:\s*(#[0-9A-Fa-f]{{6}}|var\(--[a-z0-9-]+\))", html).group(1)
+    return css_color(value[6:-1], html) if value.startswith("var(") else value
 
 
 def luminance(hex_color):

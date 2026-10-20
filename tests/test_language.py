@@ -216,7 +216,7 @@ def test_the_page_marks_story_text_with_its_language_and_ui_labels_as_english():
 
 def test_the_fonts_request_covers_the_latin_extended_turkish_letters():
     html = (PROJECT_DIR / "public" / "index.html").read_text(encoding="utf-8")
-    assert "fonts.googleapis.com/css2" in html and "Newsreader" in html and "IBM+Plex+Sans" in html     # css2 serves latin-ext by unicode-range
+    assert "fonts.googleapis.com/css2" in html and "Archivo" in html and "JetBrains+Mono" in html     # css2 serves latin-ext by unicode-range
 
 
 @pytest.fixture(scope="module")
