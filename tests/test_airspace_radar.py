@@ -77,6 +77,32 @@ def test_build_zone_record():
     assert record["risk_level"] == "DO_NOT_OPERATE"
     assert record["bulletin_code"] == "CZIB-2024-01-R4"
     assert "İran" in record["restriction_tr"] or "Tehran" in record["restriction_tr"]
+    assert record["id"] == "iran"
+    assert record["lat"] > 0
+    assert record["lon"] > 0
+    assert record["svg_x"] > 0
+    assert record["svg_y"] > 0
+
+
+def test_geo_to_svg():
+    x, y = airspace_radar.geo_to_svg(0.0, 0.0)
+    assert x == 500.0
+    assert y == 250.0
+    x_north, y_north = airspace_radar.geo_to_svg(90.0, 0.0)
+    assert y_north == 0.0
+
+
+def test_global_flight_traffic():
+    traffic = airspace_radar.get_global_flight_traffic()
+    assert traffic["status"] == "ok"
+    assert traffic["daily_commercial_flights"] > 80000
+    assert traffic["active_airborne_now"] > 5000
+    assert "daily_commercial_flights_str" in traffic
+    assert "active_airborne_now_str" in traffic
+    assert len(traffic["regions"]) >= 4
+    region_ids = [r["id"] for r in traffic["regions"]]
+    assert "eurocontrol" in region_ids
+    assert "faa" in region_ids
 
 
 def test_fallback_zones():
@@ -86,6 +112,9 @@ def test_fallback_zones():
     assert "İran" in countries
     assert "Ukrayna" in countries
     assert "Lübnan" in countries
+    for z in fallbacks:
+        assert "svg_x" in z and "svg_y" in z
+        assert "id" in z
 
 
 def test_load_radar_with_xml():
@@ -97,6 +126,8 @@ def test_load_radar_with_xml():
     # Check that DO_NOT_OPERATE zones come first
     first_level = radar["zones"][0]["risk_level"]
     assert first_level == "DO_NOT_OPERATE"
+    assert "global_traffic" in radar
+    assert radar["global_traffic"]["daily_commercial_flights"] > 80000
 
 
 def test_load_radar_offline_fallback():
@@ -105,6 +136,8 @@ def test_load_radar_offline_fallback():
     assert radar["status"] == "ok"
     assert radar["total_active_zones"] >= 5
     assert radar["do_not_operate_count"] >= 3
+    assert "global_traffic" in radar
+    assert radar["global_traffic"]["daily_commercial_flights"] > 80000
 
 
 def test_ui_contract_airspace_elements():
@@ -115,3 +148,65 @@ def test_ui_contract_airspace_elements():
     assert 'id="nav-airspace-count"' in index_html
     assert 'renderAirspaceRadar' in index_html
     assert 'data-airspace-filter' in index_html
+    assert 'airspace-map-card' in index_html
+    assert 'airspace-map-svg' in index_html
+    assert 'traffic-panel' in index_html
+    assert 'data-map-zone' in index_html
+
+
+def test_airspace_radar_browser_interaction():
+    import json
+    import pytest
+    playwright = pytest.importorskip("playwright.sync_api")
+    with playwright.sync_playwright() as engine:
+        try:
+            browser = engine.chromium.launch(channel="msedge", headless=True)
+        except playwright.Error:
+            pytest.skip("MS Edge not found")
+            return
+        page = browser.new_page(viewport={"width": 1280, "height": 800})
+        errors = []
+        page.on("pageerror", lambda e: errors.append(str(e)))
+        
+        radar_data = airspace_radar.load_radar(xml_text="")
+        mock_payload = {
+            "date": "2026-10-20",
+            "date_str": "2026-10-20",
+            "stories": [],
+            "status": "ok",
+            "airspace_radar": radar_data,
+            "market": {},
+        }
+        
+        page.route("**/api/briefing*", lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body=json.dumps(mock_payload),
+        ))
+        
+        index_url = "file:///" + str((Path(__file__).resolve().parents[1] / "public" / "index.html").as_posix())
+        page.goto(index_url)
+        page.wait_for_selector(".page-nav")
+        
+        # Navigate to airspace page
+        page.click('[data-page="airspace"]')
+        page.wait_for_selector(".airspace-map-card")
+        
+        # Verify traffic panel
+        assert page.is_visible(".traffic-panel")
+        assert "Bugünkü Ticari Uçuş" in page.text_content(".traffic-panel")
+        
+        # Verify map
+        assert page.is_visible(".airspace-map-svg")
+        markers = page.query_selector_all(".map-zone-group")
+        assert len(markers) >= 5
+        
+        # Click on a map marker
+        iran_marker = page.query_selector('[data-map-zone="iran"]')
+        if iran_marker:
+            iran_marker.click(force=True)
+            page.wait_for_selector(".airspace-map-tooltip.active")
+            assert "İran" in page.text_content("#tip-title")
+        
+        assert errors == []
+        browser.close()

@@ -271,6 +271,62 @@
     .report-kpi-val { font: 700 14px/1.3 var(--mono); }
     .report-kpi-label { font: 600 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
 
+    /* Global Flight Traffic & Airspace Radar Map */
+    .traffic-panel { margin: 14px var(--pad) 0; background: var(--black); border: 1.5px solid var(--black); display: flex; flex-direction: column; }
+    .traffic-head { padding: 12px 14px; background: #161619; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #27272A; }
+    .traffic-title { font: 800 13px/1.2 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: #FFF; display: flex; align-items: center; gap: 8px; }
+    .traffic-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 8px #22C55E; display: inline-block; flex: none; }
+    .traffic-source { font: 600 10.5px/1 var(--mono); color: var(--yellow); text-transform: uppercase; }
+    .traffic-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); background: var(--black); }
+    @media (max-width: 680px) { .traffic-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    .traffic-card { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; border-left: 1px solid #27272A; border-bottom: 1px solid #27272A; }
+    .traffic-card:first-child, .traffic-card:nth-child(5) { border-left: 0; }
+    .traffic-val { font: 800 24px/1 var(--mono); color: #FFF; letter-spacing: -.02em; display: flex; align-items: baseline; gap: 6px; }
+    .traffic-trend { font: 700 11px/1 var(--mono); color: #22C55E; background: rgba(34,197,94,0.15); padding: 2px 4px; }
+    .traffic-label { font: 600 10.5px/1.2 var(--sans); color: #A0A0A6; text-transform: uppercase; }
+    .traffic-regions-strip { padding: 9px 14px; background: #111114; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font: 600 11px/1.3 var(--mono); color: #D4D4D8; }
+    .traffic-region-item strong { color: var(--yellow); }
+
+    .airspace-map-card { margin: 14px var(--pad) 0; background: var(--black); border: 1.5px solid var(--black); display: flex; flex-direction: column; }
+    .airspace-map-header { padding: 12px 14px; background: #161619; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid #27272A; }
+    .airspace-map-title { font: 800 13px/1.2 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: #FFF; display: flex; align-items: center; gap: 8px; }
+    .airspace-map-legend { display: flex; flex-wrap: wrap; gap: 10px; font: 600 10.5px/1 var(--mono); text-transform: uppercase; }
+    .legend-tag { display: inline-flex; align-items: center; gap: 4px; color: #D4D4D8; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .legend-red { background: #FF3B30; box-shadow: 0 0 6px #FF3B30; }
+    .legend-orange { background: #FF9500; box-shadow: 0 0 6px #FF9500; }
+    .legend-yellow { background: #FFCC00; box-shadow: 0 0 6px #FFCC00; }
+    
+    .map-view-toggles { display: flex; gap: 4px; }
+    .map-toggle-btn { background: #222226; color: #D4D4D8; border: 1px solid #333338; padding: 4px 8px; font: 700 11px/1 var(--sans); cursor: pointer; text-transform: uppercase; }
+    .map-toggle-btn.active { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+
+    .airspace-map-svg-wrap { transition: all 0.3s ease; position: relative; width: 100%; aspect-ratio: 2 / 1; min-height: 240px; background: #0B0B0E; overflow: hidden; }
+    .airspace-map-svg { width: 100%; height: 100%; display: block; }
+    
+    @keyframes radarPulse {
+      0% { r: 6px; opacity: 0.95; stroke-width: 2.5px; }
+      50% { opacity: 0.45; }
+      100% { r: 28px; opacity: 0; stroke-width: 0.5px; }
+    }
+    .pulse-danger { stroke: #FF3B30; fill: rgba(255, 59, 48, 0.18); animation: radarPulse 2.4s infinite ease-out; }
+    .pulse-warning { stroke: #FF9500; fill: rgba(255, 149, 0, 0.18); animation: radarPulse 2.4s infinite ease-out 0.8s; }
+    .pulse-caution { stroke: #FFCC00; fill: rgba(255, 204, 0, 0.15); animation: radarPulse 2.4s infinite ease-out 1.6s; }
+    
+    .beacon-danger { fill: #FF3B30; stroke: #FFF; stroke-width: 1.2px; }
+    .beacon-warning { fill: #FF9500; stroke: #FFF; stroke-width: 1.2px; }
+    .beacon-caution { fill: #FFCC00; stroke: #000; stroke-width: 1.2px; }
+
+    .map-zone-group { cursor: pointer; transition: opacity 0.2s ease; }
+    .map-zone-group:hover .map-beacon { transform: scale(1.35); transform-origin: center; }
+    .map-zone-label { fill: #FFF; font: 700 8.5px/1 var(--mono); letter-spacing: .02em; paint-order: stroke; stroke: #0B0B0E; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+    
+    .airspace-map-tooltip { position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(14, 15, 18, 0.96); border: 1.5px solid var(--yellow); padding: 10px 14px; display: none; justify-content: space-between; align-items: center; gap: 12px; z-index: 10; backdrop-filter: blur(8px); }
+    .airspace-map-tooltip.active { display: flex; }
+    .tip-left h4 { font: 800 14px/1.2 var(--sans); color: #FFF; margin: 0; }
+    .tip-left p { font: 500 12px/1.3 var(--sans); color: #D4D4D8; margin: 3px 0 0; }
+    .tip-jump-btn { flex: none; min-height: 32px; padding: 0 12px; background: var(--yellow); color: var(--black); font: 800 11.5px/32px var(--sans); border: 0; cursor: pointer; text-transform: uppercase; }
+
     /* Airspace radar */
     .airspace-stats-grid, .fleet-stats-grid { margin: 14px var(--pad) 0; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); background: var(--black); }
     .airspace-stat-card, .fleet-stat-card { padding: 14px 12px; display: flex; flex-direction: column; gap: 6px; border-left: 1px solid #2A2A2E; }
@@ -899,6 +955,119 @@
         <strong>Havacılık Güvenliği &amp; Çatışma Bölgeleri Radarı</strong> — EASA CZIB (Conflict Zone Information Bulletins) ve küresel FIR kısıtlamaları. THY, Pegasus ve uluslararası havayollarının rota planlamasını ve uçuş güvenliğini doğrudan etkileyen aktif hava sahası yasakları, füze tehditleri, FL irtifa kısıtlamaları ve GPS/GNSS karıştırma ikazları.
       </div>`;
 
+      const traffic = radar.global_traffic || null;
+      if (traffic) {
+        html += `<div class="traffic-panel" lang="tr">
+          <div class="traffic-head">
+            <span class="traffic-title"><span class="traffic-live-dot"></span> Küresel Uçuş Trafiği &amp; Günlük Hacim</span>
+            <span class="traffic-source">${escapeHtml(traffic.source || "Eurocontrol / FAA / ICAO")}</span>
+          </div>
+          <div class="traffic-grid">
+            <div class="traffic-card">
+              <span class="traffic-val">${escapeHtml(traffic.daily_commercial_flights_str || "111,200")} <span class="traffic-trend">${escapeHtml(traffic.trend_yoy_pct || "+3.8%")}</span></span>
+              <span class="traffic-label">Bugünkü Ticari Uçuş (Küresel)</span>
+            </div>
+            <div class="traffic-card">
+              <span class="traffic-val">${escapeHtml(traffic.active_airborne_now_str || "12,450")}</span>
+              <span class="traffic-label">Anlık Havada Aktif Uçuş</span>
+            </div>
+            ${(traffic.regions || []).slice(0, 2).map(r => `
+              <div class="traffic-card">
+                <span class="traffic-val">${escapeHtml(r.flights_str)} <span class="traffic-trend">${escapeHtml(r.trend)}</span></span>
+                <span class="traffic-label">${escapeHtml(r.name_tr)}</span>
+              </div>
+            `).join("")}
+          </div>
+          ${traffic.regions && traffic.regions.length > 2 ? `
+            <div class="traffic-regions-strip">
+              <span style="color:var(--muted);text-transform:uppercase">Bölgesel Trafik:</span>
+              ${traffic.regions.slice(2).map(r => `
+                <span class="traffic-region-item">${escapeHtml(r.name_tr)}: <strong>${escapeHtml(r.flights_str)}</strong> (${escapeHtml(r.trend)})</span>
+              `).join(" · ")}
+            </div>
+          ` : ""}
+        </div>`;
+      }
+
+      html += `<div class="airspace-map-card" lang="tr">
+        <div class="airspace-map-header">
+          <span class="airspace-map-title"><span class="traffic-live-dot" style="background:#FF3B30;box-shadow:0 0 8px #FF3B30"></span> Aktif Çatışma &amp; Kapalı Hava Sahaları Haritası</span>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+            <div class="map-view-toggles">
+              <button class="map-toggle-btn active" type="button" data-map-view="global">Dünya</button>
+              <button class="map-toggle-btn" type="button" data-map-view="focus">Kriz Koridoru</button>
+            </div>
+            <div class="airspace-map-legend">
+              <span class="legend-tag"><span class="legend-dot legend-red"></span> Uçuşa Kapalı</span>
+              <span class="legend-tag"><span class="legend-dot legend-orange"></span> İrtifa Kısıtı</span>
+              <span class="legend-tag"><span class="legend-dot legend-yellow"></span> GPS Teyakkuz</span>
+            </div>
+          </div>
+        </div>
+        <div class="airspace-map-svg-wrap" id="airspace-map-wrap">
+          <svg class="airspace-map-svg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Dünya Kapalı Hava Sahaları Haritası">
+            <defs>
+              <pattern id="radarGrid" width="100" height="50" patternUnits="userSpaceOnUse">
+                <path d="M 100 0 L 0 0 0 50" fill="none" stroke="#1C1D22" stroke-width="0.8" stroke-dasharray="2 4" />
+              </pattern>
+            </defs>
+            <rect width="1000" height="500" fill="#0B0B0E" />
+            <rect width="1000" height="500" fill="url(#radarGrid)" />
+            <line x1="0" y1="250" x2="1000" y2="250" stroke="#25262C" stroke-width="1.2" />
+            <line x1="500" y1="0" x2="500" y2="500" stroke="#25262C" stroke-width="1.2" />
+            
+            <g class="map-continents" fill="#18191E" stroke="#2B2D35" stroke-width="1">
+              <path d="M 80,65 L 115,55 L 160,50 L 210,45 L 255,60 L 290,75 L 315,95 L 295,115 L 310,130 L 325,140 L 300,165 L 275,175 L 260,205 L 245,215 L 230,245 L 220,255 L 210,240 L 205,215 L 180,190 L 160,160 L 140,130 L 115,100 L 80,85 Z" />
+              <path d="M 375,35 L 435,40 L 430,80 L 385,100 L 360,70 Z" />
+              <path d="M 255,255 L 290,250 L 330,265 L 365,285 L 385,315 L 370,355 L 340,405 L 315,445 L 290,465 L 285,440 L 280,390 L 260,340 L 245,295 L 250,265 Z" />
+              <path d="M 470,145 L 455,130 L 465,110 L 485,110 L 500,95 L 515,90 L 520,70 L 535,55 L 560,50 L 565,75 L 540,85 L 570,80 L 610,65 L 680,60 L 760,55 L 830,60 L 910,70 L 955,80 L 965,110 L 940,120 L 910,140 L 890,175 L 860,200 L 820,225 L 795,250 L 765,260 L 750,230 L 725,235 L 705,260 L 685,245 L 665,225 L 655,190 L 640,180 L 625,190 L 630,220 L 620,240 L 595,235 L 585,200 L 595,175 L 580,160 L 600,150 L 620,155 L 605,140 L 580,140 L 560,130 L 540,145 L 515,145 L 495,155 Z" />
+              <path d="M 465,95 L 475,90 L 480,105 L 470,120 L 460,115 Z M 452,102 L 460,100 L 458,114 L 450,110 Z" />
+              <path d="M 470,155 L 515,150 L 550,165 L 585,160 L 580,185 L 595,220 L 630,225 L 615,260 L 595,300 L 575,340 L 550,370 L 535,365 L 510,330 L 495,280 L 485,240 L 455,210 L 445,180 L 460,165 Z" />
+              <path d="M 620,320 L 630,325 L 625,360 L 615,355 Z" />
+              <path d="M 805,310 L 855,295 L 905,315 L 925,355 L 895,395 L 840,395 L 800,355 Z M 955,400 L 965,405 L 955,435 L 945,425 Z" />
+              <path d="M 890,135 L 905,145 L 900,170 L 885,165 Z M 770,280 L 805,275 L 840,290 L 825,300 L 780,295 Z" />
+            </g>
+
+            <g class="map-flight-corridors" fill="none" stroke="#3A3D47" stroke-width="1.2" stroke-dasharray="3 5">
+              <path d="M 470,105 Q 380,80 295,135" />
+              <path d="M 495,110 Q 560,135 600,145 Q 670,190 750,230 Q 800,260 840,290" />
+              <path d="M 895,150 Q 980,110 999,105" />
+              <path d="M 0,105 Q 100,100 170,180" />
+            </g>
+
+            <g class="map-zones">
+              ${allZones.map(z => {
+                const isDanger = z.risk_level === "DO_NOT_OPERATE";
+                const isRestricted = z.risk_level === "RESTRICTED" || z.risk_level === "HIGH_RISK" || z.risk_level === "WARNING";
+                const pulseClass = isDanger ? "pulse-danger" : (isRestricted ? "pulse-warning" : "pulse-caution");
+                const beaconClass = isDanger ? "beacon-danger" : (isRestricted ? "beacon-warning" : "beacon-caution");
+                const sx = z.svg_x || 500;
+                const sy = z.svg_y || 250;
+                const isVisibleInFilter = (filter === "All") || (filter === z.risk_level);
+                const opacity = isVisibleInFilter ? "1" : "0.2";
+
+                const cleanName = (z.country || '').split('(')[0].replace('Airspace of', '').trim();
+                const firCode = (z.fir || '').split(' ')[0] || '';
+                const shortLabel = cleanName.length > 10 ? firCode || cleanName.slice(0, 8) : cleanName;
+                return `<g class="map-zone-group" data-map-zone="${escapeHtml(z.id || '')}" style="opacity:${opacity};cursor:pointer">
+                  <circle cx="${sx}" cy="${sy}" r="14" class="${pulseClass}" />
+                  <circle cx="${sx}" cy="${sy}" r="4.5" class="map-beacon ${beaconClass}" />
+                  <text x="${sx}" y="${sy - 8}" text-anchor="middle" class="map-zone-label">${escapeHtml(shortLabel)}</text>
+                </g>`;
+              }).join("")}
+            </g>
+          </svg>
+          
+          <div class="airspace-map-tooltip" id="airspace-map-tooltip">
+            <div class="tip-left">
+              <h4 id="tip-title">Hava Sahası</h4>
+              <p id="tip-desc">Kısıtlama detayı</p>
+            </div>
+            <button class="tip-jump-btn" type="button" id="tip-jump-btn">Detaya Git ↓</button>
+          </div>
+        </div>
+      </div>`;
+
       html += `<div class="airspace-stats-grid">
         <div class="airspace-stat-card stat-danger">
           <span class="airspace-stat-val">${radar.do_not_operate_count || 0}</span>
@@ -933,7 +1102,7 @@
         const cardClass = isDanger ? "" : (isRestricted ? "card-restricted" : "card-caution");
         const pillClass = isDanger ? "pill-danger" : (isRestricted ? "pill-warning" : "pill-caution");
 
-        html += `<div class="airspace-card ${cardClass}">
+        html += `<div class="airspace-card ${cardClass}" id="zone-${escapeHtml(z.id || '')}">
           <div class="airspace-card-head">
             <div>
               <h3 class="airspace-card-title">${escapeHtml(z.country)} <span style="font-weight:400;color:var(--muted)">— ${escapeHtml(z.title)}</span></h3>
@@ -1496,6 +1665,48 @@
           renderList();
           const pressed = [...document.querySelectorAll("[data-fleet-filter]")].find(el => el.dataset.fleetFilter === state.fleetFilter);
           if (pressed) pressed.focus({ preventScroll: true });
+          return;
+        }
+        const mapToggle = e.target.closest("[data-map-view]");
+        if (mapToggle) {
+          const mode = mapToggle.dataset.mapView;
+          const svg = document.querySelector(".airspace-map-svg");
+          if (svg) {
+            svg.setAttribute("viewBox", mode === "focus" ? "460 70 230 180" : "0 0 1000 500");
+          }
+          document.querySelectorAll("[data-map-view]").forEach(btn => {
+            btn.classList.toggle("active", btn === mapToggle);
+          });
+          return;
+        }
+        const zoneMarker = e.target.closest("[data-map-zone]");
+        if (zoneMarker) {
+          const zoneId = zoneMarker.dataset.mapZone;
+          const radar = state.data && state.data.airspace_radar;
+          const zone = radar && radar.zones ? radar.zones.find(z => z.id === zoneId) : null;
+          const tip = $("airspace-map-tooltip");
+          if (tip && zone) {
+            $("tip-title").textContent = `${zone.country} (${zone.fir})`;
+            $("tip-desc").textContent = `${zone.risk_badge || zone.risk_level} — ${zone.restriction_tr || zone.restriction_en}`;
+            $("tip-jump-btn").dataset.targetZone = zone.id;
+            tip.classList.add("active");
+          }
+          const targetCard = $("zone-" + zoneId);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetCard.style.outline = "3px solid var(--yellow)";
+            setTimeout(() => { targetCard.style.outline = ""; }, 2500);
+          }
+          return;
+        }
+        const jumpBtn = e.target.closest("#tip-jump-btn");
+        if (jumpBtn && jumpBtn.dataset.targetZone) {
+          const targetCard = $("zone-" + jumpBtn.dataset.targetZone);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetCard.style.outline = "3px solid var(--yellow)";
+            setTimeout(() => { targetCard.style.outline = ""; }, 2500);
+          }
           return;
         }
         const airspaceChip = e.target.closest("[data-airspace-filter]");

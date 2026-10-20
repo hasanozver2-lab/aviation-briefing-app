@@ -1379,6 +1379,21 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode
     snapshot["market"] = market_data.apply_display_settings(snapshot.get("market"))
+    radar = snapshot.get("airspace_radar")
+    if radar and isinstance(radar, dict):
+        if not radar.get("global_traffic"):
+            radar["global_traffic"] = airspace_radar.get_global_flight_traffic(now=now)
+        for z in radar.get("zones", []):
+            if not z.get("svg_x") or not z.get("svg_y"):
+                _, meta = airspace_radar.match_known_region(z.get("title", "") or z.get("country", ""))
+                if meta:
+                    z["id"] = z.get("id") or meta.get("id", "")
+                    z["lat"] = z.get("lat") or meta.get("lat", 0.0)
+                    z["lon"] = z.get("lon") or meta.get("lon", 0.0)
+                    z["radius_km"] = z.get("radius_km") or meta.get("radius_km", 250)
+                    sx, sy = airspace_radar.geo_to_svg(z["lat"], z["lon"])
+                    z["svg_x"] = sx
+                    z["svg_y"] = sy
     if store_unreadable:
         snapshot["status"] = "stale"
         snapshot["warning"] = "The live briefing data could not be read; the last committed snapshot is shown."
