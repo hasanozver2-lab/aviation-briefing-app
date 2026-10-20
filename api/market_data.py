@@ -261,12 +261,18 @@ def apply_display_settings(market):
     """Read-time view of a stored market panel: without display_fx, no fx_usd_* items and no fx events.
 
     Archives written before the switch (or with it on) still hold FX rows; they are hidden here, not rewritten.
+    Also hides us_gulf_coast_jet_fuel from public display.
     """
-    if not isinstance(market, dict) or display_fx():
+    if not isinstance(market, dict):
         return market
     visible = dict(market)
-    visible["items"] = [item for item in market.get("items", []) if not is_fx_series(item.get("series_id"))]
-    visible["events"] = [event for event in market.get("events", []) if event.get("event_type") != "fx_currency"]
+    show_fx = display_fx()
+    visible["items"] = [
+        item for item in market.get("items", [])
+        if item.get("series_id") != "us_gulf_coast_jet_fuel" and (show_fx or not is_fx_series(item.get("series_id")))
+    ]
+    if not show_fx:
+        visible["events"] = [event for event in market.get("events", []) if event.get("event_type") != "fx_currency"]
     return visible
 
 
