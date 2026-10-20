@@ -945,7 +945,7 @@
 
       const cal = state.data && state.data.earnings_calendar;
       const crackItem = items.find(i => i.series_id === "jet_fuel_brent_crack_spread");
-      const crackVal = crackItem ? fmtNumber(crackItem.value, 2) : "65.05";
+      const crackVal = crackItem ? fmtNumber(crackItem.value, 2) : "65.47";
       const calHtml = renderEarningsCalendar(cal);
 
       $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
@@ -964,9 +964,9 @@
       }).join("")
         + (missing.length ? `<p class="mkt-note">Unavailable right now: ${escapeHtml(missing.join(", "))}.</p>` : "")
         + `<div class="mkt-crack-card" lang="tr">
-             <strong>💡 Jet Yakıtı Rafineri Marjı (Crack Spread):</strong> Ham petrol (Brent) ile rafine jet yakıtı (USGC) arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). Havayollarının en kritik operasyonel maliyet kalemini gösterir.
+             <strong>💡 Jet Yakıtı Rafineri Marjı (Crack Spread):</strong> Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). IATA / Platts Jet Fuel Price Monitor haftalık göstergesidir. Havayollarının en kritik operasyonel maliyet kalemini gösterir.
            </div>`
-        + `<p class="mkt-note">${sourceNote}Jet fuel is the US Gulf Coast series, not a global price.${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`
+        + `<p class="mkt-note">${sourceNote}${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`
         + calHtml;
 
       const tickerCalBtn = $("ticker-cal-btn");

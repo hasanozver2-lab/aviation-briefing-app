@@ -166,3 +166,47 @@ def test_refresh_market_data_with_live_brent(tmp_path, calls, monkeypatch):
     assert brent["age_days"] == 0
     assert panel["fuel_provider"] == "fred"
     assert item(panel, "us_gulf_coast_jet_fuel")["source"] == "FRED (EIA)"
+
+
+def test_parse_iata_week_ending():
+    assert market_data.parse_iata_week_ending("16 Oct 2026") == "2026-10-16"
+    assert market_data.parse_iata_week_ending("2026-10-16") == "2026-10-16"
+
+
+def test_fetch_iata_fuel_monitor_returns_cached_on_network_failure(monkeypatch):
+    monkeypatch.setattr(market_data, "IATA_FUEL_MONITOR_URL", "http://127.0.0.1:9999/nonexistent")
+    data = market_data.fetch_iata_fuel_monitor()
+    assert data is not None
+    assert data["crack_spread_bbl"] == pytest.approx(65.47)
+    assert data["as_of"] == "2026-10-16"
+    assert "IATA" in data["source"]
+
+
+def test_apply_display_settings_updates_crack_spread_to_iata(monkeypatch):
+    raw_panel = {
+        "status": "ok",
+        "items": [
+            {"series_id": "brent_spot", "value": 110.58, "as_of": "2026-10-20"},
+            {"series_id": "us_gulf_coast_jet_fuel", "value": 4.56, "as_of": "2026-10-14"},
+            {"series_id": "jet_fuel_brent_crack_spread", "value": 85.54, "as_of": "2026-10-14", "source": "FRED (EIA)"},
+        ],
+        "events": [],
+    }
+    visible = market_data.apply_display_settings(raw_panel)
+    ids = [it["series_id"] for it in visible["items"]]
+    assert "us_gulf_coast_jet_fuel" not in ids
+    assert "jet_fuel_brent_crack_spread" in ids
+
+    crack = next(it for it in visible["items"] if it["series_id"] == "jet_fuel_brent_crack_spread")
+    assert crack["value"] == pytest.approx(65.47)
+    assert crack["as_of"] == "2026-10-16"
+    assert "IATA / Platts" in crack["source"]
+
+
+def test_refresh_market_data_with_live_iata_crack(tmp_path, calls, monkeypatch):
+    monkeypatch.setattr(market_data, "utc_now", lambda: datetime(TODAY.year, TODAY.month, TODAY.day, 12, tzinfo=timezone.utc))
+    panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", end_date=TODAY, live_iata_crack=True)
+    crack = item(panel, "jet_fuel_brent_crack_spread")
+    assert crack["value"] == pytest.approx(65.47)
+    assert crack["as_of"] == "2026-10-16"
+    assert "IATA / Platts" in crack["source"]
