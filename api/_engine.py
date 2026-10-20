@@ -248,6 +248,11 @@ def extract_html_entries(content, source):
         heading = _html_text(heading_match.group(1)) if heading_match else ""
         image_match = re.search(r"<img\b(?P<attributes>[^>]*)>", body, flags=re.IGNORECASE | re.DOTALL)
         image_alt = _html_attribute(image_match.group("attributes"), "alt") if image_match else ""
+        image_src = ""
+        if image_match:
+            raw_src = _html_attribute(image_match.group("attributes"), "src") or _html_attribute(image_match.group("attributes"), "data-src")
+            if raw_src and not raw_src.startswith("data:"):
+                image_src = urllib.parse.urljoin(source["url"], raw_src)
         title = title or heading or image_alt or _html_text(body)
         description = _html_text(body)
         if heading and description.startswith(heading):
@@ -264,6 +269,7 @@ def extract_html_entries(content, source):
             "link": urllib.parse.urljoin(source["url"], href),
             "description": description[:1200],
             "pub_date": pub_date,
+            "image_url": image_src,
         })
     return entries[:20]
 
@@ -468,6 +474,91 @@ def parse_feed_entries(content):
     return []
 
 
+
+def extract_entry_image(entry):
+    """Extract an image URL from an RSS item or Atom entry.
+
+    Checks:
+    1. <enclosure> tags with image type or image file extension
+    2. <media:content> or <media:thumbnail> elements
+    3. Atom <link rel="enclosure" type="image/..." href="..." />
+    4. <img> tags embedded within <description>, <summary>, <content> or <content:encoded>
+    """
+    if entry is None:
+        return ""
+
+    def _is_image_url(u, content_type=""):
+        if not u or not isinstance(u, str):
+            return False
+        u = u.strip()
+        if not (u.startswith("http://") or u.startswith("https://")):
+            return False
+        if content_type and "image" in content_type.lower():
+            return True
+        path = urllib.parse.urlparse(u).path.lower()
+        return any(path.endswith(ext) for ext in (".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif"))
+
+    # 1. Enclosure / media / link elements
+    for child in list(entry):
+        tag = _local_name(child.tag)
+        if tag in ("enclosure", "content", "thumbnail"):
+            url = child.attrib.get("url") or child.attrib.get("href")
+            ctype = child.attrib.get("type", "")
+            medium = child.attrib.get("medium", "")
+            if url and (_is_image_url(url, ctype) or medium == "image"):
+                return unescape(url.strip())
+        elif tag == "link" and child.attrib.get("rel") == "enclosure":
+            url = child.attrib.get("href") or child.attrib.get("url")
+            ctype = child.attrib.get("type", "")
+            if url and _is_image_url(url, ctype):
+                return unescape(url.strip())
+
+    # 2. Search HTML inside text-bearing children
+    for child in list(entry):
+        tag = _local_name(child.tag)
+        if tag in ("description", "summary", "content", "encoded"):
+            text = child.text or ""
+            if "<img" in text:
+                match = re.search(r'<img\b[^>]*\bsrc=["\']([^"\']+)["\']', text, flags=re.IGNORECASE)
+                if match:
+                    src = unescape(match.group(1).strip())
+                    if src.startswith("http://") or src.startswith("https://"):
+                        return src
+
+    return ""
+
+
+def fetch_og_image(url, timeout=2.5):
+    """Attempt to extract og:image or twitter:image from an article page."""
+    if not url or not (url.startswith("http://") or url.startswith("https://")):
+        return ""
+    try:
+        headers = {"User-Agent": feed_discovery.USER_AGENT, "Accept": "text/html,application/xhtml+xml"}
+        ctx = ssl.create_default_context()
+        request = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(request, context=ctx, timeout=timeout) as response:
+            chunk = response.read(65536).decode("utf-8", errors="replace")
+        patterns = (
+            r'<meta\s+[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']',
+            r'<meta\s+[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']',
+            r'<meta\s+[^>]*name=["\']twitter:image["\'][^>]*content=["\']([^"\']+)["\']',
+            r'<meta\s+[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']twitter:image["\']',
+        )
+        for pattern in patterns:
+            match = re.search(pattern, chunk, flags=re.IGNORECASE)
+            if match:
+                img_url = unescape(match.group(1).strip())
+                if img_url.startswith("//"):
+                    img_url = "https:" + img_url
+                elif img_url.startswith("/"):
+                    img_url = urllib.parse.urljoin(url, img_url)
+                if img_url.startswith("http://") or img_url.startswith("https://"):
+                    return img_url
+    except Exception:
+        return ""
+    return ""
+
+
 def entry_values(entry, include_description=True):
     title = _child_text(entry, {"title"})
     description = _child_text(entry, {"description", "summary", "content"}) if include_description else ""
@@ -544,8 +635,10 @@ def _fetch_source_articles(source, cutoff, headers):
                 link = item.get("link", "")
                 description = ""
                 pub_date = item.get("pub_date", "")
+                image_url = item.get("image_url", "")
             else:
                 title, link, description, pub_date = entry_values(item, include_description=not is_paid_source)
+                image_url = extract_entry_image(item)
 
             if not title or not link:
                 continue
@@ -599,6 +692,7 @@ def _fetch_source_articles(source, cutoff, headers):
                 "topics": classify_topics(f"{title} {description}"),
                 "pub_date": pub_str,
                 "timestamp": pub_ts,
+                "image_url": image_url,
             }
             if feed_only:
                 article["basis"] = feed_sources.BASIS_HEADLINE_ONLY
@@ -1022,6 +1116,7 @@ def normalize_generated_briefing(briefing, mode, article_metadata=None):
                 "reliability_weight": source_article.get("reliability_weight", source.get("reliability_weight")),
             },
             "related_news": text_list(raw_story.get("related_news")),
+            "image_url": str(source_article.get("image_url") or raw_story.get("image_url") or ""),
         })
 
     return build_briefing_payload(mode, stories, status="ok")
@@ -1087,6 +1182,7 @@ def build_candidate_story(article, index=1):
         },
         "related_news": [],
         "narrative_status": "pending",
+        "image_url": str(article.get("image_url") or ""),
         **({"basis": article["basis"]} if article.get("basis") else {}),
         **({"context_demoted_from": article["context_demoted_from"]} if article.get("context_demoted_from") else {}),
     }
@@ -1103,6 +1199,7 @@ def fallback_briefing(articles, mode="daily", warning="AI analysis is unavailabl
         for key in ("source_description", "narrative_status"):
             story.pop(key, None)
         story["lead"] = str(article.get("description", ""))
+        story["image_url"] = str(article.get("image_url") or "")
         stories.append(story)
     status = "degraded" if stories else "unavailable"
     return build_briefing_payload(mode, stories, status=status, warning=warning)
@@ -1137,6 +1234,11 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
     if is_deep:
         selection_cfg["max_per_run"] = max(22, int(selection_cfg.get("max_per_run", 18)))
     selected = story_lifecycle.select_stories(candidates, selection_cfg, relevance_config.get("commentary"))
+    for story in selected:
+        if not story.get("image_url"):
+            orig_url = (story.get("original_source") or {}).get("url")
+            if orig_url and "news.google.com" not in orig_url:
+                story["image_url"] = fetch_og_image(orig_url)
     source_registry.record_source_statistics(articles, {"stories": selected})
     print(f"{len(articles)} articles, {len(candidates)} candidate stories, {len(selected)} above the score threshold (deep_scan={is_deep})")
     radar_data = airspace_radar.load_radar()

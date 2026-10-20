@@ -360,6 +360,12 @@ def enrich_stories(stories, articles, relevance_config=None):
         publishers = {entry["name"] for entry in sources if entry["name"]}
         score, components = score_article(article, max(1, len(publishers)), config)
         published = article.get("timestamp")
+        img = str(story.get("image_url") or article.get("image_url") or "")
+        if not img:
+            for member in members:
+                if member.get("image_url"):
+                    img = str(member["image_url"])
+                    break
         story.update({
             "story_id": story.get("id") or stable_story_id(source.get("url"), story.get("headline")),
             "relevance_score": score,
@@ -370,6 +376,7 @@ def enrich_stories(stories, articles, relevance_config=None):
             "is_strategic_report": bool(is_strategic_report(story) or is_strategic_report(article)),
             "is_flash_alert": bool(is_flash_alert(story) or is_flash_alert(article)),
             "publication_date_status": article.get("publication_date_status", "verified" if published else "unknown"),
+            "image_url": img,
         })
         story["language"] = language.story_language(story)
     return stories
@@ -700,6 +707,11 @@ def _consolidate(stored, story, threshold):
         stored.remove(other)
     if len(matches) > 1:
         primary["source_count"] = len({entry["name"] for entry in primary["sources"] if entry.get("name")}) or 1
+        if not primary.get("image_url"):
+            for other in matches:
+                if other.get("image_url"):
+                    primary["image_url"] = other["image_url"]
+                    break
     return primary
 
 
@@ -729,6 +741,8 @@ def _apply_incoming(target, story, now_iso, config):
         for key in ("published_at_iso", "published_at", "publication_date_status"):
             if key in story:
                 target[key] = story[key]
+    if not target.get("image_url") and story.get("image_url"):
+        target["image_url"] = story["image_url"]
     new_sources = [entry for entry in story.get("sources", []) if canonicalize_url(entry.get("url")) not in known]
     old_score = float(target.get("relevance_score", 0))
     score_changed = abs(float(story.get("relevance_score", 0)) - old_score) >= config["updated"]["min_score_change"]

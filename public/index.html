@@ -164,6 +164,8 @@
 
     /* Lead story */
     .lead-story { margin: 16px var(--pad) 0; padding: 16px; background: var(--card); border: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; cursor: pointer; }
+    .lead-media { width: calc(100% + 32px); margin: -16px -16px 14px; aspect-ratio: 16 / 9; max-height: 260px; overflow: hidden; background: var(--black); border-bottom: 1.5px solid var(--black); }
+    .lead-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .lead-story:hover { border-color: var(--black); }
     .lead-story h2 { font: 800 25px/1.12 var(--sans); letter-spacing: -.02em; text-wrap: pretty; }
     .lead-story .why { font: 400 15px/1.5 var(--sans); color: var(--body); text-wrap: pretty; }
@@ -187,6 +189,9 @@
     .group-head::before { content: ""; width: 12px; height: 12px; background: var(--yellow); outline: 3px solid var(--black); outline-offset: -3px; flex: none; }
     .group-head::after { content: ""; flex: 1; height: 1.5px; background: var(--black); }
     .row { display: grid; grid-template-columns: 30px minmax(0,1fr); gap: 8px; width: 100%; text-align: left; padding: 14px; background: var(--card); border: 1px solid var(--rule); border-top: 0; cursor: pointer; }
+    .row.has-thumb { grid-template-columns: 30px minmax(0,1fr) 76px; gap: 10px; }
+    .row-thumb { width: 76px; height: 76px; overflow: hidden; background: var(--paper-2); border: 1px solid var(--rule-2); flex: none; align-self: start; margin-top: 2px; }
+    .row-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .group-head + .row, .group > .row:first-child { border-top: 1px solid var(--rule); }
     .row:hover { background: #FAFAF7; }
     .row-num { font: 700 12px/1.6 var(--mono); color: var(--faint); }
@@ -222,6 +227,9 @@
     .art-body h1 { font: 800 29px/1.08 var(--sans); letter-spacing: -.025em; text-wrap: pretty; }
     .art-body h1:focus { outline: none; }
     .art-src { font: 600 10.5px/1.5 var(--mono); color: var(--faint); text-transform: uppercase; }
+    .art-media { width: 100%; border: 1.5px solid var(--black); background: var(--black); overflow: hidden; display: flex; flex-direction: column; }
+    .art-media img { width: 100%; max-height: 340px; object-fit: cover; display: block; }
+    .art-media-caption { font: 600 10.5px/1.3 var(--mono); color: #FFF; background: var(--black); padding: 6px 10px; letter-spacing: .06em; text-transform: uppercase; border-top: 1px solid #2A2A2E; }
     .art-why, .report-why { background: var(--black); color: #FFF; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
     .art-why .eyebrow, .report-why .eyebrow { color: var(--yellow); }
     .art-why p, .report-why p { font: 500 16px/1.5 var(--sans); }
@@ -843,7 +851,8 @@
         const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
         const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${escapeHtml(s.why_it_matters)}</p>` : (s.lead ? `<p lang="${langOf(s)}">${escapeHtml(s.lead)}</p>` : ""));
         const dps = (Array.isArray(s.data_points) ? s.data_points : []).slice(0, 4).map(d => `<span class="report-dp-chip">${escapeHtml(d)}</span>`).join("");
-        return `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
+        const img = s.image_url ? `<span class="row-thumb"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.row-thumb').style.display='none'"></span>` : "";
+        return `<button class="row${s.image_url ? ' has-thumb' : ''}" type="button" data-open="${escapeHtml(storyKey(s))}">
           <span class="row-num">${String(n).padStart(2, "0")}</span>
           <span class="row-body">
             <span class="kicker"><span class="report-badge-pill">STRATEGIC REPORT</span> · <strong>${escapeHtml(sourceName(s))}</strong></span>
@@ -852,6 +861,7 @@
             ${dps ? `<div class="report-dps-bar" lang="${langOf(s)}">${dps}</div>` : ""}
             <span class="src" lang="en">${meta} · <strong class="report-view-link">1-Page Summary →</strong></span>
           </span>
+          ${img}
         </button>`;
       };
 
@@ -1050,7 +1060,8 @@
         const count = sourceCount(s);
         const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
         const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${escapeHtml(s.why_it_matters)}</p>` : "");
-        return `<button class="row" type="button" data-open="${escapeHtml(storyKey(s))}">
+        const img = s.image_url ? `<span class="row-thumb"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.row-thumb').style.display='none'"></span>` : "";
+        return `<button class="row${s.image_url ? ' has-thumb' : ''}" type="button" data-open="${escapeHtml(storyKey(s))}">
           <span class="row-num">${String(n).padStart(2, "0")}</span>
           <span class="row-body">
             ${tags ? `<span class="kicker">${tags}</span>` : ""}
@@ -1058,6 +1069,7 @@
             ${body}
             <span class="src" lang="en">${meta}</span>
           </span>
+          ${img}
         </button>`;
       };
 
@@ -1065,7 +1077,9 @@
       if (block.length) html += `<section class="group"><div lang="en" class="group-head eyebrow">Critical &amp; Important · ${block.length}</div></section>`;
       if (lead) {
         const count = sourceCount(lead);
+        const leadImg = lead.image_url ? `<div class="lead-media"><img src="${escapeHtml(lead.image_url)}" alt="" loading="lazy" onerror="this.closest('.lead-media').style.display='none'"></div>` : "";
         html += `<article class="lead-story" role="button" tabindex="0" data-open="${escapeHtml(storyKey(lead))}">
+          ${leadImg}
           <div class="kicker">${tagsHtml(lead, true)}</div>
           <h2 lang="${langOf(lead)}">${escapeHtml(lead.headline)}</h2>
           ${isPending(lead) ? `<p class="why" lang="en">Analysis pending</p>` : (lead.why_it_matters ? `<p class="why" lang="${langOf(lead)}">${escapeHtml(lead.why_it_matters)}</p>` : "")}
@@ -1253,10 +1267,12 @@
         const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
           `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span lang="en" class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p lang="${lang}">${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
 
+        const artImg = s.image_url ? `<div class="art-media"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.art-media').style.display='none'"><span class="art-media-caption">${escapeHtml(sourceName(s))}</span></div>` : "";
         $("art-body").innerHTML = `
           <div class="kicker"><span class="report-badge-pill">STRATEGIC REPORT</span> · <strong>${escapeHtml(sourceName(s))}</strong>${s.published_at ? ` · ${escapeHtml(s.published_at)}` : ""}</div>
           <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
           <div class="art-src" lang="en">Flagship Outlook &amp; Benchmark Publication · ${escapeHtml(sourceName(s))}${src.official ? " · Official Report" : ""}${count > 1 ? ` · ${count} sources` : ""}</div>
+          ${artImg}
           ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the executive summary appears after the next update.</p>` : ""}
           ${s.why_it_matters ? `<div class="report-why"><span lang="en" class="eyebrow">Executive Summary</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
           ${s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : ""}
@@ -1272,10 +1288,12 @@
         const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
           `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span lang="en" class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p lang="${lang}">${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
 
+        const artImg = s.image_url ? `<div class="art-media"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.art-media').style.display='none'"><span class="art-media-caption">${escapeHtml(sourceName(s))}</span></div>` : "";
         $("art-body").innerHTML = `
           <div class="kicker">${tagsHtml(s, true)}</div>
           <h1 tabindex="-1" lang="${lang}">${escapeHtml(s.headline)}</h1>
           <div class="art-src" lang="en">${escapeHtml(sourceName(s))} · ${type}${src.official ? " · Official" : ""}${count > 1 ? ` · ${count} sources` : ""}${s.published_at ? " · " + escapeHtml(s.published_at) : ""}</div>
+          ${artImg}
           ${s.is_flash_alert ? `<div class="flash-alert-banner" lang="tr"><strong>Sektör Radarı (Kısa Sinyal):</strong> Kritik havacılık analistleri ve sektör radarı kaynaklı hızlı gelişme.</div>` : ""}
           ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
           ${isUnverified(s) ? `<p class="art-src" lang="en">This collected headline has not been independently checked. No verified publisher link or analysis is available; please check the named publisher yourself.</p>` : ""}

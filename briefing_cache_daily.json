@@ -508,7 +508,7 @@
       "original_source": {
         "title": "Austrian Airlines flight from Tel Aviv diverts to Sofia after 'threat'",
         "source_name": "Reuters",
-        "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPSUtxZ043QVFPYU1WRmVrQU1EOUswTG5xYWhwYWxrcXhPaFdWX0F0Z2E2TXFNM3lnOE9NdHd4amJtbWRXSkpsOXlVN3M2OUgyYVlrTkNjYUx0YUN3ZlBieEplbXNyLVRKNTYzRGJvdExqZGxjWjNlRE5TdVpyUUhKbzlfeGNVN2diOGcwaU9hS1I5VnE2YjJ3X3REZFFwSkJqdHMzZWpUdEtORElCUnB2RXd2MUJLV2ktYk5DZWVn?oc=5",
+        "url": "https://www.reuters.com/world/austrian-airlines-flight-tel-aviv-makes-emergency-landing-after-bomb-threat-sky-2026-10-18/",
         "source_type": "mainstream",
         "official": false,
         "airline": "",
@@ -671,7 +671,8 @@
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "en"
+      "narrative_language": "en",
+      "image_url": "https://theaviationhub.co.uk/wp-content/uploads/2026/10/EC-MJR_A321_Vueling_ACe_28-03-17_33886978196-scaled.jpg"
     },
     {
       "id": "story-c61b3d06229e",
@@ -730,7 +731,7 @@
       "original_source": {
         "title": "Turkish Airlines, CFM Ink MOU For More Than 600 Leap-1B Engines",
         "source_name": "Aviation Week",
-        "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOTW9JLVFTQmduVi1BTmlSTjFxdTFUeHdpSDYxR2JGQmVlV0dHWG5JNHFiYm9NYzdsMGxveTZqbGliZExGdGtDeHBWT1RWR0Vjc1pUWUJoZ3U2NVlxcnY3d3hQZGFVWTJubGNuOUZzdnFpMVVZeEkzeGtiSm13Ykc3aGtJSFRuUU1jNXR2WmdjWVNRU1d4Z2JqSDY2TUNFVkpaS3pLUGVtYWM1N1hWMnc?oc=5",
+        "url": "https://aviationweek.com/air-transport/airlines-lessors/turkish-airlines-cfm-ink-mou-more-600-leap-1b-engines",
         "source_type": "trade_media",
         "official": false,
         "airline": "",
@@ -793,7 +794,8 @@
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "en"
+      "narrative_language": "en",
+      "image_url": "https://aviationweek.com/sites/default/files/2026-10/turkish_737.-9.jpeg"
     },
     {
       "id": "story-6a1a9ac74a07",
@@ -1164,7 +1166,7 @@
       "original_source": {
         "title": "EUROCONTROL European Aviation Overview 2026 - Week 41",
         "source_name": "Eurocontrol",
-        "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQcGZrc2Y4ZjFHTVB4NXE2Ymxza2MyV3F2dDlwdzJueFA0dXJPS0lLRWNfN3U0RkJRcEFkZWczX0JFdThJREZqVUppV2hadmVMYTlreUphelIxTS1CZnlIR3ZSVmtzX0l0M096VWROcmNHb3BxVDlzX21TSmt0TC1sMVpnSlQ3cGRIaE9EejdXc1N2THh2TFE?oc=5",
+        "url": "https://www.eurocontrol.int/publication/eurocontrol-european-aviation-overview-2026-week-41",
         "source_type": "regulator",
         "official": true,
         "airline": "",
@@ -1224,7 +1226,8 @@
       ],
       "level": "critical",
       "level_label": "Kritik",
-      "listed": true
+      "listed": true,
+      "image_url": "https://www.eurocontrol.int/sites/default/files/styles/seo_image/public/2026-02/banner-eao-2026-1920x1080.jpg?h=673214ff&itok=OkTDzcWh"
     },
     {
       "id": "story-9fb6dd653852",
@@ -1326,7 +1329,8 @@
       "listed": true,
       "narrative_generated_at": "2026-10-18T14:54:14+00:00",
       "narrative_language": "en",
-      "is_strategic_report": true
+      "is_strategic_report": true,
+      "image_url": "https://mediaassets.airbus.com/pm_38_916_916320-dcgt3bek22-preview.jpg"
     },
     {
       "id": "story-a23bff053879",
@@ -1657,7 +1661,7 @@
       "original_source": {
         "title": "Lufthansa to transfer up to eight A350s to TAP after 2030",
         "source_name": "ch-aviation",
-        "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNWkFsOFZsSXFKYUNJeVRseklNTjF0NmJ0TmJrOE8wQUh1NUg3SW5hQmxiRFFaSFVMOEU3YmVORzRqcnBYczl3a3B1MnFZXzIwQzBhbTZrM0lMVlBsVVF4b20zUEVsbWxkaVFEaFR2SWlRaTJURldzX1JTX1VXZnpBQUlaTHdSV1FkNVh2bm02MjVfM2RPNWNtNVVKSWRTUQ?oc=5",
+        "url": "https://www.ch-aviation.com/news/172888-lufthansa-to-transfer-up-to-eight-a350s-to-tap-after-2030",
         "source_type": "trade_media",
         "official": false,
         "airline": "",
@@ -1702,7 +1706,8 @@
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "en"
+      "narrative_language": "en",
+      "image_url": "https://www.ch-aviation.com/images/stockPhotos/5180/11c5ba8cb1111222f2c1766154bdbe539bb898bb.jpg"
     },
     {
       "id": "story-d43cb360f275",
@@ -1750,7 +1755,7 @@
       "original_source": {
         "title": "Southwest ‘Not There Yet’ on Long-Haul Fleet Choice",
         "source_name": "Aviation Week",
-        "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNU212ak1sVGtSS1VVRFJHdlFqZ1NnZDhDOFBiUDlYczVYTUtiS1BnSFRpSVdNU0drUThab05GRFMtUGl2UFVFSlJLbGZCV0R5X2kySHluV2JobWp5OF9LRjdQa3BjN0lsUENfVUs2enRtaHluTzJJNEVJWVhuVlVSLTlxT2xqcmtRWDRNVHpOeHlYTEk0eVBxdV9YSl81THRLMy03Yw?oc=5",
+        "url": "https://aviationweek.com/air-transport/airlines-lessors/southwest-not-there-yet-long-haul-fleet-choice",
         "source_type": "trade_media",
         "official": false,
         "airline": "",
@@ -1795,7 +1800,8 @@
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "en"
+      "narrative_language": "en",
+      "image_url": "https://aviationweek.com/sites/default/files/2026-10/img_3410_copy.jpeg"
     },
     {
       "id": "story-6516a5a16be8",
@@ -1851,7 +1857,7 @@
       "original_source": {
         "title": "United Airlines Unveils 5 New Nonstop Routes: See Full List Now",
         "source_name": "Simple Flying",
-        "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE8xc0tHWDZmVG1sd0xmTlo4dXNxS2lzTFh5dDdXVDRhMXhzQ0IxemxvSmZ0QWEzdUM3ZGtlckVEeFktNmNiVGt6V0laV1pNd2JnNW9iN1BxS2xURmpMUTlEN2drUEV6MEtWN2JtSkxn?oc=5",
+        "url": "https://simpleflying.com/united-airlnes-5-new-nonstop-routes/",
         "source_type": "trade_media",
         "official": false,
         "airline": "",
@@ -1902,7 +1908,8 @@
       "level_label": "Kritik",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "en"
+      "narrative_language": "en",
+      "image_url": "https://static0.simpleflyingimages.com/wordpress/wp-content/uploads/2026/10/united-airlines-737-taxis-under-the-bridge-at-denver-international.jpg?w=1600&h=900&fit=crop"
     },
     {
       "id": "story-563be0a43b81",
@@ -1962,7 +1969,7 @@
       "original_source": {
         "title": "KLM Royal Dutch Airlines wet leases in A319 capacity",
         "source_name": "ch-aviation",
-        "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNbUpYU3dEdEpJdVNJbkRsTHFIZUd5VmN4OTNuakFIc3BfWlU0bW81VGJfQUpyMWhoT0VxeGxoZ1pGaGZ2dE85OFVIbnhlOHIwUTRsUU9QVUZkUWVXNmxFX2RNWEJzaFQwVjFnQUNFdGNxNThzUGQwWnNfalNSLVdEWmRHM0gtWG13b19CaEtIRnpVSUlBUlhZ?oc=5",
+        "url": "https://www.ch-aviation.com/news/172768-klm-royal-dutch-airlines-wet-leases-in-a319-capacity",
         "source_type": "trade_media",
         "official": false,
         "airline": "",
@@ -2005,7 +2012,8 @@
       "level_label": "Önemli",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "en"
+      "narrative_language": "en",
+      "image_url": "https://www.ch-aviation.com/images/stockPhotos/8245/fb4a2fa3b83ae9b905a1eea4188c859b9bcd2878.jpg"
     },
     {
       "id": "story-1481c5a27ca7",
@@ -2126,7 +2134,8 @@
       "level_label": "Önemli",
       "listed": true,
       "narrative_generated_at": "2026-10-19T05:46:09+00:00",
-      "narrative_language": "tr"
+      "narrative_language": "tr",
+      "image_url": "https://havahaber.com/wp-content/uploads/2024/06/easyjet-istanbul.webp"
     },
     {
       "id": "story-164806bd63d2",
