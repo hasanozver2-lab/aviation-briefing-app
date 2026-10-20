@@ -34,22 +34,64 @@
 
     header.mast { padding: 12px var(--pad) 0; display: flex; flex-direction: column; gap: 10px; }
     .mast-top { display: flex; justify-content: space-between; align-items: center; font: 500 11px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .mast-top-left { display: flex; align-items: center; gap: 10px; }
+    .menu-toggle-btn { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 6px; border: 1px solid var(--rule-2); background: var(--paper-2); color: var(--ink); font: 600 11.5px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; cursor: pointer; transition: all .15s ease; }
+    .menu-toggle-btn:hover { background: var(--rule-2); border-color: var(--ink); }
+    .menu-toggle-icon { font-size: 13px; line-height: 1; }
+    .menu-active-pill { font: 500 11px/1 var(--sans); padding: 2px 7px; border-radius: 999px; background: var(--paper); color: var(--ink-2); border: 1px solid var(--rule-2); text-transform: none; letter-spacing: 0; }
     .mast-actions { display: flex; gap: 16px; }
     .mast-actions button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; padding: 6px 0; }
-        .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
+    .title { font: 500 36px/1 var(--serif); letter-spacing: -.02em; padding-bottom: 12px; border-bottom: 3px double var(--ink); }
     .mast-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
-        .mast-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
+    .mast-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding-bottom: 9px; white-space: nowrap; font: 400 12px/1 var(--sans); color: var(--muted); }
     .mast-meta #updated { font-size: 11px; color: var(--faint); }
-    .page-nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 10px; border-bottom: 1px solid var(--ink); }
+
+    .page-nav { display: flex; align-items: center; gap: 6px; padding: 6px 0 8px; border-bottom: 2px solid var(--ink); overflow-x: auto; scrollbar-width: none; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+    .page-nav::-webkit-scrollbar { display: none; }
+    .page-nav-menu-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--rule-2); background: var(--paper-2); font: 600 11.5px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--ink); cursor: pointer; flex-shrink: 0; transition: all .15s ease; }
+    .page-nav-menu-btn:hover { background: var(--rule-2); border-color: var(--ink); }
+    .page-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 6px; border: 1px solid transparent; font: 600 11.5px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: transparent; transition: all .15s ease; flex-shrink: 0; cursor: pointer; }
+    .page-btn:hover { color: var(--ink); background: var(--paper-2); }
+    .page-btn .page-cnt { font: 600 10.5px/1 var(--mono); padding: 2px 6px; border-radius: 999px; background: var(--paper-2); color: var(--ink); }
+    .page-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .page-btn[aria-pressed="true"] .page-cnt { background: rgba(255,255,255,0.22); color: #fff; }
+    .page-btn .btn-icon { font-size: 13px; margin-right: 1px; }
+
+    /* Offcanvas Drawer Navigation */
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(27, 26, 23, 0.45); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 80; opacity: 0; transition: opacity .25s ease; pointer-events: none; }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    .drawer { position: fixed; top: 0; bottom: 0; left: 0; width: min(340px, 86vw); background: var(--paper); z-index: 90; transform: translateX(-100%); transition: transform .28s cubic-bezier(.16, 1, .3, 1); box-shadow: 4px 0 24px rgba(0, 0, 0, .14); display: flex; flex-direction: column; visibility: hidden; }
+    .drawer.open { transform: translateX(0); visibility: visible; }
+    .drawer-header { padding: 16px 20px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--ink); }
+    .drawer-brand { display: flex; flex-direction: column; gap: 2px; }
+    .drawer-logo { font: 600 15px/1.2 var(--serif); letter-spacing: -.01em; color: var(--ink); }
+    .drawer-sub { font: 500 10px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .drawer-close { width: 32px; height: 32px; border-radius: 4px; border: 1px solid var(--rule-2); background: var(--paper-2); color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+    .drawer-close:hover { background: var(--rule-2); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .drawer-section-title { font: 600 10.5px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 6px 10px 4px; }
+    .drawer-item { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; border: 1px solid transparent; background: transparent; text-align: left; cursor: pointer; transition: all .15s ease; width: 100%; }
+    .drawer-item:hover { background: var(--paper-2); border-color: var(--rule-2); }
+    .drawer-item[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .drawer-item[aria-pressed="true"] .drawer-item-desc { color: #D6CFC1; }
+    .drawer-item[aria-pressed="true"] .drawer-cnt { background: rgba(255, 255, 255, .2); color: #fff; border-color: transparent; }
+    .drawer-item-icon { font-size: 18px; display: flex; align-items: center; justify-content: center; }
+    .drawer-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .drawer-item-title { font: 600 14px/1.2 var(--sans); color: inherit; }
+    .drawer-item-desc { font: 400 11.5px/1.3 var(--sans); color: var(--muted); }
+    .drawer-cnt { font: 600 11px/1 var(--mono); padding: 3px 7px; border-radius: 999px; background: var(--paper-2); border: 1px solid var(--rule-2); color: var(--ink); }
+    .drawer-footer { padding: 14px 16px; border-top: 1px solid var(--rule); background: var(--paper-2); display: flex; flex-direction: column; gap: 8px; }
+    .drawer-footer-title { font: 600 10.5px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .drawer-market-grid { display: flex; gap: 8px; }
+    .drawer-market-chip { flex: 1; background: var(--paper); border: 1px solid var(--rule-2); border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .drawer-market-chip span:first-child { font: 500 10px/1 var(--sans); color: var(--muted); text-transform: uppercase; }
+    .drawer-market-chip span:last-child { font: 700 13px/1 var(--mono); color: var(--ink); }
+
     .archive-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px var(--pad); font: 500 13px/1.4 var(--sans); }
     .archive-controls[hidden] { display: none; }
     .archive-controls input, .archive-controls button { padding: 9px; min-height: 44px; border: 1px solid var(--rule-2); border-radius: 4px; background: var(--paper); color: var(--ink); font: inherit; max-width: 100%; }
     .archive-controls button:disabled { opacity: .45; cursor: default; }
     .archive-note { width: 100%; margin: 0; color: var(--muted); font-weight: 400; }
-    .page-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border: 1px solid var(--rule-2); border-radius: 999px; font: 600 11.5px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--paper); transition: background .15s ease, color .15s ease; }
-    .page-btn .page-cnt { font: 500 11px/1 var(--mono); color: var(--faint); }
-    .page-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-    .page-btn[aria-pressed="true"] .page-cnt { color: var(--rule-2); }
     .report-intro { margin: 0 var(--pad); padding: 14px 0 12px; border-bottom: 1px solid var(--rule); font: 400 13.5px/1.45 var(--sans); color: var(--body); }
     .report-intro strong { color: var(--ink); font-weight: 600; }
     .row-dps { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
@@ -76,17 +118,18 @@
     .mkt-note { font: 400 11px/1.4 var(--sans); color: var(--muted); padding-top: 6px; }
     .mkt-miss { color: var(--muted); font-weight: 400; }
 
-    .lead-story { margin: 0 var(--pad); padding: 20px 0 22px; border-bottom: 1px solid var(--ink); display: flex; flex-direction: column; gap: 11px; cursor: pointer; }
+    .lead-story { margin: 12px var(--pad) 0; padding: 22px 24px; background: var(--paper-2); border: 1px solid var(--rule-2); border-radius: 8px; display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+    .lead-story:hover { transform: translateY(-2px); border-color: var(--ink); box-shadow: 0 8px 24px rgba(27, 26, 23, 0.07); }
     .kicker { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
     .kicker .lvl-critical { color: var(--neg); }
     .kicker .lvl-important { color: var(--ink); }
-    .kicker .new { color: var(--ink); background: var(--paper-2); padding: 3px 5px; margin-top: -3px; }
-    .kicker .updated { color: var(--ink); border: 1px solid var(--rule-2); padding: 2px 4px; margin-top: -3px; }
-    .kicker .breaking { color: var(--paper); background: var(--neg); padding: 3px 5px; margin-top: -3px; }
+    .kicker .new { color: var(--ink); background: var(--paper); border: 1px solid var(--rule-2); padding: 3px 6px; border-radius: 3px; }
+    .kicker .updated { color: var(--ink); border: 1px solid var(--rule-2); padding: 2px 5px; border-radius: 3px; }
+    .kicker .breaking { color: var(--paper); background: var(--neg); padding: 3px 6px; border-radius: 3px; }
     #new-pill { position: fixed; top: calc(env(safe-area-inset-top) + 62px); left: 50%; transform: translateX(-50%); z-index: 20; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 999px; font: 600 12px/1 var(--sans); letter-spacing: .04em; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
     #new-pill[hidden] { display: none; }
-    .lead-story h2 { font: 500 31px/1.1 var(--serif); letter-spacing: -.02em; text-wrap: pretty; }
-    .lead-story .why { font: italic 400 17px/1.45 var(--serif); color: #3A3732; text-wrap: pretty; }
+    .lead-story h2 { font: 600 31px/1.18 var(--serif); letter-spacing: -.02em; text-wrap: pretty; color: var(--ink); }
+    .lead-story .why { font: italic 400 16.5px/1.45 var(--serif); color: #3A3732; text-wrap: pretty; padding: 9px 12px; background: rgba(0, 0, 0, 0.025); border-left: 3px solid var(--ink); border-radius: 0 4px 4px 0; }
     .meta { display: flex; justify-content: space-between; gap: 10px; font: 400 12px/1.3 var(--sans); color: var(--muted); }
     .meta strong { font-weight: 600; color: var(--ink); white-space: nowrap; }
 
@@ -101,13 +144,14 @@
     .group { padding: 0 var(--pad); }
     .group-head { display: flex; align-items: center; gap: 10px; padding: 22px 0 2px; }
     .group-head::after { content: ""; flex: 1; height: 1px; background: var(--ink); }
-    .row { display: grid; grid-template-columns: 26px minmax(0,1fr); gap: 6px; padding: 15px 0 16px; border-bottom: 1px solid var(--rule); cursor: pointer; text-align: left; width: 100%; }
-    .row-num { font: 400 15px/1.4 var(--serif); color: var(--faint); }
+    .row { display: grid; grid-template-columns: 28px minmax(0,1fr); gap: 10px; padding: 15px 14px; margin: 4px 0; border-radius: 6px; border: 1px solid transparent; border-bottom: 1px solid var(--rule); cursor: pointer; text-align: left; width: 100%; transition: all .15s ease; }
+    .row:hover { background: var(--paper-2); border-color: var(--rule-2); transform: translateX(2px); }
+    .row-num { font: 500 14px/1.4 var(--mono); color: var(--muted); padding-top: 2px; }
     .row-body { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-    .row h3 { font: 500 20px/1.2 var(--serif); letter-spacing: -.01em; text-wrap: pretty; }
+    .row h3 { font: 600 20px/1.25 var(--serif); letter-spacing: -.01em; text-wrap: pretty; color: var(--ink); }
     .row p { font: 400 14px/1.5 var(--sans); color: var(--body); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .row .src { font: 400 12px/1.3 var(--sans); color: var(--muted); }
-    .row.compact { padding: 12px 0 13px; }
+    .row.compact { padding: 12px 14px; }
     .row.compact h3 { font-size: 18px; }
     .row.compact .row-num { color: var(--muted); }
     .row .pending, .art-pending { font: italic 400 14px/1.4 var(--serif); color: var(--muted); }
@@ -256,9 +300,85 @@
   </style>
 </head>
 <body>
+  <!-- Offcanvas Drawer Menu -->
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menü" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <span class="drawer-logo">THE AVIATION BRIEFING</span>
+        <span class="drawer-sub">Navigasyon &amp; Radarlar</span>
+      </div>
+      <button class="drawer-close" id="drawer-close" type="button" aria-label="Menüyü Kapat">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-section-title">Bölümler</div>
+      <nav class="drawer-nav" aria-label="Ana Menü">
+        <button class="drawer-item" type="button" data-drawer-page="briefing" aria-pressed="true">
+          <span class="drawer-item-icon">📰</span>
+          <div class="drawer-item-text">
+            <span class="drawer-item-title">Günlük Brifing</span>
+            <span class="drawer-item-desc">Havacılık haber akışı ve piyasa özeti</span>
+          </div>
+          <span class="drawer-cnt" id="drawer-briefing-count">0</span>
+        </button>
+        <button class="drawer-item" type="button" data-drawer-page="reports" aria-pressed="false">
+          <span class="drawer-item-icon">📊</span>
+          <div class="drawer-item-text">
+            <span class="drawer-item-title">Stratejik Raporlar</span>
+            <span class="drawer-item-desc">Havayolu IR ve resmî analizler</span>
+          </div>
+          <span class="drawer-cnt" id="drawer-reports-count">0</span>
+        </button>
+        <button class="drawer-item" type="button" data-drawer-page="airspace" aria-pressed="false">
+          <span class="drawer-item-icon">🚨</span>
+          <div class="drawer-item-text">
+            <span class="drawer-item-title">Hava Sahası Radarı</span>
+            <span class="drawer-item-desc">Çatışma bölgeleri ve uçuş kısıtlamaları</span>
+          </div>
+          <span class="drawer-cnt" id="drawer-airspace-count">0</span>
+        </button>
+        <button class="drawer-item" type="button" data-drawer-page="fleet" aria-pressed="false">
+          <span class="drawer-item-icon">✈️</span>
+          <div class="drawer-item-text">
+            <span class="drawer-item-title">Filo &amp; Motor Radarı</span>
+            <span class="drawer-item-desc">Motor kontrolleri ve teslimat aksamaları</span>
+          </div>
+          <span class="drawer-cnt" id="drawer-fleet-count">0</span>
+        </button>
+        <button class="drawer-item" type="button" data-drawer-page="archive" aria-pressed="false">
+          <span class="drawer-item-icon">🏛️</span>
+          <div class="drawer-item-text">
+            <span class="drawer-item-title">Arşiv</span>
+            <span class="drawer-item-desc">Geçmiş tarihli brifingler</span>
+          </div>
+        </button>
+      </nav>
+      <div class="drawer-footer">
+        <span class="drawer-footer-title">Piyasa Göstergeleri</span>
+        <div class="drawer-market-grid">
+          <div class="drawer-market-chip">
+            <span>Brent Spot</span>
+            <span id="drawer-brent-val">110.58 USD</span>
+          </div>
+          <div class="drawer-market-chip">
+            <span>Crack Marjı</span>
+            <span id="drawer-crack-val">65.47 USD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
   <div class="wrap" id="wrap">
     <header class="mast">
       <div class="mast-top">
+        <div class="mast-top-left">
+          <button class="menu-toggle-btn" id="menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="drawer">
+            <span class="menu-toggle-icon" aria-hidden="true">☰</span>
+            <span>Menü</span>
+            <span class="menu-active-pill" id="menu-active-pill">Günlük Brifing</span>
+          </button>
+        </div>
         <span id="dateline">—</span>
         <div class="mast-actions">
           <button id="btn-share" type="button">Share</button>
@@ -269,11 +389,14 @@
         <div class="mast-meta"><span id="counts"></span><span id="updated"></span></div>
       </div>
       <nav class="page-nav" aria-label="Briefing sections">
-        <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
-        <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
-        <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span lang="tr">🚨 Hava Sahası Radarı</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
-        <button class="page-btn" type="button" data-page="fleet" aria-pressed="false"><span lang="tr">✈️ Filo &amp; Motor Radarı</span> <span class="page-cnt" id="nav-fleet-count">0</span></button>
-        <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span lang="tr">Arşiv</span></button>
+        <button class="page-nav-menu-btn" id="page-nav-menu-btn" type="button" aria-label="Menüyü Aç">
+          <span aria-hidden="true">☰</span> <span>Menü</span>
+        </button>
+        <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span class="btn-icon">📰</span> <span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
+        <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span class="btn-icon">📊</span> <span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
+        <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span class="btn-icon">🚨</span> <span lang="tr">Hava Sahası Radarı</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
+        <button class="page-btn" type="button" data-page="fleet" aria-pressed="false"><span class="btn-icon">✈️</span> <span lang="tr">Filo &amp; Motor Radarı</span> <span class="page-cnt" id="nav-fleet-count">0</span></button>
+        <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span class="btn-icon">🏛️</span> <span lang="tr">Arşiv</span></button>
       </nav>
     </header>
 
@@ -467,6 +590,32 @@
       }
     }
 
+    function openDrawer() {
+      const drawer = $("drawer"), backdrop = $("drawer-backdrop");
+      if (!drawer || !backdrop) return;
+      backdrop.hidden = false;
+      void backdrop.offsetWidth;
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      backdrop.classList.add("open");
+      const btn = $("menu-btn");
+      if (btn) btn.setAttribute("aria-expanded", "true");
+      $("drawer-close").focus();
+    }
+
+    function closeDrawer() {
+      const drawer = $("drawer"), backdrop = $("drawer-backdrop");
+      if (!drawer || !backdrop) return;
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      backdrop.classList.remove("open");
+      const btn = $("menu-btn");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+      setTimeout(() => {
+        if (!drawer.classList.contains("open")) backdrop.hidden = true;
+      }, 260);
+    }
+
     function setPage(pageName) {
       if (!["briefing", "reports", "airspace", "fleet", "archive"].includes(pageName)) return;
       state.page = pageName;
@@ -475,6 +624,19 @@
       document.querySelectorAll("[data-page]").forEach(btn => {
         btn.setAttribute("aria-pressed", String(btn.dataset.page === pageName));
       });
+      document.querySelectorAll("[data-drawer-page]").forEach(btn => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.drawerPage === pageName));
+      });
+      const sectionTitles = {
+        briefing: "Günlük Brifing",
+        reports: "Stratejik Raporlar",
+        airspace: "Hava Sahası Radarı",
+        fleet: "Filo & Motor Radarı",
+        archive: "Arşiv"
+      };
+      const pill = $("menu-active-pill");
+      if (pill) pill.textContent = sectionTitles[pageName] || "Günlük Brifing";
+      closeDrawer();
       $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : pageName === "fleet" ? "‹ Filo Radarı" : "‹ Briefing";
       if (pageName === "archive") {
         if ($("airspace-alert-banner")) $("airspace-alert-banner").hidden = true;
@@ -575,6 +737,20 @@
       const fleet = data.fleet_watch;
       const fleetCount = fleet ? (fleet.total_programs || (fleet.programs || []).length) : 0;
       if ($("nav-fleet-count")) $("nav-fleet-count").textContent = String(fleetCount);
+
+      if ($("drawer-briefing-count")) $("drawer-briefing-count").textContent = String(dailyStories.length);
+      if ($("drawer-reports-count")) $("drawer-reports-count").textContent = String(reportStories.length);
+      if ($("drawer-airspace-count")) $("drawer-airspace-count").textContent = String(airspaceCount);
+      if ($("drawer-fleet-count")) $("drawer-fleet-count").textContent = String(fleetCount);
+
+      const sectionTitles = {
+        briefing: "Günlük Brifing",
+        reports: "Stratejik Raporlar",
+        airspace: "Hava Sahası Radarı",
+        fleet: "Filo & Motor Radarı",
+        archive: "Arşiv"
+      };
+      if ($("menu-active-pill")) $("menu-active-pill").textContent = sectionTitles[state.page] || "Günlük Brifing";
 
       const banner = $("airspace-alert-banner");
       if (banner) {
@@ -944,8 +1120,11 @@
       const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
 
       const cal = state.data && state.data.earnings_calendar;
+      const brentItem = items.find(i => i.series_id === "brent_spot");
       const crackItem = items.find(i => i.series_id === "jet_fuel_brent_crack_spread");
       const crackVal = crackItem ? fmtNumber(crackItem.value, 2) : "65.47";
+      if (brentItem && $("drawer-brent-val")) $("drawer-brent-val").textContent = `${fmtNumber(brentItem.value, 2)} USD`;
+      if (crackItem && $("drawer-crack-val")) $("drawer-crack-val").textContent = `${fmtNumber(crackItem.value, 2)} USD`;
       const calHtml = renderEarningsCalendar(cal);
 
       $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
@@ -1206,7 +1385,27 @@
         if (Date.now() - state.lastPoll > MIN_POLL_GAP_MS) pollBriefing();
       });
       checkForNewVersion();
-$("btn-share").addEventListener("click", shareBriefing);
+      $("btn-share").addEventListener("click", shareBriefing);
+      const menuBtn = $("menu-btn");
+      if (menuBtn) menuBtn.addEventListener("click", openDrawer);
+      const pageNavMenuBtn = $("page-nav-menu-btn");
+      if (pageNavMenuBtn) pageNavMenuBtn.addEventListener("click", openDrawer);
+      const drawerClose = $("drawer-close");
+      if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
+      const drawerBackdrop = $("drawer-backdrop");
+      if (drawerBackdrop) drawerBackdrop.addEventListener("click", closeDrawer);
+      const drawer = $("drawer");
+      if (drawer) {
+        drawer.addEventListener("click", (e) => {
+          const btn = e.target.closest("[data-drawer-page]");
+          if (btn) setPage(btn.dataset.drawerPage);
+        });
+      }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && $("drawer") && $("drawer").classList.contains("open")) {
+          closeDrawer();
+        }
+      });
       const airspaceBannerBtn = $("airspace-banner-btn");
       if (airspaceBannerBtn) airspaceBannerBtn.addEventListener("click", () => setPage("airspace"));
       document.querySelector(".page-nav").addEventListener("click", (e) => {
