@@ -688,6 +688,7 @@
         nav_archive_desc: "Historical briefing editions",
         drawer_sections: "Sections",
         drawer_markets: "Market Indicators",
+        crack_spread_title: "Jet Fuel Crack Spread",
         drawer_lang: "Language",
         drawer_close: "Close Menu",
         drawer_sub: "Navigation & Radars",
@@ -703,6 +704,8 @@
         airspace_alert_btn: "Inspect Radar ›",
 
         traffic_title: "Global Flight Traffic & Daily Volume",
+        traffic_estimate_badge: "Modelled Estimate",
+        traffic_estimate_tooltip: "Calibrated daily statistical estimate based on ICAO, FAA ATO, and Eurocontrol seasonal baselines (not live ADS-B telemetry).",
         traffic_commercial_today: "Commercial Flights Today (Global)",
         traffic_airborne_now: "Active Airborne Now",
         traffic_regional: "Regional Traffic:",
@@ -826,6 +829,7 @@
         nav_archive_desc: "Geçmiş tarihli brifingler",
         drawer_sections: "Bölümler",
         drawer_markets: "Piyasa Göstergeleri",
+        crack_spread_title: "Jet Yakıtı Rafineri Marjı (Crack Spread)",
         drawer_lang: "Dil Seçimi",
         drawer_close: "Menüyü Kapat",
         drawer_sub: "Navigasyon & Radarlar",
@@ -841,6 +845,8 @@
         airspace_alert_btn: "Radarı İncele ›",
 
         traffic_title: "Küresel Uçuş Trafiği & Günlük Hacim",
+        traffic_estimate_badge: "Modellenmiş Tahmin",
+        traffic_estimate_tooltip: "ICAO, FAA ATO ve Eurocontrol mevsimsel bazlarına göre kalibre edilmiş günlük istatistiki tahmin (canlı ADS-B radar ölçümü değildir).",
         traffic_commercial_today: "Bugünkü Ticari Uçuş (Küresel)",
         traffic_airborne_now: "Anlık Havada Aktif Uçuş",
         traffic_regional: "Bölgesel Trafik:",
@@ -1453,9 +1459,9 @@
       const isTr = state.uiLang === "tr";
       return `<div class="traffic-panel" lang="${state.uiLang}">
         <div class="traffic-head">
-          <span class="traffic-title"><span class="traffic-live-dot"></span> ${escapeHtml(t("traffic_title"))}</span>
+          <span class="traffic-title"><span class="traffic-live-dot"></span> ${escapeHtml(t("traffic_title"))} <span class="estimate-pill" style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,0.12);color:#E5A93C;text-transform:uppercase;letter-spacing:0.5px" title="${escapeHtml(t("traffic_estimate_tooltip"))}">${escapeHtml(t("traffic_estimate_badge"))}</span></span>
           <div style="display:flex;align-items:center;gap:10px">
-            <span class="traffic-source">${escapeHtml(traffic.source || "Eurocontrol / FAA / ICAO")}</span>
+            <span class="traffic-source" title="${escapeHtml(t("traffic_estimate_tooltip"))}">${escapeHtml(isTr ? (traffic.source_tr || traffic.source || "ICAO / Eurocontrol Bazları") : (traffic.source_en || traffic.source || "ICAO / Eurocontrol Baselines"))}</span>
             ${actionBtn}
           </div>
         </div>
@@ -1501,6 +1507,12 @@
         <strong>${escapeHtml(t("airspace_intro_title"))}</strong> — ${escapeHtml(t("airspace_intro_desc"))}
       </div>`;
 
+      if (radar.is_fallback || radar.feed_status === "offline_fallback") {
+        html += `<div class="airspace-fallback-banner" style="background:#2A1F05;border:1px solid #FF9500;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:12px;color:#FFD60A" lang="${state.uiLang}">
+          <span style="font-size:16px">⚠️</span>
+          <span>${escapeHtml(isTr ? (radar.feed_warning_tr || "Canlı EASA akışına ulaşılamadı. Son doğrulanmış hava sahası bültenleri (arşiv) gösteriliyor.") : (radar.feed_warning_en || "Real-time EASA CZIB feed currently unreachable. Displaying verified baseline conflict zones."))}</span>
+        </div>`;
+      }
 
       html += `<div class="airspace-map-card" lang="${state.uiLang}">
         <div class="airspace-map-header">
@@ -1938,11 +1950,12 @@
       const sources = [...new Set(items.map(it => String(it.source || "").split(";")[0].trim()).filter(Boolean))];
       const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
 
-      const brentItem = items.find(i => i.series_id === "brent_spot");
+      const brentItem = items.find(i => i.series_id === "brent_spot" || i.series_id === "brent_futures");
       const crackItem = items.find(i => i.series_id === "jet_fuel_brent_crack_spread");
-      const crackVal = crackItem ? fmtNumber(crackItem.value, 2) : "65.47";
-      if (brentItem && $("drawer-brent-val")) $("drawer-brent-val").textContent = `${fmtNumber(brentItem.value, 2)} USD`;
-      if (crackItem && $("drawer-crack-val")) $("drawer-crack-val").textContent = `${fmtNumber(crackItem.value, 2)} USD`;
+      const hasCrack = Boolean(crackItem && Number.isFinite(crackItem.value));
+      const crackVal = hasCrack ? fmtNumber(crackItem.value, 2) : "—";
+      if ($("drawer-brent-val")) $("drawer-brent-val").textContent = brentItem ? `${fmtNumber(brentItem.value, 2)} USD` : "—";
+      if ($("drawer-crack-val")) $("drawer-crack-val").textContent = hasCrack ? `${crackVal} USD` : "—";
 
       $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
         + (missing.length ? `<span class="mkt-miss">${missing.length} unavailable</span>` : "");
@@ -1958,9 +1971,17 @@
         </div>`;
       }).join("")
         + (missing.length ? `<p class="mkt-note">Unavailable right now: ${escapeHtml(missing.join(", "))}.</p>` : "")
-        + `<div class="mkt-crack-card" lang="tr">
-             <strong>Jet Yakıtı Rafineri Marjı (Crack Spread):</strong> Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). IATA / Platts Jet Fuel Price Monitor haftalık göstergesidir. Havayollarının en kritik operasyonel maliyet kalemini gösterir.
-           </div>`
+        + (hasCrack
+            ? `<div class="mkt-crack-card" lang="${state.uiLang}">
+                 <strong>${escapeHtml(t("crack_spread_title"))}:</strong> ${state.uiLang === "tr"
+                   ? `Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). Kaynak: ${escapeHtml((crackItem && crackItem.source) ? crackItem.source : "EIA US Gulf Coast vs Brent Spot")}. Havayollarının en kritik operasyonel maliyet kalemini gösterir.`
+                   : `Refining margin per barrel between crude (Brent) and finished jet fuel (${escapeHtml(crackVal)} USD/bbl). Source: ${escapeHtml((crackItem && crackItem.source) ? crackItem.source : "EIA US Gulf Coast vs Brent Spot")}. Primary airline fuel cost and margin benchmark.`}
+               </div>`
+            : `<div class="mkt-crack-card" lang="${state.uiLang}" style="opacity:0.85">
+                 <strong>${escapeHtml(t("crack_spread_title"))}:</strong> ${state.uiLang === "tr"
+                   ? `Güncel marj verisi geçici olarak erişilemiyor. EIA ve IATA haftalık göstergeleri yayımlandığında otomatik güncellenir.`
+                   : `Current crack margin data temporarily unavailable. Updates automatically upon official release.`}
+               </div>`)
         + `<p class="mkt-note">${sourceNote}${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
 
       $("market").hidden = false;
@@ -2063,8 +2084,9 @@
 
         const artImg = s.image_url ? `<div class="art-media"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.art-media').style.display='none'"><span class="art-media-caption">${escapeHtml(sourceName(s))}</span></div>` : "";
         
-        // Haberin asıl/orijinal metni (kaynaktan nasıl geldiyse)
-        const rawBody = s.article_body || s.source_description || s.lead || "";
+        // Haberin asıl/orijinal metni (telif ve lisans kısıtlamalarına tam uyumlu)
+        const isRestricted = Boolean(s.license_required || s.license_status === "paid" || s.basis === "headline_only");
+        const rawBody = isRestricted ? (s.lead || "") : (s.article_body || s.source_description || s.lead || "");
         const bodyParagraphs = rawBody.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
         const bodyHtml = bodyParagraphs.length > 0
           ? bodyParagraphs.map(p => `<p class="art-para" lang="${lang}">${escapeHtml(p)}</p>`).join("")

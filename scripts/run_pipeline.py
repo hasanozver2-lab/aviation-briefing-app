@@ -183,7 +183,13 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
                         entry["url"] = res
             if not story.get("image_url"):
                 target_url = (story.get("original_source") or {}).get("url", "")
-                if target_url and "news.google.com" not in target_url:
+                is_restricted = (
+                    story.get("license_required")
+                    or story.get("license_status") == "paid"
+                    or (story.get("original_source") or {}).get("license_required")
+                    or (story.get("original_source") or {}).get("license_status") == "paid"
+                )
+                if target_url and "news.google.com" not in target_url and not is_restricted:
                     story["image_url"] = _engine.fetch_og_image(target_url)
         # The archive-only low band costs no LLM calls; it is narrated if its score ever reaches the list.
         # A headline-only story's publisher summary is held in memory for the model call and never written to the archive.
@@ -197,6 +203,10 @@ def plan_files(collected, collection_error, read, now, api_key, narrate=narrativ
         for story in day["stories"]:
             if story.get("basis") == HEADLINE_ONLY:
                 story["source_description"] = ""
+                story["article_body"] = ""
+            if story.get("license_required") or story.get("license_status") == "paid":
+                story["source_description"] = ""
+                story["article_body"] = ""
 
     files = {}
     if day and story_lifecycle.fingerprint(day) != story_lifecycle.fingerprint(existing_day):

@@ -166,11 +166,13 @@ SCHEDULED_EVENTS = [
 ]
 
 
-def classify_event_status(target_date, today):
+def classify_event_status(target_date, today, has_verified_document=False):
     """Determine event status, days difference, and human badge."""
     delta_days = (target_date - today).days
     if delta_days < 0:
-        return "REPORTED", delta_days, "Açıklandı", "Reported"
+        if has_verified_document:
+            return "REPORTED", delta_days, "Açıklandı (Doğrulandı)", "Reported (Verified)"
+        return "REPORTED", delta_days, "Açıklandı (Teyit Bekleniyor)", "Reported (Pending Filing)"
     elif delta_days == 0:
         return "TODAY", 0, "BUGÜN AÇIKLANIYOR", "TODAY"
     elif delta_days <= 3:
@@ -195,7 +197,11 @@ def load_calendar(now=None):
     items = []
     for ev in SCHEDULED_EVENTS:
         ev_date = datetime.strptime(ev["date"], "%Y-%m-%d").date()
-        status_code, days_diff, badge_tr, badge_en = classify_event_status(ev_date, today)
+        has_doc = bool(ev.get("document_url"))
+        status_code, days_diff, badge_tr, badge_en = classify_event_status(ev_date, today, has_verified_document=has_doc)
+        pub_status = "CONFIRMED_REPORTED" if (days_diff < 0 and has_doc) else ("PENDING_CONFIRMATION" if days_diff < 0 else "SCHEDULED")
+        pub_status_tr = "Yayımlandı & Doğrulandı" if (days_diff < 0 and has_doc) else ("Teyit Bekleniyor" if days_diff < 0 else "Planlandı")
+        pub_status_en = "Published & Verified" if (days_diff < 0 and has_doc) else ("Pending Confirmation" if days_diff < 0 else "Scheduled")
         items.append({
             "id": ev["id"],
             "entity": ev["entity"],
@@ -212,6 +218,11 @@ def load_calendar(now=None):
             "days_diff": days_diff,
             "badge_tr": badge_tr,
             "badge_en": badge_en,
+            "publication_status": pub_status,
+            "publication_status_tr": pub_status_tr,
+            "publication_status_en": pub_status_en,
+            "verification_date": ev.get("verification_date", "2026-10-18"),
+            "document_url": ev.get("document_url", ev.get("official_url", "")),
             "official_url": ev.get("official_url", ""),
             "watchpoints_tr": ev.get("watchpoints_tr", ""),
             "watchpoints_en": ev.get("watchpoints_en", ""),

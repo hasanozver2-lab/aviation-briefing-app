@@ -115,9 +115,14 @@ def load_fleet_watch():
     delivery_delay_count = sum(1 for p in programs if p["category"] == "DELIVERY_DELAY")
     critical_count = sum(1 for p in programs if p["severity"] in ("CRITICAL", "HIGH"))
 
+    # Baseline audit and verification timestamp of the tracked fleet dataset
+    dataset_verified_at = "2026-10-18T10:00:00+00:00"
+
     return {
         "status": "ok",
-        "updated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "dataset_version": "2026.10-R1",
+        "last_verified_at": dataset_verified_at,
+        "updated_at": dataset_verified_at,
         "total_programs": len(programs),
         "grounding_count": grounding_count,
         "delivery_delay_count": delivery_delay_count,

@@ -261,3 +261,39 @@ def test_call_counts_over_three_hourly_runs():
     hour(base + stories(2, start=6), 2)
 
     assert calls == [1, 0, 1]
+
+
+def test_regular_stories_sanitize_ungrounded_numbers():
+    """Verify that hallucinated/ungrounded numbers are stripped from regular stories as well as headline_only."""
+    story_item = {
+        "story_id": "story-grounding",
+        "relevance_score": 85.0,
+        "narrative_status": "pending",
+        "headline": "Airline orders 10 aircraft",
+        "original_source": {"title": "Airline orders 10 aircraft", "source_name": "Trade"},
+        "source_description": "The carrier confirmed an order for 10 single-aisle aircraft on Tuesday.",
+        "source_count": 1,
+        "first_seen_at": "2026-10-16T08:00:00+00:00",
+    }
+    def answer_with_hallucinated_numbers(items):
+        produced = [{
+            "story_id": "story-grounding",
+            "headline": "Airline orders 999 aircraft in massive deal",
+            "lead": "Carrier finalized 999 aircraft order.",
+            "detailed_analysis": ["Confirmed 10 aircraft.", "Invented 999 aircraft."],
+            "data_points": ["10 aircraft", "999 aircraft"],
+            "strategic_impact": "Impact.",
+            "market_exposure": [],
+            "why_it_matters": "Context.",
+        }]
+        return {"candidates": [{"content": {"parts": [{"text": json.dumps({"stories": produced})}]}}]}
+
+    llm = FakeLlm(answer=answer_with_hallucinated_numbers)
+    report, _ = fill([story_item], llm)
+
+    assert report["narrated"] == 1
+    # Ungrounded headline falls back to original title
+    assert story_item["headline"] == "Airline orders 10 aircraft"
+    # Ungrounded numbers are stripped from data_points and detailed_analysis
+    assert story_item["data_points"] == ["10 aircraft"]
+    assert story_item["detailed_analysis"] == ["Confirmed 10 aircraft."]

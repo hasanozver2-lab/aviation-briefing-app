@@ -256,12 +256,13 @@ def parse_czib_feed(xml_text):
     if channel is None:
         return []
     for item in channel.findall("item"):
-        title = (item.find("title").text if item.find("title") is not None else "").strip()
-        link = (item.find("link").text if item.find("link") is not None else "").strip()
-        pub_date = (item.find("pubDate").text if item.find("pubDate") is not None else "").strip()
+        title = (item.find("title").text or "").strip() if item.find("title") is not None else ""
+        link = (item.find("link").text or "").strip() if item.find("link") is not None else ""
+        pub_date = (item.find("pubDate").text or "").strip() if item.find("pubDate") is not None else ""
+        description = (item.find("description").text or "").strip() if item.find("description") is not None else ""
         if not title:
             continue
-        items.append({"title": title, "link": link, "pub_date": pub_date})
+        items.append({"title": title, "link": link, "pub_date": pub_date, "description": description})
     return items
 
 
@@ -287,6 +288,12 @@ def build_zone_record(feed_item):
     title = feed_item.get("title", "")
     link = feed_item.get("link", CZIB_PORTAL_URL)
     pub_date = feed_item.get("pub_date", "")
+    description = feed_item.get("description", "")
+    valid_until = ""
+    m_valid = re.search(r"valid\s+(?:until|through)\s+([0-9]{1,2}\s+[A-Za-z]+\s+[0-9]{4}|[0-9]{4}-[0-9]{2}-[0-9]{2})", description, re.IGNORECASE)
+    if m_valid:
+        valid_until = m_valid.group(1)
+
     key, meta = match_known_region(title)
     if not meta:
         meta = {
@@ -326,6 +333,8 @@ def build_zone_record(feed_item):
         "summary_en": meta.get("summary_en", ""),
         "bulletin_code": extract_bulletin_code(link),
         "published_date": pub_date,
+        "valid_until": valid_until,
+        "bulletin_description": description,
         "link": link or CZIB_PORTAL_URL,
     }
 
@@ -402,16 +411,22 @@ def get_global_flight_traffic(now=None):
     time_factor = math.sin((hour - 8.5) * math.pi / 12.0)
     airborne_now = int(11600 + time_factor * 2200)
 
-    # Regional breakdowns summing to total
-    faa_flights = int(daily_commercial * 0.408)
-    eurocontrol_flights = int(daily_commercial * 0.271)
-    apac_flights = int(daily_commercial * 0.312)
-    mideast_flights = int(daily_commercial * 0.098)
-    latam_flights = int(daily_commercial * 0.078)
+    # Regional breakdowns calibrated to sum exactly to daily_commercial (100.0%)
+    # Baseline global commercial share distribution:
+    # North America (FAA): ~34.5%, APAC: ~31.0%, Europe: ~24.5%, Middle East: ~6.5%, Latin America: ~3.5%
+    faa_flights = int(daily_commercial * 0.345)
+    apac_flights = int(daily_commercial * 0.310)
+    eurocontrol_flights = int(daily_commercial * 0.245)
+    mideast_flights = int(daily_commercial * 0.065)
+    latam_flights = daily_commercial - (faa_flights + apac_flights + eurocontrol_flights + mideast_flights)
 
     return {
         "status": "ok",
         "updated_at": ref_time.isoformat(timespec="seconds"),
+        "is_estimate": True,
+        "data_type": "modelled_estimate",
+        "methodology_en": "Calibrated statistical estimate modeled on ICAO, FAA ATO, and Eurocontrol seasonal traffic baselines.",
+        "methodology_tr": "ICAO, FAA ATO ve Eurocontrol mevsimsel trafik bazlarına göre kalibre edilmiş istatistiki günlük tahmin.",
         "daily_commercial_flights": daily_commercial,
         "daily_commercial_flights_str": f"{daily_commercial:,}",
         "active_airborne_now": airborne_now,
@@ -426,6 +441,7 @@ def get_global_flight_traffic(now=None):
                 "name_en": "North America (FAA)",
                 "flights": faa_flights,
                 "flights_str": f"{faa_flights:,}",
+                "share_pct": "34.5%",
                 "trend": "+2.8%",
                 "status": "NORMAL",
             },
@@ -435,6 +451,7 @@ def get_global_flight_traffic(now=None):
                 "name_en": "Europe (Eurocontrol)",
                 "flights": eurocontrol_flights,
                 "flights_str": f"{eurocontrol_flights:,}",
+                "share_pct": "24.5%",
                 "trend": "+3.4%",
                 "status": "NORMAL",
             },
@@ -444,6 +461,7 @@ def get_global_flight_traffic(now=None):
                 "name_en": "Asia - Pacific",
                 "flights": apac_flights,
                 "flights_str": f"{apac_flights:,}",
+                "share_pct": "31.0%",
                 "trend": "+5.1%",
                 "status": "HIGH_GROWTH",
             },
@@ -453,6 +471,7 @@ def get_global_flight_traffic(now=None):
                 "name_en": "Middle East & Gulf",
                 "flights": mideast_flights,
                 "flights_str": f"{mideast_flights:,}",
+                "share_pct": "6.5%",
                 "trend": "+4.6%",
                 "status": "DISRUPTED_REROUTING",
             },
@@ -462,11 +481,14 @@ def get_global_flight_traffic(now=None):
                 "name_en": "Latin America",
                 "flights": latam_flights,
                 "flights_str": f"{latam_flights:,}",
+                "share_pct": "3.5%",
                 "trend": "+2.1%",
                 "status": "NORMAL",
             },
         ],
-        "source": "Eurocontrol / FAA / ICAO Global Traffic Statistics",
+        "source": "Modelled Estimate (ICAO / Eurocontrol / FAA Baselines)",
+        "source_en": "Modelled Estimate (ICAO / Eurocontrol / FAA Baselines)",
+        "source_tr": "Modellenmiş Tahmin (ICAO / Eurocontrol / FAA Bazları)",
         "source_url": "https://www.eurocontrol.int/our-data",
     }
 
@@ -476,7 +498,8 @@ def load_radar(xml_text=None, opener=None, timeout=6, now=None):
     raw_xml = xml_text if xml_text is not None else fetch_czib_feed(timeout=timeout, opener=opener)
     feed_items = parse_czib_feed(raw_xml) if raw_xml else []
     
-    if feed_items:
+    is_live = bool(feed_items)
+    if is_live:
         seen_keys = set()
         zones = []
         for item in feed_items:
@@ -503,8 +526,26 @@ def load_radar(xml_text=None, opener=None, timeout=6, now=None):
 
     global_traffic = get_global_flight_traffic(now=updated_time)
 
+    feed_warning_tr = None if is_live else "Canlı EASA akışına ulaşılamadı. Son doğrulanmış hava sahası bültenleri (arşiv) gösteriliyor."
+    feed_warning_en = None if is_live else "Real-time EASA CZIB feed currently unreachable. Displaying verified baseline conflict zones."
+
+    headline_alert_tr = (
+        f"🚨 {do_not_operate_count} Hava Sahası Sivil Uçuşa Kapalı / Yüksek Riskli"
+        if is_live
+        else f"⚠️ [Arşiv] {do_not_operate_count} Hava Sahası Bilgisi (EASA Akışı Çevrimdışı)"
+    )
+    headline_alert_en = (
+        f"🚨 {do_not_operate_count} Airspaces Under Do-Not-Operate / High Risk Advisory"
+        if is_live
+        else f"⚠️ [Baseline] {do_not_operate_count} Airspaces Monitored (Live Feed Offline)"
+    )
+
     return {
         "status": "ok",
+        "feed_status": "live" if is_live else "offline_fallback",
+        "is_fallback": not is_live,
+        "feed_warning_tr": feed_warning_tr,
+        "feed_warning_en": feed_warning_en,
         "updated_at": updated_time.isoformat(timespec="seconds"),
         "source": "EASA Conflict Zone Information Bulletins (CZIB)",
         "source_url": CZIB_PORTAL_URL,
@@ -512,8 +553,8 @@ def load_radar(xml_text=None, opener=None, timeout=6, now=None):
         "do_not_operate_count": do_not_operate_count,
         "restricted_count": restricted_count,
         "caution_count": caution_count,
-        "headline_alert_tr": f"🚨 {do_not_operate_count} Hava Sahası Sivil Uçuşa Kapalı / Yüksek Riskli",
-        "headline_alert_en": f"🚨 {do_not_operate_count} Airspaces Under Do-Not-Operate / High Risk Advisory",
+        "headline_alert_tr": headline_alert_tr,
+        "headline_alert_en": headline_alert_en,
         "global_traffic": global_traffic,
         "zones": zones,
     }

@@ -441,6 +441,12 @@ def market_series_definitions(provider_by_series=None):
             "source": _fuel_source(configured_series["brent_spot"], provider_by_series.get("brent_spot")),
             "frequency": "daily",
         },
+        "brent_futures": {
+            "name": "Brent Vadeli Ham Petrol (ICE)",
+            "unit": "USD/varil",
+            "source": "ICE / Yahoo Finance (BZ=F front-month)",
+            "frequency": "daily",
+        },
         "us_gulf_coast_jet_fuel": {
             "name": configured_series["us_gulf_coast_jet_fuel"]["name"],
             "unit": configured_series["us_gulf_coast_jet_fuel"]["unit"],
@@ -1006,7 +1012,12 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
             live_brent_rows = fetch_live_brent()
             if live_brent_rows:
                 provider_by_series["brent_spot"] = "ice"
-                upsert_observations(target, {"brent_spot": live_brent_rows}, provider_by_series=provider_by_series)
+                provider_by_series["brent_futures"] = "ice"
+                upsert_observations(
+                    target,
+                    {"brent_spot": live_brent_rows, "brent_futures": live_brent_rows},
+                    provider_by_series=provider_by_series,
+                )
         except Exception as exc:
             errors.append(f"LiveBrent: {type(exc).__name__}")
     should_iata_crack = (

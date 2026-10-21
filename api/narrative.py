@@ -262,14 +262,26 @@ def fill_pending(stories, api_key, description_limit, config=None, post=None, sl
             break
         for story in batch:
             fields = parsed.get(story["story_id"])
-            if fields and story.get("basis") == BASIS_HEADLINE_ONLY:
+            if fields:
+                is_headline_only = story.get("basis") == BASIS_HEADLINE_ONLY
                 title = (story.get("original_source") or {}).get("title") or story.get("headline", "")
-                fields, removed = sanitize_headline_only(fields, f"{title} {story.get('source_description', '')}")
-                report["numbers_removed"] = report.get("numbers_removed", 0) + removed
-                fields["lead"] = fields["lead"] or title
-                if has_ungrounded_number(fields["headline"], grounded_numbers(title)):
-                    fields["headline"] = title
-                    report["numbers_removed"] += 1
+                if is_headline_only:
+                    source_context = f"{title} {story.get('source_description', '')}"
+                    fields, removed = sanitize_headline_only(fields, source_context)
+                    report["numbers_removed"] = report.get("numbers_removed", 0) + removed
+                    fields["lead"] = fields["lead"] or title
+                    if has_ungrounded_number(fields["headline"], grounded_numbers(title)):
+                        fields["headline"] = title
+                        report["numbers_removed"] = report.get("numbers_removed", 0) + 1
+                else:
+                    # Enforce number grounding on regular stories when the source provides verified figures
+                    source_body = f"{title} {story.get('source_description', '')} {story.get('article_body', '')} {story.get('description', '')}"
+                    source_nums = grounded_numbers(source_body)
+                    if source_nums:
+                        fields, _ = sanitize_headline_only(fields, source_body)
+                        fields["lead"] = fields["lead"] or title
+                        if has_ungrounded_number(fields["headline"], source_nums):
+                            fields["headline"] = title
             if fields:
                 was_rewrite = story.get("narrative_status") == NARRATIVE_DONE
                 story.update(fields)

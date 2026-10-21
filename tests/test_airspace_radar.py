@@ -99,10 +99,14 @@ def test_global_flight_traffic():
     assert traffic["active_airborne_now"] > 5000
     assert "daily_commercial_flights_str" in traffic
     assert "active_airborne_now_str" in traffic
+    assert traffic["is_estimate"] is True
+    assert traffic["data_type"] == "modelled_estimate"
     assert len(traffic["regions"]) >= 4
     region_ids = [r["id"] for r in traffic["regions"]]
     assert "eurocontrol" in region_ids
     assert "faa" in region_ids
+    # Verify regional breakdown sums EXACTLY to global commercial flights
+    assert sum(r["flights"] for r in traffic["regions"]) == traffic["daily_commercial_flights"]
 
 
 def test_fallback_zones():
@@ -120,6 +124,9 @@ def test_fallback_zones():
 def test_load_radar_with_xml():
     radar = airspace_radar.load_radar(xml_text=SAMPLE_CZIB_XML)
     assert radar["status"] == "ok"
+    assert radar["feed_status"] == "live"
+    assert radar["is_fallback"] is False
+    assert radar["feed_warning_tr"] is None
     assert radar["total_active_zones"] == 3
     assert radar["do_not_operate_count"] >= 2
     assert len(radar["zones"]) == 3
@@ -134,6 +141,9 @@ def test_load_radar_offline_fallback():
     # Passing empty string forces fallback
     radar = airspace_radar.load_radar(xml_text="")
     assert radar["status"] == "ok"
+    assert radar["feed_status"] == "offline_fallback"
+    assert radar["is_fallback"] is True
+    assert "Canlı EASA akışına ulaşılamadı" in radar["feed_warning_tr"]
     assert radar["total_active_zones"] >= 5
     assert radar["do_not_operate_count"] >= 3
     assert "global_traffic" in radar

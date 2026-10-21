@@ -643,15 +643,18 @@ def _fetch_source_articles(source, cutoff, headers):
             if is_html_source:
                 title = item.get("title", "")
                 link = item.get("link", "")
-                description = item.get("description", "")
+                description = "" if is_paid_source else item.get("description", "")
                 pub_date = item.get("pub_date", "")
                 image_url = item.get("image_url", "")
-                raw_body = description
+                raw_body = "" if is_paid_source else description
             else:
                 title, link, description, pub_date = entry_values(item, include_description=not is_paid_source)
                 image_url = extract_entry_image(item)
-                raw_body = _child_text(item, {"encoded", "content", "description", "summary"})
-                raw_body = clean_html_paragraphs(raw_body) if raw_body else description
+                if is_paid_source:
+                    raw_body = ""
+                else:
+                    raw_body = _child_text(item, {"encoded", "content", "description", "summary"})
+                    raw_body = clean_html_paragraphs(raw_body) if raw_body else description
 
             if not title or not link:
                 continue
@@ -685,6 +688,10 @@ def _fetch_source_articles(source, cutoff, headers):
 
             if feed_only:
                 description = description[:feed_sources.FEED_ONLY_SUMMARY_CHARS]
+                raw_body = raw_body[:feed_sources.FEED_ONLY_SUMMARY_CHARS] if raw_body else description
+            if is_paid_source:
+                description = ""
+                raw_body = ""
             article = {
                 "title": title,
                 "link": link,
