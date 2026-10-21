@@ -1425,6 +1425,46 @@ def wants_low(query):
     """?include_low=1 (or true) asks for the archive-only low band as well."""
     return str((query.get("include_low") or [""])[0]).lower() in {"1", "true", "yes"}
 
+
+def analyze_single_story(story_id):
+    """Generate or refresh AI analysis on a single story on demand."""
+    if not story_id:
+        raise ValueError("story_id is required")
+
+    env = load_env()
+    api_key = env.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY is not configured")
+
+    snapshot = _read_local_briefing_cache("daily")
+    if not isinstance(snapshot, dict):
+        snapshot = briefing_store.read_json(briefing_store.latest_path())
+    if not isinstance(snapshot, dict):
+        raise BriefingNotFound("no active briefing found to analyze")
+
+    stories = snapshot.get("stories", [])
+    target = None
+    for s in stories:
+        if s.get("story_id") == story_id:
+            target = s
+            break
+
+    if not target:
+        raise BriefingNotFound(f"story not found: {story_id}")
+
+    target["narrative_status"] = "pending"
+    description_limit = load_description_limit()
+    try:
+        from . import narrative
+    except ImportError:
+        import narrative
+    report = narrative.fill_pending([target], api_key, description_limit)
+    if report.get("error"):
+        raise RuntimeError(report["error"])
+
+    _write_local_briefing_cache(snapshot, "daily")
+    return {"status": "ok", "story": target, "report": report}
+
 if __name__ == "__main__":
     print("Aviation Briefing Engine test ediliyor...")
     res = run_pipeline(mode="daily")

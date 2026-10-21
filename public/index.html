@@ -246,6 +246,24 @@
     .art-why, .report-why { background: var(--black); color: #FFF; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
     .art-story-body { display: flex; flex-direction: column; gap: 14px; font: 400 16px/1.65 var(--sans); color: var(--ink); }
     .art-para { text-wrap: pretty; }
+    .card-ai-badge { display: inline-flex; align-items: center; gap: 3px; background: var(--black); color: var(--yellow); font: 700 9.5px/1.3 var(--mono); padding: 1px 6px; margin-right: 6px; vertical-align: middle; letter-spacing: .04em; text-transform: uppercase; }
+    .art-ai-panel { background: var(--paper-2); border: 1.5px solid var(--black); padding: 18px; display: flex; flex-direction: column; gap: 14px; margin: 6px 0; }
+    .art-ai-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .art-ai-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--black); color: var(--yellow); padding: 5px 10px; font: 700 11.5px/1.2 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+    .art-ai-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1.5px solid var(--black); color: var(--ink); padding: 6px 12px; font: 700 12px/1.2 var(--sans); cursor: pointer; transition: background .15s; }
+    .art-ai-btn:hover { background: var(--yellow); }
+    .art-ai-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .art-ai-takeaway { background: var(--black); color: #FFF; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .art-ai-takeaway .eyebrow { color: var(--yellow); }
+    .art-ai-takeaway p { font: 500 15px/1.5 var(--sans); margin: 0; }
+    .art-ai-section { display: flex; flex-direction: column; gap: 8px; }
+    .art-ai-section-title { font: 700 11px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--faint); }
+    .art-ai-bullets { list-style: none; display: flex; flex-direction: column; gap: 8px; counter-reset: aib; }
+    .art-ai-bullets li { display: grid; grid-template-columns: 24px 1fr; gap: 8px; font: 400 14.5px/1.5 var(--sans); color: var(--ink-2); counter-increment: aib; }
+    .art-ai-bullets li::before { content: counter(aib); width: 20px; height: 20px; background: var(--black); color: var(--yellow); font: 700 11px/20px var(--mono); text-align: center; }
+    .art-ai-impact-box { background: var(--card); border-left: 4px solid var(--black); padding: 12px 14px; font: 400 14px/1.5 var(--sans); color: var(--ink); }
+    .art-ai-impact-box strong { font-weight: 800; color: var(--ink); }
+    .art-ai-pending-banner { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: var(--card); border: 1px dashed var(--black); font: 400 13.5px/1.5 var(--sans); color: var(--muted); }
     .art-data-card { background: var(--paper-2); border: 1.5px solid var(--black); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
     .art-data-head { display: flex; justify-content: space-between; align-items: center; }
     .art-data-head .eyebrow { color: var(--black); font-weight: 800; }
@@ -808,6 +826,17 @@
         story_flash_banner: "Sector Radar (Flash Signal):",
         story_analysis_pending: "Analysis pending — written summary appears after next update.",
         story_flagship_report: "Flagship Outlook & Benchmark Publication",
+        ai_panel_title: "AI Executive Analysis",
+        ai_takeaway: "Executive Takeaway",
+        ai_findings: "Strategic Analysis & Key Findings",
+        ai_data_points: "Quoted Figures & Metrics",
+        ai_strategic_impact: "Operational & Commercial Impact",
+        ai_market_exposure: "Airline & Manufacturer Exposure",
+        ai_analyze_btn: "Analyze with AI",
+        ai_reanalyze_btn: "Re-analyze with AI",
+        ai_analyzing: "Analyzing with AI…",
+        ai_analysis_ready: "AI analysis generated successfully.",
+        ai_badge_card: "AI Brief",
 
         archive_title: "Archive date",
         archive_note: "Previously collected stories, including the lower-score archive. Dates follow Istanbul time.",
@@ -949,6 +978,17 @@
         story_flash_banner: "Sektör Radarı (Kısa Sinyal):",
         story_analysis_pending: "Analiz bekleniyor — yazılı analiz bir sonraki güncellemede görünecektir.",
         story_flagship_report: "Stratejik Görünüm & Benchmark Yayını",
+        ai_panel_title: "Yapay Zekâ Stratejik Analizi",
+        ai_takeaway: "Yönetici Özeti (Neden Önemli?)",
+        ai_findings: "Stratejik Analiz & Çıkarımlar",
+        ai_data_points: "Haberdeki Kritik Rakamlar",
+        ai_strategic_impact: "Sektörel & Operasyonel Etki",
+        ai_market_exposure: "Havayolu & Paydaş Etkisi",
+        ai_analyze_btn: "Yapay Zekâ ile Analiz Et",
+        ai_reanalyze_btn: "Yeniden Analiz Et",
+        ai_analyzing: "Yapay zekâ analiz ediyor…",
+        ai_analysis_ready: "Yapay zekâ analizi başarıyla tamamlandı.",
+        ai_badge_card: "AI Analiz",
 
         archive_title: "Arşiv tarihi",
         archive_note: "Daha önce derlenen haberler ve arşiv akışı. Tarihler İstanbul saatini izler.",
@@ -1888,7 +1928,8 @@
         const tags = tagsHtml(s, withRegion);
         const count = sourceCount(s);
         const meta = [sourceName(s), count > 1 ? `${count} sources` : "", s.published_at || ""].filter(Boolean).map(escapeHtml).join(" · ");
-        const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${escapeHtml(s.why_it_matters)}</p>` : "");
+        const aiTag = (s.narrative_status === "done" && s.why_it_matters) ? `<span class="card-ai-badge">✦ AI</span>` : "";
+        const body = isPending(s) ? `<p class="pending" lang="en">Analysis pending</p>` : (s.why_it_matters ? `<p lang="${langOf(s)}">${aiTag}${escapeHtml(s.why_it_matters)}</p>` : "");
         const img = s.image_url ? `<span class="row-thumb"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.row-thumb').style.display='none'"></span>` : "";
         return `<button class="row${s.image_url ? ' has-thumb' : ''}" type="button" data-open="${escapeHtml(storyKey(s))}">
           <span class="row-num">${String(n).padStart(2, "0")}</span>
@@ -1912,11 +1953,12 @@
       if (lead) {
         const count = sourceCount(lead);
         const leadImg = lead.image_url ? `<div class="lead-media"><img src="${escapeHtml(lead.image_url)}" alt="" loading="lazy" onerror="this.closest('.lead-media').style.display='none'"></div>` : "";
+        const leadAiTag = (lead.narrative_status === "done" && lead.why_it_matters) ? `<span class="card-ai-badge">✦ AI</span>` : "";
         html += `<article class="lead-story" role="button" tabindex="0" data-open="${escapeHtml(storyKey(lead))}">
           ${leadImg}
           <div class="kicker">${tagsHtml(lead, true)}</div>
           <h2 lang="${langOf(lead)}">${escapeHtml(lead.headline)}</h2>
-          ${isPending(lead) ? `<p class="why" lang="en">Analysis pending</p>` : (lead.why_it_matters ? `<p class="why" lang="${langOf(lead)}">${escapeHtml(lead.why_it_matters)}</p>` : "")}
+          ${isPending(lead) ? `<p class="why" lang="en">Analysis pending</p>` : (lead.why_it_matters ? `<p class="why" lang="${langOf(lead)}">${leadAiTag}${escapeHtml(lead.why_it_matters)}</p>` : "")}
           <div class="meta" lang="en"><span>${escapeHtml([sourceName(lead), count > 1 ? `${count} sources` : ""].filter(Boolean).join(" · "))}</span><strong>Read the analysis →</strong></div>
         </article>`;
       }
@@ -2077,9 +2119,11 @@
           ${src.url ? `<a class="report-cta-btn" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer"><span>View Official Report &amp; Data Tables (${escapeHtml(sourceName(s))})</span> <span aria-hidden="true">↗</span></a>` : ""}
           ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next strategic report ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
       } else {
-        const analysis = (s.detailed_analysis || []).map(b => `<li>${escapeHtml(b)}</li>`).join("");
-        const dps = (s.data_points || []).map(d => `<span>${escapeHtml(d)}</span>`).join("");
-        const exposure = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
+        const storyId = storyKey(s);
+        const hasAi = s.narrative_status === "done";
+        const hasAnalysisBullets = Array.isArray(s.detailed_analysis) && s.detailed_analysis.length > 0;
+        const hasDataPoints = Array.isArray(s.data_points) && s.data_points.length > 0;
+        const exposureHtml = (Array.isArray(s.market_exposure) ? s.market_exposure : []).map(e =>
           `<div class="exp"><div class="exp-head"><span>${escapeHtml(e.carrier || "Stakeholder")}</span><span lang="en" class="${tone(e.impact)}">${escapeHtml(e.impact || "Neutral")}</span></div>${e.details ? `<p lang="${lang}">${escapeHtml(e.details)}</p>` : ""}</div>`).join("");
 
         const artImg = s.image_url ? `<div class="art-media"><img src="${escapeHtml(s.image_url)}" alt="" loading="lazy" onerror="this.closest('.art-media').style.display='none'"><span class="art-media-caption">${escapeHtml(sourceName(s))}</span></div>` : "";
@@ -2092,17 +2136,43 @@
           ? bodyParagraphs.map(p => `<p class="art-para" lang="${lang}">${escapeHtml(p)}</p>`).join("")
           : (s.lead ? `<p class="art-lead" lang="${lang}">${escapeHtml(s.lead)}</p>` : "");
 
-        // Haberde veri/rakam varsa özel veri analizi kartı
-        const hasDataPoints = Array.isArray(s.data_points) && s.data_points.length > 0;
-        const dataPanelHtml = hasDataPoints ? `
-          <div class="art-data-card" lang="${lang}">
-            <div class="art-data-head"><span class="eyebrow" lang="en">Data &amp; Figures Analysis · Haberdeki Veriler</span></div>
-            <div class="datapoints-chips">
-              ${s.data_points.map(d => `<span class="dp-chip"><strong>${escapeHtml(d)}</strong></span>`).join("")}
+        const aiPanelHtml = `
+          <div class="art-ai-panel" lang="${lang}">
+            <div class="art-ai-head">
+              <span class="art-ai-badge">✦ ${escapeHtml(t("ai_panel_title"))}</span>
+              <button class="art-ai-btn" type="button" id="btn-ai-analyze-${escapeHtml(storyId)}" onclick="requestAiAnalysis('${escapeHtml(storyId)}')">
+                ${hasAi ? `🔄 ${escapeHtml(t("ai_reanalyze_btn"))}` : `✨ ${escapeHtml(t("ai_analyze_btn"))}`}
+              </button>
             </div>
-            ${analysis ? `<div class="dp-bullets-wrap"><span class="eyebrow" lang="en" style="color:var(--faint)">Veri Analizi &amp; Çıkarımlar</span><ul class="bullets" lang="${lang}">${analysis}</ul></div>` : ""}
-            ${strategic ? `<div class="dp-impact-line"><strong>Sektörel Etki:</strong> ${escapeHtml(strategic)}</div>` : ""}
-          </div>` : "";
+            ${s.why_it_matters ? `
+              <div class="art-ai-takeaway">
+                <span class="eyebrow">${escapeHtml(t("ai_takeaway"))}</span>
+                <p lang="${lang}">${escapeHtml(s.why_it_matters)}</p>
+              </div>` : (isPending(s) ? `<div class="art-ai-pending-banner"><p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p></div>` : "")}
+            ${hasAnalysisBullets ? `
+              <div class="art-ai-section">
+                <div class="art-ai-section-title">${escapeHtml(t("ai_findings"))}</div>
+                <ul class="art-ai-bullets" lang="${lang}">
+                  ${s.detailed_analysis.map(b => `<li><span>${escapeHtml(b)}</span></li>`).join("")}
+                </ul>
+              </div>` : ""}
+            ${hasDataPoints ? `
+              <div class="art-ai-section">
+                <div class="art-ai-section-title">${escapeHtml(t("ai_data_points"))}</div>
+                <div class="datapoints-chips">
+                  ${s.data_points.map(d => `<span class="dp-chip"><strong>${escapeHtml(d)}</strong></span>`).join("")}
+                </div>
+              </div>` : ""}
+            ${strategic ? `
+              <div class="art-ai-impact-box" lang="${lang}">
+                <strong>${escapeHtml(t("ai_strategic_impact"))}:</strong> ${escapeHtml(strategic)}
+              </div>` : ""}
+            ${exposureHtml ? `
+              <div class="art-ai-section">
+                <div class="art-ai-section-title">${escapeHtml(t("ai_market_exposure"))}</div>
+                <div class="exp-wrap">${exposureHtml}</div>
+              </div>` : ""}
+          </div>`;
 
         $("art-body").innerHTML = `
           <div class="kicker">${tagsHtml(s, true)}</div>
@@ -2112,13 +2182,10 @@
           ${s.is_flash_alert ? `<div class="flash-alert-banner" lang="tr"><strong>Sektör Radarı (Kısa Sinyal):</strong> Kritik havacılık analistleri ve sektör radarı kaynaklı hızlı gelişme.</div>` : ""}
           ${s.basis === "headline_only" ? `<p class="art-src" lang="en">Based on the publisher's headline and short summary only; no figures beyond the source's own.</p>` : ""}
           ${isUnverified(s) ? `<p class="art-src" lang="en">This collected headline has not been independently checked. No verified publisher link or analysis is available; please check the named publisher yourself.</p>` : ""}
-          ${isPending(s) ? `<p class="art-pending" lang="en">Analysis pending — the written analysis appears after the next update.</p>` : ""}
-          ${s.why_it_matters ? `<div class="art-why"><span lang="en" class="eyebrow">Why it matters</span><p lang="${lang}">${escapeHtml(s.why_it_matters)}</p></div>` : ""}
+          ${aiPanelHtml}
           <div class="art-story-body">
             ${bodyHtml}
           </div>
-          ${dataPanelHtml}
-          ${(!hasDataPoints && strategic) || exposure ? `<div class="impact"><span lang="en" class="eyebrow">Strategic &amp; market impact</span>${!hasDataPoints && strategic ? `<p lang="${lang}">${escapeHtml(strategic)}</p>` : ""}${exposure}</div>` : ""}
           ${coverageHtml}
           ${src.url ? `<a class="art-link" lang="en" href="${safeExternalUrl(src.url)}" target="_blank" rel="noopener noreferrer">Original source: ${escapeHtml(src.title || "Read full article")}${src.source_name ? " — " + escapeHtml(src.source_name) : ""} ↗</a>` : ""}
           ${next ? `<button class="next" type="button" data-open="${escapeHtml(storyKey(next))}" data-replace="1"><span lang="en" class="eyebrow" style="color:var(--muted)">Next story ↓</span><span lang="${langOf(next)}">${escapeHtml(next.headline)}</span></button>` : ""}`;
@@ -2134,6 +2201,45 @@
       renderArticle();
       if (moveFocus) focusArticleHeading();
     }
+    async function requestAiAnalysis(storyId) {
+      const btn = document.getElementById(`btn-ai-analyze-${storyId}`);
+      const origContent = btn ? btn.innerHTML : "";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳</span> ${escapeHtml(t("ai_analyzing"))}`;
+      }
+      try {
+        const res = await fetch("/api/analyze-story", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ story_id: storyId })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        if (data && data.story) {
+          const updateStory = (list) => {
+            const idx = (list || []).findIndex(item => storyKey(item) === storyId);
+            if (idx >= 0) list[idx] = { ...list[idx], ...data.story };
+          };
+          updateStory(state.order);
+          updateStory(state.stories);
+          if (state.data && Array.isArray(state.data.stories)) updateStory(state.data.stories);
+          showToast(t("ai_analysis_ready"));
+          renderArticle();
+          renderStories();
+        }
+      } catch (err) {
+        showToast(`AI Error: ${err.message}`);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origContent || `✨ ${escapeHtml(t("ai_analyze_btn"))}`;
+        }
+      }
+    }
+    window.requestAiAnalysis = requestAiAnalysis;
     // A shared link (#story-id) opens that story once the list has loaded; an id that is no longer in this view is dropped quietly.
     let linkedStoryHandled = !initialHash;
     function openLinkedStory() {

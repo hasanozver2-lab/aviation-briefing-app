@@ -141,6 +141,28 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
+        if path == "/api/analyze-story":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length) if content_length > 0 else b"{}"
+            try:
+                req_data = json.loads(body.decode("utf-8")) if body else {}
+            except json.JSONDecodeError:
+                req_data = {}
+            story_id = req_data.get("story_id") or query.get("story_id", [None])[0]
+            if not story_id:
+                self.send_json({"error": "story_id is required"}, status=400)
+                return
+            try:
+                result = engine.analyze_single_story(story_id)
+                self.send_json(result)
+            except engine.BriefingNotFound as e:
+                self.send_json({"error": str(e)}, status=404)
+            except ValueError as e:
+                self.send_json({"error": str(e)}, status=400)
+            except Exception as e:
+                self.send_json({"error": str(e)}, status=500)
+            return
+
         if path == "/api/refresh":
             mode = query.get("mode", ["daily"])[0]
             authorization = self.headers.get("Authorization", "")
