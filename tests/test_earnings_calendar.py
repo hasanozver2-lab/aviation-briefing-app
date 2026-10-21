@@ -74,7 +74,6 @@ def test_ui_contract_crack_spread_and_calendar():
     html = (Path(__file__).resolve().parents[1] / "public" / "index.html").read_text(encoding="utf-8")
     assert "mkt-crack-card" in html
     assert "Jet Yakıtı Rafineri Marjı (Crack Spread)" in html
-    assert "renderEarningsCalendar" in html
     assert "renderEarningsCalendarPage" in html
     assert 'data-page="calendar"' in html
     assert 'id="nav-calendar-count"' in html
@@ -83,9 +82,9 @@ def test_ui_contract_crack_spread_and_calendar():
     assert "data-calendar-filter" in html
     assert "calendar-list" in html
     assert "calendar-stats-grid" in html
-    assert "calendar-section" in html
     assert "Havacılık Bilanço &amp; Trafik Takvimi" in html
-    assert "ticker-cal-btn" in html
+    # Calendar is now exclusively in its dedicated tab, not inside the market ticker
+    assert "ticker-cal-btn" not in html
 
 
 def test_calendar_browser_interaction():

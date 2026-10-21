@@ -1034,10 +1034,6 @@
         <strong>Havacılık Güvenliği &amp; Çatışma Bölgeleri Radarı</strong> — EASA CZIB (Conflict Zone Information Bulletins) ve küresel FIR kısıtlamaları. THY, Pegasus ve uluslararası havayollarının rota planlamasını ve uçuş güvenliğini doğrudan etkileyen aktif hava sahası yasakları, füze tehditleri, FL irtifa kısıtlamaları ve GPS/GNSS karıştırma ikazları.
       </div>`;
 
-      const traffic = radar.global_traffic || null;
-      if (traffic) {
-        html += renderTrafficPanel(traffic);
-      }
 
       html += `<div class="airspace-map-card" lang="tr">
         <div class="airspace-map-header">
@@ -1354,7 +1350,15 @@
       if (state.page === "calendar") { renderEarningsCalendarPage(); return; }
       const { filter } = state;
       const stories = state.stories;
-      if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${state.page === "archive" ? "No eligible stories in this saved briefing." : EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
+      if (!stories.length) {
+        state.order = [];
+        const radar = state.data && state.data.airspace_radar;
+        const traffic = radar && radar.global_traffic;
+        let emptyHtml = (traffic && state.page === "briefing") ? renderTrafficPanel(traffic) : "";
+        emptyHtml += `<div class="state">${state.page === "archive" ? "No eligible stories in this saved briefing." : EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`;
+        $("content").innerHTML = emptyHtml;
+        return;
+      }
       const counts = {};
       stories.forEach(s => { const k = sectionOf(s); counts[k] = (counts[k] || 0) + 1; });
       const sectionNames = Object.keys(counts).sort((a, b) => sectionRank(a) - sectionRank(b));
@@ -1435,40 +1439,6 @@
 
     function sourceName(s) { const o = s.original_source || {}; return o.source_name || o.title || "Verified source"; }
 
-    function renderEarningsCalendar(cal) {
-      if (!cal || !cal.events || !cal.events.length) return "";
-      const events = cal.events;
-      let html = `<div class="calendar-section" lang="tr">
-        <div class="calendar-head">
-          <div>
-            <h4>Havacılık Bilanço &amp; Trafik Takvimi</h4>
-            <span class="cal-sub">THY, Pegasus, Lufthansa, Airbus vb. çeyreklik finansal sonuçlar ve aylık trafik açıklamaları</span>
-          </div>
-          <span style="font:600 11.5px/1 var(--mono);color:var(--muted)">${cal.upcoming_count || 0} Yaklaşan Açıklama</span>
-        </div>
-        <div class="calendar-grid">`;
-
-      events.forEach(e => {
-        const isUrgent = e.status === "THIS_WEEK" || e.status === "TODAY";
-        const badgeCls = e.status === "TODAY" ? "cal-badge-today" : (isUrgent ? "cal-badge-urgent" : (e.status === "REPORTED" ? "cal-badge-reported" : "cal-badge-upcoming"));
-        html += `<div class="calendar-card">
-          <div class="calendar-card-top">
-            <div>
-              <span class="calendar-entity">${escapeHtml(e.entity)}</span>
-              <span class="calendar-ticker">${escapeHtml(e.ticker)}</span>
-            </div>
-            <span class="calendar-badge ${badgeCls}">${escapeHtml(e.badge_tr)}</span>
-          </div>
-          <div class="calendar-period"><strong>${escapeHtml(e.period)}</strong> · <span class="calendar-date">${escapeHtml(e.date)}</span></div>
-          ${e.watchpoints_tr ? `<div class="calendar-watch"><strong>İzlenecek:</strong> ${escapeHtml(e.watchpoints_tr)}</div>` : ""}
-          ${e.official_url ? `<a class="calendar-link" href="${safeExternalUrl(e.official_url)}" target="_blank" rel="noopener noreferrer">Resmî Yatırımcı İlişkileri ↗</a>` : ""}
-        </div>`;
-      });
-
-      html += `</div></div>`;
-      return html;
-    }
-
     function renderMarket(market) {
       const items = (market && Array.isArray(market.items) ? market.items : []).filter(it => it.series_id !== "us_gulf_coast_jet_fuel").slice()
         .sort((a, b) => (MARKET_ORDER.indexOf(a.series_id) + 99) % 99 - (MARKET_ORDER.indexOf(b.series_id) + 99) % 99);
@@ -1485,16 +1455,13 @@
       const sources = [...new Set(items.map(it => String(it.source || "").split(";")[0].trim()).filter(Boolean))];
       const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
 
-      const cal = state.data && state.data.earnings_calendar;
       const brentItem = items.find(i => i.series_id === "brent_spot");
       const crackItem = items.find(i => i.series_id === "jet_fuel_brent_crack_spread");
       const crackVal = crackItem ? fmtNumber(crackItem.value, 2) : "65.47";
       if (brentItem && $("drawer-brent-val")) $("drawer-brent-val").textContent = `${fmtNumber(brentItem.value, 2)} USD`;
       if (crackItem && $("drawer-crack-val")) $("drawer-crack-val").textContent = `${fmtNumber(crackItem.value, 2)} USD`;
-      const calHtml = renderEarningsCalendar(cal);
 
       $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
-        + (cal && cal.highlight_tr ? `<button type="button" class="ticker-cal-pill" id="ticker-cal-btn" title="Takvimi İncele">${escapeHtml(cal.highlight_tr)} ›</button>` : "")
         + (missing.length ? `<span class="mkt-miss">${missing.length} unavailable</span>` : "");
 
       $("mkt-table").innerHTML = items.map(it => {
@@ -1511,20 +1478,8 @@
         + `<div class="mkt-crack-card" lang="tr">
              <strong>Jet Yakıtı Rafineri Marjı (Crack Spread):</strong> Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). IATA / Platts Jet Fuel Price Monitor haftalık göstergesidir. Havayollarının en kritik operasyonel maliyet kalemini gösterir.
            </div>`
-        + `<p class="mkt-note">${sourceNote}${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`
-        + calHtml;
+        + `<p class="mkt-note">${sourceNote}${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
 
-      const tickerCalBtn = $("ticker-cal-btn");
-      if (tickerCalBtn) {
-        tickerCalBtn.onclick = () => {
-          setPage("calendar");
-
-
-
-
-
-        };
-      }
       $("market").hidden = false;
     }
     function sparkline(points) {

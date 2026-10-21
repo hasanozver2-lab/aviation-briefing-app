@@ -188,13 +188,16 @@ def test_airspace_radar_browser_interaction():
         page.goto(index_url)
         page.wait_for_selector(".page-nav")
         
+        # Verify traffic panel on main page (only displayed on main page)
+        assert page.is_visible(".traffic-panel")
+        assert "Bugünkü Ticari Uçuş" in page.text_content(".traffic-panel")
+
         # Navigate to airspace page
         page.click('[data-page="airspace"]')
         page.wait_for_selector(".airspace-map-card")
         
-        # Verify traffic panel
-        assert page.is_visible(".traffic-panel")
-        assert "Bugünkü Ticari Uçuş" in page.text_content(".traffic-panel")
+        # Verify traffic panel is removed from airspace page
+        assert not page.is_visible(".traffic-panel")
         
         # Verify map
         assert page.is_visible(".airspace-map-svg")
