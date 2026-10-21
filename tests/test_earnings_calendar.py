@@ -75,6 +75,72 @@ def test_ui_contract_crack_spread_and_calendar():
     assert "mkt-crack-card" in html
     assert "Jet Yakıtı Rafineri Marjı (Crack Spread)" in html
     assert "renderEarningsCalendar" in html
+    assert "renderEarningsCalendarPage" in html
+    assert 'data-page="calendar"' in html
+    assert 'id="nav-calendar-count"' in html
+    assert 'data-drawer-page="calendar"' in html
+    assert 'id="drawer-calendar-count"' in html
+    assert "data-calendar-filter" in html
+    assert "calendar-list" in html
+    assert "calendar-stats-grid" in html
     assert "calendar-section" in html
     assert "Havacılık Bilanço &amp; Trafik Takvimi" in html
     assert "ticker-cal-btn" in html
+
+
+def test_calendar_browser_interaction():
+    import json
+    import pytest
+    playwright = pytest.importorskip("playwright.sync_api")
+    with playwright.sync_playwright() as engine:
+        try:
+            browser = engine.chromium.launch(channel="msedge", headless=True)
+        except playwright.Error:
+            pytest.skip("MS Edge not found")
+            return
+        page = browser.new_page(viewport={"width": 1280, "height": 800})
+        errors = []
+        page.on("pageerror", lambda e: errors.append(str(e)))
+
+        cal_data = earnings_calendar.load_calendar()
+        mock_payload = {
+            "date": "2026-10-21",
+            "date_str": "2026-10-21",
+            "stories": [],
+            "status": "ok",
+            "earnings_calendar": cal_data,
+            "market": {},
+        }
+
+        page.route("**/api/briefing*", lambda route: route.fulfill(
+            status=200,
+            content_type="application/json",
+            body=json.dumps(mock_payload)
+        ))
+
+        html_path = (Path(__file__).resolve().parents[1] / "public" / "index.html").as_uri()
+        page.goto(html_path, wait_until="domcontentloaded")
+
+        # Navigate to calendar page
+        page.click('[data-page="calendar"]')
+        page.wait_for_selector(".calendar-stats-grid")
+
+        assert page.is_visible(".calendar-intro")
+        assert page.is_visible(".calendar-stats-grid")
+        assert page.is_visible(".calendar-list")
+
+        cards = page.query_selector_all(".calendar-card")
+        assert len(cards) >= 5
+
+        # Check filter interaction
+        page.click('[data-calendar-filter="TURKEY"]')
+        turkey_cards = page.query_selector_all(".calendar-card")
+        assert 0 < len(turkey_cards) < len(cards)
+
+        # Screenshot artifact
+        artifact_dir = Path("C:/Users/Lenovo/.gemini/antigravity/brain/5081c83a-eb09-4b62-8ac6-e2e267264392")
+        if artifact_dir.exists():
+            page.screenshot(path=str(artifact_dir / "calendar_tab_view.png"))
+
+        browser.close()
+        assert not errors, f"Browser console errors encountered: {errors}"

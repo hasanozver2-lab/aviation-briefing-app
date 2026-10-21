@@ -50,7 +50,7 @@
     .mast-meta #updated::before { content: "● "; color: #3DDC97; }
 
     /* Bottom tab bar (was the top page nav) */
-    .page-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #FFF; border-top: 1.5px solid var(--black); padding: 0 max(env(safe-area-inset-left), 6px) env(safe-area-inset-bottom); }
+    .page-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); background: #FFF; border-top: 1.5px solid var(--black); padding: 0 max(env(safe-area-inset-left), 6px) env(safe-area-inset-bottom); }
     .page-nav::-webkit-scrollbar { display: none; }
     .page-nav-menu-btn { display: none; }
     .page-btn { position: relative; min-width: 0; min-height: var(--tabbar); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 6px 2px; color: #8A8A90; font: 700 10px/1.1 var(--sans); text-align: center; }
@@ -66,6 +66,7 @@
     .page-btn[data-page="reports"]::before, .drawer-item[data-drawer-page="reports"] .drawer-item-icon::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M7%203.5h7.5L19%208v12.5H7zM14%203.5V8h5M10%2012.5h6M10%2016h6'%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M7%203.5h7.5L19%208v12.5H7zM14%203.5V8h5M10%2012.5h6M10%2016h6'%2F%3E%3C%2Fsvg%3E"); }
     .page-btn[data-page="airspace"]::before, .drawer-item[data-drawer-page="airspace"] .drawer-item-icon::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M12%203.5L2.5%2020h19zM12%2010v4.5M12%2017.4v.2'%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M12%203.5L2.5%2020h19zM12%2010v4.5M12%2017.4v.2'%2F%3E%3C%2Fsvg%3E"); }
     .page-btn[data-page="fleet"]::before, .drawer-item[data-drawer-page="fleet"] .drawer-item-icon::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M12%202.8c.8%200%201.3.7%201.3%201.5v5.1l7.4%204.4v1.9l-7.4-2.2v4.4l2%201.6v1.7L12%2020.4l-3.3.8v-1.7l2-1.6v-4.4l-7.4%202.2v-1.9l7.4-4.4V4.3c0-.8.5-1.5%201.3-1.5z'%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M12%202.8c.8%200%201.3.7%201.3%201.5v5.1l7.4%204.4v1.9l-7.4-2.2v4.4l2%201.6v1.7L12%2020.4l-3.3.8v-1.7l2-1.6v-4.4l-7.4%202.2v-1.9l7.4-4.4V4.3c0-.8.5-1.5%201.3-1.5z'%2F%3E%3C%2Fsvg%3E"); }
+    .page-btn[data-page="calendar"]::before, .drawer-item[data-drawer-page="calendar"] .drawer-item-icon::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Crect%20x%3D'3'%20y%3D'4'%20width%3D'18'%20height%3D'17'%20rx%3D'0'%2F%3E%3Cpath%20d%3D'M16%202v4M8%202v4M3%209h18M8%2014h.01M12%2014h.01M16%2014h.01M8%2017h.01M12%2017h.01M16%2017h.01'%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Crect%20x%3D'3'%20y%3D'4'%20width%3D'18'%20height%3D'17'%20rx%3D'0'%2F%3E%3Cpath%20d%3D'M16%202v4M8%202v4M3%209h18M8%2014h.01M12%2014h.01M16%2014h.01M8%2017h.01M12%2017h.01M16%2017h.01'%2F%3E%3C%2Fsvg%3E"); }
     .page-btn[data-page="archive"]::before, .drawer-item[data-drawer-page="archive"] .drawer-item-icon::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M3.5%205h17v4h-17zM5.5%209v10h13V9M10%2013h4'%2F%3E%3C%2Fsvg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M3.5%205h17v4h-17zM5.5%209v10h13V9M10%2013h4'%2F%3E%3C%2Fsvg%3E"); }
 
     /* Drawer */
@@ -207,8 +208,8 @@
     .row-dps span, .report-dp-chip { font: 700 11px/1 var(--mono); padding: 6px 7px; background: var(--yellow); color: var(--black); }
     .report-view-link { color: var(--ink); font-family: var(--sans); font-weight: 800; text-transform: none; }
     .report-badge-pill { background: var(--black); color: var(--yellow); padding: 4px 6px; font: 700 10px/1 var(--mono); letter-spacing: .08em; }
-    .report-intro, .airspace-intro, .fleet-intro { margin: 16px var(--pad) 0; padding: 14px; background: var(--card); border: 1px solid var(--rule); font: 400 13px/1.5 var(--sans); color: var(--body); }
-    .report-intro strong, .airspace-intro strong, .fleet-intro strong { display: block; margin-bottom: 4px; font: 800 15px/1.25 var(--sans); color: var(--ink); }
+    .report-intro, .airspace-intro, .fleet-intro, .calendar-intro { margin: 16px var(--pad) 0; padding: 14px; background: var(--card); border: 1px solid var(--rule); font: 400 13px/1.5 var(--sans); color: var(--body); }
+    .report-intro strong, .airspace-intro strong, .fleet-intro strong, .calendar-intro strong { display: block; margin-bottom: 4px; font: 800 15px/1.25 var(--sans); color: var(--ink); }
     .end { padding: 28px var(--pad) 12px; text-align: center; font: 600 10.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
     .state { margin: 32px var(--pad) 0; padding: 18px; background: var(--card); border: 1px solid var(--rule); font: 400 15px/1.5 var(--sans); color: var(--muted); }
     .state strong { display: block; margin-bottom: 4px; font: 800 18px/1.25 var(--sans); color: var(--ink); }
@@ -330,14 +331,14 @@
     .tip-jump-btn { flex: none; min-height: 32px; padding: 0 12px; background: var(--yellow); color: var(--black); font: 800 11.5px/32px var(--sans); border: 0; cursor: pointer; text-transform: uppercase; }
 
     /* Airspace radar */
-    .airspace-stats-grid, .fleet-stats-grid { margin: 14px var(--pad) 0; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); background: var(--black); }
-    .airspace-stat-card, .fleet-stat-card { padding: 14px 12px; display: flex; flex-direction: column; gap: 6px; border-left: 1px solid #2A2A2E; }
-    .airspace-stat-card:first-child, .fleet-stat-card:first-child { border-left: 0; }
-    .airspace-stat-val, .fleet-stat-val { font: 800 34px/1 var(--sans); letter-spacing: -.03em; color: #FFF; }
+    .airspace-stats-grid, .fleet-stats-grid, .calendar-stats-grid { margin: 14px var(--pad) 0; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); background: var(--black); }
+    .airspace-stat-card, .fleet-stat-card, .calendar-stat-card { padding: 14px 12px; display: flex; flex-direction: column; gap: 6px; border-left: 1px solid #2A2A2E; }
+    .airspace-stat-card:first-child, .fleet-stat-card:first-child, .calendar-stat-card:first-child { border-left: 0; }
+    .airspace-stat-val, .fleet-stat-val, .calendar-stat-val { font: 800 34px/1 var(--sans); letter-spacing: -.03em; color: #FFF; }
     .airspace-stat-card.stat-danger .airspace-stat-val { color: #FF5A4F; }
     .airspace-stat-card.stat-warning .airspace-stat-val { color: var(--yellow); }
     .airspace-stat-card.stat-caution .airspace-stat-val { color: #FFF; }
-    .airspace-stat-label, .fleet-stat-label { font: 500 11.5px/1.25 var(--sans); color: #A0A0A6; }
+    .airspace-stat-label, .fleet-stat-label, .calendar-stat-label { font: 500 11.5px/1.25 var(--sans); color: #A0A0A6; }
     .fleet-stat-val[style] { filter: brightness(1.35); }
     .airspace-list, .fleet-list { padding: 12px var(--pad) 0; display: flex; flex-direction: column; gap: 8px; }
     .airspace-card, .fleet-card { background: var(--card); border: 1px solid var(--rule); border-top: 6px solid var(--red); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
@@ -372,7 +373,26 @@
     .calendar-head h4 { font: 800 15px/1.2 var(--sans); }
     .calendar-head .cal-sub { display: block; margin-top: 3px; font: 400 12px/1.4 var(--sans); color: var(--muted); }
     .calendar-grid { display: flex; flex-direction: column; gap: 6px; }
-    .calendar-card { background: var(--bg); padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .calendar-list { padding: 12px var(--pad) 0; display: flex; flex-direction: column; gap: 10px; }
+    .calendar-card { background: var(--card); border: 1px solid var(--rule); border-top: 6px solid var(--black); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .calendar-grid .calendar-card { background: var(--bg); border: 0; border-top: 0; padding: 12px; gap: 6px; }
+    .calendar-card.card-today { border-top-color: var(--red); }
+    .calendar-card.card-this-week { border-top-color: var(--yellow); }
+    .calendar-card.card-upcoming { border-top-color: var(--black); }
+    .calendar-card.card-reported { border-top-color: #8E8E93; opacity: .85; }
+    .calendar-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .calendar-card-title { font: 800 17px/1.25 var(--sans); letter-spacing: -.01em; color: var(--ink); text-wrap: pretty; }
+    .cal-country-badge { font: 600 10.5px/1 var(--mono); color: var(--muted); background: var(--bg); padding: 2px 6px; }
+    .calendar-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font: 600 11.5px/1 var(--mono); }
+    .calendar-pill-entity { font-weight: 800; color: var(--ink); font-family: var(--sans); }
+    .calendar-pill-ticker { background: var(--black); color: var(--yellow); padding: 3px 6px; }
+    .calendar-pill-period { background: var(--paper-2); padding: 3px 6px; border: 1px solid var(--rule); }
+    .calendar-pill-date { color: var(--muted); }
+    .calendar-watch-box { background: var(--bg); padding: 10px 12px; font: 400 13px/1.5 var(--sans); color: var(--body); }
+    .calendar-watch-box strong { font-weight: 800; color: var(--ink); }
+    .calendar-card-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid var(--rule); font: 600 10.5px/1.4 var(--mono); color: var(--faint); text-transform: uppercase; }
+    .calendar-ir-btn { min-height: 36px; padding: 0 12px; display: inline-flex; align-items: center; background: var(--black); color: var(--yellow); font: 800 12px/1 var(--sans); text-decoration: none; text-transform: none; }
+    .calendar-ir-btn:hover { opacity: .9; }
     .calendar-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .calendar-entity { font: 800 15px/1.2 var(--sans); }
     .calendar-ticker { margin-left: 6px; font: 600 11px/1 var(--mono); color: var(--faint); }
@@ -438,6 +458,14 @@
           </div>
           <span class="drawer-cnt" id="drawer-fleet-count">0</span>
         </button>
+        <button class="drawer-item" type="button" data-drawer-page="calendar" aria-pressed="false">
+          <span class="drawer-item-icon">📅</span>
+          <div class="drawer-item-text">
+            <span class="drawer-item-title">Bilanço &amp; Trafik Takvimi</span>
+            <span class="drawer-item-desc">Çeyreklik finansal sonuçlar ve yolcu verileri</span>
+          </div>
+          <span class="drawer-cnt" id="drawer-calendar-count">0</span>
+        </button>
         <button class="drawer-item" type="button" data-drawer-page="archive" aria-pressed="false">
           <span class="drawer-item-icon">🏛️</span>
           <div class="drawer-item-text">
@@ -489,6 +517,7 @@
         <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span class="btn-icon">📊</span> <span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
         <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span class="btn-icon">🚨</span> <span lang="tr">Hava Sahası Radarı</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
         <button class="page-btn" type="button" data-page="fleet" aria-pressed="false"><span class="btn-icon">✈️</span> <span lang="tr">Filo &amp; Motor Radarı</span> <span class="page-cnt" id="nav-fleet-count">0</span></button>
+        <button class="page-btn" type="button" data-page="calendar" aria-pressed="false"><span class="btn-icon">📅</span> <span lang="tr">Bilanço &amp; Takvim</span> <span class="page-cnt" id="nav-calendar-count">0</span></button>
         <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span class="btn-icon">🏛️</span> <span lang="tr">Arşiv</span></button>
       </nav>
     </header>
@@ -564,7 +593,7 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", fleetFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
+    const state = { page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", fleetFilter: "All", calendarFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
     let briefingRequestId = 0;
     let archiveRequestId = 0;
     state.archiveDate = "";
@@ -678,6 +707,9 @@
       } else if (state.page === "fleet") {
         const fleet = state.data && state.data.fleet_watch;
         $("counts").textContent = fleet ? `${fleet.total_programs || 0} filo programı · ${fleet.grounding_count || 0} kritik motor sorunu` : "Filo & Motor Radarı";
+      } else if (state.page === "calendar") {
+        const cal = state.data && state.data.earnings_calendar;
+        $("counts").textContent = cal ? `${cal.upcoming_count || 0} yaklaşan bilanço & trafik bülteni` : "Bilanço & Trafik Takvimi";
       } else {
         $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
       }
@@ -710,7 +742,7 @@
     }
 
     function setPage(pageName) {
-      if (!["briefing", "reports", "airspace", "fleet", "archive"].includes(pageName)) return;
+      if (!["briefing", "reports", "airspace", "fleet", "calendar", "archive"].includes(pageName)) return;
       state.page = pageName;
       archiveRequestId++;
       $("archive-controls").hidden = pageName !== "archive";
@@ -725,12 +757,13 @@
         reports: "Stratejik Raporlar",
         airspace: "Hava Sahası Radarı",
         fleet: "Filo & Motor Radarı",
+        calendar: "Bilanço & Trafik Takvimi",
         archive: "Arşiv"
       };
       const pill = $("menu-active-pill");
       if (pill) pill.textContent = sectionTitles[pageName] || "Günlük Brifing";
       closeDrawer();
-      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : pageName === "fleet" ? "‹ Filo Radarı" : "‹ Briefing";
+      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : pageName === "fleet" ? "‹ Filo Radarı" : pageName === "calendar" ? "‹ Takvim" : "‹ Briefing";
       if (pageName === "archive") {
         if ($("airspace-alert-banner")) $("airspace-alert-banner").hidden = true;
         loadArchive(state.archiveDate || previousDate(istanbulToday()));
@@ -830,17 +863,22 @@
       const fleet = data.fleet_watch;
       const fleetCount = fleet ? (fleet.total_programs || (fleet.programs || []).length) : 0;
       if ($("nav-fleet-count")) $("nav-fleet-count").textContent = String(fleetCount);
+      const cal = data.earnings_calendar;
+      const calCount = cal ? (cal.upcoming_count || (cal.events || []).length) : 0;
+      if ($("nav-calendar-count")) $("nav-calendar-count").textContent = String(calCount);
 
       if ($("drawer-briefing-count")) $("drawer-briefing-count").textContent = String(dailyStories.length);
       if ($("drawer-reports-count")) $("drawer-reports-count").textContent = String(reportStories.length);
       if ($("drawer-airspace-count")) $("drawer-airspace-count").textContent = String(airspaceCount);
       if ($("drawer-fleet-count")) $("drawer-fleet-count").textContent = String(fleetCount);
+      if ($("drawer-calendar-count")) $("drawer-calendar-count").textContent = String(calCount);
 
       const sectionTitles = {
         briefing: "Günlük Brifing",
         reports: "Stratejik Raporlar",
         airspace: "Hava Sahası Radarı",
         fleet: "Filo & Motor Radarı",
+        calendar: "Bilanço & Trafik Takvimi",
         archive: "Arşiv"
       };
       if ($("menu-active-pill")) $("menu-active-pill").textContent = sectionTitles[state.page] || "Günlük Brifing";
@@ -1211,10 +1249,109 @@
       $("content").innerHTML = html;
     }
 
+    function renderEarningsCalendarPage() {
+      const cal = state.data && state.data.earnings_calendar ? state.data.earnings_calendar : null;
+      if (!cal || !cal.events || !cal.events.length) {
+        $("content").innerHTML = `<div class="state">Aktif bilanço ve trafik takvimi kaydı bulunamadı.</div><div class="end">— Takvim Sonu —</div>`;
+        return;
+      }
+      const filter = state.calendarFilter || "All";
+      const allEvents = cal.events;
+
+      let visible = allEvents;
+      if (filter === "FINANCIAL") {
+        visible = allEvents.filter(e => e.event_type === "financial_results");
+      } else if (filter === "TRAFFIC") {
+        visible = allEvents.filter(e => e.event_type === "traffic_report");
+      } else if (filter === "TURKEY") {
+        visible = allEvents.filter(e => e.country === "Türkiye");
+      } else if (filter === "GLOBAL") {
+        visible = allEvents.filter(e => e.country !== "Türkiye");
+      }
+
+      const turkeyCount = allEvents.filter(e => e.country === "Türkiye").length;
+      const globalCount = allEvents.filter(e => e.country !== "Türkiye").length;
+
+      let html = `<div class="calendar-intro" lang="tr">
+        <strong>Havacılık Bilanço &amp; Trafik Takvimi</strong> — Türk Hava Yolları (THY), Pegasus, Lufthansa Group, Airbus, Boeing, IAG ve Ryanair’in 3Ç / 9 aylık finansal bilanço takvimi; DHMİ ve IATA aylık yolcu &amp; kargo trafik istatistikleri ve resmî yatırımcı ajandası.
+      </div>`;
+
+      html += `<div class="calendar-stats-grid">
+        <div class="calendar-stat-card">
+          <span class="calendar-stat-val" style="color:var(--yellow)">${cal.financial_count || 0}</span>
+          <span class="calendar-stat-label">3Ç Finansal Bilanço</span>
+        </div>
+        <div class="calendar-stat-card">
+          <span class="calendar-stat-val" style="color:#FFF">${cal.traffic_count || 0}</span>
+          <span class="calendar-stat-label">Aylık Trafik Bülteni</span>
+        </div>
+        <div class="calendar-stat-card">
+          <span class="calendar-stat-val" style="color:#FFF">${cal.total_events || 0}</span>
+          <span class="calendar-stat-label">İzlenen Takvim Kaydı</span>
+        </div>
+      </div>`;
+
+      const filterOptions = [
+        ["All", "Tümü", allEvents.length],
+        ["FINANCIAL", "Bilanço & 3Ç", cal.financial_count || 0],
+        ["TRAFFIC", "Aylık Trafik", cal.traffic_count || 0],
+        ["TURKEY", "THY & Pegasus (TR)", turkeyCount],
+        ["GLOBAL", "Küresel & Avrupa", globalCount]
+      ];
+
+      html += `<nav class="filters" aria-label="Filter calendar events"><div class="filters-inner">
+        ${filterOptions.map(([val, label, cnt]) =>
+          `<button class="chip" type="button" data-calendar-filter="${escapeHtml(val)}" aria-pressed="${val === filter}">${escapeHtml(label)}<span>${cnt}</span></button>`).join("")}
+      </div></nav>`;
+
+      html += `<div class="calendar-list">`;
+      visible.forEach(e => {
+        const isToday = e.status === "TODAY";
+        const isThisWeek = e.status === "THIS_WEEK";
+        const isReported = e.status === "REPORTED";
+        const cardBorderCls = isToday ? "card-today" : (isThisWeek ? "card-this-week" : (isReported ? "card-reported" : "card-upcoming"));
+        const badgeCls = isToday ? "cal-badge-today" : (isThisWeek ? "cal-badge-urgent" : (isReported ? "cal-badge-reported" : "cal-badge-upcoming"));
+        const typeLabel = e.event_type_tr || (e.event_type === "financial_results" ? "Bilanço & Finansallar" : "Aylık Trafik");
+
+        html += `<div class="calendar-card ${cardBorderCls}" lang="tr">
+          <div class="calendar-card-head">
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <span class="eyebrow" style="color:var(--muted)">${escapeHtml(typeLabel)}</span>
+                <span class="cal-country-badge">${escapeHtml(e.country || "")}</span>
+              </div>
+              <h3 class="calendar-card-title">${escapeHtml(e.title_tr || e.entity)}</h3>
+            </div>
+            <span class="calendar-badge ${badgeCls}">${escapeHtml(e.badge_tr)}</span>
+          </div>
+
+          <div class="calendar-meta-row">
+            <span class="calendar-pill-entity">${escapeHtml(e.entity)}</span>
+            <span class="calendar-pill-ticker">${escapeHtml(e.ticker)}</span>
+            <span class="calendar-pill-period">${escapeHtml(e.period)}</span>
+            <span class="calendar-pill-date">📅 ${escapeHtml(e.date)}</span>
+          </div>
+
+          ${e.watchpoints_tr ? `<div class="calendar-watch-box">
+            <strong>İzlenecek Kritik Noktalar:</strong> ${escapeHtml(e.watchpoints_tr)}
+          </div>` : ""}
+
+          <div class="calendar-card-footer">
+            <span>Kategori: <strong>${escapeHtml(e.event_type_tr)}</strong></span>
+            ${e.official_url ? `<a class="calendar-ir-btn" href="${safeExternalUrl(e.official_url)}" target="_blank" rel="noopener noreferrer">Resmî Yatırımcı İlişkileri ↗</a>` : ""}
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+      html += `<div class="end">— Havacılık Bilanço &amp; Trafik Takvimi Sonu —</div>`;
+      $("content").innerHTML = html;
+    }
+
     function renderList() {
       if (state.page === "reports") { renderReportsList(); return; }
       if (state.page === "airspace") { renderAirspaceRadar(); return; }
       if (state.page === "fleet") { renderFleetWatch(); return; }
+      if (state.page === "calendar") { renderEarningsCalendarPage(); return; }
       const { filter } = state;
       const stories = state.stories;
       if (!stories.length) { state.order = []; $("content").innerHTML = `<div class="state">${state.page === "archive" ? "No eligible stories in this saved briefing." : EMPTY_TEXT}</div><div class="end">— End of briefing —</div>`; return; }
@@ -1380,12 +1517,12 @@
       const tickerCalBtn = $("ticker-cal-btn");
       if (tickerCalBtn) {
         tickerCalBtn.onclick = () => {
-          const table = $("mkt-table");
-          table.hidden = false;
-          $("mkt-toggle").textContent = "Hide";
-          $("mkt-toggle").setAttribute("aria-expanded", "true");
-          const calEl = document.querySelector(".calendar-section");
-          if (calEl) calEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          setPage("calendar");
+
+
+
+
+
         };
       }
       $("market").hidden = false;
@@ -1676,6 +1813,14 @@
         $("mkt-toggle").setAttribute("aria-expanded", String(open));
       });
       $("content").addEventListener("click", (e) => {
+        const calChip = e.target.closest("[data-calendar-filter]");
+        if (calChip) {
+          state.calendarFilter = calChip.dataset.calendarFilter;
+          renderList();
+          const pressed = [...document.querySelectorAll("[data-calendar-filter]")].find(el => el.dataset.calendarFilter === state.calendarFilter);
+          if (pressed) pressed.focus({ preventScroll: true });
+          return;
+        }
         const fleetChip = e.target.closest("[data-fleet-filter]");
         if (fleetChip) {
           state.fleetFilter = fleetChip.dataset.fleetFilter;
