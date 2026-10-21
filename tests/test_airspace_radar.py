@@ -190,7 +190,7 @@ def test_airspace_radar_browser_interaction():
         
         # Verify traffic panel on main page (only displayed on main page)
         assert page.is_visible(".traffic-panel")
-        assert "Bugünkü Ticari Uçuş" in page.text_content(".traffic-panel")
+        assert any(w in page.text_content(".traffic-panel") for w in ["Bugünkü Ticari Uçuş", "Commercial Flights Today"])
 
         # Navigate to airspace page
         page.click('[data-page="airspace"]')
@@ -209,7 +209,7 @@ def test_airspace_radar_browser_interaction():
         if iran_marker:
             iran_marker.click(force=True)
             page.wait_for_selector(".airspace-map-tooltip.active")
-            assert "İran" in page.text_content("#tip-title")
+            assert any(w in page.text_content("#tip-title") for w in ["İran", "Iran"])
         
         assert errors == []
         browser.close()

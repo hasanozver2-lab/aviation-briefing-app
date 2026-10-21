@@ -43,7 +43,19 @@
     .menu-toggle-icon::before { content: ""; position: absolute; inset: 11px; background: var(--black); -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M4%207h16M4%2012h16M4%2017h10'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.9'%20stroke-linecap%3D'square'%20stroke-linejoin%3D'miter'%3E%3Cpath%20d%3D'M4%207h16M4%2012h16M4%2017h10'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat; }
     .menu-active-pill { display: none; }
     #dateline { font: 600 11px/1.2 var(--mono); letter-spacing: .06em; color: var(--yellow); text-align: center; }
+    .mast-actions { display: flex; align-items: center; gap: 8px; }
     .mast-actions button { min-height: 44px; padding: 0 12px; border: 1.5px solid #3A3A3F; color: #FFF; font: 800 12px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; }
+    .lang-switch { display: inline-flex; align-items: center; background: #1C1C1F; border: 1.5px solid #3A3A3F; border-radius: 2px; height: 44px; padding: 3px; }
+    .lang-btn { background: transparent; border: none; color: #8A8A93; font: 800 12px/1 var(--mono); letter-spacing: .06em; padding: 0 10px; height: 100%; cursor: pointer; border-radius: 2px; transition: all .15s ease; }
+    .lang-btn:hover { color: #FFF; }
+    .lang-btn.active { background: var(--yellow); color: var(--black); font-weight: 900; }
+    .lang-sep { color: #3A3A3F; font-size: 11px; user-select: none; }
+
+    .drawer-lang-strip { padding: 12px 16px 16px; border-bottom: 1.5px solid #2A2A2E; }
+    .drawer-lang-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .drawer-lang-btn { background: #1C1C1F; border: 1.5px solid #3A3A3F; color: #8A8A93; padding: 10px 8px; font: 700 11.5px/1 var(--sans); letter-spacing: .04em; cursor: pointer; text-align: center; border-radius: 2px; transition: all .15s; }
+    .drawer-lang-btn:hover { color: #FFF; border-color: #555; }
+    .drawer-lang-btn.active { background: var(--yellow); color: var(--black); border-color: var(--yellow); font-weight: 800; }
     .title { font: 800 34px/1 var(--sans); letter-spacing: -.03em; color: #FFF; }
     .mast-row { display: flex; }
     .mast-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font: 600 11px/1.3 var(--mono); letter-spacing: .04em; color: #A0A0A6; text-transform: uppercase; }
@@ -415,74 +427,81 @@
 <body>
   <!-- Offcanvas Drawer Menu -->
   <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
-  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menü" aria-hidden="true">
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
     <div class="drawer-header">
       <div class="drawer-brand">
         <span class="drawer-logo">THE AVIATION BRIEFING</span>
-        <span class="drawer-sub">Navigasyon &amp; Radarlar</span>
+        <span class="drawer-sub" id="drawer-sub">Navigation &amp; Radars</span>
       </div>
-      <button class="drawer-close" id="drawer-close" type="button" aria-label="Menüyü Kapat">✕</button>
+      <button class="drawer-close" id="drawer-close" type="button" aria-label="Close Menu">✕</button>
     </div>
     <div class="drawer-body">
-      <div class="drawer-section-title">Bölümler</div>
-      <nav class="drawer-nav" aria-label="Ana Menü">
+      <div class="drawer-lang-strip">
+        <span class="drawer-section-title" id="drawer-lang-title">Language / Dil</span>
+        <div class="drawer-lang-buttons">
+          <button type="button" class="drawer-lang-btn active" data-drawer-lang="en">EN · English</button>
+          <button type="button" class="drawer-lang-btn" data-drawer-lang="tr">TR · Türkçe</button>
+        </div>
+      </div>
+      <div class="drawer-section-title" id="drawer-sec-title">Sections</div>
+      <nav class="drawer-nav" aria-label="Main Menu">
         <button class="drawer-item" type="button" data-drawer-page="briefing" aria-pressed="true">
           <span class="drawer-item-icon">📰</span>
           <div class="drawer-item-text">
-            <span class="drawer-item-title">Günlük Brifing</span>
-            <span class="drawer-item-desc">Havacılık haber akışı ve piyasa özeti</span>
+            <span class="drawer-item-title">Daily Briefing</span>
+            <span class="drawer-item-desc">Aviation news flow &amp; market briefing</span>
           </div>
           <span class="drawer-cnt" id="drawer-briefing-count">0</span>
         </button>
         <button class="drawer-item" type="button" data-drawer-page="reports" aria-pressed="false">
           <span class="drawer-item-icon">📊</span>
           <div class="drawer-item-text">
-            <span class="drawer-item-title">Stratejik Raporlar</span>
-            <span class="drawer-item-desc">Havayolu IR ve resmî analizler</span>
+            <span class="drawer-item-title">Strategic Reports</span>
+            <span class="drawer-item-desc">Airline IR &amp; benchmark outlooks</span>
           </div>
           <span class="drawer-cnt" id="drawer-reports-count">0</span>
         </button>
         <button class="drawer-item" type="button" data-drawer-page="airspace" aria-pressed="false">
           <span class="drawer-item-icon">🚨</span>
           <div class="drawer-item-text">
-            <span class="drawer-item-title">Hava Sahası Radarı</span>
-            <span class="drawer-item-desc">Çatışma bölgeleri ve uçuş kısıtlamaları</span>
+            <span class="drawer-item-title">Airspace Radar</span>
+            <span class="drawer-item-desc">Conflict zones &amp; route restrictions</span>
           </div>
           <span class="drawer-cnt" id="drawer-airspace-count">0</span>
         </button>
         <button class="drawer-item" type="button" data-drawer-page="fleet" aria-pressed="false">
           <span class="drawer-item-icon">✈️</span>
           <div class="drawer-item-text">
-            <span class="drawer-item-title">Filo &amp; Motor Radarı</span>
-            <span class="drawer-item-desc">Motor kontrolleri ve teslimat aksamaları</span>
+            <span class="drawer-item-title">Fleet &amp; Engines</span>
+            <span class="drawer-item-desc">Engine checks &amp; delivery delays</span>
           </div>
           <span class="drawer-cnt" id="drawer-fleet-count">0</span>
         </button>
         <button class="drawer-item" type="button" data-drawer-page="calendar" aria-pressed="false">
           <span class="drawer-item-icon">📅</span>
           <div class="drawer-item-text">
-            <span class="drawer-item-title">Bilanço &amp; Trafik Takvimi</span>
-            <span class="drawer-item-desc">Çeyreklik finansal sonuçlar ve yolcu verileri</span>
+            <span class="drawer-item-title">Earnings &amp; Traffic</span>
+            <span class="drawer-item-desc">Quarterly financials &amp; traffic reports</span>
           </div>
           <span class="drawer-cnt" id="drawer-calendar-count">0</span>
         </button>
         <button class="drawer-item" type="button" data-drawer-page="archive" aria-pressed="false">
           <span class="drawer-item-icon">🏛️</span>
           <div class="drawer-item-text">
-            <span class="drawer-item-title">Arşiv</span>
-            <span class="drawer-item-desc">Geçmiş tarihli brifingler</span>
+            <span class="drawer-item-title">Archive</span>
+            <span class="drawer-item-desc">Historical briefing editions</span>
           </div>
         </button>
       </nav>
       <div class="drawer-footer">
-        <span class="drawer-footer-title">Piyasa Göstergeleri</span>
+        <span class="drawer-footer-title" id="drawer-mkt-title">Market Indicators</span>
         <div class="drawer-market-grid">
           <div class="drawer-market-chip">
-            <span>Brent Spot</span>
+            <span id="drawer-brent-lbl">Brent Spot</span>
             <span id="drawer-brent-val">110.58 USD</span>
           </div>
           <div class="drawer-market-chip">
-            <span>Crack Marjı</span>
+            <span id="drawer-crack-lbl">Crack Margin</span>
             <span id="drawer-crack-val">65.47 USD</span>
           </div>
         </div>
@@ -496,12 +515,17 @@
         <div class="mast-top-left">
           <button class="menu-toggle-btn" id="menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="drawer">
             <span class="menu-toggle-icon" aria-hidden="true">☰</span>
-            <span>Menü</span>
-            <span class="menu-active-pill" id="menu-active-pill">Günlük Brifing</span>
+            <span id="menu-btn-label">Menu</span>
+            <span class="menu-active-pill" id="menu-active-pill">Daily Briefing</span>
           </button>
         </div>
         <span id="dateline">—</span>
         <div class="mast-actions">
+          <div class="lang-switch" role="group" aria-label="Language selection">
+            <button type="button" class="lang-btn active" id="lang-btn-en" data-lang="en">EN</button>
+            <span class="lang-sep">/</span>
+            <button type="button" class="lang-btn" id="lang-btn-tr" data-lang="tr">TR</button>
+          </div>
           <button id="btn-share" type="button">Share</button>
         </div>
       </div>
@@ -510,15 +534,15 @@
         <div class="mast-meta"><span id="counts"></span><span id="updated"></span></div>
       </div>
       <nav class="page-nav" aria-label="Briefing sections">
-        <button class="page-nav-menu-btn" id="page-nav-menu-btn" type="button" aria-label="Menüyü Aç">
-          <span aria-hidden="true">☰</span> <span>Menü</span>
+        <button class="page-nav-menu-btn" id="page-nav-menu-btn" type="button" aria-label="Menu">
+          <span aria-hidden="true">☰</span> <span id="page-nav-menu-btn-label">Menu</span>
         </button>
-        <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span class="btn-icon">📰</span> <span lang="tr">Günlük Brifing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
-        <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span class="btn-icon">📊</span> <span lang="tr">Stratejik Raporlar</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
-        <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span class="btn-icon">🚨</span> <span lang="tr">Hava Sahası Radarı</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
-        <button class="page-btn" type="button" data-page="fleet" aria-pressed="false"><span class="btn-icon">✈️</span> <span lang="tr">Filo &amp; Motor Radarı</span> <span class="page-cnt" id="nav-fleet-count">0</span></button>
-        <button class="page-btn" type="button" data-page="calendar" aria-pressed="false"><span class="btn-icon">📅</span> <span lang="tr">Bilanço &amp; Takvim</span> <span class="page-cnt" id="nav-calendar-count">0</span></button>
-        <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span class="btn-icon">🏛️</span> <span lang="tr">Arşiv</span></button>
+        <button class="page-btn" type="button" data-page="briefing" aria-pressed="true"><span class="btn-icon">📰</span> <span lang="en">Daily Briefing</span> <span class="page-cnt" id="nav-briefing-count">0</span></button>
+        <button class="page-btn" type="button" data-page="reports" aria-pressed="false"><span class="btn-icon">📊</span> <span lang="en">Strategic Reports</span> <span class="page-cnt" id="nav-reports-count">0</span></button>
+        <button class="page-btn" type="button" data-page="airspace" aria-pressed="false"><span class="btn-icon">🚨</span> <span lang="en">Airspace Radar</span> <span class="page-cnt" id="nav-airspace-count">0</span></button>
+        <button class="page-btn" type="button" data-page="fleet" aria-pressed="false"><span class="btn-icon">✈️</span> <span lang="en">Fleet &amp; Engines</span> <span class="page-cnt" id="nav-fleet-count">0</span></button>
+        <button class="page-btn" type="button" data-page="calendar" aria-pressed="false"><span class="btn-icon">📅</span> <span lang="en">Earnings &amp; Traffic</span> <span class="page-cnt" id="nav-calendar-count">0</span></button>
+        <button class="page-btn" type="button" data-page="archive" aria-pressed="false"><span class="btn-icon">🏛️</span> <span lang="en">Archive</span></button>
       </nav>
     </header>
 
@@ -546,10 +570,9 @@
 
     <div class="airspace-alert-banner" id="airspace-alert-banner" hidden>
       <div class="airspace-banner-text">
-        
-        <span id="airspace-banner-msg"><strong>Hava Sahası Kriz Uyarısı:</strong> Aktif askeri çatışma ve güvenlik bülteni bulunan hava sahaları mevcuttur.</span>
+        <span id="airspace-banner-msg"><strong>Airspace Crisis Advisory:</strong> Active military conflict and security bulletins in effect across international FIRs.</span>
       </div>
-      <button type="button" class="airspace-banner-btn" id="airspace-banner-btn">Radarı İncele ›</button>
+      <button type="button" class="airspace-banner-btn" id="airspace-banner-btn">Inspect Radar ›</button>
     </div>
 
     <main id="content"><div class="state">Loading the briefing…</div></main>
@@ -593,14 +616,6 @@
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
 
-    const state = { page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", fleetFilter: "All", calendarFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
-    let briefingRequestId = 0;
-    let archiveRequestId = 0;
-    state.archiveDate = "";
-    state.archiveData = null;
-    const initialArchiveDate = new URLSearchParams(location.search).get("archive");
-    const initialHash = location.hash ? decodeURIComponent(location.hash.slice(1)) : "";
-
     const HTML_ESCAPE_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
     const $ = (id) => document.getElementById(id);
     function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, c => HTML_ESCAPE_MAP[c]); }
@@ -616,6 +631,447 @@
       get(key) { try { return localStorage.getItem(key); } catch { return null; } },
       set(key, value) { try { localStorage.setItem(key, value); } catch { /* ignored */ } }
     };
+
+    const initialLang = (function() {
+      const stored = safeStorage.get("aerobrief_lang");
+      return (stored === "tr" || stored === "en") ? stored : "en";
+    })();
+
+    const state = { uiLang: initialLang, page: "briefing", filter: "All", reportFilter: "All", airspaceFilter: "All", fleetFilter: "All", calendarFilter: "All", data: null, stories: [], dailyStories: [], reportStories: [], order: [], articleId: null, lastTrigger: null, lastTriggerIndex: 0, pending: null, polling: false, lastPoll: 0, updatedAt: null };
+    let briefingRequestId = 0;
+    let archiveRequestId = 0;
+    state.archiveDate = "";
+    state.archiveData = null;
+    const initialArchiveDate = new URLSearchParams(location.search).get("archive");
+    const initialHash = location.hash ? decodeURIComponent(location.hash.slice(1)) : "";
+
+    const COUNTRY_NAMES = {
+      en: {
+        "İran": "Iran",
+        "Lübnan": "Lebanon",
+        "İsrail": "Israel",
+        "Irak": "Iraq",
+        "Basra Körfezi & Umman Denizi": "Persian Gulf & Sea of Oman",
+        "Suudi Arabistan": "Saudi Arabia",
+        "Ürdün": "Jordan",
+        "Ukrayna": "Ukraine",
+        "Rusya (Güney Sınırı)": "Russia (Southern Border)",
+        "Yemen & Kızıldeniz": "Yemen & Red Sea",
+        "Suriye": "Syria",
+        "Sudan": "Sudan",
+        "Libya": "Libya",
+        "Somali": "Somalia"
+      },
+      tr: {}
+    };
+
+    function zoneCountry(zone) {
+      if (!zone) return "";
+      if (state.uiLang === "tr") return zone.country_tr || zone.country || "";
+      return zone.country_en || (COUNTRY_NAMES.en && COUNTRY_NAMES.en[zone.country]) || zone.country || zone.country_tr || "";
+    }
+
+    const I18N = {
+      en: {
+        nav_menu: "Menu",
+        nav_briefing: "Daily Briefing",
+        nav_briefing_desc: "Aviation news flow & market briefing",
+        nav_reports: "Strategic Reports",
+        nav_reports_desc: "Airline IR & benchmark outlooks",
+        nav_airspace: "Airspace Radar",
+        nav_airspace_desc: "Conflict zones & route restrictions",
+        nav_fleet: "Fleet & Engines",
+        nav_fleet_desc: "Engine checks & delivery delays",
+        nav_calendar: "Earnings & Traffic",
+        nav_calendar_desc: "Quarterly financials & traffic reports",
+        nav_archive: "Archive",
+        nav_archive_desc: "Historical briefing editions",
+        drawer_sections: "Sections",
+        drawer_markets: "Market Indicators",
+        drawer_lang: "Language",
+        drawer_close: "Close Menu",
+        drawer_sub: "Navigation & Radars",
+
+        btn_share: "Share",
+        copied_toast: "Link copied to clipboard",
+        loading_briefing: "Loading the briefing…",
+        stories_count: "stories",
+        breaking_count: "breaking",
+
+        airspace_alert_title: "Airspace Crisis Advisory:",
+        airspace_alert_msg: "Active military conflict and security bulletins in effect across international FIRs.",
+        airspace_alert_btn: "Inspect Radar ›",
+
+        traffic_title: "Global Flight Traffic & Daily Volume",
+        traffic_commercial_today: "Commercial Flights Today (Global)",
+        traffic_airborne_now: "Active Airborne Now",
+        traffic_regional: "Regional Traffic:",
+        traffic_airspace_btn: "Airspace Map ↗",
+
+        airspace_intro_title: "Aviation Security & Conflict Zones Radar",
+        airspace_intro_desc: "EASA CZIB (Conflict Zone Information Bulletins) and global FIR restrictions. Active airspace closures, missile risks, altitude caps, and GPS/GNSS spoofing alerts affecting international airline routing and safety.",
+        airspace_map_title: "Active Conflict & Restricted Airspace Map",
+        airspace_map_view_global: "Global",
+        airspace_map_view_focus: "Crisis Corridor",
+        airspace_legend_closed: "Closed Airspace",
+        airspace_legend_restricted: "Altitude Cap",
+        airspace_legend_caution: "GPS Advisory",
+        airspace_stat_closed: "Closed Airspace (Do Not Fly)",
+        airspace_stat_restricted: "Altitude / Military Cap",
+        airspace_stat_caution: "GPS / Vigilance Airspace",
+        airspace_filter_all: "All Zones",
+        airspace_filter_closed: "Closed Airspace",
+        airspace_filter_restricted: "Altitude Cap",
+        airspace_filter_caution: "GPS & Vigilance",
+        airspace_card_fir: "FIR Code:",
+        airspace_card_restr: "Restriction:",
+        airspace_card_bulletin: "Bulletin:",
+        airspace_card_link: "Official EASA Bulletin ↗",
+        airspace_empty: "No active airspace crisis bulletins found.",
+        airspace_end: "End of Airspace Radar",
+        airspace_tip_title: "Airspace",
+        airspace_tip_desc: "Restriction details",
+        airspace_tip_btn: "Go to details ↓",
+
+        fleet_intro_title: "Fleet, Engine & OEM Delivery Radar",
+        fleet_intro_desc: "Airbus, Boeing and Embraer commercial delivery targets, Pratt & Whitney GTF (PW1100G) and CFM LEAP engine maintenance & AOG groundings, direct operational impact on global carriers.",
+        fleet_stat_grounded: "Engine MRO / Grounded (AOG)",
+        fleet_stat_delays: "OEM Delivery Delays",
+        fleet_stat_total: "Tracked Fleet Programs",
+        fleet_filter_all: "All Programs",
+        fleet_filter_engines: "Engine Groundings (GTF)",
+        fleet_filter_deliveries: "Delivery Delays",
+        fleet_filter_expansion: "Fleet Expansion",
+        fleet_filter_mro: "MRO Bottlenecks",
+        fleet_thy_impact: "THY & Pegasus Operational Impact:",
+        fleet_impacted_carriers: "Key Impacted Carriers:",
+        fleet_timeline: "Timeline Horizon:",
+        fleet_source: "Source:",
+        fleet_empty: "No fleet watchpoints recorded yet.",
+        fleet_end: "End of Fleet Radar",
+
+        cal_title: "Aviation Earnings & Traffic Calendar",
+        cal_desc: "Quarterly earnings calendar for Turkish Airlines (THY), Pegasus, Lufthansa Group, Airbus, Boeing, IAG, Ryanair; DHMI & IATA monthly passenger/cargo traffic releases and investor agendas.",
+        cal_stat_financial: "Quarterly Financials",
+        cal_stat_traffic: "Monthly Traffic Reports",
+        cal_stat_total: "Tracked Calendar Events",
+        cal_filter_all: "All Events",
+        cal_filter_fin: "Financial Results",
+        cal_filter_trf: "Monthly Traffic",
+        cal_filter_turkey: "THY & Pegasus (TR)",
+        cal_filter_global: "Global & European Carriers",
+        cal_watchpoints_lbl: "Key Watchpoints & Metrics:",
+        cal_category_lbl: "Category:",
+        cal_ir_link: "Official Investor Relations ↗",
+        cal_empty: "No upcoming calendar events matching the filter.",
+        cal_end: "End of Calendar",
+
+        reports_title: "Strategic Reports, Forecasts & Benchmark Publications",
+        reports_desc: "Boeing Commercial Market Outlook, Airbus Global Market Forecast, IATA, ICAO and leading global aviation research institutes official projections.",
+        reports_head: "Strategic Outlooks & Benchmark Reports",
+        reports_empty: "No strategic reports available yet.",
+        reports_end: "End of Strategic Reports",
+        reports_filter_all: "All Sources",
+        reports_view_link: "1-Page Summary →",
+
+        mkt_brent_spot: "Brent Spot",
+        mkt_crack_margin: "Crack Margin",
+        mkt_crack_title: "Jet Fuel Refinery Margin (Crack Spread)",
+        mkt_crack_desc: "Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır. IATA / Platts Jet Fuel Price Monitor haftalık göstergesidir. Havayollarının en kritik operasyonel maliyet kalemini gösterir.",
+        mkt_physical_jet: "Physical Jet Fuel (Est.):",
+        mkt_all_indicators: "All indicators",
+        mkt_hide_indicators: "Hide indicators",
+        mkt_missing: "Unavailable right now",
+
+        story_exec_summary: "Executive Summary",
+        story_key_metrics: "Key Metrics & Forecast Indicators",
+        story_key_findings: "Key Findings & Industry Projections",
+        story_macro_impact: "Macro & Commercial Market Outlook",
+        story_data_figures: "Data & Figures Analysis",
+        story_takeaways: "Data Analysis & Implications",
+        story_why_matters: "Why it matters",
+        story_impact: "Strategic & market impact",
+        story_exposure: "Carrier & Stakeholder Exposure",
+        story_original_source: "Original source:",
+        story_view_official: "View Official Report & Data Tables",
+        story_next_report: "Next strategic report ↓",
+        story_next_story: "Next story ↓",
+        story_back_briefing: "‹ Briefing",
+        story_back_reports: "‹ Reports",
+        story_back_airspace: "‹ Airspace",
+        story_back_fleet: "‹ Fleet",
+        story_back_calendar: "‹ Calendar",
+        story_back_archive: "‹ Archive",
+        story_flash_banner: "Sector Radar (Flash Signal):",
+        story_analysis_pending: "Analysis pending — written summary appears after next update.",
+        story_flagship_report: "Flagship Outlook & Benchmark Publication",
+
+        archive_title: "Archive date",
+        archive_note: "Previously collected stories, including the lower-score archive. Dates follow Istanbul time.",
+        archive_empty: "No saved briefing for this date."
+      },
+      tr: {
+        nav_menu: "Menü",
+        nav_briefing: "Günlük Brifing",
+        nav_briefing_desc: "Havacılık haber akışı ve piyasa özeti",
+        nav_reports: "Stratejik Raporlar",
+        nav_reports_desc: "Havayolu IR ve resmî analizler",
+        nav_airspace: "Hava Sahası Radarı",
+        nav_airspace_desc: "Çatışma bölgeleri ve uçuş kısıtlamaları",
+        nav_fleet: "Filo & Motor Radarı",
+        nav_fleet_desc: "Motor kontrolleri ve teslimat aksamaları",
+        nav_calendar: "Bilanço & Takvim",
+        nav_calendar_desc: "Çeyreklik finansal sonuçlar ve yolcu verileri",
+        nav_archive: "Arşiv",
+        nav_archive_desc: "Geçmiş tarihli brifingler",
+        drawer_sections: "Bölümler",
+        drawer_markets: "Piyasa Göstergeleri",
+        drawer_lang: "Dil Seçimi",
+        drawer_close: "Menüyü Kapat",
+        drawer_sub: "Navigasyon & Radarlar",
+
+        btn_share: "Paylaş",
+        copied_toast: "Bağlantı panoya kopyalandı",
+        loading_briefing: "Brifing yükleniyor…",
+        stories_count: "haber",
+        breaking_count: "flaş",
+
+        airspace_alert_title: "Hava Sahası Kriz Uyarısı:",
+        airspace_alert_msg: "Aktif askeri çatışma ve güvenlik bülteni bulunan hava sahaları mevcuttur.",
+        airspace_alert_btn: "Radarı İncele ›",
+
+        traffic_title: "Küresel Uçuş Trafiği & Günlük Hacim",
+        traffic_commercial_today: "Bugünkü Ticari Uçuş (Küresel)",
+        traffic_airborne_now: "Anlık Havada Aktif Uçuş",
+        traffic_regional: "Bölgesel Trafik:",
+        traffic_airspace_btn: "Hava Sahası Haritası ↗",
+
+        airspace_intro_title: "Havacılık Güvenliği & Çatışma Bölgeleri Radarı",
+        airspace_intro_desc: "EASA CZIB (Conflict Zone Information Bulletins) ve küresel FIR kısıtlamaları. THY, Pegasus ve uluslararası havayollarının rota planlamasını ve uçuş güvenliğini doğrudan etkileyen aktif hava sahası yasakları, füze tehditleri, FL irtifa kısıtlamaları ve GPS/GNSS karıştırma ikazları.",
+        airspace_map_title: "Aktif Çatışma & Kapalı Hava Sahaları Haritası",
+        airspace_map_view_global: "Dünya",
+        airspace_map_view_focus: "Kriz Koridoru",
+        airspace_legend_closed: "Uçuşa Kapalı",
+        airspace_legend_restricted: "İrtifa Kısıtı",
+        airspace_legend_caution: "GPS Teyakkuz",
+        airspace_stat_closed: "Uçuşa Kapalı (Do Not Fly)",
+        airspace_stat_restricted: "İrtifa / Askeri Kısıt",
+        airspace_stat_caution: "GPS / Teyakkuz Sahası",
+        airspace_filter_all: "Tümü",
+        airspace_filter_closed: "Uçuşa Kapalı",
+        airspace_filter_restricted: "İrtifa Kısıtı",
+        airspace_filter_caution: "GPS & Teyakkuz",
+        airspace_card_fir: "FIR Kodu:",
+        airspace_card_restr: "Kısıtlama:",
+        airspace_card_bulletin: "Bülten:",
+        airspace_card_link: "Resmî EASA Bülteni ↗",
+        airspace_empty: "Aktif hava sahası kriz bülteni bulunamadı.",
+        airspace_end: "Hava Sahası Radarı Sonu",
+        airspace_tip_title: "Hava Sahası",
+        airspace_tip_desc: "Kısıtlama detayı",
+        airspace_tip_btn: "Detaya Git ↓",
+
+        fleet_intro_title: "Filo, Teslimat &amp; Motor Gecikmeleri Radarı",
+        fleet_intro_desc: "Airbus, Boeing ve Embraer ticari teslimat hedefleri, Pratt & Whitney GTF (PW1100G) ve CFM LEAP motorlarındaki küresel bakım ve yere indirme (AOG) krizleri, THY ve Pegasus filolarına doğrudan operasyonel ve kapasite etkileri.",
+        fleet_stat_grounded: "Motor Bakım / Yere İndirme",
+        fleet_stat_delays: "OEM Teslimat Gecikmesi",
+        fleet_stat_total: "İzlenen Filo Programı",
+        fleet_filter_all: "Tümü",
+        fleet_filter_engines: "Motor Krizleri (GTF)",
+        fleet_filter_deliveries: "Teslimat Gecikmeleri",
+        fleet_filter_expansion: "Filo Genişleme",
+        fleet_filter_mro: "MRO Darboğazı",
+        fleet_thy_impact: "THY & Pegasus Operasyonel Etkisi:",
+        fleet_impacted_carriers: "Etkilenen Başlıca Havayolları:",
+        fleet_timeline: "Zaman Ufku:",
+        fleet_source: "Kaynak:",
+        fleet_empty: "Aktif filo ve motor takip kaydı bulunamadı.",
+        fleet_end: "Filo Radarı Sonu",
+
+        cal_title: "Havacılık Bilanço &amp; Trafik Takvimi",
+        cal_desc: "Türk Hava Yolları (THY), Pegasus, Lufthansa Group, Airbus, Boeing, IAG ve Ryanair’in 3Ç / 9 aylık finansal bilanço takvimi; DHMİ ve IATA aylık yolcu & kargo trafik istatistikleri ve resmî yatırımcı ajandası.",
+        cal_stat_financial: "3Ç Finansal Bilanço",
+        cal_stat_traffic: "Aylık Trafik Bülteni",
+        cal_stat_total: "İzlenen Takvim Kaydı",
+        cal_filter_all: "Tümü",
+        cal_filter_fin: "Bilanço & 3Ç",
+        cal_filter_trf: "Aylık Trafik",
+        cal_filter_turkey: "THY & Pegasus (TR)",
+        cal_filter_global: "Küresel & Avrupa",
+        cal_watchpoints_lbl: "İzlenecek Kritik Noktalar:",
+        cal_category_lbl: "Kategori:",
+        cal_ir_link: "Resmî Yatırımcı İlişkileri ↗",
+        cal_empty: "Aktif bilanço ve trafik takvimi kaydı bulunamadı.",
+        cal_end: "Havacılık Bilanço & Trafik Takvimi Sonu",
+
+        reports_title: "Stratejik Raporlar, Küresel Tahminler & Benchmark Endeksleri",
+        reports_desc: "Boeing Commercial Market Outlook, Airbus Global Market Forecast, IATA, ICAO ve önde gelen küresel havacılık araştırma kuruluşlarının resmi sektörel projeksiyonları.",
+        reports_head: "Stratejik Raporlar ve Benchmark İndeksleri",
+        reports_empty: "Henüz stratejik rapor bulunmuyor.",
+        reports_end: "Stratejik Raporlar Sonu",
+        reports_filter_all: "Tüm Kaynaklar",
+        reports_view_link: "1-Page Summary →",
+
+        mkt_brent_spot: "Brent Spot",
+        mkt_crack_margin: "Crack Marjı",
+        mkt_crack_title: "Jet Yakıtı Rafineri Marjı (Crack Spread)",
+        mkt_crack_desc: "Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır. IATA / Platts Jet Fuel Price Monitor haftalık göstergesidir. Havayollarının en kritik operasyonel maliyet kalemini gösterir.",
+        mkt_physical_jet: "Fiziksel Jet Yakıtı (Tahmini):",
+        mkt_all_indicators: "Tüm göstergeler",
+        mkt_hide_indicators: "Göstergeleri gizle",
+        mkt_missing: "Şu an ulaşılamıyor",
+
+        story_exec_summary: "Yönetici Özeti",
+        story_key_metrics: "Temel Göstergeler & Veriler",
+        story_key_findings: "Temel Bulgular & Sektörel Çıkarımlar",
+        story_macro_impact: "Makro & Ticari Piyasa Etkisi",
+        story_data_figures: "Haberdeki Veriler",
+        story_takeaways: "Veri Analizi & Çıkarımlar",
+        story_why_matters: "Neden önemli",
+        story_impact: "Sektörel Etki",
+        story_exposure: "Havayolu & Paydaş Etkisi",
+        story_original_source: "Orijinal kaynak:",
+        story_view_official: "Resmi Raporu Görüntüle →",
+        story_next_report: "Sonraki stratejik rapor ↓",
+        story_next_story: "Sonraki haber ↓",
+        story_back_briefing: "‹ Brifing",
+        story_back_reports: "‹ Raporlar",
+        story_back_airspace: "‹ Hava Sahası",
+        story_back_fleet: "‹ Filo Radarı",
+        story_back_calendar: "‹ Takvim",
+        story_back_archive: "‹ Arşiv",
+        story_flash_banner: "Sektör Radarı (Kısa Sinyal):",
+        story_analysis_pending: "Analiz bekleniyor — yazılı analiz bir sonraki güncellemede görünecektir.",
+        story_flagship_report: "Stratejik Görünüm & Benchmark Yayını",
+
+        archive_title: "Arşiv tarihi",
+        archive_note: "Daha önce derlenen haberler ve arşiv akışı. Tarihler İstanbul saatini izler.",
+        archive_empty: "Bu tarihe ait arşivlenmiş brifing bulunamadı."
+      }
+    };
+
+    function t(key) {
+      const lang = state.uiLang || "en";
+      return (I18N[lang] && I18N[lang][key]) || (I18N.en && I18N.en[key]) || key;
+    }
+
+    function updateStaticTranslations() {
+      const lang = state.uiLang;
+      document.documentElement.lang = lang;
+
+      const menuLabel = $("menu-btn-label");
+      if (menuLabel) menuLabel.textContent = t("nav_menu");
+
+      const pageNavMenuLabel = $("page-nav-menu-btn-label");
+      if (pageNavMenuLabel) pageNavMenuLabel.textContent = t("nav_menu");
+
+      const shareBtn = $("btn-share");
+      if (shareBtn) shareBtn.textContent = t("btn_share");
+
+      const navBriefing = document.querySelector('.page-btn[data-page="briefing"] span[lang]');
+      if (navBriefing) { navBriefing.textContent = t("nav_briefing"); navBriefing.setAttribute("lang", lang); }
+      const navReports = document.querySelector('.page-btn[data-page="reports"] span[lang]');
+      if (navReports) { navReports.textContent = t("nav_reports"); navReports.setAttribute("lang", lang); }
+      const navAirspace = document.querySelector('.page-btn[data-page="airspace"] span[lang]');
+      if (navAirspace) { navAirspace.textContent = t("nav_airspace"); navAirspace.setAttribute("lang", lang); }
+      const navFleet = document.querySelector('.page-btn[data-page="fleet"] span[lang]');
+      if (navFleet) { navFleet.textContent = t("nav_fleet"); navFleet.setAttribute("lang", lang); }
+      const navCalendar = document.querySelector('.page-btn[data-page="calendar"] span[lang]');
+      if (navCalendar) { navCalendar.textContent = t("nav_calendar"); navCalendar.setAttribute("lang", lang); }
+      const navArchive = document.querySelector('.page-btn[data-page="archive"] span[lang]');
+      if (navArchive) { navArchive.textContent = t("nav_archive"); navArchive.setAttribute("lang", lang); }
+
+      const drawerBriefingTitle = document.querySelector('.drawer-item[data-drawer-page="briefing"] .drawer-item-title');
+      if (drawerBriefingTitle) drawerBriefingTitle.textContent = t("nav_briefing");
+      const drawerBriefingDesc = document.querySelector('.drawer-item[data-drawer-page="briefing"] .drawer-item-desc');
+      if (drawerBriefingDesc) drawerBriefingDesc.textContent = t("nav_briefing_desc");
+
+      const drawerReportsTitle = document.querySelector('.drawer-item[data-drawer-page="reports"] .drawer-item-title');
+      if (drawerReportsTitle) drawerReportsTitle.textContent = t("nav_reports");
+      const drawerReportsDesc = document.querySelector('.drawer-item[data-drawer-page="reports"] .drawer-item-desc');
+      if (drawerReportsDesc) drawerReportsDesc.textContent = t("nav_reports_desc");
+
+      const drawerAirspaceTitle = document.querySelector('.drawer-item[data-drawer-page="airspace"] .drawer-item-title');
+      if (drawerAirspaceTitle) drawerAirspaceTitle.textContent = t("nav_airspace");
+      const drawerAirspaceDesc = document.querySelector('.drawer-item[data-drawer-page="airspace"] .drawer-item-desc');
+      if (drawerAirspaceDesc) drawerAirspaceDesc.textContent = t("nav_airspace_desc");
+
+      const drawerFleetTitle = document.querySelector('.drawer-item[data-drawer-page="fleet"] .drawer-item-title');
+      if (drawerFleetTitle) drawerFleetTitle.textContent = t("nav_fleet");
+      const drawerFleetDesc = document.querySelector('.drawer-item[data-drawer-page="fleet"] .drawer-item-desc');
+      if (drawerFleetDesc) drawerFleetDesc.textContent = t("nav_fleet_desc");
+
+      const drawerCalendarTitle = document.querySelector('.drawer-item[data-drawer-page="calendar"] .drawer-item-title');
+      if (drawerCalendarTitle) drawerCalendarTitle.textContent = t("nav_calendar");
+      const drawerCalendarDesc = document.querySelector('.drawer-item[data-drawer-page="calendar"] .drawer-item-desc');
+      if (drawerCalendarDesc) drawerCalendarDesc.textContent = t("nav_calendar_desc");
+
+      const drawerArchiveTitle = document.querySelector('.drawer-item[data-drawer-page="archive"] .drawer-item-title');
+      if (drawerArchiveTitle) drawerArchiveTitle.textContent = t("nav_archive");
+      const drawerArchiveDesc = document.querySelector('.drawer-item[data-drawer-page="archive"] .drawer-item-desc');
+      if (drawerArchiveDesc) drawerArchiveDesc.textContent = t("nav_archive_desc");
+
+      const drawerSecTitle = $("drawer-sec-title");
+      if (drawerSecTitle) drawerSecTitle.textContent = t("drawer_sections");
+      const drawerMktTitle = $("drawer-mkt-title");
+      if (drawerMktTitle) drawerMktTitle.textContent = t("drawer_markets");
+      const drawerLangTitle = $("drawer-lang-title");
+      if (drawerLangTitle) drawerLangTitle.textContent = t("drawer_lang");
+      const drawerSub = $("drawer-sub");
+      if (drawerSub) drawerSub.textContent = t("drawer_sub");
+      const drawerCloseBtn = $("drawer-close");
+      if (drawerCloseBtn) drawerCloseBtn.setAttribute("aria-label", t("drawer_close"));
+
+      const pill = $("menu-active-pill");
+      if (pill) pill.textContent = t("nav_" + state.page) || t("nav_briefing");
+
+      const backTitles = {
+        archive: t("story_back_archive"),
+        reports: t("story_back_reports"),
+        airspace: t("story_back_airspace"),
+        fleet: t("story_back_fleet"),
+        calendar: t("story_back_calendar"),
+        briefing: t("story_back_briefing")
+      };
+      const artBack = $("art-back");
+      if (artBack) artBack.textContent = backTitles[state.page] || t("story_back_briefing");
+
+      document.querySelectorAll("[data-lang]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === lang);
+      });
+      document.querySelectorAll("[data-drawer-lang]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.drawerLang === lang);
+      });
+
+      const banner = $("airspace-alert-banner");
+      if (banner && !banner.hidden) {
+        const radar = state.data && state.data.airspace_radar;
+        const dangerCount = radar ? (radar.do_not_operate_count || (radar.zones || []).filter(z => z.risk_level === "DO_NOT_OPERATE").length) : 0;
+        if (dangerCount > 0) {
+          $("airspace-banner-msg").innerHTML = lang === "tr"
+            ? `<strong>Hava Sahası Kriz Uyarısı:</strong> ${dangerCount} kritik hava sahası sivil uçuşlara kapalı (EASA CZIB / Do Not Fly). Bölgesel çatışma ve GPS karıştırma riski mevcut.`
+            : `<strong>Airspace Crisis Advisory:</strong> ${dangerCount} critical airspaces closed to civil aviation (EASA CZIB / Do Not Fly). Regional conflict and GPS spoofing risks active.`;
+        }
+      }
+      const bannerBtn = $("airspace-banner-btn");
+      if (bannerBtn) bannerBtn.textContent = t("airspace_alert_btn");
+    }
+
+    function setLanguage(lang) {
+      if (lang !== "en" && lang !== "tr") return;
+      state.uiLang = lang;
+      safeStorage.set("aerobrief_lang", lang);
+      updateStaticTranslations();
+      updateMastCount();
+      if (state.articleId) {
+        renderArticle();
+      }
+      if (state.page === "archive" && state.archiveDate) {
+        renderArchive(state.data);
+      } else if (state.data) {
+        render(state.data);
+      }
+    }
     function storyKey(story) {
       const url = story && story.original_source && story.original_source.url;
       return String(story && (story.story_id || story.id || url || story.headline) || "story").trim().toLowerCase();
@@ -700,16 +1156,30 @@
       const stories = state.dailyStories;
       const breakingCount = stories.filter(isBreaking).length;
       if (state.page === "reports") {
-        $("counts").textContent = `${state.reportStories.length} stratejik rapor & küresel endeks`;
+        $("counts").textContent = state.uiLang === "tr"
+          ? `${state.reportStories.length} stratejik rapor & küresel endeks`
+          : `${state.reportStories.length} strategic reports & global indices`;
       } else if (state.page === "airspace") {
         const radar = state.data && state.data.airspace_radar;
-        $("counts").textContent = radar ? `${radar.total_active_zones || (radar.zones || []).length} aktif kriz bölgesi · ${radar.do_not_operate_count || 0} uçuşa kapalı` : "Hava Sahası Radarı";
+        $("counts").textContent = radar
+          ? (state.uiLang === "tr"
+              ? `${radar.total_active_zones || (radar.zones || []).length} aktif kriz bölgesi · ${radar.do_not_operate_count || 0} uçuşa kapalı`
+              : `${radar.total_active_zones || (radar.zones || []).length} active zones · ${radar.do_not_operate_count || 0} closed airspace`)
+          : t("nav_airspace");
       } else if (state.page === "fleet") {
         const fleet = state.data && state.data.fleet_watch;
-        $("counts").textContent = fleet ? `${fleet.total_programs || 0} filo programı · ${fleet.grounding_count || 0} kritik motor sorunu` : "Filo & Motor Radarı";
+        $("counts").textContent = fleet
+          ? (state.uiLang === "tr"
+              ? `${fleet.total_programs || 0} filo programı · ${fleet.grounding_count || 0} kritik motor sorunu`
+              : `${fleet.total_programs || 0} fleet programs · ${fleet.grounding_count || 0} engine groundings`)
+          : t("nav_fleet");
       } else if (state.page === "calendar") {
         const cal = state.data && state.data.earnings_calendar;
-        $("counts").textContent = cal ? `${cal.upcoming_count || 0} yaklaşan bilanço & trafik bülteni` : "Bilanço & Trafik Takvimi";
+        $("counts").textContent = cal
+          ? (state.uiLang === "tr"
+              ? `${cal.upcoming_count || 0} yaklaşan bilanço & trafik bülteni`
+              : `${cal.upcoming_count || 0} upcoming earnings & traffic releases`)
+          : t("nav_calendar");
       } else {
         $("counts").textContent = `${stories.length} ${stories.length === 1 ? "story" : "stories"} · ${breakingCount} breaking`;
       }
@@ -752,18 +1222,18 @@
       document.querySelectorAll("[data-drawer-page]").forEach(btn => {
         btn.setAttribute("aria-pressed", String(btn.dataset.drawerPage === pageName));
       });
-      const sectionTitles = {
-        briefing: "Günlük Brifing",
-        reports: "Stratejik Raporlar",
-        airspace: "Hava Sahası Radarı",
-        fleet: "Filo & Motor Radarı",
-        calendar: "Bilanço & Trafik Takvimi",
-        archive: "Arşiv"
-      };
       const pill = $("menu-active-pill");
-      if (pill) pill.textContent = sectionTitles[pageName] || "Günlük Brifing";
+      if (pill) pill.textContent = t("nav_" + pageName) || t("nav_briefing");
       closeDrawer();
-      $("art-back").textContent = pageName === "archive" ? "‹ Archive" : pageName === "reports" ? "‹ Raporlar" : pageName === "airspace" ? "‹ Hava Sahası" : pageName === "fleet" ? "‹ Filo Radarı" : pageName === "calendar" ? "‹ Takvim" : "‹ Briefing";
+      const backTitles = {
+        archive: t("story_back_archive"),
+        reports: t("story_back_reports"),
+        airspace: t("story_back_airspace"),
+        fleet: t("story_back_fleet"),
+        calendar: t("story_back_calendar"),
+        briefing: t("story_back_briefing")
+      };
+      $("art-back").textContent = backTitles[pageName] || t("story_back_briefing");
       if (pageName === "archive") {
         if ($("airspace-alert-banner")) $("airspace-alert-banner").hidden = true;
         loadArchive(state.archiveDate || previousDate(istanbulToday()));
@@ -873,22 +1343,17 @@
       if ($("drawer-fleet-count")) $("drawer-fleet-count").textContent = String(fleetCount);
       if ($("drawer-calendar-count")) $("drawer-calendar-count").textContent = String(calCount);
 
-      const sectionTitles = {
-        briefing: "Günlük Brifing",
-        reports: "Stratejik Raporlar",
-        airspace: "Hava Sahası Radarı",
-        fleet: "Filo & Motor Radarı",
-        calendar: "Bilanço & Trafik Takvimi",
-        archive: "Arşiv"
-      };
-      if ($("menu-active-pill")) $("menu-active-pill").textContent = sectionTitles[state.page] || "Günlük Brifing";
+      if ($("menu-active-pill")) $("menu-active-pill").textContent = t("nav_" + state.page) || t("nav_briefing");
 
       const banner = $("airspace-alert-banner");
       if (banner) {
         const hasDanger = radar && (radar.do_not_operate_count > 0 || (radar.zones || []).some(z => z.risk_level === "DO_NOT_OPERATE"));
         if (hasDanger && state.page === "briefing") {
           const dangerCount = radar.do_not_operate_count || (radar.zones || []).filter(z => z.risk_level === "DO_NOT_OPERATE").length;
-          $("airspace-banner-msg").innerHTML = `<strong>Hava Sahası Kriz Uyarısı:</strong> ${dangerCount} kritik hava sahası sivil uçuşlara kapalı (EASA CZIB / Do Not Fly). Bölgesel çatışma ve GPS karıştırma riski mevcut.`;
+          $("airspace-banner-msg").innerHTML = state.uiLang === "tr"
+            ? `<strong>Hava Sahası Kriz Uyarısı:</strong> ${dangerCount} kritik hava sahası sivil uçuşlara kapalı (EASA CZIB / Do Not Fly). Bölgesel çatışma ve GPS karıştırma riski mevcut.`
+            : `<strong>Airspace Crisis Advisory:</strong> ${dangerCount} critical airspaces closed to civil aviation (EASA CZIB / Do Not Fly). Regional conflict and GPS spoofing risks active.`;
+          if ($("airspace-banner-btn")) $("airspace-banner-btn").textContent = t("airspace_alert_btn");
           banner.hidden = false;
         } else {
           banner.hidden = true;
@@ -941,7 +1406,7 @@
       const reports = state.reportStories;
       if (!reports.length) {
         state.order = [];
-        $("content").innerHTML = `<div class="state">Henüz stratejik rapor bulunmuyor.</div><div class="end">— Stratejik Raporlar sonu —</div>`;
+        $("content").innerHTML = `<div class="state">${escapeHtml(t("reports_empty"))}</div><div class="end">— ${escapeHtml(t("reports_end"))} —</div>`;
         return;
       }
       const counts = {};
@@ -971,7 +1436,7 @@
         </button>`;
       };
 
-      let html = `<div class="report-intro" lang="tr"><strong>Stratejik Raporlar, Küresel Tahminler &amp; Benchmark Endeksleri</strong> — Boeing CMO, Airbus GMF, EUROCONTROL Tahminleri, ICAO, FAA, EASA, IATA, ACI World, Oliver Wyman MRO Forecast, OAG Megahubs, IdeaWorksCompany, Cirium ve CAPA raporları. Yeni yayımlanan tüm stratejik raporlar otomatik olarak bu sayfaya eklenir.</div>`;
+      let html = `<div class="report-intro" lang="${state.uiLang}"><strong>${escapeHtml(t("reports_title"))}</strong> — ${escapeHtml(t("reports_desc"))}</div>`;
       html += `<nav class="filters" aria-label="Filter by publisher"><div class="filters-inner">
         ${[["All", reports.length]].concat(pubNames.map(name => [name, counts[name]])).map(([name, c]) =>
           `<button class="chip" type="button" data-report-filter="${escapeHtml(name)}" aria-pressed="${name === reportFilter}">${escapeHtml(name)}<span>${c}</span></button>`).join("")}
@@ -984,10 +1449,11 @@
     function renderTrafficPanel(traffic) {
       if (!traffic) return "";
       const isAirspacePage = state.page === "airspace";
-      const actionBtn = isAirspacePage ? "" : `<button class="traffic-link-btn" type="button" data-page="airspace">Hava Sahası Haritası ↗</button>`;
-      return `<div class="traffic-panel" lang="tr">
+      const actionBtn = isAirspacePage ? "" : `<button class="traffic-link-btn" type="button" data-page="airspace">${escapeHtml(t("traffic_airspace_btn"))}</button>`;
+      const isTr = state.uiLang === "tr";
+      return `<div class="traffic-panel" lang="${state.uiLang}">
         <div class="traffic-head">
-          <span class="traffic-title"><span class="traffic-live-dot"></span> Küresel Uçuş Trafiği &amp; Günlük Hacim</span>
+          <span class="traffic-title"><span class="traffic-live-dot"></span> ${escapeHtml(t("traffic_title"))}</span>
           <div style="display:flex;align-items:center;gap:10px">
             <span class="traffic-source">${escapeHtml(traffic.source || "Eurocontrol / FAA / ICAO")}</span>
             ${actionBtn}
@@ -996,24 +1462,24 @@
         <div class="traffic-grid">
           <div class="traffic-card">
             <span class="traffic-val">${escapeHtml(traffic.daily_commercial_flights_str || "111,200")} <span class="traffic-trend">${escapeHtml(traffic.trend_yoy_pct || "+3.8%")}</span></span>
-            <span class="traffic-label">Bugünkü Ticari Uçuş (Küresel)</span>
+            <span class="traffic-label">${escapeHtml(t("traffic_commercial_today"))}</span>
           </div>
           <div class="traffic-card">
             <span class="traffic-val">${escapeHtml(traffic.active_airborne_now_str || "12,450")}</span>
-            <span class="traffic-label">Anlık Havada Aktif Uçuş</span>
+            <span class="traffic-label">${escapeHtml(t("traffic_airborne_now"))}</span>
           </div>
           ${(traffic.regions || []).slice(0, 2).map(r => `
             <div class="traffic-card">
               <span class="traffic-val">${escapeHtml(r.flights_str)} <span class="traffic-trend">${escapeHtml(r.trend)}</span></span>
-              <span class="traffic-label">${escapeHtml(r.name_tr)}</span>
+              <span class="traffic-label">${escapeHtml(isTr ? (r.name_tr || r.name_en) : (r.name_en || r.name_tr))}</span>
             </div>
           `).join("")}
         </div>
         ${traffic.regions && traffic.regions.length > 2 ? `
           <div class="traffic-regions-strip">
-            <span style="color:var(--muted);text-transform:uppercase">Bölgesel Trafik:</span>
+            <span style="color:var(--muted);text-transform:uppercase">${escapeHtml(t("traffic_regional"))}</span>
             ${traffic.regions.slice(2).map(r => `
-              <span class="traffic-region-item">${escapeHtml(r.name_tr)}: <strong>${escapeHtml(r.flights_str)}</strong> (${escapeHtml(r.trend)})</span>
+              <span class="traffic-region-item">${escapeHtml(isTr ? (r.name_tr || r.name_en) : (r.name_en || r.name_tr))}: <strong>${escapeHtml(r.flights_str)}</strong> (${escapeHtml(r.trend)})</span>
             `).join(" · ")}
           </div>
         ` : ""}
@@ -1030,23 +1496,24 @@
       const allZones = radar.zones;
       const visible = filter === "All" ? allZones : allZones.filter(z => z.risk_level === filter);
 
-      let html = `<div class="airspace-intro" lang="tr">
-        <strong>Havacılık Güvenliği &amp; Çatışma Bölgeleri Radarı</strong> — EASA CZIB (Conflict Zone Information Bulletins) ve küresel FIR kısıtlamaları. THY, Pegasus ve uluslararası havayollarının rota planlamasını ve uçuş güvenliğini doğrudan etkileyen aktif hava sahası yasakları, füze tehditleri, FL irtifa kısıtlamaları ve GPS/GNSS karıştırma ikazları.
+      const isTr = state.uiLang === "tr";
+      let html = `<div class="airspace-intro" lang="${state.uiLang}">
+        <strong>${escapeHtml(t("airspace_intro_title"))}</strong> — ${escapeHtml(t("airspace_intro_desc"))}
       </div>`;
 
 
-      html += `<div class="airspace-map-card" lang="tr">
+      html += `<div class="airspace-map-card" lang="${state.uiLang}">
         <div class="airspace-map-header">
-          <span class="airspace-map-title"><span class="traffic-live-dot" style="background:#FF3B30;box-shadow:0 0 8px #FF3B30"></span> Aktif Çatışma &amp; Kapalı Hava Sahaları Haritası</span>
+          <span class="airspace-map-title"><span class="traffic-live-dot" style="background:#FF3B30;box-shadow:0 0 8px #FF3B30"></span> ${escapeHtml(t("airspace_map_title"))}</span>
           <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
             <div class="map-view-toggles">
-              <button class="map-toggle-btn active" type="button" data-map-view="global">Dünya</button>
-              <button class="map-toggle-btn" type="button" data-map-view="focus">Kriz Koridoru</button>
+              <button class="map-toggle-btn active" type="button" data-map-view="global">${escapeHtml(t("airspace_map_view_global"))}</button>
+              <button class="map-toggle-btn" type="button" data-map-view="focus">${escapeHtml(t("airspace_map_view_focus"))}</button>
             </div>
             <div class="airspace-map-legend">
-              <span class="legend-tag"><span class="legend-dot legend-red"></span> Uçuşa Kapalı</span>
-              <span class="legend-tag"><span class="legend-dot legend-orange"></span> İrtifa Kısıtı</span>
-              <span class="legend-tag"><span class="legend-dot legend-yellow"></span> GPS Teyakkuz</span>
+              <span class="legend-tag"><span class="legend-dot legend-red"></span> ${escapeHtml(t("airspace_legend_closed"))}</span>
+              <span class="legend-tag"><span class="legend-dot legend-orange"></span> ${escapeHtml(t("airspace_legend_restricted"))}</span>
+              <span class="legend-tag"><span class="legend-dot legend-yellow"></span> ${escapeHtml(t("airspace_legend_caution"))}</span>
             </div>
           </div>
         </div>
@@ -1117,23 +1584,23 @@
       html += `<div class="airspace-stats-grid">
         <div class="airspace-stat-card stat-danger">
           <span class="airspace-stat-val">${radar.do_not_operate_count || 0}</span>
-          <span class="airspace-stat-label">Uçuşa Kapalı (Do Not Fly)</span>
+          <span class="airspace-stat-label">${escapeHtml(t("airspace_stat_closed"))}</span>
         </div>
         <div class="airspace-stat-card stat-warning">
           <span class="airspace-stat-val">${radar.restricted_count || 0}</span>
-          <span class="airspace-stat-label">İrtifa / Askeri Kısıt</span>
+          <span class="airspace-stat-label">${escapeHtml(t("airspace_stat_restricted"))}</span>
         </div>
         <div class="airspace-stat-card stat-caution">
           <span class="airspace-stat-val">${radar.caution_count || 0}</span>
-          <span class="airspace-stat-label">GPS / Teyakkuz Sahası</span>
+          <span class="airspace-stat-label">${escapeHtml(t("airspace_stat_caution"))}</span>
         </div>
       </div>`;
 
       const filterOptions = [
-        ["All", "Tümü", allZones.length],
-        ["DO_NOT_OPERATE", "Uçuşa Kapalı", radar.do_not_operate_count || 0],
-        ["RESTRICTED", "İrtifa Kısıtı", radar.restricted_count || 0],
-        ["CAUTION", "GPS & Teyakkuz", radar.caution_count || 0]
+        ["All", t("airspace_filter_all"), allZones.length],
+        ["DO_NOT_OPERATE", t("airspace_filter_closed"), radar.do_not_operate_count || 0],
+        ["RESTRICTED", t("airspace_filter_restricted"), radar.restricted_count || 0],
+        ["CAUTION", t("airspace_filter_caution"), radar.caution_count || 0]
       ];
 
       html += `<nav class="filters" aria-label="Filter by risk level"><div class="filters-inner">
@@ -1148,24 +1615,29 @@
         const cardClass = isDanger ? "" : (isRestricted ? "card-restricted" : "card-caution");
         const pillClass = isDanger ? "pill-danger" : (isRestricted ? "pill-warning" : "pill-caution");
 
+        const zCountry = zoneCountry(z);
+        const zBadge = isTr ? (z.risk_badge || z.risk_badge_en || z.risk_level) : (z.risk_badge_en || z.risk_badge || z.risk_level);
+        const zRestr = isTr ? (z.restriction_tr || z.restriction_en) : (z.restriction_en || z.restriction_tr);
+        const zSummary = isTr ? (z.summary_tr || z.summary_en) : (z.summary_en || z.summary_tr);
+
         html += `<div class="airspace-card ${cardClass}" id="zone-${escapeHtml(z.id || '')}">
           <div class="airspace-card-head">
             <div>
-              <h3 class="airspace-card-title">${escapeHtml(z.country)} <span style="font-weight:400;color:var(--muted)">— ${escapeHtml(z.title)}</span></h3>
-              <div class="airspace-card-fir">FIR Kodu: <strong>${escapeHtml(z.fir)}</strong></div>
+              <h3 class="airspace-card-title">${escapeHtml(zCountry)} <span style="font-weight:400;color:var(--muted)">— ${escapeHtml(z.fir)}</span></h3>
+              <div class="airspace-card-fir">${escapeHtml(t("airspace_card_fir"))} <strong>${escapeHtml(z.fir)}</strong></div>
             </div>
-            <span class="airspace-pill ${pillClass}">${escapeHtml(z.risk_badge || z.risk_level)}</span>
+            <span class="airspace-pill ${pillClass}">${escapeHtml(zBadge)}</span>
           </div>
-          <div class="airspace-restr"><strong>Kısıtlama:</strong> ${escapeHtml(z.restriction_tr || z.restriction_en)}</div>
-          <p class="airspace-desc">${escapeHtml(z.summary_tr || z.summary_en)}</p>
+          <div class="airspace-restr"><strong>${escapeHtml(t("airspace_card_restr"))}</strong> ${escapeHtml(zRestr)}</div>
+          <p class="airspace-desc">${escapeHtml(zSummary)}</p>
           <div class="airspace-card-footer">
-            <span>Bülten: <strong>${escapeHtml(z.bulletin_code || "EASA CZIB")}</strong> · ${escapeHtml(z.published_date || "")}</span>
-            <a class="airspace-link" href="${safeExternalUrl(z.link)}" target="_blank" rel="noopener noreferrer">Resmî EASA Bülteni ↗</a>
+            <span>${escapeHtml(t("airspace_card_bulletin"))} <strong>${escapeHtml(z.bulletin_code || "EASA CZIB")}</strong> · ${escapeHtml(z.published_date || "")}</span>
+            <a class="airspace-link" href="${safeExternalUrl(z.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("airspace_card_link"))}</a>
           </div>
         </div>`;
       });
       html += `</div>`;
-      html += `<div class="end">— Hava Sahası Radarı Sonu —</div>`;
+      html += `<div class="end">— ${escapeHtml(t("airspace_end"))} —</div>`;
       $("content").innerHTML = html;
     }
 
@@ -1179,31 +1651,32 @@
       const allPrograms = fleet.programs;
       const visible = filter === "All" ? allPrograms : allPrograms.filter(p => p.category === filter);
 
-      let html = `<div class="fleet-intro" lang="tr">
-        <strong>Filo, Teslimat &amp; Motor Gecikmeleri Radarı</strong> — Airbus, Boeing ve Embraer ticari teslimat hedefleri, Pratt &amp; Whitney GTF (PW1100G) ve CFM LEAP motorlarındaki küresel bakım ve yere indirme (AOG) krizleri, THY ve Pegasus filolarına doğrudan operasyonel ve kapasite etkileri.
+      const isTr = state.uiLang === "tr";
+      let html = `<div class="fleet-intro" lang="${state.uiLang}">
+        <strong>${escapeHtml(t("fleet_intro_title"))}</strong> — ${escapeHtml(t("fleet_intro_desc"))}
       </div>`;
 
       html += `<div class="fleet-stats-grid">
         <div class="fleet-stat-card">
           <span class="fleet-stat-val" style="color:#DC2626">${fleet.grounding_count || 0}</span>
-          <span class="fleet-stat-label">Motor Bakım / Yere İndirme</span>
+          <span class="fleet-stat-label">${escapeHtml(t("fleet_stat_grounded"))}</span>
         </div>
         <div class="fleet-stat-card">
           <span class="fleet-stat-val" style="color:#EA580C">${fleet.delivery_delay_count || 0}</span>
-          <span class="fleet-stat-label">OEM Teslimat Gecikmesi</span>
+          <span class="fleet-stat-label">${escapeHtml(t("fleet_stat_delays"))}</span>
         </div>
         <div class="fleet-stat-card">
           <span class="fleet-stat-val">${fleet.total_programs || 0}</span>
-          <span class="fleet-stat-label">İzlenen Filo Programı</span>
+          <span class="fleet-stat-label">${escapeHtml(t("fleet_stat_total"))}</span>
         </div>
       </div>`;
 
       const filterOptions = [
-        ["All", "Tümü", allPrograms.length],
-        ["ENGINE_GROUNDING", "Motor Krizleri (GTF)", fleet.grounding_count || 0],
-        ["DELIVERY_DELAY", "Teslimat Gecikmeleri", fleet.delivery_delay_count || 0],
-        ["FLEET_EXPANSION", "Filo Genişleme", allPrograms.filter(p => p.category === "FLEET_EXPANSION").length],
-        ["MAINTENANCE_BOTTLENECK", "MRO Darboğazı", allPrograms.filter(p => p.category === "MAINTENANCE_BOTTLENECK").length]
+        ["All", t("fleet_filter_all"), allPrograms.length],
+        ["ENGINE_GROUNDING", t("fleet_filter_engines"), fleet.grounding_count || 0],
+        ["DELIVERY_DELAY", t("fleet_filter_deliveries"), fleet.delivery_delay_count || 0],
+        ["FLEET_EXPANSION", t("fleet_filter_expansion"), allPrograms.filter(p => p.category === "FLEET_EXPANSION").length],
+        ["MAINTENANCE_BOTTLENECK", t("fleet_filter_mro"), allPrograms.filter(p => p.category === "MAINTENANCE_BOTTLENECK").length]
       ];
 
       html += `<nav class="filters" aria-label="Filter fleet programs"><div class="filters-inner">
@@ -1219,11 +1692,16 @@
         const affectedBadges = (p.affected_carriers || []).map(c => `<span class="fleet-tag"><strong>${escapeHtml(c)}</strong></span>`).join("");
         const modelBadges = (p.aircraft_models || []).map(m => `<span class="fleet-tag">${escapeHtml(m)}</span>`).join("");
 
+        const pCategory = isTr ? (p.category_tr || p.category_en) : (p.category_en || p.category_tr);
+        const pTitle = isTr ? (p.title_tr || p.title_en) : (p.title_en || p.title_tr);
+        const pStatus = isTr ? (p.current_status_tr || p.current_status_en) : (p.current_status_en || p.current_status_tr);
+        const pThyImpact = isTr ? (p.thy_pegasus_impact_tr || p.thy_pegasus_impact_en) : (p.thy_pegasus_impact_en || p.thy_pegasus_impact_tr);
+
         html += `<div class="fleet-card ${sevClass}">
           <div class="fleet-card-head">
             <div>
-              <span class="eyebrow" style="color:var(--muted)">${escapeHtml(p.category_tr)}</span>
-              <h3 class="fleet-card-title">${escapeHtml(p.title_tr)}</h3>
+              <span class="eyebrow" style="color:var(--muted)">${escapeHtml(pCategory)}</span>
+              <h3 class="fleet-card-title">${escapeHtml(pTitle)}</h3>
             </div>
             <span class="fleet-pill" style="background:${pillBg}">${escapeHtml(p.severity_badge || p.severity)}</span>
           </div>
@@ -1231,17 +1709,17 @@
             <span class="fleet-tag" style="background:var(--paper-2);font-weight:600">${escapeHtml(p.engine_model)}</span>
             ${modelBadges}
           </div>
-          <p class="fleet-desc">${escapeHtml(p.current_status_tr)}</p>
-          ${p.thy_pegasus_impact_tr ? `<div class="fleet-thy-box" lang="tr"><strong>THY &amp; Pegasus Operasyonel Etkisi:</strong> ${escapeHtml(p.thy_pegasus_impact_tr)}</div>` : ""}
-          <div style="font:400 12.5px/1.4 var(--sans);color:var(--muted)"><strong>Etkilenen Başlıca Havayolları:</strong> <div class="fleet-tags" style="display:inline-flex">${affectedBadges}</div></div>
+          <p class="fleet-desc">${escapeHtml(pStatus)}</p>
+          ${pThyImpact ? `<div class="fleet-thy-box" lang="${state.uiLang}"><strong>${escapeHtml(t("fleet_thy_impact"))}</strong> ${escapeHtml(pThyImpact)}</div>` : ""}
+          <div style="font:400 12.5px/1.4 var(--sans);color:var(--muted)"><strong>${escapeHtml(t("fleet_impacted_carriers"))}</strong> <div class="fleet-tags" style="display:inline-flex">${affectedBadges}</div></div>
           <div class="fleet-footer">
-            <span>Zaman Ufku: <strong>${escapeHtml(p.timeline_horizon || "")}</strong></span>
-            <span>Kaynak: ${escapeHtml(p.source_reference || "")}</span>
+            <span>${escapeHtml(t("fleet_timeline"))} <strong>${escapeHtml(p.timeline_horizon || "")}</strong></span>
+            <span>${escapeHtml(t("fleet_source"))} ${escapeHtml(p.source_reference || "")}</span>
           </div>
         </div>`;
       });
       html += `</div>`;
-      html += `<div class="end">— Filo Radarı Sonu —</div>`;
+      html += `<div class="end">— ${escapeHtml(t("fleet_end"))} —</div>`;
       $("content").innerHTML = html;
     }
 
@@ -1268,31 +1746,32 @@
       const turkeyCount = allEvents.filter(e => e.country === "Türkiye").length;
       const globalCount = allEvents.filter(e => e.country !== "Türkiye").length;
 
-      let html = `<div class="calendar-intro" lang="tr">
-        <strong>Havacılık Bilanço &amp; Trafik Takvimi</strong> — Türk Hava Yolları (THY), Pegasus, Lufthansa Group, Airbus, Boeing, IAG ve Ryanair’in 3Ç / 9 aylık finansal bilanço takvimi; DHMİ ve IATA aylık yolcu &amp; kargo trafik istatistikleri ve resmî yatırımcı ajandası.
+      const isTr = state.uiLang === "tr";
+      let html = `<div class="calendar-intro" lang="${state.uiLang}">
+        <strong>${escapeHtml(t("cal_title"))}</strong> — ${escapeHtml(t("cal_desc"))}
       </div>`;
 
       html += `<div class="calendar-stats-grid">
         <div class="calendar-stat-card">
           <span class="calendar-stat-val" style="color:var(--yellow)">${cal.financial_count || 0}</span>
-          <span class="calendar-stat-label">3Ç Finansal Bilanço</span>
+          <span class="calendar-stat-label">${escapeHtml(t("cal_stat_financial"))}</span>
         </div>
         <div class="calendar-stat-card">
           <span class="calendar-stat-val" style="color:#FFF">${cal.traffic_count || 0}</span>
-          <span class="calendar-stat-label">Aylık Trafik Bülteni</span>
+          <span class="calendar-stat-label">${escapeHtml(t("cal_stat_traffic"))}</span>
         </div>
         <div class="calendar-stat-card">
           <span class="calendar-stat-val" style="color:#FFF">${cal.total_events || 0}</span>
-          <span class="calendar-stat-label">İzlenen Takvim Kaydı</span>
+          <span class="calendar-stat-label">${escapeHtml(t("cal_stat_total"))}</span>
         </div>
       </div>`;
 
       const filterOptions = [
-        ["All", "Tümü", allEvents.length],
-        ["FINANCIAL", "Bilanço & 3Ç", cal.financial_count || 0],
-        ["TRAFFIC", "Aylık Trafik", cal.traffic_count || 0],
-        ["TURKEY", "THY & Pegasus (TR)", turkeyCount],
-        ["GLOBAL", "Küresel & Avrupa", globalCount]
+        ["All", t("cal_filter_all"), allEvents.length],
+        ["FINANCIAL", t("cal_filter_fin"), cal.financial_count || 0],
+        ["TRAFFIC", t("cal_filter_trf"), cal.traffic_count || 0],
+        ["TURKEY", t("cal_filter_turkey"), turkeyCount],
+        ["GLOBAL", t("cal_filter_global"), globalCount]
       ];
 
       html += `<nav class="filters" aria-label="Filter calendar events"><div class="filters-inner">
@@ -1309,16 +1788,20 @@
         const badgeCls = isToday ? "cal-badge-today" : (isThisWeek ? "cal-badge-urgent" : (isReported ? "cal-badge-reported" : "cal-badge-upcoming"));
         const typeLabel = e.event_type_tr || (e.event_type === "financial_results" ? "Bilanço & Finansallar" : "Aylık Trafik");
 
-        html += `<div class="calendar-card ${cardBorderCls}" lang="tr">
+        const eTitle = isTr ? (e.title_tr || e.title_en || e.entity) : (e.title_en || e.title_tr || e.entity);
+        const eBadge = isTr ? (e.badge_tr || e.badge_en) : (e.badge_en || e.badge_tr);
+        const eWatch = isTr ? (e.watchpoints_tr || e.watchpoints_en) : (e.watchpoints_en || e.watchpoints_tr);
+
+        html += `<div class="calendar-card ${cardBorderCls}" lang="${state.uiLang}">
           <div class="calendar-card-head">
             <div>
               <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
                 <span class="eyebrow" style="color:var(--muted)">${escapeHtml(typeLabel)}</span>
                 <span class="cal-country-badge">${escapeHtml(e.country || "")}</span>
               </div>
-              <h3 class="calendar-card-title">${escapeHtml(e.title_tr || e.entity)}</h3>
+              <h3 class="calendar-card-title">${escapeHtml(eTitle)}</h3>
             </div>
-            <span class="calendar-badge ${badgeCls}">${escapeHtml(e.badge_tr)}</span>
+            <span class="calendar-badge ${badgeCls}">${escapeHtml(eBadge)}</span>
           </div>
 
           <div class="calendar-meta-row">
@@ -1328,18 +1811,18 @@
             <span class="calendar-pill-date">📅 ${escapeHtml(e.date)}</span>
           </div>
 
-          ${e.watchpoints_tr ? `<div class="calendar-watch-box">
-            <strong>İzlenecek Kritik Noktalar:</strong> ${escapeHtml(e.watchpoints_tr)}
+          ${eWatch ? `<div class="calendar-watch-box">
+            <strong>${escapeHtml(t("cal_watchpoints_lbl"))}</strong> ${escapeHtml(eWatch)}
           </div>` : ""}
 
           <div class="calendar-card-footer">
-            <span>Kategori: <strong>${escapeHtml(e.event_type_tr)}</strong></span>
-            ${e.official_url ? `<a class="calendar-ir-btn" href="${safeExternalUrl(e.official_url)}" target="_blank" rel="noopener noreferrer">Resmî Yatırımcı İlişkileri ↗</a>` : ""}
+            <span>${escapeHtml(t("cal_category_lbl"))} <strong>${escapeHtml(typeLabel)}</strong></span>
+            ${e.official_url ? `<a class="calendar-ir-btn" href="${safeExternalUrl(e.official_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("cal_ir_link"))}</a>` : ""}
           </div>
         </div>`;
       });
       html += `</div>`;
-      html += `<div class="end">— Havacılık Bilanço &amp; Trafik Takvimi Sonu —</div>`;
+      html += `<div class="end">— ${escapeHtml(t("cal_end"))} —</div>`;
       $("content").innerHTML = html;
     }
 
@@ -1808,8 +2291,11 @@
           const zone = radar && radar.zones ? radar.zones.find(z => z.id === zoneId) : null;
           const tip = $("airspace-map-tooltip");
           if (tip && zone) {
-            $("tip-title").textContent = `${zone.country} (${zone.fir})`;
-            $("tip-desc").textContent = `${zone.risk_badge || zone.risk_level} — ${zone.restriction_tr || zone.restriction_en}`;
+            const countryName = zoneCountry(zone);
+            const badge = (state.uiLang === "tr" ? (zone.risk_badge || zone.risk_badge_en || zone.risk_level) : (zone.risk_badge_en || zone.risk_badge || zone.risk_level));
+            const restr = (state.uiLang === "tr" ? (zone.restriction_tr || zone.restriction_en) : (zone.restriction_en || zone.restriction_tr));
+            $("tip-title").textContent = `${countryName} (${zone.fir})`;
+            $("tip-desc").textContent = `${badge} — ${restr}`;
             $("tip-jump-btn").dataset.targetZone = zone.id;
             tip.classList.add("active");
           }
@@ -1878,6 +2364,21 @@
         if (e.key === "ArrowDown" || e.key === "j") stepArticle(1);
         if (e.key === "ArrowUp" || e.key === "k") stepArticle(-1);
       });
+
+      document.addEventListener("click", (e) => {
+        const langBtn = e.target.closest("[data-lang]");
+        if (langBtn) {
+          setLanguage(langBtn.dataset.lang);
+          return;
+        }
+        const drawerLangBtn = e.target.closest("[data-drawer-lang]");
+        if (drawerLangBtn) {
+          setLanguage(drawerLangBtn.dataset.drawerLang);
+          return;
+        }
+      });
+
+      updateStaticTranslations();
 
       const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const standalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
