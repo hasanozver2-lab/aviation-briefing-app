@@ -277,6 +277,8 @@
     .traffic-title { font: 800 13px/1.2 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: #FFF; display: flex; align-items: center; gap: 8px; }
     .traffic-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 8px #22C55E; display: inline-block; flex: none; }
     .traffic-source { font: 600 10.5px/1 var(--mono); color: var(--yellow); text-transform: uppercase; }
+    .traffic-link-btn { background: #222226; color: var(--yellow); border: 1px solid #333338; padding: 4px 8px; font: 700 11px/1 var(--sans); cursor: pointer; text-transform: uppercase; }
+    .traffic-link-btn:hover { background: var(--yellow); color: var(--black); }
     .traffic-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); background: var(--black); }
     @media (max-width: 680px) { .traffic-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
     .traffic-card { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; border-left: 1px solid #27272A; border-bottom: 1px solid #27272A; }
@@ -941,6 +943,45 @@
       $("content").innerHTML = html;
     }
 
+    function renderTrafficPanel(traffic) {
+      if (!traffic) return "";
+      const isAirspacePage = state.page === "airspace";
+      const actionBtn = isAirspacePage ? "" : `<button class="traffic-link-btn" type="button" data-page="airspace">Hava Sahası Haritası ↗</button>`;
+      return `<div class="traffic-panel" lang="tr">
+        <div class="traffic-head">
+          <span class="traffic-title"><span class="traffic-live-dot"></span> Küresel Uçuş Trafiği &amp; Günlük Hacim</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="traffic-source">${escapeHtml(traffic.source || "Eurocontrol / FAA / ICAO")}</span>
+            ${actionBtn}
+          </div>
+        </div>
+        <div class="traffic-grid">
+          <div class="traffic-card">
+            <span class="traffic-val">${escapeHtml(traffic.daily_commercial_flights_str || "111,200")} <span class="traffic-trend">${escapeHtml(traffic.trend_yoy_pct || "+3.8%")}</span></span>
+            <span class="traffic-label">Bugünkü Ticari Uçuş (Küresel)</span>
+          </div>
+          <div class="traffic-card">
+            <span class="traffic-val">${escapeHtml(traffic.active_airborne_now_str || "12,450")}</span>
+            <span class="traffic-label">Anlık Havada Aktif Uçuş</span>
+          </div>
+          ${(traffic.regions || []).slice(0, 2).map(r => `
+            <div class="traffic-card">
+              <span class="traffic-val">${escapeHtml(r.flights_str)} <span class="traffic-trend">${escapeHtml(r.trend)}</span></span>
+              <span class="traffic-label">${escapeHtml(r.name_tr)}</span>
+            </div>
+          `).join("")}
+        </div>
+        ${traffic.regions && traffic.regions.length > 2 ? `
+          <div class="traffic-regions-strip">
+            <span style="color:var(--muted);text-transform:uppercase">Bölgesel Trafik:</span>
+            ${traffic.regions.slice(2).map(r => `
+              <span class="traffic-region-item">${escapeHtml(r.name_tr)}: <strong>${escapeHtml(r.flights_str)}</strong> (${escapeHtml(r.trend)})</span>
+            `).join(" · ")}
+          </div>
+        ` : ""}
+      </div>`;
+    }
+
     function renderAirspaceRadar() {
       const radar = state.data && state.data.airspace_radar ? state.data.airspace_radar : null;
       if (!radar || !radar.zones || !radar.zones.length) {
@@ -957,36 +998,7 @@
 
       const traffic = radar.global_traffic || null;
       if (traffic) {
-        html += `<div class="traffic-panel" lang="tr">
-          <div class="traffic-head">
-            <span class="traffic-title"><span class="traffic-live-dot"></span> Küresel Uçuş Trafiği &amp; Günlük Hacim</span>
-            <span class="traffic-source">${escapeHtml(traffic.source || "Eurocontrol / FAA / ICAO")}</span>
-          </div>
-          <div class="traffic-grid">
-            <div class="traffic-card">
-              <span class="traffic-val">${escapeHtml(traffic.daily_commercial_flights_str || "111,200")} <span class="traffic-trend">${escapeHtml(traffic.trend_yoy_pct || "+3.8%")}</span></span>
-              <span class="traffic-label">Bugünkü Ticari Uçuş (Küresel)</span>
-            </div>
-            <div class="traffic-card">
-              <span class="traffic-val">${escapeHtml(traffic.active_airborne_now_str || "12,450")}</span>
-              <span class="traffic-label">Anlık Havada Aktif Uçuş</span>
-            </div>
-            ${(traffic.regions || []).slice(0, 2).map(r => `
-              <div class="traffic-card">
-                <span class="traffic-val">${escapeHtml(r.flights_str)} <span class="traffic-trend">${escapeHtml(r.trend)}</span></span>
-                <span class="traffic-label">${escapeHtml(r.name_tr)}</span>
-              </div>
-            `).join("")}
-          </div>
-          ${traffic.regions && traffic.regions.length > 2 ? `
-            <div class="traffic-regions-strip">
-              <span style="color:var(--muted);text-transform:uppercase">Bölgesel Trafik:</span>
-              ${traffic.regions.slice(2).map(r => `
-                <span class="traffic-region-item">${escapeHtml(r.name_tr)}: <strong>${escapeHtml(r.flights_str)}</strong> (${escapeHtml(r.trend)})</span>
-              `).join(" · ")}
-            </div>
-          ` : ""}
-        </div>`;
+        html += renderTrafficPanel(traffic);
       }
 
       html += `<div class="airspace-map-card" lang="tr">
@@ -1255,6 +1267,11 @@
       };
 
       let html = stories.length ? "" : `<div class="state">${EMPTY_TEXT}</div>`;
+      const radar = state.data && state.data.airspace_radar;
+      const traffic = radar && radar.global_traffic;
+      if (traffic && state.page === "briefing" && showBlock) {
+        html += renderTrafficPanel(traffic);
+      }
       if (block.length) html += `<section class="group"><div lang="en" class="group-head eyebrow">Critical &amp; Important · ${block.length}</div></section>`;
       if (lead) {
         const count = sourceCount(lead);
@@ -1665,6 +1682,11 @@
           renderList();
           const pressed = [...document.querySelectorAll("[data-fleet-filter]")].find(el => el.dataset.fleetFilter === state.fleetFilter);
           if (pressed) pressed.focus({ preventScroll: true });
+          return;
+        }
+        const pageLink = e.target.closest("[data-page]");
+        if (pageLink && !e.target.closest(".page-nav")) {
+          setPage(pageLink.dataset.page);
           return;
         }
         const mapToggle = e.target.closest("[data-map-view]");

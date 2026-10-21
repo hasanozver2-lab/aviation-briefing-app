@@ -85,11 +85,13 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         if path in ("/", "/index.html"):
             index_path = PUBLIC_DIR / "index.html"
             if index_path.exists():
+                content = index_path.read_bytes()
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(content)))
                 self.send_header("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
                 self.end_headers()
-                self.wfile.write(index_path.read_bytes())
+                self.wfile.write(content)
                 return
 
         # /static/... dosyaları
@@ -97,12 +99,14 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
             file_name = path[len("/static/"):]
             target = resolve_public_file(file_name)
             if target:
+                content = target.read_bytes()
                 self.send_response(200)
                 content_type, _ = mimetypes.guess_type(target.name)
                 self.send_header("Content-Type", content_type or "application/octet-stream")
+                self.send_header("Content-Length", str(len(content)))
                 self.send_header("X-Content-Type-Options", "nosniff")
                 self.end_headers()
-                self.wfile.write(target.read_bytes())
+                self.wfile.write(content)
                 return
             self.send_error(404, "Not Found")
             return
