@@ -170,12 +170,20 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def send_json(self, data, status=200):
+        body = json.dumps(data, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "close")
         self.end_headers()
-        self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+        try:
+            self.wfile.write(body)
+            self.wfile.flush()
+        except (ConnectionResetError, BrokenPipeError):
+            pass
+        self.close_connection = True
 
     def log_message(self, format, *args):
         # Konsolu temiz tutmak için sadece API isteklerini yaz
