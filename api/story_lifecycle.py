@@ -950,11 +950,18 @@ def present_stories(day, now, config=None, levels=None):
     """Set badges and score band on every story and order them: breaking first, then score, then newest."""
     config = config or load_badges_config()
     levels = load_relevance_config().get("levels") if levels is None else levels
+    today_key = day.get("date") or day_key(now, config)
+    prev_key = previous_day_key(today_key) if today_key else None
     for story in day.get("stories", []):
         story["badges"] = compute_badges(story, now, config)
         story["language"] = language.story_language(story)       # recomputed on every read: sources can be added after the story was stored
         story["is_strategic_report"] = is_strategic_report(story)
         story["is_flash_alert"] = is_flash_alert(story)
+        published = parse_iso(story.get("published_at_iso"))
+        first_seen = parse_iso(story.get("first_seen_at"))
+        moment = published or first_seen
+        story_day = day_key(moment, config) if moment else None
+        story["is_overnight"] = bool(story_day and prev_key and story_day == prev_key and not story.get("is_strategic_report"))
         if levels:
             level = level_for(story.get("relevance_score", 0), levels)
             story["level"] = level["name"] if level else "below"

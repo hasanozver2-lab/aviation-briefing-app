@@ -296,6 +296,22 @@ def test_ordering_puts_breaking_first_then_score_then_newest():
     assert [item["story_id"] for item in day["stories"]] == ["breaking", "mid", "low-new", "low-old"]
 
 
+def test_present_stories_flags_overnight_stories():
+    day = {
+        "date": "2026-10-21",
+        "stories": [
+            {**stored(score=60.0), "story_id": "today", "published_at_iso": "2026-10-21T08:00:00+00:00"},
+            {**stored(score=60.0), "story_id": "overnight", "published_at_iso": "2026-10-20T20:00:00+00:00"},
+            {**stored(score=60.0), "story_id": "strategic", "published_at_iso": "2026-10-20T20:00:00+00:00", "strategic_publication": True},
+        ],
+    }
+    story_lifecycle.present_stories(day, datetime(2026, 10, 21, 10, 0, tzinfo=timezone.utc), CONFIG)
+    by_id = {s["story_id"]: s for s in day["stories"]}
+    assert by_id["today"]["is_overnight"] is False
+    assert by_id["overnight"]["is_overnight"] is True
+    assert by_id["strategic"]["is_overnight"] is False
+
+
 # --- relevance score -------------------------------------------------------------------------
 
 def test_relevance_score_is_a_deterministic_weighted_sum_of_data():

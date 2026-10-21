@@ -3,7 +3,7 @@
   "timezone": "Europe/Istanbul",
   "fallback_utc_offset_hours": 3,
   "max_publication_age_hours": 24,
-  "rolling_retention_hours": 36,
+  "rolling_retention_hours": 18,
   "new": {
     "max_age_hours": 6
   },
