@@ -787,7 +787,10 @@ def _taxonomy():
 
 def _military_strike_applies(prepared_text):
     """True for a strike in a military context ("missile strike", "airstrike") that no labour context contradicts."""
-    from . import story_lifecycle  # lazy, as in is_excluded_from_typing
+    try:
+        from . import story_lifecycle
+    except ImportError:
+        import story_lifecycle
     return story_lifecycle.military_strike_matches(prepared_text, story_lifecycle.load_relevance_config()["selection"])
 
 
@@ -796,7 +799,10 @@ def is_excluded_from_typing(title):
 
     Reads the same lists the selection step uses (config/relevance.json), so the two cannot drift apart.
     """
-    from . import story_lifecycle  # lazy: story_lifecycle's own imports must not depend on this module
+    try:
+        from . import story_lifecycle
+    except ImportError:
+        import story_lifecycle
 
     relevance = story_lifecycle.load_relevance_config()
     selection = relevance.get("selection", {})

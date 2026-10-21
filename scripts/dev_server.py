@@ -118,26 +118,6 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(content)
                 return
 
-        # API: On-demand AI Story Analysis (GET fallback)
-        if path in {"/api/analyze-story", "/api/analyze-story/", "/api/analyze_story", "/api/analyze_story/"}:
-            story_id = query.get("story_id", [None])[0]
-            headline = query.get("headline", [None])[0]
-            if not story_id and not headline:
-                self.send_json({"error": "story_id or headline query parameter is required"}, status=400)
-                return
-            try:
-                result = engine.analyze_single_story(story_id=story_id, headline=headline)
-                self.send_json(result)
-            except engine.BriefingNotFound as e:
-                self.send_json({"error": str(e)}, status=404)
-            except ValueError as e:
-                self.send_json({"error": str(e)}, status=400)
-            except RuntimeError as e:
-                self.send_json({"error": str(e)}, status=503)
-            except Exception as e:
-                self.send_json({"error": f"AI analysis failed: {str(e)}"}, status=500)
-            return
-
         # API: Brifing verisini al
         if path == "/api/briefing":
             mode = query.get("mode", ["daily"])[0]
@@ -170,32 +150,6 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
-
-        if path in {"/api/analyze-story", "/api/analyze-story/", "/api/analyze_story", "/api/analyze_story/"}:
-            content_length = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(content_length) if content_length > 0 else b"{}"
-            try:
-                req_data = json.loads(body.decode("utf-8")) if body else {}
-            except json.JSONDecodeError:
-                req_data = {}
-            story_id = req_data.get("story_id") or query.get("story_id", [None])[0]
-            headline = req_data.get("headline") or query.get("headline", [None])[0]
-            story_payload = req_data.get("story")
-            if not story_id and not headline and not story_payload:
-                self.send_json({"error": "story_id, headline, or story payload is required"}, status=400)
-                return
-            try:
-                result = engine.analyze_single_story(story_id=story_id, headline=headline, story_payload=story_payload)
-                self.send_json(result)
-            except engine.BriefingNotFound as e:
-                self.send_json({"error": str(e)}, status=404)
-            except ValueError as e:
-                self.send_json({"error": str(e)}, status=400)
-            except RuntimeError as e:
-                self.send_json({"error": str(e)}, status=503)
-            except Exception as e:
-                self.send_json({"error": f"AI analysis failed: {str(e)}"}, status=500)
-            return
 
         if path == "/api/refresh":
             mode = query.get("mode", ["daily"])[0]

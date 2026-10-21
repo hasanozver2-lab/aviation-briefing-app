@@ -4,9 +4,5 @@
     "deploymentEnabled": {
       "briefing-data": false
     }
-  },
-  "rewrites": [
-    { "source": "/api/analyze-story", "destination": "/api/analyze_story" },
-    { "source": "/api/analyze-story/", "destination": "/api/analyze_story" }
-  ]
+  }
 }
