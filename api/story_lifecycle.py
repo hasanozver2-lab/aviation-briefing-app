@@ -206,7 +206,7 @@ BENCHMARK_REPORT_KEYWORDS = re.compile(
 )
 
 
-def published_on_day(story, date_text, config):
+def published_on_day(story, date_text, config, now=None):
     """Whether a story belongs to a local archive day by publication time.
 
     A source date is authoritative. First-seen time is only a fallback for the
@@ -218,13 +218,25 @@ def published_on_day(story, date_text, config):
     published = parse_iso(story.get("published_at_iso"))
     first_seen = parse_iso(story.get("first_seen_at"))
     moment = published or first_seen
-    return bool(moment and day_key(moment, config) == date_text)
+    if not moment:
+        return False
+    local_day = day_key(moment, config)
+    if local_day == date_text:
+        return True
+    allowed_prev_day = previous_day_key(date_text)
+    if local_day == allowed_prev_day:
+        max_age = (config or {}).get("rolling_retention_hours", 0)
+        if max_age > 0:
+            current_moment = now if now is not None else utc_now()
+            age_hours = (current_moment - moment).total_seconds() / 3600
+            return 0 <= age_hours <= max_age
+    return False
 
 
-def drop_not_published_on_day(day, date_text, config):
+def drop_not_published_on_day(day, date_text, config, now=None):
     """Apply the current-day view without changing an archive file on disk."""
     stories = day.get("stories", [])
-    day["stories"] = [story for story in stories if published_on_day(story, date_text, config)]
+    day["stories"] = [story for story in stories if published_on_day(story, date_text, config, now=now)]
     return len(stories) - len(day["stories"])
 
 
@@ -639,7 +651,7 @@ def select_stories(stories, selection, commentary=None):
     strategic_listed = [
         story for story in eligible
         if float(story["relevance_score"]) >= selection["min_score"] and is_strategic_report(story)
-    ][: selection.get("max_strategic_per_run", 12)]
+    ][: selection.get("max_strategic_per_run", 3)]
     listed = sorted(
         regular_listed + strategic_listed,
         key=lambda story: (-float(story["relevance_score"]), story["story_id"]),
@@ -850,9 +862,14 @@ def build_day(existing_day, previous_day, briefings, now, config=None, morning_r
         else:
             _apply_incoming(target, story, now_iso, config)
 
+    relevance_cfg = load_relevance_config()
+    max_strategic = int((relevance_cfg.get("selection") or {}).get("max_strategic_per_run", 3))
+    strategic_count = sum(1 for s in stored if is_strategic_report(s))
     for prev_story in previous:
         if is_strategic_report(prev_story) and find_match(prev_story, stored, threshold) is None:
-            stored.append(copy.deepcopy(prev_story))
+            if strategic_count < max_strategic:
+                stored.append(copy.deepcopy(prev_story))
+                strategic_count += 1
 
     head = {
         key: value

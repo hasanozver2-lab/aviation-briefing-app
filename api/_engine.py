@@ -1255,7 +1255,7 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
     relevance_config = story_lifecycle.load_relevance_config()
     selection_cfg = dict(relevance_config["selection"])
     if is_deep:
-        selection_cfg["max_per_run"] = max(22, int(selection_cfg.get("max_per_run", 18)))
+        selection_cfg["max_per_run"] = max(42, int(selection_cfg.get("max_per_run", 36)))
     selected = story_lifecycle.select_stories(candidates, selection_cfg, relevance_config.get("commentary"))
     for story in selected:
         if not story.get("image_url"):
@@ -1373,7 +1373,7 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
         snapshot = story_lifecycle.present_stories(snapshot, now, config)
         snapshot["older_archive_count"] = 0
         if mode == "daily" and date is None and snapshot["date"] == today:
-            snapshot["older_archive_count"] = story_lifecycle.drop_not_published_on_day(snapshot, today, config)
+            snapshot["older_archive_count"] = story_lifecycle.drop_not_published_on_day(snapshot, today, config, now=now)
         for story in snapshot["stories"]:
             if story.get("basis") == feed_sources.BASIS_HEADLINE_ONLY:
                 story["source_description"] = ""
