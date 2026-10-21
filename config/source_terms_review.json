@@ -982,6 +982,177 @@
    "automated_reading_forbidden": false,
    "quote": "",
    "read": false
+  },
+  "RTX Pratt & Whitney Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official RTX Pratt & Whitney corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "ANA Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official ANA corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Japan Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Japan Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Etihad Airways Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Etihad Airways corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Qatar Airways Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Qatar Airways corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Embraer Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Embraer corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Qantas Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Qantas corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "British Airways Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official British Airways corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Boeing Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Boeing corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "LATAM Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official LATAM Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Air Canada Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Air Canada corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Safran CFM Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Safran CFM corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Southwest Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Southwest Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Turkish Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Turkish Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "AeroRoutes": {
+   "terms_url": "https://www.aeroroutes.com/",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed for route intelligence and flight schedule updates.",
+   "robots": "Allowed: public RSS feed endpoint at /eng?format=rss.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Singapore Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Singapore Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Copa Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Copa Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "United Airlines Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official United Airlines corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
+  },
+  "Korean Air Official Wire": {
+   "terms_url": "https://www.prnewswire.com/terms-of-use-pages/terms-of-service-terms.html",
+   "commercial_use_risk": "medium",
+   "summary": "Public RSS syndication feed distributed via PR Newswire for official Korean Air corporate disclosures.",
+   "robots": "Allowed for public RSS feed endpoints with standard Accept header.",
+   "automated_reading_forbidden": false,
+   "quote": "",
+   "read": true
   }
  }
 }
