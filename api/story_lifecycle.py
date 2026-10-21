@@ -225,6 +225,10 @@ def published_on_day(story, date_text, config, now=None):
         return True
     allowed_prev_day = previous_day_key(date_text)
     if local_day == allowed_prev_day:
+        if published and first_seen and day_key(first_seen, config) == date_text:
+            delay_h = (first_seen - published).total_seconds() / 3600
+            if delay_h >= 12:
+                return False
         max_age = (config or {}).get("rolling_retention_hours", 0)
         if max_age > 0:
             current_moment = now if now is not None else utc_now()
