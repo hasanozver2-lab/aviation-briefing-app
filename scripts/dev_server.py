@@ -49,7 +49,8 @@ def resolve_public_file(file_name):
 def is_refresh_authorized(client_ip, authorization_header):
     """Allow local maintenance or callers holding the refresh secret."""
     try:
-        if ipaddress.ip_address(client_ip).is_loopback:
+        ip = ipaddress.ip_address(client_ip)
+        if ip.is_loopback or (isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped and ip.ipv4_mapped.is_loopback):
             return True
     except ValueError:
         return False
@@ -76,6 +77,13 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PUBLIC_DIR), **kwargs)
 
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.end_headers()
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
@@ -94,11 +102,12 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
                 self.wfile.write(content)
                 return
 
-        # /static/... dosyaları
-        if path.startswith("/static/"):
-            file_name = path[len("/static/"):]
-            target = resolve_public_file(file_name)
-            if target:
+        # /static/... veya genel statik dosyalar (manifest, favicon, ikonlar)
+        clean_path = path.lstrip("/")
+        if clean_path and not clean_path.startswith("api/"):
+            sub_path = clean_path[len("static/"):] if clean_path.startswith("static/") else clean_path
+            target = resolve_public_file(sub_path)
+            if target and target.is_file():
                 content = target.read_bytes()
                 self.send_response(200)
                 content_type, _ = mimetypes.guess_type(target.name)
@@ -108,14 +117,35 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(content)
                 return
-            self.send_error(404, "Not Found")
+
+        # API: On-demand AI Story Analysis (GET fallback)
+        if path in {"/api/analyze-story", "/api/analyze-story/", "/api/analyze_story", "/api/analyze_story/"}:
+            story_id = query.get("story_id", [None])[0]
+            headline = query.get("headline", [None])[0]
+            if not story_id and not headline:
+                self.send_json({"error": "story_id or headline query parameter is required"}, status=400)
+                return
+            try:
+                result = engine.analyze_single_story(story_id=story_id, headline=headline)
+                self.send_json(result)
+            except engine.BriefingNotFound as e:
+                self.send_json({"error": str(e)}, status=404)
+            except ValueError as e:
+                self.send_json({"error": str(e)}, status=400)
+            except RuntimeError as e:
+                self.send_json({"error": str(e)}, status=503)
+            except Exception as e:
+                self.send_json({"error": f"AI analysis failed: {str(e)}"}, status=500)
             return
 
         # API: Brifing verisini al
         if path == "/api/briefing":
             mode = query.get("mode", ["daily"])[0]
             try:
-                data = engine.get_briefing(mode=mode, force_refresh=False, date=query.get("date", [None])[0], include_low=engine.wants_low(query))
+                try:
+                    data = engine.get_ready_briefing(mode=mode, date=query.get("date", [None])[0], include_low=engine.wants_low(query))
+                except engine.BriefingNotFound:
+                    data = engine.get_briefing(mode=mode, force_refresh=False, date=query.get("date", [None])[0], include_low=engine.wants_low(query))
                 self.send_json(data)
             except engine.BriefingNotFound as e:
                 self.send_json({"error": str(e)}, status=404)
@@ -141,7 +171,7 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
 
-        if path == "/api/analyze-story":
+        if path in {"/api/analyze-story", "/api/analyze-story/", "/api/analyze_story", "/api/analyze_story/"}:
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length) if content_length > 0 else b"{}"
             try:
@@ -149,18 +179,22 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
             except json.JSONDecodeError:
                 req_data = {}
             story_id = req_data.get("story_id") or query.get("story_id", [None])[0]
-            if not story_id:
-                self.send_json({"error": "story_id is required"}, status=400)
+            headline = req_data.get("headline") or query.get("headline", [None])[0]
+            story_payload = req_data.get("story")
+            if not story_id and not headline and not story_payload:
+                self.send_json({"error": "story_id, headline, or story payload is required"}, status=400)
                 return
             try:
-                result = engine.analyze_single_story(story_id)
+                result = engine.analyze_single_story(story_id=story_id, headline=headline, story_payload=story_payload)
                 self.send_json(result)
             except engine.BriefingNotFound as e:
                 self.send_json({"error": str(e)}, status=404)
             except ValueError as e:
                 self.send_json({"error": str(e)}, status=400)
+            except RuntimeError as e:
+                self.send_json({"error": str(e)}, status=503)
             except Exception as e:
-                self.send_json({"error": str(e)}, status=500)
+                self.send_json({"error": f"AI analysis failed: {str(e)}"}, status=500)
             return
 
         if path == "/api/refresh":
@@ -182,12 +216,19 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def send_json(self, data, status=200):
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Cache-Control", "no-cache")
-        self.end_headers()
-        self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+        try:
+            body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            self.wfile.write(body)
+        except (ConnectionResetError, BrokenPipeError):
+            pass
 
     def log_message(self, format, *args):
         # Konsolu temiz tutmak için sadece API isteklerini yaz

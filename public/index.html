@@ -2140,7 +2140,7 @@
           <div class="art-ai-panel" lang="${lang}">
             <div class="art-ai-head">
               <span class="art-ai-badge">✦ ${escapeHtml(t("ai_panel_title"))}</span>
-              <button class="art-ai-btn" type="button" id="btn-ai-analyze-${escapeHtml(storyId)}" onclick="requestAiAnalysis('${escapeHtml(storyId)}')">
+              <button class="art-ai-btn" type="button" id="btn-ai-analyze" data-action="ai-analyze" data-story-id="${escapeHtml(storyId)}">
                 ${hasAi ? `🔄 ${escapeHtml(t("ai_reanalyze_btn"))}` : `✨ ${escapeHtml(t("ai_analyze_btn"))}`}
               </button>
             </div>
@@ -2202,17 +2202,34 @@
       if (moveFocus) focusArticleHeading();
     }
     async function requestAiAnalysis(storyId) {
-      const btn = document.getElementById(`btn-ai-analyze-${storyId}`);
+      const btn = document.getElementById("btn-ai-analyze") || document.querySelector("[data-action='ai-analyze']");
       const origContent = btn ? btn.innerHTML : "";
       if (btn) {
         btn.disabled = true;
         btn.innerHTML = `<span>⏳</span> ${escapeHtml(t("ai_analyzing"))}`;
       }
+      const target = (state.order || []).find(x => storyKey(x) === state.articleId) ||
+                     (state.stories || []).find(x => storyKey(x) === state.articleId) ||
+                     (state.reportStories || []).find(x => storyKey(x) === state.articleId) || {};
+      const payloadId = storyId || target.story_id || target.id || state.articleId;
       try {
         const res = await fetch("/api/analyze-story", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ story_id: storyId })
+          body: JSON.stringify({
+            story_id: payloadId,
+            headline: target.headline,
+            story: {
+              story_id: payloadId,
+              id: target.id || payloadId,
+              headline: target.headline,
+              lead: target.lead,
+              article_body: target.article_body,
+              source_description: target.source_description,
+              original_source: target.original_source,
+              basis: target.basis
+            }
+          })
         });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
@@ -2221,18 +2238,19 @@
         const data = await res.json();
         if (data && data.story) {
           const updateStory = (list) => {
-            const idx = (list || []).findIndex(item => storyKey(item) === storyId);
+            const idx = (list || []).findIndex(item => storyKey(item) === state.articleId || item.story_id === payloadId || item.id === payloadId);
             if (idx >= 0) list[idx] = { ...list[idx], ...data.story };
           };
           updateStory(state.order);
           updateStory(state.stories);
+          updateStory(state.reportStories);
           if (state.data && Array.isArray(state.data.stories)) updateStory(state.data.stories);
           showToast(t("ai_analysis_ready"));
           renderArticle();
           renderStories();
         }
       } catch (err) {
-        showToast(`AI Error: ${err.message}`);
+        showToast(`AI: ${err.message}`);
         if (btn) {
           btn.disabled = false;
           btn.innerHTML = origContent || `✨ ${escapeHtml(t("ai_analyze_btn"))}`;
@@ -2478,7 +2496,15 @@
         const lead = e.target.closest(".lead-story");
         if (lead && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openArticle(lead.dataset.open); }
       });
-      $("art-body").addEventListener("click", (e) => { const n = e.target.closest("[data-open]"); if (n) stepArticle(1, true); });
+      $("art-body").addEventListener("click", (e) => {
+        const aiBtn = e.target.closest("[data-action='ai-analyze']");
+        if (aiBtn) {
+          requestAiAnalysis(aiBtn.dataset.storyId);
+          return;
+        }
+        const n = e.target.closest("[data-open]");
+        if (n) stepArticle(1, true);
+      });
       $("art-back").addEventListener("click", () => closeArticle());
       $("art-prev").addEventListener("click", () => stepArticle(-1));
       $("art-next").addEventListener("click", () => stepArticle(1));
