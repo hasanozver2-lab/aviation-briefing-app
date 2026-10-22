@@ -655,7 +655,7 @@ def select_stories(stories, selection, commentary=None):
     strategic_listed = [
         story for story in eligible
         if float(story["relevance_score"]) >= selection["min_score"] and is_strategic_report(story)
-    ][: selection.get("max_strategic_per_run", 3)]
+    ][: selection.get("max_strategic_per_run", 12)]
     listed = sorted(
         regular_listed + strategic_listed,
         key=lambda story: (-float(story["relevance_score"]), story["story_id"]),
@@ -867,7 +867,7 @@ def build_day(existing_day, previous_day, briefings, now, config=None, morning_r
             _apply_incoming(target, story, now_iso, config)
 
     relevance_cfg = load_relevance_config()
-    max_strategic = int((relevance_cfg.get("selection") or {}).get("max_strategic_per_run", 3))
+    max_strategic = int((relevance_cfg.get("selection") or {}).get("max_strategic_per_run", 12))
     strategic_count = sum(1 for s in stored if is_strategic_report(s))
     for prev_story in previous:
         if is_strategic_report(prev_story) and find_match(prev_story, stored, threshold) is None:

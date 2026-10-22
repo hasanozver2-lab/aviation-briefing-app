@@ -46,7 +46,7 @@
       "selection": {
         "min_score": 40,
         "max_per_run": 36,
-        "max_strategic_per_run": 3,
+        "max_strategic_per_run": 12,
         "exclude_terms": [
           "F-35*",
           "F-16*",

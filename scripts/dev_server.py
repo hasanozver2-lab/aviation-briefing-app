@@ -26,6 +26,8 @@ PUBLIC_DIR = BASE_DIR / "public"
 API_DIR = BASE_DIR / "api"
 sys.path.insert(0, str(API_DIR))
 import _engine as engine
+import briefing_store
+briefing_store.read_json = briefing_store.read_for_update
 
 
 def resolve_public_file(file_name):
