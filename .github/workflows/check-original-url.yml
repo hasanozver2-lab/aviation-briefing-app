@@ -1,0 +1,49 @@
+name: Check original Vercel URL
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  connectivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check the unchanged production address from an independent network
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import socket
+          import ssl
+          import urllib.error
+          import urllib.request
+
+          host = "aviation-briefing-app-drvd.vercel.app"
+          print("DNS:", sorted({entry[4][0] for entry in socket.getaddrinfo(host, 443)}))
+          context = ssl.create_default_context()
+          with socket.create_connection((host, 443), timeout=15) as connection:
+              with context.wrap_socket(connection, server_hostname=host) as secure:
+                  print("TLS:", secure.version(), "certificate expires:", secure.getpeercert().get("notAfter"))
+
+          failures = []
+          for path in ("/", "/api/briefing", "/static/manifest.json"):
+              url = "https://" + host + path
+              request = urllib.request.Request(url, headers={"User-Agent": "Aviation-Briefing-Connectivity-Check/1.0"})
+              try:
+                  with urllib.request.urlopen(request, timeout=30, context=context) as response:
+                      body = response.read()
+                      result = {"url": url, "status": response.status, "final_url": response.geturl(), "bytes": len(body), "content_type": response.headers.get("Content-Type")}
+                      if path == "/api/briefing":
+                          payload = json.loads(body)
+                          result.update(stories=len(payload.get("stories", [])), status_field=payload.get("status"), last_pipeline_run_at=payload.get("last_pipeline_run_at"))
+                      print(json.dumps(result))
+                      if response.status != 200 or not response.geturl().startswith("https://" + host + "/"):
+                          failures.append(path)
+              except Exception as error:
+                  print(json.dumps({"url": url, "error": type(error).__name__, "message": str(error)}))
+                  failures.append(path)
+          if failures:
+              raise SystemExit("Connectivity check failed: " + ", ".join(failures))
+          PY
