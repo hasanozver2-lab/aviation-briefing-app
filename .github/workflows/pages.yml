@@ -1,0 +1,57 @@
+name: Publish GitHub Pages mirror
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - public/**
+      - api/**
+      - config/**
+      - scripts/build_pages.py
+      - tests/test_pages_export.py
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Publish aviation briefings]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Even a failed collection may have published stale status; export the last ready data and warning.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pin the ready data branch
+        run: git fetch --no-tags origin +refs/heads/briefing-data:refs/remotes/origin/briefing-data
+      - name: Export the ready UI and briefings without collection or LLM calls
+        run: python scripts/build_pages.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: output/github-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

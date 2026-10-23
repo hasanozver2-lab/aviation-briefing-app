@@ -10,7 +10,7 @@ from api import story_lifecycle
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 INDEX = "public/index.html"
-IGNORED_DIRS = {".git", "node_modules", ".venv", "__pycache__", ".playwright-cli", ".pytest_cache", "design_handoff"}
+IGNORED_DIRS = {".git", "node_modules", ".venv", "__pycache__", ".playwright-cli", ".pytest_cache", "design_handoff", "output"}
 ALLOWED_EXTERNAL_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com"}
 MIN_TEXT_CONTRAST = 4.5
 

@@ -1337,7 +1337,7 @@ class BriefingNotFound(LookupError):
     """No archive file exists for the requested day."""
 
 
-def get_ready_briefing(mode="daily", date=None, include_low=False):
+def get_ready_briefing(mode="daily", date=None, include_low=False, *, reader=None):
     """Read a completed briefing; this function never collects feeds or calls an LLM.
 
     date=None serves today's archive (latest.json); date="YYYY-MM-DD" serves that day and raises
@@ -1352,8 +1352,9 @@ def get_ready_briefing(mode="daily", date=None, include_low=False):
     config = story_lifecycle.load_badges_config()
     today = story_lifecycle.day_key(now, config)
     snapshot_path = briefing_store.latest_path() if date is None else briefing_store.day_path(date)
-    snapshot = briefing_store.read_json(snapshot_path)
-    pipeline_status = briefing_store.read_json(briefing_store.status_path()) or {}
+    read_snapshot = reader or briefing_store.read_json
+    snapshot = read_snapshot(snapshot_path)
+    pipeline_status = read_snapshot(briefing_store.status_path()) or {}
     store_unreadable = not isinstance(snapshot, dict)
     if store_unreadable and date is not None:
         raise BriefingNotFound(f"no briefing archive for {date}")
