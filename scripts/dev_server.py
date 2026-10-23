@@ -10,6 +10,8 @@ import socket
 import ipaddress
 import mimetypes
 import urllib.parse
+import time
+import struct
 from pathlib import Path
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
@@ -27,7 +29,27 @@ API_DIR = BASE_DIR / "api"
 sys.path.insert(0, str(API_DIR))
 import _engine as engine
 import briefing_store
-briefing_store.read_json = briefing_store.read_for_update
+import github_store
+
+_last_git_fetch = 0
+
+def fast_read_branch_json(pathname, repo_dir=None, remote="origin", branch="briefing-data"):
+    """Read directly from local tracking ref with at most 1 fetch per 60 seconds (no CDN lag)."""
+    global _last_git_fetch
+    now = time.time()
+    tracking_ref = f"refs/remotes/{remote}/{branch}"
+    if now - _last_git_fetch > 60:
+        github_store._git(["fetch", "--quiet", remote, f"+refs/heads/{branch}:{tracking_ref}"], str(BASE_DIR), check=False)
+        _last_git_fetch = now
+    shown = github_store._git(["show", f"{tracking_ref}:{github_store._safe_path(pathname)}"], str(BASE_DIR), check=False)
+    if shown.returncode != 0:
+        return None
+    try:
+        return json.loads(shown.stdout.decode("utf-8"))
+    except Exception:
+        return None
+
+briefing_store.read_json = fast_read_branch_json
 
 
 def resolve_public_file(file_name):
@@ -76,6 +98,15 @@ def get_local_ip():
     return ip
 
 class BriefingRequestHandler(SimpleHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+
+    def setup(self):
+        super().setup()
+        try:
+            self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', 1, 5))
+        except OSError:
+            pass
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PUBLIC_DIR), **kwargs)
 
@@ -178,14 +209,12 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Cache-Control", "no-cache")
-        self.send_header("Connection", "close")
         self.end_headers()
         try:
             self.wfile.write(body)
             self.wfile.flush()
         except (ConnectionResetError, BrokenPipeError):
             pass
-        self.close_connection = True
 
     def log_message(self, format, *args):
         # Konsolu temiz tutmak için sadece API isteklerini yaz
@@ -198,6 +227,8 @@ class BriefingRequestHandler(SimpleHTTPRequestHandler):
 def run_server(port=8090):
     local_ip = get_local_ip()
     server_address = ('0.0.0.0', port)
+    ThreadingHTTPServer.allow_reuse_address = True
+    ThreadingHTTPServer.daemon_threads = True
     httpd = ThreadingHTTPServer(server_address, BriefingRequestHandler)
     
     print("\n" + "="*60)
