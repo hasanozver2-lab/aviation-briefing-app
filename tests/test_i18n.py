@@ -87,7 +87,7 @@ def test_i18n_browser_interaction():
         assert "Daily Briefing" in briefing_nav_text
 
         traffic_panel = page.text_content(".traffic-panel")
-        assert "Commercial Flights Today" in traffic_panel
+        assert "Flight counts are unavailable" in traffic_panel
 
         # 2. Click TR button to switch to Turkish
         page.click("#lang-btn-tr")
@@ -98,7 +98,7 @@ def test_i18n_browser_interaction():
         assert "Günlük Brifing" in briefing_nav_text_tr
 
         traffic_panel_tr = page.text_content(".traffic-panel")
-        assert "Bugünkü Ticari Uçuş" in traffic_panel_tr
+        assert "Uçuş sayısı gösterilmiyor" in traffic_panel_tr
 
         # 3. Check Airspace Radar tab in Turkish
         page.click('.page-btn[data-page="airspace"]')

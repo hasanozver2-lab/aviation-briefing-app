@@ -5,7 +5,6 @@ and military/geopolitical airspace closures relevant to civil airlines (THY, Peg
 """
 
 import json
-import math
 import re
 import urllib.error
 import urllib.parse
@@ -389,107 +388,17 @@ def get_fallback_zones():
 
 
 def get_global_flight_traffic(now=None):
-    """Return daily commercial airline flight traffic metrics and regional volume.
-
-    Modeled on Eurocontrol daily traffic monitor, FAA Air Traffic Organization,
-    and ICAO global commercial scheduled & unscheduled flight statistics.
-    """
-    ref_time = now if isinstance(now, datetime) else datetime.now(timezone.utc)
-    if ref_time.tzinfo is None:
-        ref_time = ref_time.replace(tzinfo=timezone.utc)
-
-    # Base daily commercial flights (~111,000 on weekdays, ~106,000 on weekends)
-    is_weekend = ref_time.weekday() >= 5
-    base_daily = 106200 if is_weekend else 111800
-
-    # Deterministic daily variance based on day of month
-    day_wobble = ((ref_time.day * 137) % 1900) - 950
-    daily_commercial = base_daily + day_wobble
-
-    # Active airborne flights vary by UTC hour (peak around 14:00-16:00 UTC, trough around 02:00-04:00 UTC)
-    hour = ref_time.hour + ref_time.minute / 60.0
-    time_factor = math.sin((hour - 8.5) * math.pi / 12.0)
-    airborne_now = int(11600 + time_factor * 2200)
-
-    # Regional breakdowns calibrated to sum exactly to daily_commercial (100.0%)
-    # Baseline global commercial share distribution:
-    # North America (FAA): ~34.5%, APAC: ~31.0%, Europe: ~24.5%, Middle East: ~6.5%, Latin America: ~3.5%
-    faa_flights = int(daily_commercial * 0.345)
-    apac_flights = int(daily_commercial * 0.310)
-    eurocontrol_flights = int(daily_commercial * 0.245)
-    mideast_flights = int(daily_commercial * 0.065)
-    latam_flights = daily_commercial - (faa_flights + apac_flights + eurocontrol_flights + mideast_flights)
-
+    """No measured live traffic provider is configured; never manufacture operational counts."""
     return {
-        "status": "ok",
-        "updated_at": ref_time.isoformat(timespec="seconds"),
-        "is_estimate": True,
-        "data_type": "modelled_estimate",
-        "methodology_en": "Calibrated statistical estimate modeled on ICAO, FAA ATO, and Eurocontrol seasonal traffic baselines.",
-        "methodology_tr": "ICAO, FAA ATO ve Eurocontrol mevsimsel trafik bazlarına göre kalibre edilmiş istatistiki günlük tahmin.",
-        "daily_commercial_flights": daily_commercial,
-        "daily_commercial_flights_str": f"{daily_commercial:,}",
-        "active_airborne_now": airborne_now,
-        "active_airborne_now_str": f"{airborne_now:,}",
-        "trend_yoy_pct": "+3.8%",
-        "trend_wow_pct": "+1.2%",
-        "total_aviation_flights_str": f"{int(daily_commercial * 1.92):,}",
-        "regions": [
-            {
-                "id": "faa",
-                "name_tr": "Kuzey Amerika (FAA)",
-                "name_en": "North America (FAA)",
-                "flights": faa_flights,
-                "flights_str": f"{faa_flights:,}",
-                "share_pct": "34.5%",
-                "trend": "+2.8%",
-                "status": "NORMAL",
-            },
-            {
-                "id": "eurocontrol",
-                "name_tr": "Avrupa (Eurocontrol)",
-                "name_en": "Europe (Eurocontrol)",
-                "flights": eurocontrol_flights,
-                "flights_str": f"{eurocontrol_flights:,}",
-                "share_pct": "24.5%",
-                "trend": "+3.4%",
-                "status": "NORMAL",
-            },
-            {
-                "id": "apac",
-                "name_tr": "Asya - Pasifik",
-                "name_en": "Asia - Pacific",
-                "flights": apac_flights,
-                "flights_str": f"{apac_flights:,}",
-                "share_pct": "31.0%",
-                "trend": "+5.1%",
-                "status": "HIGH_GROWTH",
-            },
-            {
-                "id": "mideast",
-                "name_tr": "Orta Doğu & Körfez",
-                "name_en": "Middle East & Gulf",
-                "flights": mideast_flights,
-                "flights_str": f"{mideast_flights:,}",
-                "share_pct": "6.5%",
-                "trend": "+4.6%",
-                "status": "DISRUPTED_REROUTING",
-            },
-            {
-                "id": "latam",
-                "name_tr": "Latin Amerika",
-                "name_en": "Latin America",
-                "flights": latam_flights,
-                "flights_str": f"{latam_flights:,}",
-                "share_pct": "3.5%",
-                "trend": "+2.1%",
-                "status": "NORMAL",
-            },
-        ],
-        "source": "Modelled Estimate (ICAO / Eurocontrol / FAA Baselines)",
-        "source_en": "Modelled Estimate (ICAO / Eurocontrol / FAA Baselines)",
-        "source_tr": "Modellenmiş Tahmin (ICAO / Eurocontrol / FAA Bazları)",
-        "source_url": "https://www.eurocontrol.int/our-data",
+        "status": "unavailable",
+        "updated_at": None,
+        "is_estimate": False,
+        "data_type": "unavailable",
+        "daily_commercial_flights": None,
+        "active_airborne_now": None,
+        "regions": [],
+        "reason_en": "No verified live flight-traffic feed is connected. No flight counts are estimated.",
+        "reason_tr": "Doğrulanmış canlı uçuş trafiği beslemesi bağlı değil. Uçuş sayısı tahmini gösterilmiyor.",
     }
 
 

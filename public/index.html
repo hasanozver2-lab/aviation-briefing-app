@@ -36,7 +36,16 @@
 
     /* Header — black signage block */
     header.mast { background: var(--black); color: #FFF; width: 100vw; margin-left: calc(50% - 50vw); padding: calc(env(safe-area-inset-top) + 10px) max(var(--pad), calc(50vw - 302px)) 18px; display: flex; flex-direction: column; gap: 14px; }
-    .mast-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+    .mast-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+    .mast-top > * { min-width: 0; }
+    @media (max-width: 600px) {
+      .mast-top { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+      .mast-top-left { grid-column: 1; grid-row: 1; }
+      .mast-actions { grid-column: 2; grid-row: 1; gap: 6px; }
+      header.mast .menu-toggle-btn { gap: 6px; padding-right: 0; font-size: 11px; }
+      header.mast .mast-actions button { padding-left: 8px; padding-right: 8px; }
+      header.mast #dateline { grid-column: 1 / -1; grid-row: 2; text-align: left; }
+    }
     .mast-top-left { display: flex; align-items: center; }
     .menu-toggle-btn { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px 0 0; color: #FFF; font: 800 12px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; }
     .menu-toggle-icon { width: 44px; height: 44px; background: var(--yellow); font-size: 0; position: relative; }
@@ -576,6 +585,7 @@
       <button type="button" class="airspace-banner-btn" id="airspace-banner-btn">Inspect Radar ›</button>
     </div>
 
+    <details id="source-health" class="fleet-intro source-health" hidden></details>
     <main id="content"><div class="state">Loading the briefing…</div></main>
   </div>
 
@@ -613,6 +623,7 @@
     const MARKET_ORDER = ["brent_spot", "jet_fuel_brent_crack_spread"];   // the strip shows fuel only; the API adds FX rows only when config market.display_fx is on
     const MARKET_LABELS = {
       brent_spot: ["Brent", "Brent spot"],
+      brent_futures: ["Brent futures", "Brent futures · BZ=F"],
       us_gulf_coast_jet_fuel: ["Jet USGC", "US Gulf Coast jet fuel"],
       jet_fuel_brent_crack_spread: ["Crack", "Jet fuel – Brent spread"]
     };
@@ -1074,7 +1085,7 @@
         renderArticle();
       }
       if (state.page === "archive" && state.archiveDate) {
-        renderArchive(state.data);
+        if (state.archiveData) renderArchive(state.archiveData);
       } else if (state.data) {
         render(state.data);
       }
@@ -1130,8 +1141,8 @@
       if (/pos|growth|opp|hedged/.test(r)) return "up";
       return "";
     }
-    function fmtNumber(v, digits) { const n = Number(v); return Number.isFinite(n) ? new Intl.NumberFormat("en-GB", { maximumFractionDigits: digits }).format(n) : "–"; }
-    function fmtChange(v) { const n = Number(v); if (!Number.isFinite(n)) return ""; return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(1) + "%"; }
+    function fmtNumber(v, digits) { if (v == null || v === "") return "–"; const n = Number(v); return Number.isFinite(n) ? new Intl.NumberFormat("en-GB", { maximumFractionDigits: digits }).format(n) : "–"; }
+    function fmtChange(v) { if (v == null || v === "") return ""; const n = Number(v); if (!Number.isFinite(n)) return ""; return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(1) + "%"; }
     function showToast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2500); }
 
     async function loadBriefing(requestLatest = true) {
@@ -1223,6 +1234,7 @@
     function setPage(pageName) {
       if (!["briefing", "reports", "airspace", "fleet", "calendar", "archive"].includes(pageName)) return;
       state.page = pageName;
+      renderSourceHealth(state.data && state.data.source_health);
       archiveRequestId++;
       $("archive-controls").hidden = pageName !== "archive";
       document.querySelectorAll("[data-page]").forEach(btn => {
@@ -1325,6 +1337,7 @@
 
     function render(data) {
       state.data = data;
+      renderSourceHealth(data.source_health);
       state.pending = null;
       $("new-pill").hidden = true;
       const allStories = visibleStories(data);
@@ -1455,11 +1468,31 @@
       $("content").innerHTML = html;
     }
 
+    function renderSourceHealth(health) {
+      const panel = $("source-health");
+      panel.hidden = !health || health.status !== "reported" || state.page === "archive";
+      if (panel.hidden) return;
+      const isTr = state.uiLang === "tr";
+      const issues = health.issues || [];
+      const gaps = health.coverage_gaps || [];
+      const readingGaps = health.reading_coverage_gaps || [];
+      const counts = health.status_counts || {};
+      panel.innerHTML = `<summary>${escapeHtml(isTr ? "Kaynak sağlığı" : "Source health")} · ${health.reading_ok}/${health.configured_active} ${escapeHtml(isTr ? "okunuyor" : "reading")} · ${issues.length} ${escapeHtml(isTr ? "kontrol gerekli" : "need attention")}</summary>`
+        + `<p>${escapeHtml(isTr ? "Son toplama denemesi: " : "Last collection attempt: ")}${escapeHtml(health.checked_at || "—")}</p>`
+        + (issues.length ? `<ul>${issues.map(issue => `<li><strong>${escapeHtml(issue.name)}</strong> · ${escapeHtml(issue.status)} — ${escapeHtml(isTr ? issue.action_tr : issue.action_en)}</li>`).join("")}</ul>` : "")
+        + (gaps.length ? `<p>${escapeHtml(isTr ? "Aktif kaynak bulunmayan bölgeler: " : "Regions without active sources: ")}${escapeHtml(gaps.join(", "))}</p>` : "")
+        + (readingGaps.length ? `<p>${escapeHtml(isTr ? "Son okumada kapsanmayan bölgeler: " : "Regions absent from the latest successful reads: ")}${escapeHtml(readingGaps.join(", "))}</p>` : "")
+        + `<p>${escapeHtml(isTr ? "Politika gereği hariç tutulanlar hata sayılmaz: " : "Policy exclusions are counted separately from errors: ")}${Number(counts.excluded_policy) || 0}. ${escapeHtml(isTr ? "Aday kaynaklar onay alınmadan açılmaz." : "Candidates stay inactive until approved.")}</p>`;
+    }
+
     function renderTrafficPanel(traffic) {
       if (!traffic) return "";
       const isAirspacePage = state.page === "airspace";
       const actionBtn = isAirspacePage ? "" : `<button class="traffic-link-btn" type="button" data-page="airspace">${escapeHtml(t("traffic_airspace_btn"))}</button>`;
       const isTr = state.uiLang === "tr";
+      if (traffic.status === "unavailable" || traffic.is_estimate || traffic.data_type === "modelled_estimate") {
+        return `<div class="traffic-panel" lang="${state.uiLang}"><div class="traffic-head"><span>${escapeHtml(isTr ? "Canlı uçuş trafiği verisi bağlı değil. Uçuş sayısı gösterilmiyor." : "A verified flight traffic feed is not connected. Flight counts are unavailable.")}</span>${actionBtn}</div></div>`;
+      }
       return `<div class="traffic-panel" lang="${state.uiLang}">
         <div class="traffic-head">
           <span class="traffic-title"><span class="traffic-live-dot"></span> ${escapeHtml(t("traffic_title"))} <span class="estimate-pill" style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,0.12);color:#E5A93C;text-transform:uppercase;letter-spacing:0.5px" title="${escapeHtml(t("traffic_estimate_tooltip"))}">${escapeHtml(t("traffic_estimate_badge"))}</span></span>
@@ -1470,11 +1503,11 @@
         </div>
         <div class="traffic-grid">
           <div class="traffic-card">
-            <span class="traffic-val">${escapeHtml(traffic.daily_commercial_flights_str || "111,200")} <span class="traffic-trend">${escapeHtml(traffic.trend_yoy_pct || "+3.8%")}</span></span>
+            <span class="traffic-val">${escapeHtml(traffic.daily_commercial_flights_str || "—")} <span class="traffic-trend">${escapeHtml(traffic.trend_yoy_pct || "")}</span></span>
             <span class="traffic-label">${escapeHtml(t("traffic_commercial_today"))}</span>
           </div>
           <div class="traffic-card">
-            <span class="traffic-val">${escapeHtml(traffic.active_airborne_now_str || "12,450")}</span>
+            <span class="traffic-val">${escapeHtml(traffic.active_airborne_now_str || "—")}</span>
             <span class="traffic-label">${escapeHtml(t("traffic_airborne_now"))}</span>
           </div>
           ${(traffic.regions || []).slice(0, 2).map(r => `
@@ -1670,6 +1703,8 @@
       let html = `<div class="fleet-intro" lang="${state.uiLang}">
         <strong>${escapeHtml(t("fleet_intro_title"))}</strong> — ${escapeHtml(t("fleet_intro_desc"))}
       </div>`;
+      const verifiedAt = fleet.last_verified_at || fleet.updated_at || "—";
+      html += `<div class="fleet-intro" role="note">${escapeHtml(isTr ? "Manuel referans verisi · Canlı filo takibi değildir. Son doğrulama: " : "Manual reference data · Not a live fleet feed. Last verified: ")}${escapeHtml(verifiedAt)}${fleet.is_stale ? escapeHtml(isTr ? " · Güncelliği yeniden doğrulanmalı." : " · Verification is overdue.") : ""}</div>`;
 
       html += `<div class="fleet-stats-grid">
         <div class="fleet-stat-card">
@@ -1948,7 +1983,7 @@
       if (!items.length) { $("market").hidden = true; return; }      // nothing to show: no empty strip
       const present = new Set(items.map(it => it.series_id));
       const missing = MARKET_ORDER.filter(id => !present.has(id)).map(id => label({ series_id: id })[0]);
-      const chg = (it) => Number(it.changes && it.changes.daily_pct);
+      const chg = (it) => { const value = it.changes && it.changes.daily_pct; return value == null || value === "" ? NaN : Number(value); };
       const cls = (v) => Number.isFinite(v) ? (v >= 0 ? "up" : "down") : "";
       const sources = [...new Set(items.map(it => String(it.source || "").split(";")[0].trim()).filter(Boolean))];
       const sourceNote = sources.length ? `Sources: ${escapeHtml(sources.join(" · "))}. ` : "";
@@ -1960,12 +1995,12 @@
       if ($("drawer-brent-val")) $("drawer-brent-val").textContent = brentItem ? `${fmtNumber(brentItem.value, 2)} USD` : "—";
       if ($("drawer-crack-val")) $("drawer-crack-val").textContent = hasCrack ? `${crackVal} USD` : "—";
 
-      $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span></span>`).join("")
+      $("ticker").innerHTML = items.map(it => `<span>${escapeHtml(label(it)[0])} ${fmtNumber(it.value, 3)} <span class="${cls(chg(it))}">${fmtChange(chg(it))}</span> <small>${escapeHtml(it.as_of || "—")}${it.is_stale ? " · " + escapeHtml(state.uiLang === "tr" ? "Eski veri" : "Stale") : ""}</small></span>`).join("")
         + (missing.length ? `<span class="mkt-miss">${missing.length} unavailable</span>` : "");
 
       $("mkt-table").innerHTML = items.map(it => {
         const age = Number(it.age_days) || 0;
-        const asOf = it.as_of ? `${it.as_of}${it.carried_forward && age > 0 ? ` · ${age} d old` : ""}` : "";
+        const asOf = it.as_of ? `${it.as_of}${it.carried_forward && age > 0 ? ` · ${age} d old` : ""}${it.is_stale ? " · " + (state.uiLang === "tr" ? "Eski veri" : "Stale") : ""}` : "—";
         return `<div class="mkt-line">
           <span class="mkt-name">${escapeHtml(label(it)[1])}<small>${escapeHtml(asOf)}</small></span>
           ${sparkline(it.sparkline)}
@@ -1977,14 +2012,15 @@
         + (hasCrack
             ? `<div class="mkt-crack-card" lang="${state.uiLang}">
                  <strong>${escapeHtml(t("crack_spread_title"))}:</strong> ${state.uiLang === "tr"
-                   ? `Ham petrol (Brent) ile rafine jet yakıtı arasındaki varil başı kâr marjıdır (${escapeHtml(crackVal)} USD/varil). Kaynak: ${escapeHtml((crackItem && crackItem.source) ? crackItem.source : "EIA US Gulf Coast vs Brent Spot")}. Havayollarının en kritik operasyonel maliyet kalemini gösterir.`
-                   : `Refining margin per barrel between crude (Brent) and finished jet fuel (${escapeHtml(crackVal)} USD/bbl). Source: ${escapeHtml((crackItem && crackItem.source) ? crackItem.source : "EIA US Gulf Coast vs Brent Spot")}. Primary airline fuel cost and margin benchmark.`}
+                   ? `ABD Körfez Kıyısı jet yakıtı ile Brent spot arasındaki varil başı fiyat farkıdır (${escapeHtml(crackVal)} USD/varil). Kaynak: ${escapeHtml((crackItem && crackItem.source) ? crackItem.source : "EIA US Gulf Coast vs Brent Spot")}. Bölgesel bir göstergedir; küresel jet yakıtı fiyatı değildir.`
+                   : `Price difference per barrel between US Gulf Coast jet fuel and Brent spot (${escapeHtml(crackVal)} USD/bbl). Source: ${escapeHtml((crackItem && crackItem.source) ? crackItem.source : "EIA US Gulf Coast vs Brent Spot")}. A regional indicator, not a global jet fuel price.`}
                </div>`
             : `<div class="mkt-crack-card" lang="${state.uiLang}" style="opacity:0.85">
                  <strong>${escapeHtml(t("crack_spread_title"))}:</strong> ${state.uiLang === "tr"
-                   ? `Güncel marj verisi geçici olarak erişilemiyor. EIA ve IATA haftalık göstergeleri yayımlandığında otomatik güncellenir.`
+                   ? `Doğrulanmış Brent spot ve ABD Körfez Kıyısı jet yakıtı verileri bekleniyor. IATA yalnızca dış kaynak bağlantısıdır.`
                    : `Current crack margin data temporarily unavailable. Updates automatically upon official release.`}
                </div>`)
+        + (market.quality_warnings || []).map(note => `<p class="mkt-note" role="note">${escapeHtml(note)}</p>`).join("")
         + `<p class="mkt-note">${sourceNote}${market.iata_monitor && market.iata_monitor.url ? ` <a href="${safeExternalUrl(market.iata_monitor.url)}" target="_blank" rel="noopener noreferrer">IATA Jet Fuel Price Monitor ↗</a>` : ""}</p>`;
 
       $("market").hidden = false;

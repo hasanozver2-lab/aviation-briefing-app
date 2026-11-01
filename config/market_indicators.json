@@ -27,13 +27,17 @@
     90,
     365
   ],
-  "iatanote": "IATA Jet Fuel Price Monitor ve Platts rafineri marjı (crack spread) göstergesi haftalık resmî rapordan alınmaktadır.",
+  "iatanote": "Jet marjı, ABD Körfez Kıyısı jet yakıtı spot fiyatı × 42 − Brent spot fiyatı olarak hesaplanır. IATA yalnızca dış kaynak bağlantısıdır.",
+  "quality": {
+    "daily_max_age_days": 4,
+    "weekly_max_age_days": 14
+  },
   "providers": {
     "eia": "U.S. Energy Information Administration",
     "fred": "FRED (EIA)",
     "ice": "ICE Futures (Piyasa Kapanışı)",
     "iata": "IATA / Platts Jet Fuel Price Monitor",
-    "_doc": "EIA is primary when EIA_API_KEY is set; otherwise (or when EIA fails) FRED serves the same EIA series. FRED uses FRED_API_KEY when set, else the keyless fredgraph.csv. ICE Futures Europe provides daily market closes for Brent crude (BZ=F). IATA Jet Fuel Price Monitor provides weekly global jet fuel and crack spread benchmarks."
+    "_doc": "EIA is primary when EIA_API_KEY is set; otherwise FRED serves the same EIA spot series. Yahoo BZ=F futures are stored separately from Brent spot. IATA is an external reference link only and is never ingested."
   },
   "market": {
     "display_fx": false,

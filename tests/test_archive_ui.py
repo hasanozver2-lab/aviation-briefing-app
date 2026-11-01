@@ -128,6 +128,36 @@ def test_archive_controls_fit_viewport(archive_page):
     assert not errors
 
 
+def test_archive_language_switch_preserves_selected_day_and_stories(archive_page):
+    page, errors, requests = archive_page
+    page.goto("https://archive.test/?archive=" + YESTERDAY, wait_until="networkidle")
+    playwright.expect(page.locator('#content [data-open="old"]').first).to_be_visible()
+    request_count = len(requests)
+    for language in ("TR", "EN", "TR"):
+        page.get_by_role("button", name=language, exact=True).click()
+        assert page.evaluate("state.archiveData.date") == YESTERDAY
+        assert page.locator("#archive-date").input_value() == YESTERDAY
+        assert page.locator('#content [data-open="today"]').count() == 0
+        playwright.expect(page.locator('#content [data-open="old"]').first).to_be_visible()
+    assert len(requests) == request_count
+    assert not errors
+
+
+@pytest.mark.parametrize("width", [320, 375, 390, 430])
+def test_mobile_masthead_actions_remain_inside_viewport(browser, width):
+    page = browser.new_page(viewport={"width": width, "height": 844})
+    page.route("**/*", lambda route: route.fulfill(content_type="text/html", body=PAGE_HTML)
+               if route.request.url == "https://layout.test/" else route.abort())
+    page.goto("https://layout.test/", wait_until="networkidle")
+    page.locator("#dateline").evaluate("element => element.textContent = '1 November 2026 · 12:45 Istanbul'")
+    for selector in ("#menu-btn", "#btn-share", ".lang-switch"):
+        bounds = page.locator(selector).bounding_box()
+        assert bounds and bounds["x"] >= 0
+        assert bounds["x"] + bounds["width"] <= width
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    page.close()
+
+
 def test_unchecked_headlines_are_normal_clickable_rows_without_unsupported_analysis(archive_page):
     page, errors, requests = archive_page
     page.goto("https://archive.test/", wait_until="networkidle")

@@ -34,6 +34,7 @@ try:
     from . import benchmark_search
     from . import safety_context
     from . import source_catalog
+    from . import source_health
     from . import source_recovery
     from . import airspace_radar
     from . import earnings_calendar
@@ -53,6 +54,7 @@ except ImportError:
     import benchmark_search
     import safety_context
     import source_catalog
+    import source_health
     import source_recovery
     import airspace_radar
     import earnings_calendar
@@ -1241,7 +1243,7 @@ def collect_run(market_database=None, recovered=None, deep_scan=None):
     entity_index = entities.EntityIndex.from_csv()
     entities.sync_entities(local_market_database)
     # Commentary on market events stays template-based: it keeps the run's LLM budget for story narratives.
-    market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="", fred_api_key=_env_value("FRED_API_KEY"), live_brent=True, live_iata_crack=True)
+    market_panel = market_data.refresh_market_data(local_market_database, eia_api_key=_env_value("EIA_API_KEY"), gemini_api_key="", fred_api_key=_env_value("FRED_API_KEY"), live_brent=True, live_iata_crack=False)
     source_report = {}
     articles = fetch_rss_items(max_hours=48, report=source_report, recovered=recovered)
     if not articles:
@@ -1305,7 +1307,7 @@ def run_pipeline(mode="daily", market_database=None):
         fred_api_key=_env_value("FRED_API_KEY"),
         gemini_api_key=GEMINI_API_KEY,
         live_brent=True,
-        live_iata_crack=True,
+        live_iata_crack=False,
     )
     articles = fetch_rss_items(max_hours=48 if mode == "daily" else 2)
     market_data.record_article_events(local_market_database, articles)
@@ -1387,9 +1389,12 @@ def get_ready_briefing(mode="daily", date=None, include_low=False, *, reader=Non
             snapshot = story_lifecycle.hourly_view(snapshot, now, config)
         snapshot["mode"] = mode
     snapshot["market"] = market_data.apply_display_settings(snapshot.get("market"))
+    snapshot["source_health"] = source_health.present_source_health(pipeline_status)
+    snapshot["fleet_watch"] = fleet_watch.present_fleet_watch(snapshot.get("fleet_watch"), now=now)
     radar = snapshot.get("airspace_radar")
     if radar and isinstance(radar, dict):
-        if not radar.get("global_traffic"):
+        traffic = radar.get("global_traffic") or {}
+        if not traffic or traffic.get("is_estimate") or traffic.get("data_type") == "modelled_estimate":
             radar["global_traffic"] = airspace_radar.get_global_flight_traffic(now=now)
         for z in radar.get("zones", []):
             if not z.get("svg_x") or not z.get("svg_y"):

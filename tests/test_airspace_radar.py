@@ -94,19 +94,13 @@ def test_geo_to_svg():
 
 def test_global_flight_traffic():
     traffic = airspace_radar.get_global_flight_traffic()
-    assert traffic["status"] == "ok"
-    assert traffic["daily_commercial_flights"] > 80000
-    assert traffic["active_airborne_now"] > 5000
-    assert "daily_commercial_flights_str" in traffic
-    assert "active_airborne_now_str" in traffic
-    assert traffic["is_estimate"] is True
-    assert traffic["data_type"] == "modelled_estimate"
-    assert len(traffic["regions"]) >= 4
-    region_ids = [r["id"] for r in traffic["regions"]]
-    assert "eurocontrol" in region_ids
-    assert "faa" in region_ids
-    # Verify regional breakdown sums EXACTLY to global commercial flights
-    assert sum(r["flights"] for r in traffic["regions"]) == traffic["daily_commercial_flights"]
+    assert traffic["status"] == "unavailable"
+    assert traffic["daily_commercial_flights"] is None
+    assert traffic["active_airborne_now"] is None
+    assert traffic["is_estimate"] is False
+    assert traffic["data_type"] == "unavailable"
+    assert traffic["updated_at"] is None
+    assert traffic["regions"] == []
 
 
 def test_fallback_zones():
@@ -134,7 +128,7 @@ def test_load_radar_with_xml():
     first_level = radar["zones"][0]["risk_level"]
     assert first_level == "DO_NOT_OPERATE"
     assert "global_traffic" in radar
-    assert radar["global_traffic"]["daily_commercial_flights"] > 80000
+    assert radar["global_traffic"]["daily_commercial_flights"] is None
 
 
 def test_load_radar_offline_fallback():
@@ -147,7 +141,7 @@ def test_load_radar_offline_fallback():
     assert radar["total_active_zones"] >= 5
     assert radar["do_not_operate_count"] >= 3
     assert "global_traffic" in radar
-    assert radar["global_traffic"]["daily_commercial_flights"] > 80000
+    assert radar["global_traffic"]["daily_commercial_flights"] is None
 
 
 def test_ui_contract_airspace_elements():
@@ -200,7 +194,8 @@ def test_airspace_radar_browser_interaction():
         
         # Verify traffic panel on main page (only displayed on main page)
         assert page.is_visible(".traffic-panel")
-        assert any(w in page.text_content(".traffic-panel") for w in ["Bugünkü Ticari Uçuş", "Commercial Flights Today"])
+        assert any(w in page.text_content(".traffic-panel") for w in ["Uçuş sayısı gösterilmiyor", "Flight counts are unavailable"])
+        assert page.locator(".traffic-grid, .traffic-live-dot").count() == 0
 
         # Navigate to airspace page
         page.click('[data-page="airspace"]')

@@ -1,0 +1,4 @@
+{
+  "fleet_max_age_days": 7,
+  "_doc": "Manual fleet reference data becomes stale after this many days. Pipeline runs never advance its verification date."
+}

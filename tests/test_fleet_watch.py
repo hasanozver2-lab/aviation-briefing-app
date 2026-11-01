@@ -7,7 +7,8 @@ from api import _engine
 
 def test_load_fleet_watch_structure():
     data = fleet_watch.load_fleet_watch()
-    assert data["status"] == "ok"
+    assert data["status"] in ("reference", "stale")
+    assert data["data_type"] == "manual_reference"
     assert data["total_programs"] >= 4
     assert data["grounding_count"] >= 1
     assert data["delivery_delay_count"] >= 2

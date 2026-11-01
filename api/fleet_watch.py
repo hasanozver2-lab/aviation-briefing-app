@@ -5,7 +5,10 @@ Tracks OEM delivery targets (Airbus, Boeing, Embraer), engine inspection groundi
 and Turkish / global airline fleet impacts (THY A321neo groundings, Pegasus deliveries).
 """
 
+import copy
+import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 FLEET_PROGRAMS = [
     {
@@ -106,7 +109,26 @@ FLEET_PROGRAMS = [
 ]
 
 
-def load_fleet_watch():
+def present_fleet_watch(fleet, now=None):
+    if not isinstance(fleet, dict):
+        return fleet
+    result = copy.deepcopy(fleet)
+    policy = json.loads((Path(__file__).resolve().parent.parent / "config" / "panel_quality.json").read_text(encoding="utf-8"))
+    verified_at = result.get("last_verified_at") or result.get("updated_at")
+    result.update(data_type="manual_reference", last_verified_at=verified_at)
+    try:
+        verified = datetime.fromisoformat(verified_at.replace("Z", "+00:00"))
+        if verified.tzinfo is None:
+            verified = verified.replace(tzinfo=timezone.utc)
+        age = max(0, ((now or datetime.now(timezone.utc)) - verified).days)
+        result.update(verified_age_days=age, is_stale=age > policy["fleet_max_age_days"])
+    except (ValueError, TypeError, AttributeError):
+        result.update(verified_age_days=None, is_stale=True)
+    result["status"] = "stale" if result["is_stale"] else "reference"
+    return result
+
+
+def load_fleet_watch(now=None):
     """Return complete structured Fleet, Delivery and Engine Delays dataset."""
     programs = FLEET_PROGRAMS[:]
     
@@ -118,7 +140,7 @@ def load_fleet_watch():
     # Baseline audit and verification timestamp of the tracked fleet dataset
     dataset_verified_at = "2026-10-18T10:00:00+00:00"
 
-    return {
+    return present_fleet_watch({
         "status": "ok",
         "dataset_version": "2026.10-R1",
         "last_verified_at": dataset_verified_at,
@@ -130,4 +152,4 @@ def load_fleet_watch():
         "headline_tr": f"🚨 Filo & Motor Radarı: {grounding_count} Kritik Motor Sorunu · {delivery_delay_count} OEM Teslimat Gecikmesi",
         "headline_en": f"🚨 Fleet Watch: {grounding_count} Engine Grounding Issues · {delivery_delay_count} OEM Delivery Delays",
         "programs": programs,
-    }
+    }, now=now)

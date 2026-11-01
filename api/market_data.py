@@ -232,91 +232,8 @@ def save_iata_fuel_data(data):
 
 
 def fetch_iata_fuel_monitor(gemini_api_key="", timeout=10):
-    """Fetch official weekly Jet Fuel Price and Crack Spread from IATA's Fuel Monitor page.
-
-    Combines HTML headline parsing and multimodal table parsing (when Gemini key is available),
-    caching successful results in data/iata_fuel_cache.json. Gracefully falls back to cache on any error.
-    """
-    cached = get_cached_iata_fuel_data()
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    }
-    extracted = None
-    try:
-        req = urllib.request.Request(IATA_FUEL_MONITOR_URL, headers=headers)
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            html = resp.read().decode("utf-8", errors="ignore")
-
-        headline_price = None
-        headline_match = re.search(r"global average jet fuel price.*?to\s*\$?([0-9]+\.?[0-9]*)/bbl", html, re.I)
-        if headline_match:
-            try:
-                headline_price = float(headline_match.group(1))
-            except ValueError:
-                pass
-
-        img_match = re.search(r'src=["\']([^"\']*fuel_price_analysis[^"\']*)["\']', html, re.I)
-        img_url = img_match.group(1) if img_match else ""
-        if img_url and img_url.startswith("/"):
-            img_url = "https://www.iata.org" + img_url
-
-        if img_url and gemini_api_key:
-            try:
-                import base64
-                img_req = urllib.request.Request(img_url, headers=headers)
-                with urllib.request.urlopen(img_req, timeout=timeout) as img_resp:
-                    img_bytes = img_resp.read()
-                b64 = base64.b64encode(img_bytes).decode("utf-8")
-                prompt = (
-                    "Analyze this IATA Fuel Price Analysis table image. Return a JSON object with: "
-                    "week_ending (string, e.g. '16 Oct 2026'), "
-                    "jet_fuel_price_bbl (number, in $/bbl for global Jet fuel price), "
-                    "brent_price_bbl (number, Oil Price Dated Brent in $/bbl), "
-                    "crack_spread_bbl (number, Crack Spread in $/bbl), "
-                    "weekly_change_pct (number, Crack spread prior week change %). "
-                    "Only return valid JSON."
-                )
-                payload = {
-                    "contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": "image/jpeg", "data": b64}}]}],
-                    "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"},
-                }
-                greq = urllib.request.Request(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}",
-                    data=json.dumps(payload).encode("utf-8"),
-                    headers={"Content-Type": "application/json"},
-                )
-                with urllib.request.urlopen(greq, timeout=timeout) as gresp:
-                    gres = json.loads(gresp.read().decode("utf-8"))
-                    cand = gres.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                    parsed = json.loads(cand)
-                    if "crack_spread_bbl" in parsed:
-                        as_of_iso = parse_iata_week_ending(parsed.get("week_ending", ""))
-                        extracted = {
-                            "as_of": as_of_iso,
-                            "week_ending": parsed.get("week_ending", ""),
-                            "jet_fuel_price_bbl": float(parsed.get("jet_fuel_price_bbl", 0)),
-                            "brent_price_bbl": float(parsed.get("brent_price_bbl", 0)),
-                            "crack_spread_bbl": float(parsed["crack_spread_bbl"]),
-                            "weekly_pct": float(parsed.get("weekly_change_pct", 0)),
-                            "source": "IATA / Platts Jet Fuel Price Monitor",
-                            "updated_at": utc_now().isoformat(),
-                        }
-                        save_iata_fuel_data(extracted)
-            except Exception:
-                pass
-
-        if not extracted and headline_price and cached:
-            extracted = dict(cached)
-            extracted["jet_fuel_price_bbl"] = headline_price
-
-    except Exception:
-        pass
-
-    return extracted or cached
+    """Compatibility entry point: IATA is link-only, so neither network nor cache is read."""
+    return None
 
 
 def ecb_fx_url(start_date, end_date):
@@ -381,46 +298,54 @@ def is_fx_series(series_id):
     return str(series_id).startswith("fx_usd_")
 
 
-def apply_display_settings(market):
-    """Read-time view of a stored market panel: without display_fx, no fx_usd_* items and no fx events.
+def _is_futures_source(source):
+    label = str(source or "").lower()
+    return label.startswith("ice ") or any(marker in label for marker in ("yahoo", "bz=f", "futures"))
 
-    Archives written before the switch (or with it on) still hold FX rows; they are hidden here, not rewritten.
-    Also hides us_gulf_coast_jet_fuel from public display.
-    Ensures jet_fuel_brent_crack_spread reflects the official IATA / Platts monitor.
-    """
+
+def _market_item_quality(item):
+    item = dict(item)
+    item["changes"] = dict(item.get("changes") or {})
+    frequency = item.get("frequency", "daily")
+    weekly = frequency == "weekly" or "iata" in str(item.get("source", "")).lower()
+    if weekly:
+        item["changes"]["daily_pct"] = None
+    try:
+        observed_on = date.fromisoformat(item["as_of"])
+        age_days = max(0, (utc_now().date() - observed_on).days)
+        item.update(age_days=age_days, carried_forward=age_days > 0)
+        limits = load_market_config().get("quality", {})
+        maximum_age = limits.get("weekly_max_age_days", 14) if weekly else limits.get("daily_max_age_days", 4)
+        item["is_stale"] = age_days > maximum_age
+        item["data_status"] = "stale" if item["is_stale"] else "current"
+    except (KeyError, TypeError, ValueError):
+        item.update(is_stale=True, data_status="date_unknown")
+    return item
+
+
+def apply_display_settings(market):
+    """Present stored observations without replacing them with a local cache or a different series."""
     if not isinstance(market, dict):
         return market
     visible = dict(market)
-    show_fx = display_fx()
-    iata_data = get_cached_iata_fuel_data()
     items = []
-    for item in market.get("items", []):
-        series_id = item.get("series_id")
-        if series_id == "us_gulf_coast_jet_fuel":
+    warnings = []
+    for original in market.get("items", []):
+        series_id = original.get("series_id")
+        if series_id == "us_gulf_coast_jet_fuel" or (not display_fx() and is_fx_series(series_id)):
             continue
-        if not show_fx and is_fx_series(series_id):
+        if series_id == "brent_spot" and _is_futures_source(original.get("source")):
+            warnings.append("Legacy futures data was removed from the spot series; awaiting a verified spot observation.")
             continue
-        if series_id == "jet_fuel_brent_crack_spread" and iata_data and "crack_spread_bbl" in iata_data:
-            item = dict(item)
-            item["value"] = float(iata_data["crack_spread_bbl"])
-            item["source"] = iata_data.get("source", "IATA / Platts Jet Fuel Price Monitor")
-            item["name"] = "IATA Jet yakıtı - Brent marjı"
-            if "as_of" in iata_data:
-                item["as_of"] = iata_data["as_of"]
-                try:
-                    observed_on = date.fromisoformat(iata_data["as_of"])
-                    age_days = (utc_now().date() - observed_on).days
-                    item["carried_forward"] = age_days > 0
-                    item["age_days"] = max(age_days, 0)
-                except ValueError:
-                    pass
-            if "weekly_pct" in iata_data:
-                item["changes"] = dict(item.get("changes") or {})
-                item["changes"]["weekly_pct"] = float(iata_data["weekly_pct"])
-                item["changes"]["daily_pct"] = 0.0
-        items.append(item)
+        if "iata" in str(original.get("source", "")).lower():
+            warnings.append("IATA monitor is an external link only; archived monitor values are not republished.")
+            continue
+        items.append(_market_item_quality(original))
     visible["items"] = items
-    if not show_fx:
+    visible["quality_warnings"] = warnings
+    if warnings or any(item.get("is_stale") for item in items):
+        visible["status"] = "partial" if items else "unavailable"
+    if not display_fx():
         visible["events"] = [event for event in market.get("events", []) if event.get("event_type") != "fx_currency"]
     return visible
 
@@ -469,7 +394,15 @@ def upsert_observations(path, observations_by_series, fetched_at=None, provider_
     definitions = market_series_definitions(provider_by_series)
     fetched_timestamp = (fetched_at or utc_now()).isoformat()
     with sqlite3.connect(target) as connection:
-        for series_id, definition in definitions.items():
+        for series_id in observations_by_series:
+            if not observations_by_series[series_id]:
+                continue
+            definition = definitions[series_id]
+            prior = connection.execute("SELECT source FROM market_series WHERE series_id = ?", (series_id,)).fetchone()
+            repair_spot = series_id == "brent_spot" and prior and _is_futures_source(prior[0]) and not _is_futures_source(definition["source"])
+            if repair_spot and observations_by_series[series_id]:
+                # Rebuild only this derived cache from approved observations; mixed historical values have no trustworthy provenance.
+                connection.execute("DELETE FROM market_observations WHERE series_id = ?", (series_id,))
             connection.execute(
                 """
                 INSERT INTO market_series (series_id, name, unit, source, frequency)
@@ -499,6 +432,9 @@ def load_observations(path, series_id):
     if not target.exists():
         return []
     with sqlite3.connect(target) as connection:
+        provenance = connection.execute("SELECT source FROM market_series WHERE series_id = ?", (series_id,)).fetchone()
+        if series_id == "brent_spot" and provenance and _is_futures_source(provenance[0]):
+            return []
         rows = connection.execute(
             "SELECT date, value FROM market_observations WHERE series_id = ? ORDER BY date",
             (series_id,),
@@ -899,42 +835,21 @@ def record_article_events(path, articles):
 
 def build_market_panel(path, provider_by_series=None):
     definitions = market_series_definitions(provider_by_series)
-    jet_provider = (provider_by_series or {}).get("us_gulf_coast_jet_fuel")
+    if database_path(path).exists():
+        with sqlite3.connect(database_path(path)) as connection:
+            stored_sources = dict(connection.execute("SELECT series_id, source FROM market_series"))
+        for series_id, source in stored_sources.items():
+            if series_id in definitions:
+                definitions[series_id]["source"] = source
     indicators = {
         series_id: calculate_series_indicators(load_observations(path, series_id))
         for series_id in definitions
     }
-    crack_provider = (provider_by_series or {}).get("jet_fuel_brent_crack_spread")
-    if crack_provider == "iata":
-        iata_data = get_cached_iata_fuel_data()
-        if iata_data and "crack_spread_bbl" in iata_data:
-            observed_on = date.fromisoformat(iata_data.get("as_of", utc_now().date().isoformat()))
-            crack_spread = {
-                "as_of": observed_on.isoformat(),
-                "value": float(iata_data["crack_spread_bbl"]),
-                "changes": {
-                    "daily_pct": 0.0,
-                    "weekly_pct": float(iata_data.get("weekly_pct", 0.0)),
-                    "monthly_pct": None,
-                },
-                "name": "IATA Jet yakıtı - Brent marjı",
-                "unit": "USD/varil",
-                "source": iata_data.get("source", "IATA / Platts Jet Fuel Price Monitor"),
-                "low_52_weeks": None,
-                "high_52_weeks": None,
-                "position_52_weeks_pct": None,
-                "sparkline": [
-                    {"date": observed_on.isoformat(), "value": float(iata_data["crack_spread_bbl"])}
-                ],
-            }
-        else:
-            crack_spread = None
-    else:
-        crack_spread = calculate_crack_spread(
-            load_observations(path, "brent_spot"),
-            load_observations(path, "us_gulf_coast_jet_fuel"),
-            source_label=_fuel_source({"source": "EIA"}, jet_provider) if jet_provider else "EIA",
-        )
+    crack_spread = calculate_crack_spread(
+        load_observations(path, "brent_spot"),
+        load_observations(path, "us_gulf_coast_jet_fuel"),
+        source_label=definitions["us_gulf_coast_jet_fuel"]["source"],
+    )
     if crack_spread:
         indicators["jet_fuel_brent_crack_spread"] = crack_spread
     items = []
@@ -951,6 +866,7 @@ def build_market_panel(path, provider_by_series=None):
             "name": definition.get("name", indicator.get("name", series_id)),
             "unit": definition.get("unit", indicator.get("unit", "")),
             "source": definition.get("source", indicator.get("source", "")),
+            "frequency": definition.get("frequency", "daily"),
             # as_of is the real observation date (FRED/EIA publish with a lag); age_days says how stale that is today.
             "carried_forward": age_days > 0,
             "age_days": max(age_days, 0),
@@ -1017,11 +933,10 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
         try:
             live_brent_rows = fetch_live_brent()
             if live_brent_rows:
-                provider_by_series["brent_spot"] = "ice"
                 provider_by_series["brent_futures"] = "ice"
                 upsert_observations(
                     target,
-                    {"brent_spot": live_brent_rows, "brent_futures": live_brent_rows},
+                    {"brent_futures": live_brent_rows},
                     provider_by_series=provider_by_series,
                 )
         except Exception as exc:
@@ -1032,12 +947,7 @@ def refresh_market_data(path=None, eia_api_key="", start_date=None, end_date=Non
         else (os.environ.get("ENABLE_IATA_CRACK", "").strip().lower() in ("1", "true", "yes"))
     )
     if should_iata_crack:
-        try:
-            iata_data = fetch_iata_fuel_monitor(gemini_api_key=gemini_api_key)
-            if iata_data and "crack_spread_bbl" in iata_data:
-                provider_by_series["jet_fuel_brent_crack_spread"] = "iata"
-        except Exception as exc:
-            errors.append(f"IATA: {type(exc).__name__}")
+        skipped.append("IATA (external link only)")
     panel, indicators = build_market_panel(target, provider_by_series)
     panel["errors"] = errors
     panel["skipped"] = skipped

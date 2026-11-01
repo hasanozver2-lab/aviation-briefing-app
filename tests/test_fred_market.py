@@ -159,11 +159,14 @@ def test_refresh_market_data_with_live_brent(tmp_path, calls, monkeypatch):
 
     panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", end_date=TODAY, live_brent=True)
     brent = item(panel, "brent_spot")
-    assert brent["value"] == 109.96
-    assert brent["as_of"] == TODAY.isoformat()
-    assert brent["source"] == "ICE Futures (Piyasa Kapanışı)"
-    assert brent["carried_forward"] is False
-    assert brent["age_days"] == 0
+    assert brent["value"] == BRENT[-1][1]
+    assert brent["as_of"] == BRENT[-1][0].isoformat()
+    assert brent["source"] == "FRED (EIA)"
+    futures = item(panel, "brent_futures")
+    assert futures["value"] == 109.96
+    assert futures["as_of"] == TODAY.isoformat()
+    assert "ICE" in futures["source"]
+    assert item(panel, "jet_fuel_brent_crack_spread")["value"] == pytest.approx(JET[-1][1] * 42 - BRENT[-1][1])
     assert panel["fuel_provider"] == "fred"
     assert item(panel, "us_gulf_coast_jet_fuel")["source"] == "FRED (EIA)"
 
@@ -173,16 +176,13 @@ def test_parse_iata_week_ending():
     assert market_data.parse_iata_week_ending("2026-10-16") == "2026-10-16"
 
 
-def test_fetch_iata_fuel_monitor_returns_cached_on_network_failure(monkeypatch):
-    monkeypatch.setattr(market_data, "IATA_FUEL_MONITOR_URL", "http://127.0.0.1:9999/nonexistent")
-    data = market_data.fetch_iata_fuel_monitor()
-    assert data is not None
-    assert data["crack_spread_bbl"] == pytest.approx(65.47)
-    assert data["as_of"] == "2026-10-16"
-    assert "IATA" in data["source"]
+def test_fetch_iata_fuel_monitor_never_reads_network_or_legacy_cache(monkeypatch):
+    monkeypatch.setattr(market_data.urllib.request, "urlopen", lambda *a, **k: pytest.fail("IATA network request"))
+    monkeypatch.setattr(market_data, "get_cached_iata_fuel_data", lambda: pytest.fail("IATA cache read"))
+    assert market_data.fetch_iata_fuel_monitor() is None
 
 
-def test_apply_display_settings_updates_crack_spread_to_iata(monkeypatch):
+def test_apply_display_settings_preserves_observed_crack_spread_without_iata_override(monkeypatch):
     raw_panel = {
         "status": "ok",
         "items": [
@@ -198,15 +198,19 @@ def test_apply_display_settings_updates_crack_spread_to_iata(monkeypatch):
     assert "jet_fuel_brent_crack_spread" in ids
 
     crack = next(it for it in visible["items"] if it["series_id"] == "jet_fuel_brent_crack_spread")
-    assert crack["value"] == pytest.approx(65.47)
-    assert crack["as_of"] == "2026-10-16"
-    assert "IATA / Platts" in crack["source"]
+    assert crack["value"] == pytest.approx(85.54)
+    assert crack["as_of"] == "2026-10-14"
+    assert crack["source"] == "FRED (EIA)"
 
 
 def test_refresh_market_data_with_live_iata_crack(tmp_path, calls, monkeypatch):
+    def forbidden_fetch():
+        pytest.fail("IATA is link-only and must never be ingested")
+    monkeypatch.setattr(market_data, "fetch_iata_fuel_monitor", forbidden_fetch)
     monkeypatch.setattr(market_data, "utc_now", lambda: datetime(TODAY.year, TODAY.month, TODAY.day, 12, tzinfo=timezone.utc))
     panel = market_data.refresh_market_data(tmp_path / "m.sqlite3", end_date=TODAY, live_iata_crack=True)
     crack = item(panel, "jet_fuel_brent_crack_spread")
-    assert crack["value"] == pytest.approx(65.47)
-    assert crack["as_of"] == "2026-10-16"
-    assert "IATA / Platts" in crack["source"]
+    assert crack["value"] == pytest.approx(JET[-1][1] * 42 - BRENT[-1][1])
+    assert crack["as_of"] == BRENT[-1][0].isoformat()
+    assert "FRED (EIA)" in crack["source"]
+    assert "IATA (external link only)" in panel["skipped"]
