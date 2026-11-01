@@ -196,6 +196,7 @@ def test_airspace_radar_browser_interaction():
         assert page.is_visible(".traffic-panel")
         assert any(w in page.text_content(".traffic-panel") for w in ["Uçuş sayısı gösterilmiyor", "Flight counts are unavailable"])
         assert page.locator(".traffic-grid, .traffic-live-dot").count() == 0
+        assert page.locator(".traffic-notice").evaluate("element => getComputedStyle(element).color") == "rgb(255, 255, 255)"
 
         # Navigate to airspace page
         page.click('[data-page="airspace"]')

@@ -153,6 +153,8 @@
     .ticker-row { display: flex; align-items: center; gap: 12px; padding: 0 var(--pad); min-height: 46px; }
     .ticker { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; overflow-x: auto; white-space: nowrap; font: 600 12px/1 var(--mono); scrollbar-width: none; }
     .ticker::-webkit-scrollbar { display: none; }
+    .ticker > span { flex-shrink: 0; padding: 7px 0; }
+    .ticker > span > small { display: block; margin-top: 5px; font-size: 10px; color: var(--muted); }
     .ticker::before { content: "FUEL"; color: var(--faint); }
     .up { color: var(--green); } .down { color: var(--red); }
     .mkt-toggle { flex: none; min-height: 44px; font: 800 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; }
@@ -298,6 +300,7 @@
     .traffic-panel { margin: 14px var(--pad) 0; background: var(--black); border: 1.5px solid var(--black); display: flex; flex-direction: column; }
     .traffic-head { padding: 12px 14px; background: #161619; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #27272A; }
     .traffic-title { font: 800 13px/1.2 var(--sans); letter-spacing: .04em; text-transform: uppercase; color: #FFF; display: flex; align-items: center; gap: 8px; }
+    .traffic-notice { color: #FFF; font: 500 13px/1.5 var(--sans); }
     .traffic-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 8px #22C55E; display: inline-block; flex: none; }
     .traffic-source { font: 600 10.5px/1 var(--mono); color: var(--yellow); text-transform: uppercase; }
     .traffic-link-btn { background: #222226; color: var(--yellow); border: 1px solid #333338; padding: 4px 8px; font: 700 11px/1 var(--sans); cursor: pointer; text-transform: uppercase; }
@@ -1491,7 +1494,7 @@
       const actionBtn = isAirspacePage ? "" : `<button class="traffic-link-btn" type="button" data-page="airspace">${escapeHtml(t("traffic_airspace_btn"))}</button>`;
       const isTr = state.uiLang === "tr";
       if (traffic.status === "unavailable" || traffic.is_estimate || traffic.data_type === "modelled_estimate") {
-        return `<div class="traffic-panel" lang="${state.uiLang}"><div class="traffic-head"><span>${escapeHtml(isTr ? "Canlı uçuş trafiği verisi bağlı değil. Uçuş sayısı gösterilmiyor." : "A verified flight traffic feed is not connected. Flight counts are unavailable.")}</span>${actionBtn}</div></div>`;
+        return `<div class="traffic-panel" lang="${state.uiLang}"><div class="traffic-head"><span class="traffic-notice">${escapeHtml(isTr ? "Canlı uçuş trafiği verisi bağlı değil. Uçuş sayısı gösterilmiyor." : "A verified flight traffic feed is not connected. Flight counts are unavailable.")}</span>${actionBtn}</div></div>`;
       }
       return `<div class="traffic-panel" lang="${state.uiLang}">
         <div class="traffic-head">
